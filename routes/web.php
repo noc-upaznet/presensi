@@ -1,0 +1,22 @@
+<?php
+
+use App\Livewire\Dashboard;
+use Illuminate\Support\Facades\Route;
+use App\Livewire\Karyawan\JadwalShift;
+use App\Livewire\Karyawan\DataKaryawan;
+use App\Livewire\Karyawan\TambahJadwalShift;
+use App\Livewire\Karyawan\DetailDataKaryawan;
+use App\Livewire\Karyawan\TambahDataKaryawan;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/dashboard', Dashboard::class)->name('dashboard');
+
+Route::get('/data-karyawan', DataKaryawan::class)->name('data-karyawan');
+
+Route::get('/tambah-data-karyawan', TambahDataKaryawan::class)->name('tambah-data-karyawan');
+Route::get('/detail-data-karyawan', DetailDataKaryawan::class)->name('detail-data-karyawan');
+Route::get('/jadwal-shift', JadwalShift::class)->name('jadwal-shift');
+Route::get('/jadwal-shift/tambah-jadwal-shift', TambahJadwalShift::class)->name('tambah-jadwal-shift');

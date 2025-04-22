@@ -1,0 +1,104 @@
+<?php
+
+namespace App\Livewire\Karyawan;
+
+use App\Livewire\Forms\TambahDataKaryawanForm;
+use App\Models\M_DataKaryawan;
+use Livewire\Component;
+
+class TambahDataKaryawan extends Component
+{
+    public TambahDataKaryawanForm $form;
+
+    public $step = 1;
+
+    public $identitas = [
+        'jenis_identitas' => '',
+        'nomorKTP' => '',
+        'nomorVISA' => '',
+    ];
+    public $jenis_identitas = '';
+
+    public function updatedFormGunakanAlamatKTP($value)
+    {
+        if ($value) {
+            $this->form->alamatDomisili = $this->form->alamatKTP;
+        } else {
+            $this->form->alamatDomisili = '';
+        }
+    }
+
+    // public function updatedFormAlamatKTP($value)
+    // {
+    //     if ($this->form->gunakanAlamatKTP) {
+    //         $this->form->alamatDomisili = $value;
+    //     }
+    // }
+
+    public function nextStep() {
+        $this->step++;
+    }
+
+    public function prevStep() {
+        $this->step--;
+    }
+
+    public function store() {
+        // dd($this->form);
+        $this->form->validate();
+        $data = M_DataKaryawan::create([
+            'nama_karyawan' => $this->form->nama_karyawan,
+            'email' => $this->form->email,
+            'no_hp' => $this->form->no_hp,
+            'tempat_lahir' => $this->form->tempat_lahir,
+            'tanggal_lahir' => $this->form->tanggal_lahir,
+            'jenis_kelamin' => $this->form->jenis_kelamin,
+            'status_perkawinan' => $this->form->status_perkawinan,
+            'gol_darah' => $this->form->gol_darah,
+            'agama' => $this->form->agama,
+            'jenis_identitas' => $this->jenis_identitas,
+            'nik' => $this->form->nomorKTP,
+            'visa' => $this->form->nomorVISA,
+            'alamat_ktp' => $this->form->alamatKTP,
+            'alamat_domisili' => $this->form->alamatDomisili,
+            'npk/nip_karyawan' => $this->form->nip_karyawan,
+            'status_karyawan' => $this->form->status_karyawan,
+            'tgl_masuk' => $this->form->tgl_masuk,
+            'tgl_keluar' => $this->form->tgl_keluar,
+            'entitas' => $this->form->entitas,
+            'divisi' => $this->form->divisi,
+            'jabatan' => $this->form->jabatan,
+            'posisi' => $this->form->posisi,
+            'sistem_kerja' => $this->form->sistem_kerja,
+            'spv' => $this->form->spv,
+            'gaji_pokok' => $this->form->gaji_pokok,
+            'tunjangan_jabatan' => $this->form->tunjangan_jabatan,
+            'bonus' => $this->form->bonus,
+            'jenis_penggajian' => $this->form->jenis_penggajian,
+            'nama_bank' => $this->form->nama_bank,
+            'no_rek' => $this->form->no_rek,
+            'nama_pemilik_rekening' => $this->form->nama_pemilik_rekening,
+            'no_bpjs_tk' => $this->form->no_bpjs_tk,
+            'npp_bpjs_tk' => $this->form->npp_bpjs_tk,
+            'tgl_aktif_bpjstk' => $this->form->tgl_aktif_bpjstk,
+            'no_bpjs' => $this->form->no_bpjs,
+            'anggota_bpjs' => $this->form->anggota_bpjs,
+            'tgl_aktif_bpjs' => $this->form->tgl_aktif_bpjs,
+            'penanggung' => $this->form->penanggung,
+        ]);
+        // dd($data);
+
+        $this->form->reset();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Saved',
+            'icon' => 'success',
+            'text' => 'Data has been saved successfully'
+        ]);
+    }
+    public function render()
+    {
+        logger('Jenis Identitas: ' . $this->identitas['jenis_identitas']);
+        return view('livewire.karyawan.tambah-data-karyawan');
+    }
+}
