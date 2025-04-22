@@ -60,6 +60,30 @@
                     <p>Pembagian Shift</p>
                 </a>
             </li>
+
+            <li class="nav-item">
+                <a href="{{ route('riwayat-presensi') }}" 
+                   class="nav-link {{ request()->routeIs('riwayat-presensi') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-list-task"></i>
+                    <p>Riwayat Presensi</p>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('pengajuan-izin-cuti') }}" 
+                   class="nav-link {{ request()->routeIs('pengajuan-izin-cuti') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-file-earmark-text"></i>
+                    <p>Pengajuan Cuti/Izin</p>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('ganti-password') }}" 
+                   class="nav-link {{ request()->routeIs('ganti-password') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-"></i>
+                    <p>Pengajuan Cuti/Izin</p>
+                </a>
+            </li>
             
         </ul>
         <!--end::Sidebar Menu-->
