@@ -9,7 +9,10 @@ use App\Livewire\Karyawan\TambahJadwalShift;
 use App\Livewire\Karyawan\DetailDataKaryawan;
 use App\Livewire\Karyawan\TambahDataKaryawan;
 use App\Livewire\PengajuanCutiIzin;
+use App\Livewire\PengajuanLembur;
+use App\Livewire\ProfilePic;
 use App\Livewire\RiwayatPresensi;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 Route::get('/', function () {
     return view('welcome');
@@ -29,3 +32,7 @@ Route::get('/riwayat-presensi', RiwayatPresensi::class)->name('riwayat-presensi'
 Route::get('/pengajuan-izin-cuti', PengajuanCutiIzin::class)->name('pengajuan-izin-cuti');
 
 Route::get('/ganti-password', GantiPassword::class)->name('ganti-password');
+
+Route::get('/pengajuan-lembur',PengajuanLembur::class)->name('pengajuan-lembur');
+
+Route::get('/profile-pic', ProfilePic::class)->name('profile-pic'); 

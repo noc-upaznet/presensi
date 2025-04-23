@@ -78,10 +78,26 @@
             </li>
 
             <li class="nav-item">
+                <a href="{{ route('pengajuan-lembur') }}" 
+                   class="nav-link {{ request()->routeIs('pengajuan-lembur') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-alarm"></i>
+                    <p>Pengajuan Lembur</p>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('profile-pic') }}" 
+                   class="nav-link {{ request()->routeIs('profile-pic') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-person"></i>
+                    <p>Profile Saya</p>
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a href="{{ route('ganti-password') }}" 
                    class="nav-link {{ request()->routeIs('ganti-password') ? 'active' : '' }}">
-                    <i class="nav-icon bi bi-"></i>
-                    <p>Pengajuan Cuti/Izin</p>
+                    <i class="nav-icon bi bi-lock-fill"></i>
+                    <p>Ganti Password</p>
                 </a>
             </li>
             

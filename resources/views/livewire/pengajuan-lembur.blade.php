@@ -3,12 +3,12 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-6">
-                    <h3 class="mb-0" style="color: var(--bs-body-color);">Pengajuan Cuti/Izin</h3>
+                    <h3 class="mb-0" style="color: var(--bs-body-color);">Pengajuan Lembur</h3>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Pengajuan Cuti/Izin</li>
+                        <li class="breadcrumb-item active" aria-current="page">Pengajuan Lembur</li>
                     </ol>
                 </div>
             </div>
@@ -19,7 +19,7 @@
         <div class="container-fluid">
             <div class="mb-4">
                 <div class="card-header">
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahPengajuan">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahLembur">
                         <i class="fa-solid fa-plus"></i> Tambah
                     </button>
 
@@ -29,24 +29,24 @@
                         <thead>
                             <tr class="users-table-info">
                                 <th>Tanggal</th>
-                                <th>Jenis Pengajuan</th>
-                                <th>Waktu</th>
-                                <th>Deskripsi</th>
+                                <th>Mulai</th>
+                                <th>Selesai</th>
+                                <th>Kegiatan</th>
                                 <th>
                                     <label class="users-table__checkbox ms-20">
-                                        File
+                                        Dokumentasi
                                     </label>
                                 </th>
-                                <th>Status</th>
+                                <th>Approval</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td style="color: var(--bs-body-color);">22-04-2025</td>
-                                <td style="color: var(--bs-body-color);">Cuti</td>
-                                <td style="color: var(--bs-body-color);">Full-Day</td>
-                                <td style="color: var(--bs-body-color);">Ambil Jatah Cuti Bulan April</td>
+                                <td style="color: var(--bs-body-color);">15.00</td>
+                                <td style="color: var(--bs-body-color);">22.00</td>
+                                <td style="color: var(--bs-body-color);">Layanan Helpdesk Menggantikan Dimas sakit</td>
                                 <td style="color: var(--bs-body-color);">
                                     <label class="users-table__checkbox">
                                         <div class="categories-table-img">
@@ -64,20 +64,22 @@
                                     </label>
                                 </td>
                                 <td>
-                                    <span class="badge bg-success">Disetujui</span>
+                                    <span class="badge bg-success">SPV</span>
+                                    <span class="badge bg-warning">HR</span>
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-info" data-bs-toggle="modal"
-                                        data-bs-target="#modalDetailPengajuan2">
+                                        data-bs-target="#modalDetailPengajuanLembur1">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
                                 </td>
                             </tr>
                             <tr>
-                                <td style="color: var(--bs-body-color);">12-02-2025</td>
-                                <td style="color: var(--bs-body-color);">Izin</td>
-                                <td style="color: var(--bs-body-color);">Full-Day</td>
-                                <td style="color: var(--bs-body-color);">Sakit demam sudah 2 Hari</td>
+                                <td style="color: var(--bs-body-color);">18-04-2025</td>
+                                <td style="color: var(--bs-body-color);">16.10</td>
+                                <td style="color: var(--bs-body-color);">18.10</td>
+                                <td style="color: var(--bs-body-color);">Update laporan untuk penggajian karyawan bulan
+                                    ini</td>
                                 <td style="color: var(--bs-body-color);">
                                     <label class="users-table__checkbox">
                                         <div class="categories-table-img">
@@ -94,11 +96,12 @@
                                     </label>
                                 </td>
                                 <td>
-                                    <span class="badge bg-warning">Menunggu persetujuan</span>
+                                    <span class="badge bg-success">SPV</span>
+                                    <span class="badge bg-success">HR</span>
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-info" data-bs-toggle="modal"
-                                        data-bs-target="#modalDetailPengajuan">
+                                        data-bs-target="#modalDetailPengajuanLembur2">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
                                 </td>
@@ -110,41 +113,40 @@
         </div>
     </div>
 
-    <!-- Modal Tambah Pengajuan Cuti/Izin -->
-    <div class="modal fade" id="modalTambahPengajuan" tabindex="-1" aria-labelledby="modalTambahPengajuanLabel"
+    <!-- Modal Tambah Pengajuan Lembur -->
+    <div class="modal fade" id="modalTambahLembur" tabindex="-1" aria-labelledby="modalTambahLemburLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-danger">
-                    <h5 class="modal-title text-white" id="modalTambahPengajuanLabel">Pengajuan Izin/Cuti</h5>
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title text-white" id="modalTambahPengajuanLabel">Pengajuan Lembur</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 <div class="modal-body p-4">
                     <form>
                         <div class="mb-3">
-                            <label for="jenis_pengajuan" class="form-label">Jenis Pengajuan</label>
-                            <select class="form-select" id="jenis_pengajuan">
-                                <option>Izin</option>
-                                <option>Cuti</option>
-                            </select>
+                            <label for="tanggal" class="form-label fw-bold">Tanggal</label>
+                            <input type="text" class="form-control" id="tanggal" placeholder="17 Maret 2025">
                         </div>
                         <div class="mb-3">
-                            <label for="tanggal" class="form-label">Tanggal</label>
-                            <input type="text" class="form-control" id="tanggal" placeholder="13 - 17 Maret 2025">
+                            <label class="form-label fw-bold">Rentang Waktu</label>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="jam_mulai" class="form-label">Jam Mulai</label>
+                                    <input type="time" id="jam_mulai" class="form-control" wire:model="jam_mulai">
+                                </div>
+                                <div class="col">
+                                    <label for="jam_selesai" class="form-label">Jam Selesai</label>
+                                    <input type="time" id="jam_selesai" class="form-control" wire:model="jam_selesai">
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label for="waktu" class="form-label">Waktu</label>
-                            <select class="form-select" id="waktu">
-                                <option>Sehari Penuh</option>
-                                <option>Setengah Hari</option>
-                            </select>
+                            <label for="keterangan" class="form-label fw-bold">Keterangan</label>
+                            <input type="text" class="form-control" id="keterangan" placeholder="Layanan Helpdesk">
                         </div>
                         <div class="mb-3">
-                            <label for="keterangan" class="form-label">Keterangan</label>
-                            <input type="text" class="form-control" id="keterangan" placeholder="Contoh: Demam Tinggi">
-                        </div>
-                        <div class="mb-3">
-                            <label for="file" class="form-label">File (Opsional)</label>
+                            <label for="file" class="form-label fw-bold">File (Opsional)</label>
                             <input type="file" class="form-control" id="file">
                             <div class="form-text">Max file size: 5MB</div>
                         </div>
@@ -158,13 +160,13 @@
         </div>
     </div>
 
-    <!-- Modal Detail Pengajuan Izin Pending -->
-    <div class="modal fade" id="modalDetailPengajuan" tabindex="-1" aria-labelledby="modalDetailPengajuanLabel"
-        aria-hidden="true">
+    <!-- Modal Detail Pengajuan Lembur Pending -->
+    <div class="modal fade" id="modalDetailPengajuanLembur1" tabindex="-1"
+        aria-labelledby="modalDetailPengajuanLabelLembur1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content px-3 py-4">
                 <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold">Detail Pengajuan Izin/Cuti</h5>
+                    <h5 class="modal-title fw-bold">Detail Pengajuan Lembur</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
 
@@ -173,7 +175,7 @@
                         <img src="./assets/img/user4-128x128.jpg" alt="Foto Pegawai" class="rounded-circle" width="80"
                             height="80">
                         <h5 class="mt-3 mb-0 fw-bold">Nadia Safira Khairunnisa</h5>
-                        <small class="text-muted">Admin Human Resources</small>
+                        <small class="text-muted">Billing</small>
                     </div>
 
                     <div class="row justify-content-center">
@@ -186,29 +188,33 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-5 text-muted">Nama Pengajuan</div>
-                                <div class="col-7 fw-semibold">Izin Sakit</div>
+                                <div class="col-5 text-muted">Waktu Lembur</div>
+                                <div class="col-7 fw-semibold">6 April 2025 Pukul 16.10 - 19.00 WIB</div>
                             </div>
                             <div class="row mb-2">
-                                <div class="col-5 text-muted">Jenis</div>
-                                <div class="col-7 fw-semibold">Sehari Penuh</div>
+                                <div class="col-5 text-muted">Deskripsi</div>
+                                <div class="col-7 fw-semibold">Update & input data pelanggan bulan ini</div>
                             </div>
                             <div class="row mb-2">
-                                <div class="col-5 text-muted">Tanggal Cuti</div>
-                                <div class="col-7 fw-semibold">13 - 17 Mar 2025</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-5 text-muted">Lama Izin/Cuti</div>
-                                <div class="col-7 fw-semibold">2 Hari</div>
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col-5 text-muted">Tanggal Permohonan</div>
-                                <div class="col-7 fw-semibold">13 Mar 2025</div>
+                                <div class="col-5 text-muted">Lampiran Gambar</div>
+                                <div class="col-7 fw-semibold">
+                                    <picture>
+                                        <source srcset="assets/img/categories/03.webp" type="image/webp"><img
+                                            src="./img/categories/03.jpg" alt="category">
+                                    </picture>
+                                </div>
                             </div>
 
                             <div class="position-relative ps-4 ms-1">
-                                <div class="timeline-dot bg-dark"></div>
-                                <div class="fw-semibold">Menunggu Persetujuan dari Amin Syukron</div>
+                                <div class="timeline-dot bg-success"></div>
+                                <div class="fw-semibold">Disetujui Oleh SPV Finance</div>
+                                <div class="text-muted ms-4">13 Maret 2025 11:20:31 WIB</div>
+
+                                <div class="timeline-line"></div> <!-- ini garis -->
+                            </div>
+                            <div class="position-relative ps-4 ms-1">
+                                <div class="timeline-dot bg-warning"></div>
+                                <div class="fw-semibold">Menunggu Persetujuan dari HR</div>
 
                                 <div class="timeline-line"></div> <!-- ini garis -->
                             </div>
@@ -228,14 +234,13 @@
         </div>
     </div>
 
-    
-    <!-- Modal Detail Pengajuan Izin Sukses -->
-    <div class="modal fade" id="modalDetailPengajuan2" tabindex="-1" aria-labelledby="modalDetailPengajuanLabel2"
-        aria-hidden="true">
+    <!-- Modal Detail Pengajuan Lembur Sukses -->
+    <div class="modal fade" id="modalDetailPengajuanLembur2" tabindex="-1"
+        aria-labelledby="modalDetailPengajuanLabelLembur2" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content px-3 py-4">
                 <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold">Detail Pengajuan Izin/Cuti</h5>
+                    <h5 class="modal-title fw-bold">Detail Pengajuan Lembur</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
 
@@ -244,7 +249,7 @@
                         <img src="./assets/img/user4-128x128.jpg" alt="Foto Pegawai" class="rounded-circle" width="80"
                             height="80">
                         <h5 class="mt-3 mb-0 fw-bold">Nadia Safira Khairunnisa</h5>
-                        <small class="text-muted">Admin Human Resources</small>
+                        <small class="text-muted">Billing</small>
                     </div>
 
                     <div class="row justify-content-center">
@@ -257,31 +262,33 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-5 text-muted">Nama Pengajuan</div>
-                                <div class="col-7 fw-semibold">Izin Sakit</div>
+                                <div class="col-5 text-muted">Waktu Lembur</div>
+                                <div class="col-7 fw-semibold">6 April 2025 Pukul 16.10 - 19.00 WIB</div>
                             </div>
                             <div class="row mb-2">
-                                <div class="col-5 text-muted">Jenis</div>
-                                <div class="col-7 fw-semibold">Sehari Penuh</div>
+                                <div class="col-5 text-muted">Deskripsi</div>
+                                <div class="col-7 fw-semibold">Update & input data pelanggan bulan ini</div>
                             </div>
                             <div class="row mb-2">
-                                <div class="col-5 text-muted">Tanggal Cuti</div>
-                                <div class="col-7 fw-semibold">13 - 17 Mar 2025</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-5 text-muted">Lama Izin/Cuti</div>
-                                <div class="col-7 fw-semibold">2 Hari</div>
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col-5 text-muted">Tanggal Permohonan</div>
-                                <div class="col-7 fw-semibold">13 Mar 2025</div>
+                                <div class="col-5 text-muted">Lampiran Gambar</div>
+                                <div class="col-7 fw-semibold">
+                                    <picture>
+                                        <source srcset="assets/img/categories/03.webp" type="image/webp"><img
+                                            src="./img/categories/03.jpg" alt="category">
+                                    </picture>
+                                </div>
                             </div>
 
                             <div class="position-relative ps-4 ms-1">
                                 <div class="timeline-dot bg-success"></div>
-                                <div class="fw-semibold">Disetujui oleh Amin Syukron</div>
-                                <div class="text-muted ms-4">13 Maret 2025 09:10:41 WIB</div>
-
+                                <div class="fw-semibold">Disetujui Oleh SPV Finance</div>
+                                <div class="text-muted ms-4">13 Maret 2025 11:20:31 WIB</div>
+                                <div class="timeline-line"></div> <!-- ini garis -->
+                            </div>
+                            <div class="position-relative ps-4 ms-1">
+                                <div class="timeline-dot bg-success"></div>
+                                <div class="fw-semibold">Disetujui Oleh HR</div>
+                                <div class="text-muted ms-4">13 Maret 2025 15:30:00 WIB</div>
                                 <div class="timeline-line"></div> <!-- ini garis -->
                             </div>
                             <div class="position-relative ps-4 ms-1">
@@ -318,9 +325,9 @@
             left: 4px;
             top: 12px;
         }
+
         .text-muted {
             color: var(--bs-body-color) !important;
         }
     </style>
 </div>
-

@@ -22,17 +22,17 @@
                         <form>
                             <div class="card-body">
                                 <div class="form-group mb-3">
-                                    <label for="currentPassword">Password sekarang:</label>
+                                    <label for="currentPassword" class="fw-bold">Password sekarang:</label>
                                     <input type="password" class="form-control" id="currentPassword"
                                         placeholder="Masukkan password sekarang">
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label for="newPassword">Password baru:</label>
+                                    <label for="newPassword" class="fw-bold">Password baru:</label>
                                     <input type="password" class="form-control" id="newPassword"
                                         placeholder="Masukkan password baru">
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label for="confirmPassword">Konfirmasi password baru:</label>
+                                    <label for="confirmPassword" class="fw-bold">Konfirmasi password baru:</label>
                                     <input type="password" class="form-control" id="confirmPassword"
                                         placeholder="Ulangi password baru">
                                 </div>                                
