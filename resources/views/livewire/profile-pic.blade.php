@@ -15,66 +15,200 @@
         </div>
     </div>
 
-    <div class="container mx-auto py-6 px-4">
-        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col md:flex-row items-center gap-6">
-            <!-- Foto Profil -->
-            <div class="flex-shrink-0">
-                <img src="./assets/img/user4-128x128.jpg" alt="Foto Pegawai"
-                    class="w-28 h-28 rounded-full border object-cover">
-            </div>
-
-            <!-- Info Karyawan -->
-            <div class="flex-1 w-full">
-                <!-- Header: Nama, Role, ID, Status -->
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center w-full">
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-800">Nadia Safira Khairunnisa</h2>
-                        <p class="text-sm text-gray-500 leading-tight">Marketing</p>
-                        <p class="text-sm text-gray-500 leading-tight">ID: 12345678</p>
-                    </div>
-                    <span class="mt-2 md:mt-0 bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full">Aktif</span>
+    <div class="container" style="max-width: 720px;">
+        <div class="card shadow-sm rounded-4 my-4">
+            <div class="card-body d-flex flex-column flex-md-row align-items-start gap-4">
+                <!-- Foto Profil -->
+                <div class="text-center">
+                    <img src="./assets/img/user4-128x128.jpg" class="rounded-circle border border-primary" width="96"
+                        height="96" alt="Foto Pegawai">
                 </div>
 
-                <!-- Details -->
-                <div class="mt-6">
-                    <h3 class="text-sm font-semibold text-gray-700 mb-1">Details</h3>
-                    <div class="text-sm text-gray-600 space-y-1">
-                        <p>Email: <span class="font-medium">dmarketing2@gmail.com</span></p>
-                        <p>No. Hp: <span class="font-medium">087876543216</span></p>
-                    </div>
-                </div>
-
-                <!-- Performance -->
-                <div class="mt-6">
-                    <h3 class="text-sm font-semibold text-gray-700 mb-1">Performance</h3>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-end gap-1">
-                            <span class="text-2xl font-bold text-gray-800">87</span>
-                            <span class="text-gray-400 text-sm">/100</span>
+                <!-- Info Pegawai -->
+                <div class="flex-grow-1 w-100">
+                    <div
+                        class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                        <div>
+                            <h5 class="fw-bold mb-1">Nadia Safira Khairunnisa</h5>
+                            <p class="mb-0 text-muted small">Marketing</p>
+                            <p class="mb-0 text-muted small">ID: 12345678</p>
                         </div>
-                        <img src="./assets/img/categories/04.jpg" alt="Top Performer" class="h-10 object-contain">
+                        <span class="badge bg-light text-primary fw-semibold px-3 py-1 mt-2 mt-md-0">Aktif</span>
                     </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                        <div class="bg-blue-500 h-2.5 rounded-full" style="width: 87%"></div>
+
+                    <hr class="my-3">
+
+                    <!-- Detail Kontak -->
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <small class="text-muted">Email</small>
+                            <div class="fw-medium">dmarketing2@gmail.com</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <small class="text-muted">No. Hp</small>
+                            <div class="fw-medium">087876543216</div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Info Tambahan -->
-                <div class="mt-6 text-sm text-gray-600 space-y-1">
-                    <p><span class="font-medium">Tanggal Bergabung:</span> 10 Nov 2024</p>
-                    <p><span class="font-medium">Rekruiter:</span> Dimas Pradana</p>
-                </div>
+                    <!-- Performance -->
+                    <div class="row align-items-start mt-3">
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-sm-6 mb-3">
+                                    <p class="text-muted mb-1">Performance</p>
+                                    <div class="d-flex align-items-end gap-1">
+                                        <span class="fs-4 fw-bold text-dark">87</span>
+                                        <span class="text-muted">/100</span>
+                                    </div>
+                                    <div class="progress" style="height: 6px; width: 100%; max-width: 240px;">
+                                        <div class="progress-bar bg-primary" style="width: 87%;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 d-flex align-items-center justify-content-end">
+                                    <img src="./assets/img/categories/04.jpg" alt="Top Performer"
+                                        style="height: 48px; object-fit: contain;">
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="mt-6 text-center">
-                    <button class="btn btn-primary" data-bs-target="#">
-                        View Details
-                    </button>
-                    {{-- <a href="#"
-                        class="inline-block px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
-                        View Details
-                    </a> --}}
+                        <!-- Info Lain -->
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <small class="text-muted">Tanggal Bergabung</small>
+                                <div class="fw-medium">10 Nov 2024</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <small class="text-muted">Rekruiter</small>
+                                <div class="fw-medium">Dimas Pradana</div>
+                            </div>
+                        </div>
+
+                        <!-- Tombol -->
+                        <div class="text-end">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalDetailProfil">
+                                View Detail
+                            </button>
+
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Modal Detail Profil -->
+        <div class="modal fade" id="modalDetailProfil" tabindex="-1" aria-labelledby="modalDetailProfilLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content custom-rounded">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalDetailProfilLabel">Profil Saya</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex align-items-center mb-4 border-bottom pb-3 mt-3">
+                            <img src="./assets/img/user4-128x128.jpg" alt="Avatar" class="rounded-circle me-3"
+                                width="64" height="64">
+                            <div>
+                                <h5 class="mb-0">Nadia Safira Khairunnisa</h5>
+                                <small class="text-muted">Marketing</small>
+                            </div> 
+                        </div>
+
+                        <div class="row">
+                            <!-- Kiri -->
+                            <div class="col-md-6">
+                                <h6>Informasi Umum</h6>
+                                <div class="mb-4">
+                                    <div class="row mb-2 small">
+                                        <div class="col-5 text-muted">ID Karyawan</div>
+                                        <div class="col-7 fw-semibold text-dark">1234567</div>
+                                    </div>
+                                    <div class="row mb-2 small">
+                                        <div class="col-5 text-muted">Divisi</div>
+                                        <div class="col-7 fw-semibold text-dark">SM</div>
+                                    </div>
+                                    <div class="row mb-2 small">
+                                        <div class="col-5 text-muted">Jenis Karyawan</div>
+                                        <div class="col-7 fw-semibold text-dark">PKWT-1</div>
+                                    </div>
+                                    <div class="row mb-2 small">
+                                        <div class="col-5 text-muted">Entitas</div>
+                                        <div class="col-7 fw-semibold text-dark">DJB</div>
+                                    </div>
+                                    <div class="row mb-2 small">
+                                        <div class="col-5 text-muted">SPV</div>
+                                        <div class="col-7 fw-semibold text-dark">Afnan Dhika</div>
+                                    </div>
+                                    <div class="row small">
+                                        <div class="col-5 text-muted">Tanggal Bergabung</div>
+                                        <div class="col-7 fw-semibold text-dark">10 Nov 2024</div>
+                                    </div>
+                                </div>
+
+
+                                <!-- Riwayat Kehadiran -->
+                                <div class="col-md-6">
+                                    <h6>Riwayat Kehadiran</h6>
+                                    <div class="mb-4">
+                                        <div class="row mb-2 small">
+                                            <div class="col-6 text-muted">Cuti Diambil</div>
+                                            <div class="col-6 text-end fw-semibold text-dark">2 Hari</div>
+                                        </div>
+                                        <div class="row mb-2 small">
+                                            <div class="col-6 text-muted">Terlambat</div>
+                                            <div class="col-6 text-end fw-semibold text-dark">16 Kali</div>
+                                        </div>
+                                        <div class="row small">
+                                            <div class="col-6 text-muted">Izin</div>
+                                            <div class="col-6 text-end fw-semibold text-dark">3 Hari</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h6>Feedback HR</h6>
+                                <p class="small text-muted">
+                                    Nadia sangat cekatan dan mempunyai plan yang terstruktur serta komunikasi yang baik
+                                    di pekerjaan.
+                                </p>
+                            </div>
+
+                            <!-- Kanan -->
+                            <div class="col-md-6">
+                                <h6>Skor Performa</h6>
+                                <p class="small"><strong>Target Terpenuhi:</strong> 4/12</p>
+
+                                <h6 class="mt-3">Riwayat Proyek</h6>
+                                <div class="mb-3">
+                                    <span class="badge bg-secondary me-1">Campaign "1000 jaringan" 2025</span>
+                                    <span class="badge bg-secondary me-1">Digital Marketing Overhaul</span>
+                                </div>
+
+                                <h6>Riwayat Pelatihan/Sertifikasi</h6>
+                                <div>
+                                    <span class="badge bg-primary me-1">Pelatihan SEO (2024)</span>
+                                    <span class="badge bg-primary me-1">Sertifikat Google Ads</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+            .modal-content.custom-rounded {
+                border-radius: 12px;
+                box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+                /* soft shadow */
+                padding: 1.5rem;
+            }
+
+            .modal-body {
+                padding-top: 0;
+            }
+        </style>
+
     </div>
-</div>

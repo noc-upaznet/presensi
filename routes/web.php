@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\ClockIn;
 use App\Livewire\Dashboard;
 use App\Livewire\GantiPassword;
 use Illuminate\Support\Facades\Route;
@@ -36,3 +37,5 @@ Route::get('/ganti-password', GantiPassword::class)->name('ganti-password');
 Route::get('/pengajuan-lembur',PengajuanLembur::class)->name('pengajuan-lembur');
 
 Route::get('/profile-pic', ProfilePic::class)->name('profile-pic'); 
+
+Route::get('/clock-in', ClockIn::class)->name('clock-in');
