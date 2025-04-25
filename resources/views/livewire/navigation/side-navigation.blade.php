@@ -70,6 +70,22 @@
             </li>
 
             <li class="nav-item">
+                <a href="{{ route('clock-in-selfie') }}" 
+                   class="nav-link {{ request()->routeIs('clock-in-selfie') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-grid-fill"></i>
+                    <p>ClockIn</p>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('clock-out') }}" 
+                   class="nav-link {{ request()->routeIs('clock-out') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-grid-fill"></i>
+                    <p>ClockOut</p>
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a href="{{ route('riwayat-presensi') }}" 
                    class="nav-link {{ request()->routeIs('riwayat-presensi') ? 'active' : '' }}">
                     <i class="nav-icon bi bi-list-task"></i>
@@ -100,6 +116,13 @@
                     <p>Profile Saya</p>
                 </a>
             </li>
+
+            <li class="nav-item">
+                <a href="{{ route('slip-gaji') }}" 
+                   class="nav-link {{ request()->routeIs('slip-gaji') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-receipt"></i>
+                    <p>Slip Gaji</p>
+                </a>
 
             <li class="nav-item">
                 <a href="{{ route('ganti-password') }}" 

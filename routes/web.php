@@ -1,6 +1,8 @@
 <?php
 
 use App\Livewire\ClockIn;
+use App\Livewire\ClockInSelfie;
+use App\Livewire\ClockOut;
 use App\Livewire\Dashboard;
 use App\Livewire\GantiPassword;
 use Illuminate\Support\Facades\Route;
@@ -9,10 +11,12 @@ use App\Livewire\Karyawan\DataKaryawan;
 use App\Livewire\Karyawan\TambahJadwalShift;
 use App\Livewire\Karyawan\DetailDataKaryawan;
 use App\Livewire\Karyawan\TambahDataKaryawan;
+use App\Livewire\LoginForm;
 use App\Livewire\PengajuanCutiIzin;
 use App\Livewire\PengajuanLembur;
 use App\Livewire\ProfilePic;
 use App\Livewire\RiwayatPresensi;
+use App\Livewire\SlipGaji;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
 Route::get('/', function () {
@@ -39,3 +43,11 @@ Route::get('/pengajuan-lembur',PengajuanLembur::class)->name('pengajuan-lembur')
 Route::get('/profile-pic', ProfilePic::class)->name('profile-pic'); 
 
 Route::get('/clock-in', ClockIn::class)->name('clock-in');
+
+Route::get('/clock-out', ClockOut::class)->name('clock-out');
+
+Route::get('/clock-in-selfie', ClockInSelfie::class)->name('clock-in-selfie');
+
+Route::get('/slip-gaji', SlipGaji::class)->name('slip-gaji');
+
+Route::get('/login', LoginForm::class)->name('login');

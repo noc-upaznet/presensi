@@ -13,11 +13,10 @@
         <div class="container d-flex justify-content">
             <div class="clock-card p-4 text-center w-100" style="max-width: 400px;">
                 <h6 class="text-white mb-3">Live Attendance</h6>
-    
-                {{-- Jam live pakai Livewire polling --}}
-                <h1 class="fw-bold" wire:poll.1s>{{ now()->format('H:i:s') }}</h1>
-                <p class="mb-4">{{ now()->format('D, d M Y') }}</p>
-    
+                {{-- Jam statis --}}
+                <h1 class="fw-bold">07:57:21</h1>
+                <p class="mb-4">Fri, 25 Apr 2025</p>
+                
                 <div class="clock-inner">
                     <div class="fw-semibold mb-2">Normal</div>
                     <div class="fw-bold fs-5 mb-3">08:00 - 16:00</div>
