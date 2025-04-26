@@ -25,7 +25,9 @@
                         <div class="inner-box mx-auto p-3">
                             <div class="fw-semibold text-muted mb-2">Normal</div>
                             <div class="fw-bold fs-5 mb-3">08:00 - 16:00</div>
-                            <button class="btn btn-primary px-4">Clock Out</button>
+                            <button class="btn btn-success px-4">
+                                <i class="fas fa-arrow-right-from-bracket me-2"></i> Clock Out
+                            </button>
                         </div>
                     </div>
                     <div class="log-box p-3">

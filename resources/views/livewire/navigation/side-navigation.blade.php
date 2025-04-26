@@ -86,6 +86,14 @@
             </li>
 
             <li class="nav-item">
+                <a href="{{ route('clockout') }}" 
+                   class="nav-link {{ request()->routeIs('clockout') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-grid-fill"></i>
+                    <p>AFTER PRESENSI</p>
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a href="{{ route('riwayat-presensi') }}" 
                    class="nav-link {{ request()->routeIs('riwayat-presensi') ? 'active' : '' }}">
                     <i class="nav-icon bi bi-list-task"></i>

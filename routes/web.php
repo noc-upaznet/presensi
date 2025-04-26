@@ -11,6 +11,7 @@ use App\Livewire\Karyawan\DataKaryawan;
 use App\Livewire\Karyawan\TambahJadwalShift;
 use App\Livewire\Karyawan\DetailDataKaryawan;
 use App\Livewire\Karyawan\TambahDataKaryawan;
+use App\Livewire\LiveAttendance;
 use App\Livewire\LoginForm;
 use App\Livewire\PengajuanCutiIzin;
 use App\Livewire\PengajuanLembur;
@@ -51,3 +52,5 @@ Route::get('/clock-in-selfie', ClockInSelfie::class)->name('clock-in-selfie');
 Route::get('/slip-gaji', SlipGaji::class)->name('slip-gaji');
 
 Route::get('/login', LoginForm::class)->name('login');
+
+Route::get('/clockout', LiveAttendance::class)->name('clockout');
