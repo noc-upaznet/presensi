@@ -39,7 +39,7 @@
                 <div class="log-box p-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <strong>Attendance Log</strong>
-                        <a href="#" class="text-primary text-decoration-none">View Log</a>
+                        <a href="{{ route('riwayat-presensi') }}" class="text-primary text-decoration-none">View Log</a>
                     </div>
 
                     <div class="d-flex justify-content-between">
@@ -49,7 +49,7 @@
                         </div>
                         <div class="text-end">
                             <div class="fw-semibold">Clock Out</div>
-                            <small class="text-muted">14:20:01</small>
+                            <small class="text-muted">16:10:00</small>
                         </div>
                     </div>
                 </div>
@@ -79,6 +79,7 @@
             border-radius: 15px;
             color: black;
             max-width: 320px;
+            margin-top: 1rem;
         }
 
         .log-box {
@@ -92,6 +93,39 @@
 
         .full-card {
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsif untuk mobile */
+        @media (max-width: 576px) {
+            .content-wrapper {
+                padding: 2rem 1rem;
+            }
+
+            .full-card {
+                max-width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .attendance-card {
+                padding: 2rem;
+            }
+
+            .inner-box {
+                max-width: 100%;
+                padding: 1rem;
+            }
+
+            .log-box {
+                padding: 1rem;
+            }
+
+            .text-end {
+                text-align: left;
+            }
+
+            .btn-primary {
+                width: 100%;
+            }
         }
     </style>
 </div>

@@ -11,16 +11,14 @@
         </div>
 
         <div>
-            <div class="d-flex flex-column">
+            <div class="d-flex flex-column justify-content-center">
                 <div class="full-card w-100" style="max-width: 450px; border-radius: 20px; overflow: hidden;">
 
                     <div class="attendance-card p-4 text-center">
                         <h6 class="text-white mb-3">Live Attendance</h6>
 
-                        {{-- Jam --}}
                         <h1 class="fw-bold">14:20:01</h1>
                         <p class="mb-4">Fri, 25 Apr 2025</p>
-
 
                         <div class="inner-box mx-auto p-3">
                             <div class="fw-semibold text-muted mb-2">Normal</div>
@@ -30,15 +28,17 @@
                             </button>
                         </div>
                     </div>
+
                     <div class="log-box p-3">
                         <div class="d-flex justify-content-between">
                             <div>
                                 <strong>Attendance Log</strong><br>
                                 <small>07:50:56</small> - Clock In
                             </div>
-                            <a href="#" class="text-primary text-decoration-none">View Log</a>
+                            <a href="{{ route('riwayat-presensi') }}" class="text-primary text-decoration-none">View Log</a>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -68,5 +68,34 @@
             .full-card {
                 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             }
+
+            /* Responsif untuk mobile */
+            @media (max-width: 576px) {
+                .content-wrapper {
+                    padding: 2rem 1rem;
+                }
+
+                .full-card {
+                    max-width: 100%;
+                    margin-bottom: 1rem;
+                }
+
+                .inner-box {
+                    max-width: 100%;
+                }
+
+                .attendance-card {
+                    padding: 2rem;
+                }
+
+                .log-box {
+                    padding: 1rem;
+                }
+
+                .btn-success {
+                    width: 100%;
+                }
+            }
         </style>
     </div>
+</div>

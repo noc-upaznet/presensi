@@ -111,7 +111,7 @@
                             <div>
                                 <h5 class="mb-0">Nadia Safira Khairunnisa</h5>
                                 <small class="text-muted">Marketing</small>
-                            </div> 
+                            </div>
                         </div>
 
                         <div class="row">

@@ -139,6 +139,13 @@
                     <p>Ganti Password</p>
                 </a>
             </li>
+
+            <li class="nav-item">
+                <a href="{{ route('login') }}" 
+                   class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-box-arrow-in-right"></i>
+                    <p>Login</p>
+                </a>
             
         </ul>
         <!--end::Sidebar Menu-->
