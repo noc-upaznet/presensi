@@ -20,14 +20,14 @@ return new class extends Migration
             $table->date('tanggal_lahir');
             $table->string('jenis_kelamin', 100);
             $table->string('status_perkawinan', 100);
-            $table->string('gol_darah', 10);
+            $table->string('gol_darah', 10)->nullable();
             $table->string('agama', 100);
             $table->string('jenis_identitas', 100);
-            $table->string('nik', 16);
-            $table->string('visa', 20);
+            $table->string('nik', 16)->nullable();
+            $table->string('visa', 20)->nullable();
             $table->text('alamat_ktp');
             $table->text('alamat_domisili');
-            $table->string('npk/nip_karyawan', 20);
+            $table->string('nip_karyawan', 20);
             $table->string('status_karyawan');
             $table->date('tgl_masuk');
             $table->date('tgl_keluar');

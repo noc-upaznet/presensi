@@ -17,6 +17,7 @@
       content="bootstrap 5, bootstrap, bootstrap 5 admin dashboard, bootstrap 5 dashboard, bootstrap 5 charts, bootstrap 5 calendar, bootstrap 5 datepicker, bootstrap 5 tables, bootstrap 5 datatable, vanilla js datatable, colorlibhq, colorlibhq dashboard, colorlibhq admin dashboard"
     />
     <!--end::Primary Meta Tags-->
+    <link rel="icon" href="{{ asset('assets/img/logo.png') }}" type="image/x-icon">
     <!--begin::Fonts-->
     <link
       rel="stylesheet"
@@ -163,7 +164,7 @@
         cardHeader.style.cursor = 'move';
       });
     </script>
-    <!-- apexcharts -->
+    {{-- <!-- apexcharts -->
     <script
       src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
       integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
@@ -227,7 +228,7 @@
         sales_chart_options,
       );
       sales_chart.render();
-    </script>
+    </script> --}}
     <!-- jsvectormap -->
     <script
       src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"
@@ -287,67 +288,72 @@
         colors: ['#DCE6EC'],
       };
 
-      const sparkline1 = new ApexCharts(document.querySelector('#sparkline-1'), option_sparkline1);
-      sparkline1.render();
+      // const sparkline1 = new ApexCharts(document.querySelector('#sparkline-1'), option_sparkline1);
+      // sparkline1.render();
 
-      const option_sparkline2 = {
-        series: [
-          {
-            data: [515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921],
-          },
-        ],
-        chart: {
-          type: 'area',
-          height: 50,
-          sparkline: {
-            enabled: true,
-          },
-        },
-        stroke: {
-          curve: 'straight',
-        },
-        fill: {
-          opacity: 0.3,
-        },
-        yaxis: {
-          min: 0,
-        },
-        colors: ['#DCE6EC'],
-      };
+      // const option_sparkline2 = {
+      //   series: [
+      //     {
+      //       data: [515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921],
+      //     },
+      //   ],
+      //   chart: {
+      //     type: 'area',
+      //     height: 50,
+      //     sparkline: {
+      //       enabled: true,
+      //     },
+      //   },
+      //   stroke: {
+      //     curve: 'straight',
+      //   },
+      //   fill: {
+      //     opacity: 0.3,
+      //   },
+      //   yaxis: {
+      //     min: 0,
+      //   },
+      //   colors: ['#DCE6EC'],
+      // };
 
-      const sparkline2 = new ApexCharts(document.querySelector('#sparkline-2'), option_sparkline2);
-      sparkline2.render();
+      // const sparkline2 = new ApexCharts(document.querySelector('#sparkline-2'), option_sparkline2);
+      // sparkline2.render();
 
-      const option_sparkline3 = {
-        series: [
-          {
-            data: [15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21],
-          },
-        ],
-        chart: {
-          type: 'area',
-          height: 50,
-          sparkline: {
-            enabled: true,
-          },
-        },
-        stroke: {
-          curve: 'straight',
-        },
-        fill: {
-          opacity: 0.3,
-        },
-        yaxis: {
-          min: 0,
-        },
-        colors: ['#DCE6EC'],
-      };
+      // const option_sparkline3 = {
+      //   series: [
+      //     {
+      //       data: [15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21],
+      //     },
+      //   ],
+      //   chart: {
+      //     type: 'area',
+      //     height: 50,
+      //     sparkline: {
+      //       enabled: true,
+      //     },
+      //   },
+      //   stroke: {
+      //     curve: 'straight',
+      //   },
+      //   fill: {
+      //     opacity: 0.3,
+      //   },
+      //   yaxis: {
+      //     min: 0,
+      //   },
+      //   colors: ['#DCE6EC'],
+      // };
 
-      const sparkline3 = new ApexCharts(document.querySelector('#sparkline-3'), option_sparkline3);
-      sparkline3.render();
+      // const sparkline3 = new ApexCharts(document.querySelector('#sparkline-3'), option_sparkline3);
+      // sparkline3.render();
     </script>
     <!--end::Script-->
     <script src="https://kit.fontawesome.com/800cfdc68e.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     @livewireScripts
     @stack('scripts')
     @yield('scripts')
@@ -434,6 +440,13 @@
         });
       })();
     </script>
+
+    <!-- Bootstrap Datepicker -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   </body>
   <!--end::Body-->
 </html>

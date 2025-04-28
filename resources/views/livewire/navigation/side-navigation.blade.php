@@ -48,19 +48,34 @@
             <li class="nav-item">
                 <a href="{{ route('data-karyawan') }}" 
                    class="nav-link {{ request()->routeIs('data-karyawan') ? 'active' : '' }}">
-                    <i class="nav-icon bi bi-palette"></i>
+                   <i class="bi bi-person-add"></i>
                     <p>Data Karyawan</p>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="{{ route('jadwal-shift') }}" 
-                   class="nav-link {{ request()->routeIs('jadwal-shift') ? 'active' : '' }}">
-                    <i class="nav-icon bi bi-palette"></i>
+                <a href="{{ route('template-mingguan') }}" 
+                   class="nav-link {{ request()->routeIs('template-mingguan') ? 'active' : '' }}">
+                   <i class="bi bi-calendar2-plus"></i>
+                    <p>Template Mingguan</p>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('pembagian-shift') }}" 
+                   class="nav-link {{ request()->routeIs('pembagian-shift') ? 'active' : '' }}">
+                   <i class="bi bi-calendar2-plus"></i>
                     <p>Pembagian Shift</p>
                 </a>
             </li>
             
+            <li class="nav-item">
+                <a href="{{ route('jadwal-shift') }}" 
+                   class="nav-link {{ request()->routeIs('jadwal-shift') ? 'active' : '' }}">
+                   <i class="bi bi-calendar-range"></i>
+                    <p>Jadwal Shift</p>
+                </a>
+            </li>
         </ul>
         <!--end::Sidebar Menu-->
         </nav>

@@ -22,7 +22,7 @@ class M_DataKaryawan extends Model
         'visa',
         'alamat_ktp',
         'alamat_domisili',
-        'id_karyawan',
+        'nip_karyawan',
         'status_karyawan',
         'tgl_masuk',
         'tgl_keluar',
@@ -47,4 +47,9 @@ class M_DataKaryawan extends Model
         'tgl_aktif_bpjs',
         'penanggung',
     ];
+
+    public function getJadwal()
+    {
+        return $this->hasMany(M_Jadwal::class, 'id_karyawan');
+    }
 }

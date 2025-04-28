@@ -12,16 +12,16 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-1 d-flex justify-content-between">
-                                <span>Nama</span> <span>: Salsabila Putri</span>
+                                <span>Nama</span> <span>: {{ $data['nama_karyawan'] }}</span>
                             </div>
                             <div class="mb-1 d-flex justify-content-between">
-                                <span>Tempat Lahir</span> <span>: Tulungagung</span>
+                                <span>Tempat Lahir</span> <span>: {{ $data['tempat_lahir'] }}</span>
                             </div>
                             <div class="mb-1 d-flex justify-content-between">
-                                <span>Tanggal Lahir</span> <span>: 09-01-1997</span>
+                                <span>Tanggal Lahir</span> <span>: {{ $data['tanggal_lahir'] }}</span>
                             </div>
                             <div class="mb-1 d-flex justify-content-between">
-                                <span>Status Pernikahan</span> <span>: Belum Menikah</span>
+                                <span>Status Pernikahan</span> <span>: {{ $data['status_perkawinan'] }}</span>
                             </div>
                             <div class="mb-1 d-flex justify-content-between">
                                 <span>Kewarganegaraan</span> <span>: Indonesia</span>
@@ -29,7 +29,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-1 d-flex justify-content-between">
-                                <span>Gol. Darah</span> <span>: O</span>
+                                <span>Gol. Darah</span> <span>: {{ $data['gol_darah'] }}</span>
                             </div>
                             <div class="mb-1 d-flex justify-content-between">
                                 <span>Berat Badan</span> <span>: 55</span>
@@ -53,25 +53,32 @@
             <div class="row" style="color: var(--bs-body-color);">
                 <div class="col-md-6">
                     <h6 class="fw-bold text-primary">Informasi Pribadi</h6>
-                    @foreach([
-                        'Jenis Kelamin' => 'Perempuan',
-                        'NIK' => '3509871234560197',
-                        'Agama' => 'Islam',
-                        'Jabatan' => 'Billing',
-                        'Divisi' => 'Finance',
-                        'Tanggal Bergabung' => '09-06-2024',
-                        'Status Hubungan Kerja' => 'Pegawai Kontrak',
-                        'Sisa Kontrak' => '6 Bulan'
-                    ] as $label => $value)
-                        <div class="mb-1 d-flex justify-content-between">
-                            <span>{{ $label }}</span> <span>: {{ $value }}</span>
-                        </div>
-                    @endforeach
+                    <div class="mb-1 d-flex justify-content-between">
+                        <span>Jenis Kelamin</span> <span>: {{ $data['jenis_kelamin'] }}</span>
+                    </div>
+                    <div class="mb-1 d-flex justify-content-between">
+                        <span>NIK</span> <span>: {{ $data['nik'] }}</span>
+                    </div>
+                    <div class="mb-1 d-flex justify-content-between">
+                        <span>Agama</span> <span>: {{ $data['agama'] }}</span>
+                    </div>
+                    <div class="mb-1 d-flex justify-content-between">
+                        <span>Jabatan</span> <span>: {{ $data['jabatan'] }}</span>
+                    </div>
+                    <div class="mb-1 d-flex justify-content-between">
+                        <span>Divisi</span> <span>: {{ $data['divisi'] }}</span>
+                    </div>
+                    <div class="mb-1 d-flex justify-content-between">
+                        <span>Tanggal Masuk</span> <span>: {{ $data['tgl_masuk'] }}</span>
+                    </div>
+                    <div class="mb-1 d-flex justify-content-between">
+                        <span>Status Hubungan Kerja</span> <span>: {{ $data['status_karyawan'] }}</span>
+                    </div>
                 </div>
     
                 <div class="col-md-6">
                     <h6 class="fw-bold text-primary">Informasi Kontak</h6>
-                    @foreach([
+                    {{-- @foreach([
                         'Telepon' => '087990321654',
                         'Email' => 'psbila201@gmail.com',
                         'LinkedIn' => 'Salsabilap22',
@@ -80,7 +87,13 @@
                         <div class="mb-1 d-flex justify-content-between">
                             <span>{{ $label }}</span> <span>: {{ $value }}</span>
                         </div>
-                    @endforeach
+                    @endforeach --}}
+                    <div class="mb-1 d-flex justify-content-between">
+                        <span>No.HP</span> <span>: {{ $data['no_hp'] }}</span>
+                    </div>
+                    <div class="mb-1 d-flex justify-content-between">
+                        <span>Email</span> <span>: {{ $data['email'] }}</span>
+                    </div>
                 </div>
             </div>
     
@@ -88,8 +101,12 @@
     
             <h6 class="fw-bold text-primary">Informasi Alamat</h6>
             <div class="d-flex justify-content-between" style="color: var(--bs-body-color);">
-                <span>Alamat</span>
-                <span>: Jl. Pahlawan No. 25, Desa Beji, Kecamatan Boyolangu, Kabupaten Tulungagung, Jawa Timur 66235</span>
+                <span>Alamat KTP</span>
+                <span>: {{ $data['alamat_ktp'] }}</span>
+            </div>
+            <div class="d-flex justify-content-between" style="color: var(--bs-body-color);">
+                <span>Alamat Domisili</span>
+                <span>: {{ $data['alamat_domisili'] }}</span>
             </div>
         </div>
     </div>

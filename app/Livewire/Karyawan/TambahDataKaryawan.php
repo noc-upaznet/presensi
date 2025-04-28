@@ -46,7 +46,7 @@ class TambahDataKaryawan extends Component
     public function store() {
         // dd($this->form);
         $this->form->validate();
-        $data = M_DataKaryawan::create([
+        $data = [
             'nama_karyawan' => $this->form->nama_karyawan,
             'email' => $this->form->email,
             'no_hp' => $this->form->no_hp,
@@ -56,12 +56,12 @@ class TambahDataKaryawan extends Component
             'status_perkawinan' => $this->form->status_perkawinan,
             'gol_darah' => $this->form->gol_darah,
             'agama' => $this->form->agama,
-            'jenis_identitas' => $this->jenis_identitas,
+            'jenis_identitas' => $this->form->jenis_identitas,
             'nik' => $this->form->nomorKTP,
             'visa' => $this->form->nomorVISA,
             'alamat_ktp' => $this->form->alamatKTP,
             'alamat_domisili' => $this->form->alamatDomisili,
-            'npk/nip_karyawan' => $this->form->nip_karyawan,
+            'nip_karyawan' => $this->form->nip_karyawan,
             'status_karyawan' => $this->form->status_karyawan,
             'tgl_masuk' => $this->form->tgl_masuk,
             'tgl_keluar' => $this->form->tgl_keluar,
@@ -85,8 +85,10 @@ class TambahDataKaryawan extends Component
             'anggota_bpjs' => $this->form->anggota_bpjs,
             'tgl_aktif_bpjs' => $this->form->tgl_aktif_bpjs,
             'penanggung' => $this->form->penanggung,
-        ]);
+        ];
         // dd($data);
+            
+        M_DataKaryawan::create($data);
 
         $this->form->reset();
 
@@ -95,10 +97,11 @@ class TambahDataKaryawan extends Component
             'icon' => 'success',
             'text' => 'Data has been saved successfully'
         ]);
+
+        redirect()->route('data-karyawan');
     }
     public function render()
     {
-        logger('Jenis Identitas: ' . $this->identitas['jenis_identitas']);
         return view('livewire.karyawan.tambah-data-karyawan');
     }
 }

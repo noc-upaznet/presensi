@@ -242,7 +242,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="nip-karyawan" class="form-label">NPK/NIP Karyawan</label>
-                                <input type="text" class="form-control" id="nip-karyawan" wire:model="form.nip_karyawan" required>
+                                <input type="text" class="form-control" id="nip-karyawan" wire:model="form.nip_karyawan" name="nip_karyawan">
                                 @error('form.nip_karyawan') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="col-md-6 mb-3">
