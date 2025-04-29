@@ -18,61 +18,35 @@
     <div class="app-content">
         <div class="container-fluid">
             <div class="mb-4">
-                <div class="p-0">
+                <div class="p-0 table-responsive">
                     <table class="table table-striped" style="background-color: var(--bs-body-bg);">
                         <thead>
                             <tr class="users-table-info">
                                 <th>Tanggal</th>
                                 <th>Clock In</th>
                                 <th>Clock Out</th>
-                                <th>
-                                    <label class="users-table__checkbox ms-20">
-                                        Photo
-                                    </label>
-                                </th>
+                                <th>Photo</th>
                                 <th>Status Kedatangan</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="color: var(--bs-body-color);">22-04-2025</td>
-                                <td style="color: var(--bs-body-color);">07.59</td>
-                                <td style="color: var(--bs-body-color);">16.10</td>
+                                <td style="color: var(--bs-body-color); white-space: nowrap;">22-04-2025</td>
+                                <td style="color: var(--bs-body-color); white-space: nowrap;">07.59</td>
+                                <td style="color: var(--bs-body-color); white-space: nowrap;">16.10</td>
                                 <td style="color: var(--bs-body-color);">
-                                    <label class="users-table__checkbox">
-                                        <div class="categories-table-img">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <picture>
-                                                        <source srcset="assets/img/user8-128x128.jpg" type="image/webp">
-                                                        <img src="./img/user8-128x128.jpg" alt="category">
-                                                    </picture>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </label>
+                                    <img src="./assets/img/user8-128x128.jpg" alt="category" class="img-fluid rounded" style="max-width: 70px;">
                                 </td>
                                 <td>
                                     <span class="badge bg-success">Tepat Waktu</span>
                                 </td>
                             </tr>
                             <tr>
-                                <td style="color: var(--bs-body-color);">21-04-2025</td>
-                                <td style="color: var(--bs-body-color);">08.02</td>
-                                <td style="color: var(--bs-body-color);">16.05</td>
+                                <td style="color: var(--bs-body-color); white-space: nowrap;">21-04-2025</td>
+                                <td style="color: var(--bs-body-color); white-space: nowrap;">08.02</td>
+                                <td style="color: var(--bs-body-color); white-space: nowrap;">16.05</td>
                                 <td style="color: var(--bs-body-color);">
-                                    <label class="users-table__checkbox">
-                                        <div class="categories-table-img">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <picture>
-                                                        <source srcset="assets/img/user8-128x128.jpg" type="image/webp">
-                                                        <img src="./img/user8-128x128.jpg" alt="category">
-                                                    </picture>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </label>
+                                    <img src="./assets/img/user8-128x128.jpg" alt="category" class="img-fluid rounded" style="max-width: 70px;">
                                 </td>
                                 <td>
                                     <span class="badge bg-danger">Terlambat</span>

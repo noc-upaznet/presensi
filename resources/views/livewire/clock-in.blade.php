@@ -10,7 +10,7 @@
             <p class="fs-5">Halo, Nadia Safira Khairunnisa</p>
         </div>
 
-        <div class="container d-flex justify-content-center">
+        <div class="d-flex flex-column justify-content-center">
             <div class="clock-card p-4 text-center w-100" style="max-width: 400px;">
                 <h6 class="text-white mb-3">Live Attendance</h6>
                 <h1 class="fw-bold">07:57:21</h1>

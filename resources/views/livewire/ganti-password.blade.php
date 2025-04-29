@@ -14,31 +14,33 @@
             </div>
         </div>
     </div>
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row justify-content">
-                <div class="col-md-6">
-                    <div class="card card-primary">
+    <section class="content py-4">
+        <div class="container-sm">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6">
+                    <div class="card shadow-sm rounded-4 border-0">
                         <form>
-                            <div class="card-body">
-                                <div class="form-group mb-3">
-                                    <label for="currentPassword" class="fw-bold">Password sekarang:</label>
-                                    <input type="password" class="form-control" id="currentPassword"
-                                        placeholder="Masukkan password sekarang">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-4">Ubah Password</h5>
+    
+                                <div class="mb-3">
+                                    <label for="currentPassword" class="form-label fw-semibold">Password Sekarang</label>
+                                    <input type="password" class="form-control" id="currentPassword" placeholder="Masukkan password sekarang">
                                 </div>
-                                <div class="form-group mb-3">
-                                    <label for="newPassword" class="fw-bold">Password baru:</label>
-                                    <input type="password" class="form-control" id="newPassword"
-                                        placeholder="Masukkan password baru">
+    
+                                <div class="mb-3">
+                                    <label for="newPassword" class="form-label fw-semibold">Password Baru</label>
+                                    <input type="password" class="form-control" id="newPassword" placeholder="Masukkan password baru">
                                 </div>
-                                <div class="form-group mb-3">
-                                    <label for="confirmPassword" class="fw-bold">Konfirmasi password baru:</label>
-                                    <input type="password" class="form-control" id="confirmPassword"
-                                        placeholder="Ulangi password baru">
-                                </div>                                
+    
+                                <div class="mb-3">
+                                    <label for="confirmPassword" class="form-label fw-semibold">Konfirmasi Password Baru</label>
+                                    <input type="password" class="form-control" id="confirmPassword" placeholder="Ulangi password baru">
+                                </div>
                             </div>
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary">Simpan</button>
+    
+                            <div class="card-footer bg-white border-0 px-4 pb-4">
+                                <button type="submit" class="btn btn-primary w-100 w-md-auto">Simpan</button>
                             </div>
                         </form>
                     </div>
