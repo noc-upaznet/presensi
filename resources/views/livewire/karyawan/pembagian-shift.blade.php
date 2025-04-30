@@ -26,7 +26,7 @@
           <!-- /.card-header -->
         </div>
         <div class="table-responsive">
-          <table class="table table-striped table-bordered" style="background-color: var(--bs-body-bg);">
+          <table class="table table-striped table-hover mb-0" style="background-color: var(--bs-body-bg);">
             <thead>
                 <tr>
                     <th>Shift</th>
@@ -42,8 +42,8 @@
                   <td style="color: var(--bs-body-color);">{{ \Carbon\Carbon::parse($key->jam_masuk)->format('H:i') }}</td>
                   <td style="color: var(--bs-body-color);">{{ \Carbon\Carbon::parse($key->jam_pulang)->format('H:i') }}</td>
                   <td>
-                      <button class="btn btn-warning btn-sm"><i class="bi bi-pencil-square"></i></button>
-                      <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                      <button class="btn btn-warning btn-sm" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                      <button class="btn btn-danger btn-sm" wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"><i class="fa fa-trash"></i></button>
                   </td>
               </tr>
               @endforeach
@@ -51,4 +51,26 @@
           </table>
         </div>
     </div>
+    <livewire:karyawan.modal-pembagian-shift />
 </div>
+
+@push('scripts')
+<script>
+  Livewire.on('modal-edit-shift', (event) => {
+      $('#modal-edit-shift').modal(event.action);
+  });
+  Livewire.on('modal-confirm-delete', (event) => {
+      $('#modal-confirm-delete').modal(event.action);
+      $('#btn-confirm-delete').attr('wire:click', 'delete("' + event.id + '")');
+      $('#modal-confirm-delete').modal('hide');
+  });
+
+  Livewire.on('refresh', () => {
+      Livewire.dispatch('refreshTable');
+  });
+
+  Livewire.on('swal', (e) => {
+      Swal.fire(e.params);
+  });
+</script>
+@endpush

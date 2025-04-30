@@ -25,8 +25,8 @@
             <button class="btn btn-primary" wire:click="showAdd"><i class="fa-solid fa-plus"></i> Tambah</button>
             <!-- /.card-header -->
           </div>
-          <div class="p-0">
-            <table class="table table-striped table-bordered" style="background-color: var(--bs-body-bg);">
+          <div class="p-0 table-responsive">
+            <table class="table table-striped table-hover mb-0" style="background-color: var(--bs-body-bg);">
               <thead>
                 <tr class="users-table-info">
                   <th>Nama Template</th>
@@ -69,7 +69,7 @@
                         </td>
                         <td>
                             <button class="btn btn-warning btn-sm" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                            <button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
                         </td>
                     </tr>
                 @endforeach
@@ -83,34 +83,11 @@
 @push('scripts')
 <script>
   Livewire.on('modal-tambah-template', (event) => {
-      const modalElement = document.getElementById('modal-tambah-template');
-      const modal = new bootstrap.Modal(modalElement);
-      
-      if (event.action === 'show') {
-          modal.show();
-      } else {
-          modal.hide();
-      }
-  });
-
-  Livewire.on('closeModal', () => {
-      const modal = bootstrap.Modal.getInstance(document.getElementById('modal-tambah-template'));
-      modal.hide();
+      $('#modal-tambah-template').modal(event.action);
   });
 
   Livewire.on('modal-edit-template', (event) => {
-      const modalElement = document.getElementById('modal-edit-template');
-      const modal = new bootstrap.Modal(modalElement);
-      
-      if (event.action === 'show') {
-          modal.show();
-      } else {
-          modal.hide();
-      }
-  });
-  Livewire.on('closeModal', () => {
-      const modal = bootstrap.Modal.getInstance(document.getElementById('modal-edit-template'));
-      modal.hide();
+      $('#modal-edit-template').modal(event.action);
   });
 
   Livewire.on('refresh', () => {

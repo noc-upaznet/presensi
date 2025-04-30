@@ -141,6 +141,41 @@
           </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modal-import" wire:ignore.self tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content" style="background-color: var(--bs-body-bg);">
+            <div class="modal-header" style="color: var(--bs-body-color);">
+              <h5 class="modal-title">Import Data Karyawan</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form wire:submit.prevent="saveImport">
+                <div class="modal-body" style="color: var(--bs-body-color);">
+                    <div class="container">
+                        <div class="mb-3">
+                            <label for="formFile" class="form-label">Form Upload</label>
+                            <input class="form-control" type="file" id="formFile" wire:model="file" accept=".xlsx, .xls">
+                            <div wire:loading wire:target="file" class="text-warning mt-2">
+                                Sedang upload file, mohon tunggu...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary"
+                        wire:loading.attr="disabled">
+                        <div wire:loading class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span wire:loading.remove><i class="fa fa-save"></i> Simpan</span>
+                        <span wire:loading>Loading...</span>
+                    </button>
+                </div>
+            </form>
+          </div>
+        </div>
+    </div>
 </div>
 
 @push("scripts")

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Karyawan;
 
+use App\Livewire\Forms\TambahDataKaryawanForm;
 use Livewire\Component;
 use App\Models\M_Jadwal;
 use App\Models\M_DataKaryawan;
@@ -10,17 +11,33 @@ use Illuminate\Support\Facades\Crypt;
 
 class JadwalShift extends Component
 {
+    public TambahDataKaryawanForm $form;
+    
     public $selectedTemplateId;
     public $bulan_tahun;
+    public $filterBulan;
     public $kalender = []; // format: ['minggu' => '', 'senin' => '', dst] 
     public $selectedKaryawan;
     public $namaKaryawan;
     public $karyawans;
+    public $filterJadwals = [];
+    public $filterKaryawan;
 
-    protected $listeners = ['refreshTable' => '$refresh',  ];
-    // public $dataKaryawans;
+    protected $listeners = ['refreshTable' => 'refresh',  'jadwalAdded' => 'onJadwalAdded', 'jadwalUpdated' => 'onJadwalUpdated'];
+
+    public function onJadwalAdded()
+    {
+        $this->applyFilters();
+    }
+    public function onJadwalUpdated()
+    {
+        $this->applyFilters();
+    }
+
     public function showAdd()
     {
+        // $this->dispatch('modalTambahJadwal', action: 'show');
+        $this->form->reset();
         $this->dispatch('modalTambahJadwal', action: 'show');
     }
 
@@ -53,24 +70,47 @@ class JadwalShift extends Component
         $jadwal = M_Jadwal::findOrFail(Crypt::decrypt($id));
         // dd($jadwal);
         $jadwal->delete();
-        session()->flash('success', 'Jadwal berhasil dihapus');
-        $this->dispatch('modalEditJadwal', action: 'hide');
+        $this->dispatch('modal-confirm-delete', action: 'hide');
     }
 
     public function mount()
     {
         $this->bulan_tahun = now()->format('Y-m');
+        $this->filterBulan = now()->format('Y-m');
         $this->karyawans = M_DataKaryawan::orderBy('nama_karyawan')->get();
-        // $this->jadwalShifts = M_JadwalShift::orderBy('nama_shift')->get();
-        // $this->templateWeeks = M_TemplateWeek::orderBy('nama_template')->get();
+        $this->applyFilters();
+    }
 
+    public function applyFilters()
+    {
+        $query = M_Jadwal::with('getKaryawan');
+
+        if (!empty($this->filterKaryawan)) {
+            $query->where('id_karyawan', $this->filterKaryawan);
+        }
+
+        if (!empty($this->filterBulan)) {
+            $query->where('bulan_tahun', 'like', $this->filterBulan . '%');
+        }
+
+        $this->filterJadwals = $query->get();
+    }
+
+    public function updatedFilterBulan()
+    {
+        $this->applyFilters();
+    }
+
+    public function filterByKaryawan($karyawanId)
+    {
+        $this->filterKaryawan = $karyawanId ?: null;
+        $this->applyFilters();
     }
 
     public function render()
     {
-        $jadwals = M_Jadwal::with('getKaryawan')->latest()->get();
         return view('livewire.karyawan.jadwal-shift', [
-            'jadwals' => $jadwals,
+            'jadwals' => $this->filterJadwals,
         ]);
     }
 }

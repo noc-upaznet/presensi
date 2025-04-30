@@ -2,13 +2,21 @@
 
 namespace App\Livewire\Karyawan;
 
-use App\Livewire\Forms\TambahDataKaryawanForm;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use App\Models\M_DataKaryawan;
+use App\Imports\KaryawanImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
+use App\Livewire\Forms\TambahDataKaryawanForm;
 
 class ModalKaryawan extends Component
 {
     public TambahDataKaryawanForm $form;
+    use WithFileUploads;
+
+    public $file;
 
     public $ticketId;
     protected $listeners = ['edit-ticket' => 'loadTicketData'];
@@ -85,9 +93,32 @@ class ModalKaryawan extends Component
             'text' => 'Data has been updated successfully'
         ]);
 
-        $this->dispatch('closeModal');
+        $this->dispatch('modal-edit-data-karyawan', action: 'hide');
         $this->dispatch('refresh');
     }
+
+    public function saveImport()
+    {
+        $this->validate([
+            'file' => 'required|mimes:xlsx,csv,xls',
+        ]);
+    
+        // Ambil file dari temporary path
+        $filePath = $this->file->getRealPath();
+    
+        // Import langsung dari file temporary
+        Excel::import(new KaryawanImport, $filePath);
+        // Kirim notifikasi sukses
+        $this->dispatch('swal', params: [
+            'title' => 'Berhasil!',
+            'text' => 'Data berhasil di-import.',
+            'icon' => 'success'
+        ]);
+
+        $this->dispatch('modal-import', action: 'hide');
+        $this->dispatch('refresh');
+    }
+
     public function render()
     {
         return view('livewire.karyawan.modal-karyawan');

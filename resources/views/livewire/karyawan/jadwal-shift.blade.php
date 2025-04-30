@@ -24,26 +24,22 @@
             </button>
     
             <div class="d-flex gap-2">
-                <select class="form-select" style="width: 150px;">
-                    <option selected>Pilih Karyawan</option>
+                <select class="form-select" style="width: 150px;" wire:model="filterKaryawan" wire:change="filterByKaryawan($event.target.value)">
+                    <option value="" selected>Pilih Karyawan</option>
                     @foreach($karyawans as $karyawan)
                         <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
                     @endforeach
                 </select>
     
-                <select class="form-select" style="width: 120px;">
-                    <option selected>Bulan Ini</option>
-                    <option>April 2025</option>
-                    <option>Maret 2025</option>
-                </select>
+                <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan" wire:model.lazy="filterBulan">
     
                 <button class="btn btn-light" disabled>Pilih Waktu</button>
             </div>
         </div>
     
         <div class="table-responsive">
-            <table class="table table-bordered align-middle text-nowrap">
-                <thead class="table-light">
+            <table class="table table-striped table-hover mb-0" style="background-color: var(--bs-body-bg);">
+                <thead>
                     <tr>
                         <th>Bulan</th>
                         <th>Nama Karyawan</th>
@@ -52,15 +48,15 @@
                 </thead>
                 <tbody>
                     @foreach ($jadwals as $key)
-                    <tr>
-                        <td>{{ $key->bulan_tahun }}</td>
-                        <td>{{ $key->getKaryawan->nama_karyawan }}</td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-info text-white"><i class="bi bi-eye"></i></button>
-                            <button class="btn btn-sm btn-warning" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="bi bi-pencil-square"></i></button>
-                            <button class="btn btn-sm btn-danger" wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>
+                        <tr wire:key="jadwal-{{ $key->id }}">
+                            <td style="color: var(--bs-body-color);">{{ $key->bulan_tahun }}</td>
+                            <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}</td>
+                            <td class="text-center" style="color: var(--bs-body-color);">
+                                <button class="btn btn-sm btn-info text-white"><i class="fa fa-eye"></i></button>
+                                <button class="btn btn-sm btn-warning" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn btn-sm btn-danger" wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"><i class="fa fa-trash"></i></button>
+                            </td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -74,26 +70,8 @@
 
 @push('scripts')
     <script>
-        Livewire.on('modalTambahJadwal', () => {
-            let modal = new bootstrap.Modal(document.getElementById('modalTambahJadwal'));
-            modal.show();
-            // setTimeout(() => {
-            //     // Destroy dulu kalau sudah pernah diinisialisasi
-            //     if ($.fn.select2 && $('#selectKaryawan').hasClass("select2-hidden-accessible")) {
-            //         $('#selectKaryawan').select2('destroy');
-            //     }
-
-            //     // Re-init Select2
-            //     $('#selectKaryawan').select2({
-            //         placeholder: "-- Pilih Karyawan --",
-            //         dropdownParent: $('#modalTambahJadwal') // penting jika pakai modal
-            //     });
-
-            //     // Sync ke Livewire
-            //     $('#selectKaryawan').on('change', function (e) {
-            //         Livewire.dispatch('setKaryawan', $(this).val());
-            //     });
-            // }, 200);
+        Livewire.on('modalTambahJadwal', (event) => {
+            $('#modalTambahJadwal').modal(event.action);
 
             setTimeout(() => {
                 $('#bulanPicker').datepicker({
@@ -105,28 +83,8 @@
             }, 300);
         });
 
-        Livewire.on('closeModal', () => {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('modalTambahJadwal'));
-            modal.hide();
-        });
-
-        Livewire.on('modalEditJadwal', () => {
-            let modal = new bootstrap.Modal(document.getElementById('modalEditJadwal'));
-            modal.show();
-
-            // setTimeout(() => {
-            //     $('#bulan').datepicker({
-            //         format: "yyyy-mm",
-            //         startView: "months",
-            //         minViewMode: "months",
-            //         autoclose: true
-            //     });
-            // }, 300);
-        });
-
-        Livewire.on('closeModal', () => {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditJadwal'));
-            modal.hide();
+        Livewire.on('modalEditJadwal', (event) => {
+            $('#modalEditJadwal').modal(event.action);
         });
 
         Livewire.on('modal-confirm-delete', (event) => {

@@ -47,7 +47,7 @@ class ModalTemplate extends Component
             'text' => 'Data has been saved successfully'
         ]);
 
-        $this->dispatch('closeModal');
+        $this->dispatch('modal-tambah-template', action: 'show');
         $this->dispatch('refresh');
     }
 
@@ -85,7 +85,7 @@ class ModalTemplate extends Component
             'text' => 'Data has been updated successfully'
         ]);
 
-        $this->dispatch('closeModal');
+        $this->dispatch('modal-edit-template', action: 'hide',);
         $this->dispatch('refresh');
     }
     public function render()

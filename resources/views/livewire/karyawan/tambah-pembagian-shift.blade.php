@@ -78,7 +78,14 @@
             </div>
             <div class="container mt-4">
                 <a href="{{ route('pembagian-shift') }}"><button type="button" class="btn btn-secondary"><i class="fas fa-undo"></i> Kembali</button></a>
-                <button type="button" wire:click="store" class="btn btn-primary"><i class="far fa-save"></i> Simpan</button>
+                <button type="button" wire:click="store" class="btn btn-primary"
+                    wire:loading.attr="disabled">
+                    <div wire:loading class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span wire:loading.remove><i class="fa fa-save"></i> Simpan</span>
+                    <span wire:loading>Loading...</span>
+                </button>
             </div>
         </div>
     </div>

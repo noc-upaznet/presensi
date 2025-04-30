@@ -477,7 +477,14 @@
                             @if ($step < 3)
                                 <button type="button" wire:click="nextStep" class="btn btn-primary">Selanjutnya</button>
                             @else
-                                <button type="button" wire:click="store" class="btn btn-success"><i class="far fa-save"></i> Simpan</button>
+                                <button type="button" wire:click="store" class="btn btn-success"
+                                    wire:loading.attr="disabled">
+                                    <div wire:loading class="spinner-border spinner-border-sm" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <span wire:loading.remove><i class="fa fa-save"></i> Simpan</span>
+                                    <span wire:loading>Loading...</span>
+                                </button>
                             @endif
                         </div>
                     @endif

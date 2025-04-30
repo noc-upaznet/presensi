@@ -24,12 +24,12 @@
       <div class="mb-4">
         <div class="card-header">
           <a href="{{ route('tambah-data-karyawan') }}"><button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Tambah</button></a>
-          <button class="btn btn-success"><i class="fa-solid fa-file-excel"></i> Import</button>
+          <button wire:click="showModalImport" class="btn btn-success"><i class="fa-solid fa-file-excel"></i> Import</button>
         </div>
         <!-- /.card-header -->
       </div>
-      <div class="p-0">
-        <table class="table table-striped" style="background-color: var(--bs-body-bg);">
+      <div class="p-0 table-responsive">
+        <table class="table table-striped table-hover mb-0" style="background-color: var(--bs-body-bg);">
           <thead>
             <tr class="users-table-info">
               <th>
@@ -66,9 +66,9 @@
                 <td style="color: var(--bs-body-color);"><span class="badge-success">{{ $key->status_karyawan }}</span></td>
                 <td style="color: var(--bs-body-color);">{{ $key->email }}</td>
                 {{-- <td style="color: var(--bs-body-color);">password123</td> --}}
-                <td>
-                  <button type="button" wire:click="DetailDataKaryawan({{ $key->id }})" class="btn btn-info" style="font-size: 10px;"><i class="bi bi-eye"></i></button>
-                  <button type="button" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit" style="font-size: x-small;"><i class="bi bi-pencil-square"></i></button>
+                <td class="text-center">
+                  <button type="button" wire:click="DetailDataKaryawan({{ $key->id }})" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></button>
+                  <button type="button" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')" class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
                 </td>
               </tr>
             @endforeach
@@ -84,19 +84,11 @@
 @push('scripts')
 <script>
     Livewire.on('modal-edit-data-karyawan', (event) => {
-        const modalElement = document.getElementById('modal-edit-data-karyawan');
-        const modal = new bootstrap.Modal(modalElement);
-        
-        if (event.action === 'show') {
-            modal.show();
-        } else {
-            modal.hide();
-        }
+        $('#modal-edit-data-karyawan').modal(event.action);
     });
 
-    Livewire.on('closeModal', () => {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('modal-edit-data-karyawan'));
-        modal.hide();
+    Livewire.on('modal-import', (event) => {
+        $('#modal-import').modal(event.action);
     });
 
     Livewire.on('refresh', () => {

@@ -87,7 +87,14 @@
       
             </div>
             <div class="modal-footer">
-              <button type="button" wire:click="store" class="btn btn-primary">Simpan</button>
+              {{-- <button type="button" wire:click="store" class="btn btn-primary">Simpan</button> --}}
+              <button type="button" class="btn btn-primary" wire:click='store' wire:loading.attr="disabled" wire:target="store">
+                    <div wire:loading wire:target="store" class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span wire:loading.remove wire:target="store"><i class="fa fa-save"></i> Simpan</span>
+                    <span wire:loading wire:target="store">Loading...</span>
+                </button>
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
           </div>
@@ -189,7 +196,13 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" wire:click="saveEdit" class="btn btn-primary">Simpan</button>
+                    <button type="button" class="btn btn-primary" wire:click='saveEdit' wire:loading.attr="disabled" wire:target="edit">
+                        <div wire:loading wire:target="edit" class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span wire:loading.remove wire:target="edit"><i class="fa fa-save"></i> Simpan</span>
+                        <span wire:loading wire:target="edit">Loading...</span>
+                    </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>

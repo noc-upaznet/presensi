@@ -30,6 +30,11 @@ class DataKaryawan extends Component
         $this->dispatch('modal-edit-data-karyawan', action: 'show');
     }
 
+    public function showModalImport()
+    {
+        $this->dispatch('modal-import', action: 'show');
+    }
+
     public function DetailDataKaryawan($id)
     {
         return redirect()->route('karyawan.detail-data-karyawan', ['id' => $id]);
@@ -37,7 +42,7 @@ class DataKaryawan extends Component
 
     public function render()
     {
-        $datas = M_DataKaryawan::all();
+        $datas = M_DataKaryawan::latest()->get();
         return view('livewire.karyawan.data-karyawan', [
             'datas' => $datas,
         ]);

@@ -111,8 +111,9 @@ class ModalJadwalShift extends Component
             'text' => 'Data has been saved successfully'
         ]);
 
-        $this->dispatch('closeModal');
+        $this->dispatch('modalTambahJadwal', action: 'hide');
         $this->dispatch('refresh');
+        $this->dispatch('jadwalAdded');
     }
 
     public function loadData($data)
@@ -169,8 +170,9 @@ class ModalJadwalShift extends Component
             'text' => 'Data has been updated successfully'
         ]);
 
-        $this->dispatch('closeModal');
+        $this->dispatch('modalEditJadwal', action: 'hide');
         $this->dispatch('refresh');
+        $this->dispatch('jdawalUpdated');
     }
 
     public function delete($id)
