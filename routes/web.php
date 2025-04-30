@@ -19,6 +19,8 @@ use App\Livewire\ProfilePic;
 use App\Livewire\RiwayatPresensi;
 use App\Livewire\SlipGaji;
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use App\Http\Controllers\SlipGajiController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -54,3 +56,6 @@ Route::get('/slip-gaji', SlipGaji::class)->name('slip-gaji');
 Route::get('/login', LoginForm::class)->name('login');
 
 Route::get('/clockout', LiveAttendance::class)->name('clockout');
+
+
+Route::get('/slip-gaji/download', [SlipGajiController::class, 'download'])->name('slip-gaji.download');
