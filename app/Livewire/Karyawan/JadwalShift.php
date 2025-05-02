@@ -16,7 +16,7 @@ class JadwalShift extends Component
     public $selectedTemplateId;
     public $bulan_tahun;
     public $filterBulan;
-    public $kalender = []; // format: ['minggu' => '', 'senin' => '', dst] 
+    public $kalender = [];
     public $selectedKaryawan;
     public $namaKaryawan;
     public $karyawans;

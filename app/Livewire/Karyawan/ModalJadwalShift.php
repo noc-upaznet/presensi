@@ -165,7 +165,7 @@ class ModalJadwalShift extends Component
         $this->reset(['bulan_tahun', 'selectedKaryawan', 'kalender']);
     
         $this->dispatch('swal', params: [
-            'title' => 'Data Saved',
+            'title' => 'Data Updated',
             'icon' => 'success',
             'text' => 'Data has been updated successfully'
         ]);

@@ -76,6 +76,14 @@
                     <p>Jadwal Shift</p>
                 </a>
             </li>
+
+            <li class="nav-item">
+                <a href="{{ route('pengajuan') }}" 
+                   class="nav-link {{ request()->routeIs('pengajuan') ? 'active' : '' }}">
+                   <i class="bi bi-clipboard-plus"></i>
+                    <p>Pengajuan</p>
+                </a>
+            </li>
         </ul>
         <!--end::Sidebar Menu-->
         </nav>
