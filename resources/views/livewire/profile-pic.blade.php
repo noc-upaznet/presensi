@@ -114,10 +114,19 @@
                     </div>
 
                     <div class="row">
-                        <!-- Kiri -->
-                        <div class="col-md-6">
+                        <!-- Header -->
+                        <div class="col-12 text-center mb-4 border-bottom pb-3 mt-3">
+                            <img src="./assets/img/user4-128x128.jpg" alt="Avatar" class="rounded-circle mb-2"
+                                width="64" height="64">
+                            <h5 class="mb-0">Nadia Safira Khairunnisa</h5>
+                            <small class="text-muted">Marketing</small>
+                        </div>
+
+                        <!-- Informasi Umum -->
+                        <div class="col-12 col-md-6 order-1">
                             <h6>Informasi Umum</h6>
                             <div class="mb-4">
+                                <!-- Baris-baris informasi -->
                                 <div class="row mb-2 small">
                                     <div class="col-5 text-muted">ID Karyawan</div>
                                     <div class="col-7 fw-semibold text-dark">1234567</div>
@@ -144,35 +153,25 @@
                                 </div>
                             </div>
 
-
-                            <!-- Riwayat Kehadiran -->
-                            <div class="col-md-6">
-                                <h6>Riwayat Kehadiran</h6>
-                                <div class="mb-4">
-                                    <div class="row mb-2 small">
-                                        <div class="col-6 text-muted">Cuti Diambil</div>
-                                        <div class="col-6 text-end fw-semibold text-dark">2 Hari</div>
-                                    </div>
-                                    <div class="row mb-2 small">
-                                        <div class="col-6 text-muted">Terlambat</div>
-                                        <div class="col-6 text-end fw-semibold text-dark">16 Kali</div>
-                                    </div>
-                                    <div class="row small">
-                                        <div class="col-6 text-muted">Izin</div>
-                                        <div class="col-6 text-end fw-semibold text-dark">3 Hari</div>
-                                    </div>
+                            <h6 class="mt-4">Riwayat Kehadiran</h6>
+                            <div class="mb-4">
+                                <div class="row mb-2 small">
+                                    <div class="col-6 text-muted">Cuti Diambil</div>
+                                    <div class="col-6 text-end fw-semibold text-dark">2 Hari</div>
+                                </div>
+                                <div class="row mb-2 small">
+                                    <div class="col-6 text-muted">Terlambat</div>
+                                    <div class="col-6 text-end fw-semibold text-dark">16 Kali</div>
+                                </div>
+                                <div class="row small">
+                                    <div class="col-6 text-muted">Izin</div>
+                                    <div class="col-6 text-end fw-semibold text-dark">3 Hari</div>
                                 </div>
                             </div>
-
-                            <h6>Feedback HR</h6>
-                            <p class="small text-muted">
-                                Nadia sangat cekatan dan mempunyai plan yang terstruktur serta komunikasi yang baik
-                                di pekerjaan.
-                            </p>
                         </div>
 
-                        <!-- Kanan -->
-                        <div class="col-md-6">
+                        <!-- Skor Performa & Lainnya -->
+                        <div class="col-12 col-md-6 order-2">
                             <h6>Skor Performa</h6>
                             <p class="small"><strong>Target Terpenuhi:</strong> 4/12</p>
 
@@ -188,7 +187,17 @@
                                 <span class="badge bg-primary me-1">Sertifikat Google Ads</span>
                             </div>
                         </div>
+
+                        <!-- Feedback HR -->
+                        <div class="col-12 order-3 mt-3">
+                            <h6>Feedback HR</h6>
+                            <p class="small text-muted">
+                                Nadia sangat cekatan dan mempunyai plan yang terstruktur serta komunikasi yang baik di
+                                pekerjaan.
+                            </p>
+                        </div>
                     </div>
+
 
                 </div>
                 <div class="modal-footer">
