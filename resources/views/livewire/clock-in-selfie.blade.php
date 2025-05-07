@@ -47,25 +47,46 @@
                     <script>
                         function removePhoto() {
                             if (confirm('Ingin ambil ulang foto?')) {
-                                // Kosongkan gambar jika perlu
                                 const photoImage = document.getElementById('photoImage');
                                 if (photoImage) {
-                                    photoImage.src = '';
+                                    photoImage.src = ''; // Kosongkan gambar
                                 }
-
-                                // Tampilkan modal kamera dan langsung mulai kamera
+                    
+                                // Buka modal kamera
                                 const modalEl = document.getElementById('cameraModal');
                                 const modal = new bootstrap.Modal(modalEl);
                                 modal.show();
-
-                                // Paksa jalanin kamera setelah sedikit delay
-                                setTimeout(() => {
-                                    startCamera();
-                                }, 300);
+                    
+                                // Tunggu modal terbuka sebelum akses kamera
+                                modalEl.addEventListener('shown.bs.modal', function () {
+                                    const video = document.getElementById('video');
+                                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                                        navigator.mediaDevices.getUserMedia({ video: true })
+                                            .then(stream => {
+                                                video.srcObject = stream;
+                                            })
+                                            .catch(error => {
+                                                console.error('Gagal akses kamera', error);
+                                            });
+                                    } else {
+                                        console.log('Media Devices API tidak didukung browser ini');
+                                    }
+                                });
+                    
+                                // Hentikan kamera saat modal ditutup
+                                modalEl.addEventListener('hidden.bs.modal', function () {
+                                    const video = document.getElementById('video');
+                                    const stream = video.srcObject;
+                                    if (stream) {
+                                        const tracks = stream.getTracks();
+                                        tracks.forEach(track => track.stop());
+                                        video.srcObject = null;
+                                    }
+                                });
                             }
                         }
-
                     </script>
+
 
                     <button class="btn btn-primary w-100 mt-3">Clock In</button>
                 </div>

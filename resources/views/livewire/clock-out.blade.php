@@ -23,9 +23,30 @@
                         <div class="inner-box mx-auto p-3">
                             <div class="fw-semibold text-muted mb-2">Normal</div>
                             <div class="fw-bold fs-5 mb-3">08:00 - 16:00</div>
-                            <button class="btn btn-success px-4">
+                            <button class="btn btn-success px-4" data-bs-toggle="modal" data-bs-target="#clockOutModal">
                                 <i class="fas fa-arrow-right-from-bracket me-2"></i> Clock Out
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="clockOutModal" tabindex="-1" aria-labelledby="clockOutModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" style="max-width: 300px;">
+                            <div class="modal-content text-center" style="border-radius: 20px;">
+                                <div class="modal-body py-5">
+                                    <div class="text-warning fs-1 mb-3">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                    </div>
+                                    <h5 class="mb-4">Apakah anda yakin ingin clock out?</h5>
+                                    <div class="d-flex justify-content-center gap-3">
+                                        <button type="button" class="btn btn-primary px-4"
+                                            data-bs-dismiss="modal">Yes</button>
+                                        <button type="button" class="btn btn-danger px-4"
+                                            data-bs-dismiss="modal">No</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -35,7 +56,8 @@
                                 <strong>Attendance Log</strong><br>
                                 <small>07:50:56</small> - Clock In
                             </div>
-                            <a href="{{ route('riwayat-presensi') }}" class="text-primary text-decoration-none">View Log</a>
+                            <a href="{{ route('riwayat-presensi') }}" class="text-primary text-decoration-none">View
+                                Log</a>
                         </div>
                     </div>
 
