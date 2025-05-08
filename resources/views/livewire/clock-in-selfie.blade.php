@@ -43,27 +43,57 @@
                             </button>
                         </div>
                     </div>
+                    <!-- Modal Kamera -->
+                    <div class="modal fade" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="cameraModalLabel">Ambil Foto</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <video id="video" width="100%" autoplay></video>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Batal</button>
+                                    <button type="button" class="btn btn-primary" onclick="capturePhoto()">Ambil
+                                        Foto</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <script>
                         function removePhoto() {
                             if (confirm('Ingin ambil ulang foto?')) {
                                 const photoImage = document.getElementById('photoImage');
+                                const video = document.getElementById('video');
+                                const modalEl = document.getElementById('cameraModal');
+                                
                                 if (photoImage) {
                                     photoImage.src = ''; // Kosongkan gambar
                                 }
                     
+                                if (!modalEl || !video) {
+                                    console.error('Elemen modal atau video tidak ditemukan');
+                                    return;
+                                }
+                    
                                 // Buka modal kamera
-                                const modalEl = document.getElementById('cameraModal');
                                 const modal = new bootstrap.Modal(modalEl);
                                 modal.show();
                     
                                 // Tunggu modal terbuka sebelum akses kamera
-                                modalEl.addEventListener('shown.bs.modal', function () {
-                                    const video = document.getElementById('video');
+                                modalEl.addEventListener('shown.bs.modal', function handleModalOpen() {
                                     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                                         navigator.mediaDevices.getUserMedia({ video: true })
                                             .then(stream => {
                                                 video.srcObject = stream;
+                                                video.play();
                                             })
                                             .catch(error => {
                                                 console.error('Gagal akses kamera', error);
@@ -71,21 +101,27 @@
                                     } else {
                                         console.log('Media Devices API tidak didukung browser ini');
                                     }
+                    
+                                    // Pastikan event listener hanya ditambahkan sekali
+                                    modalEl.removeEventListener('shown.bs.modal', handleModalOpen);
                                 });
                     
                                 // Hentikan kamera saat modal ditutup
-                                modalEl.addEventListener('hidden.bs.modal', function () {
-                                    const video = document.getElementById('video');
+                                modalEl.addEventListener('hidden.bs.modal', function handleModalClose() {
                                     const stream = video.srcObject;
                                     if (stream) {
                                         const tracks = stream.getTracks();
                                         tracks.forEach(track => track.stop());
                                         video.srcObject = null;
                                     }
+                    
+                                    // Pastikan event listener hanya ditambahkan sekali
+                                    modalEl.removeEventListener('hidden.bs.modal', handleModalClose);
                                 });
                             }
                         }
                     </script>
+                    
 
 
                     <button class="btn btn-primary w-100 mt-3">Clock In</button>
