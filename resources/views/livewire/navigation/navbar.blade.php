@@ -18,7 +18,64 @@
     </ul>
     <!--end::Start Navbar links-->
     <!--begin::End Navbar links-->
+    
     <ul class="navbar-nav ms-auto">
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-bs-toggle="dropdown" href="#">
+            <i class="bi bi-bell-fill"></i>
+            @if($unreadCount > 0)
+                <span class="navbar-badge badge text-bg-warning">
+                    {{ $unreadCount }}
+                </span>
+            @endif
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+            <span class="dropdown-item dropdown-header">
+                {{ count($notifs) }} Notifikasi
+            </span>
+    
+            <div class="dropdown-divider"></div>
+    
+            @foreach($notifs as $notif)
+                <a href="#" class="dropdown-item">
+                    <i class="bi bi-info-circle me-2"></i>
+                    {{ $notif['nama_karyawan'] }} mengajukan {{ $notif['nama_shift'] }}
+                    <span class="float-end text-secondary fs-7">{{ $notif['created_at'] }}</span>
+                </a>
+                <div class="dropdown-divider"></div>
+            @endforeach
+    
+            <a href="#" class="dropdown-item dropdown-footer">Lihat Semua</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown user-menu">
+        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+          {{-- <img src="assets/img/user2-160x160.jpg" class="user-image rounded-circle shadow" alt="User Image"/> --}}
+          <div x-data="{{ json_encode(['name' => auth()->user()->name]) }}" x-text="name" x-on:profile-updated.window="name = $event.detail.name"></div>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+          <!--begin::User Image-->
+          <li class="user-header text-bg-primary">
+            {{-- <img src="assets/img/user2-160x160.jpg" class="rounded-circle shadow" alt="User Image"/> --}}
+            <p>
+              Alexander Pierce - Web Developer
+              <small>Member since Nov. 2023</small>
+            </p>
+          </li>
+          <!--end::User Image-->
+          
+          <!--begin::Menu Footer-->
+          <li class="user-footer" style="background-color: var(--bs-body-bg);">
+            <a href="{{ route('profile') }}" class="btn btn-default btn-flat">Profile</a>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                {{-- <button type="submit">Logout</button> --}}
+                <button type="submit" class="btn btn-default btn-flat float-end">Logout</button>
+            </form>
+          </li>
+          <!--end::Menu Footer-->
+        </ul>
+      </li>
       <li class="nav-item dropdown">
         <button
           class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center"

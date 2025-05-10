@@ -3,11 +3,15 @@
 namespace App\Livewire\Karyawan\Pengajuan;
 
 use Carbon\Carbon;
+use App\Models\User;
 use Livewire\Component;
 use App\Models\M_Jadwal;
 use App\Models\M_Pengajuan;
 use App\Models\M_JadwalShift;
 use App\Models\M_DataKaryawan;
+use App\Notifications\PushDemo;
+use App\Events\PengajuanBaruEvent;
+use Illuminate\Support\Facades\Notification;
 use App\Livewire\Forms\PengajuanForm;
 use Illuminate\Support\Facades\Crypt;
 
@@ -38,25 +42,35 @@ class ModalPengajuan extends Component
             'shift_id' => $this->form->pengajuan,
             'tanggal' => $this->form->tanggal,
             'keterangan' => $this->form->keterangan,
-            'satatus' => 0, // Status default 0 (pending)
+            'satatus' => 0,
         ];
         // dd($data);
 
         // Simpan data ke database
-        M_Pengajuan::create($data);
+        // M_Pengajuan::create($data);
+        $pengajuan = M_Pengajuan::create($data)->load('getKaryawan', 'getShift');
+
+        // Kirim event
+        // broadcast(new PengajuanBaruEvent($pengajuan))->toOthers();
+        $user = User::first();
+        $user->notify(new \App\Notifications\PushDemo('Pengajuan baru telah dibuat!'));
+        // event(new PengajuanBaruEvent($pengajuan));
 
         // Reset input
         $this->form->reset();
 
+
+        
         $this->dispatch('swal', params: [
-            'title' => 'Data Saved',
+            'title' => 'Pengajuan Baru',
             'icon' => 'success',
-            'text' => 'Data has been saved successfully'
+            'text' => 'Pengajuan baru telah diajukan.'
         ]);
 
         // Tutup modal
         $this->dispatch('modalTambahPengajuan', action: 'hide');
         $this->dispatch('refresh');
+        
     }
 
     public function delete($id)
