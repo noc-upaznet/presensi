@@ -131,6 +131,14 @@
                     <i class="nav-icon bi bi-receipt"></i>
                     <p>Slip Gaji</p>
                 </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('history-payslip') }}" 
+                   class="nav-link {{ request()->routeIs('history-payslip') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-file-earmark-text"></i>
+                    <p>History Payslip</p>
+                </a>
 
             <li class="nav-item">
                 <a href="{{ route('ganti-password') }}" 

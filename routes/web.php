@@ -20,7 +20,7 @@ use App\Livewire\RiwayatPresensi;
 use App\Livewire\SlipGaji;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use App\Http\Controllers\SlipGajiController;
-
+use App\Livewire\HistoryPayslip;
 
 Route::get('/', function () {
     return view('welcome');
@@ -59,3 +59,5 @@ Route::get('/clockout', LiveAttendance::class)->name('clockout');
 
 
 Route::get('/slip-gaji/download', [SlipGajiController::class, 'download'])->name('slip-gaji.download');
+
+Route::get('/history-payslip', HistoryPayslip::class)->name('history-payslip');
