@@ -114,14 +114,6 @@
                     </div>
 
                     <div class="row">
-                        <!-- Header -->
-                        <div class="col-12 text-center mb-4 border-bottom pb-3 mt-3">
-                            <img src="./assets/img/user4-128x128.jpg" alt="Avatar" class="rounded-circle mb-2"
-                                width="64" height="64">
-                            <h5 class="mb-0">Nadia Safira Khairunnisa</h5>
-                            <small class="text-muted">Marketing</small>
-                        </div>
-
                         <!-- Informasi Umum -->
                         <div class="col-12 col-md-6 order-1">
                             <h6>Informasi Umum</h6>
@@ -156,16 +148,16 @@
                             <h6 class="mt-4">Riwayat Kehadiran</h6>
                             <div class="mb-4">
                                 <div class="row mb-2 small">
-                                    <div class="col-6 text-muted">Cuti Diambil</div>
-                                    <div class="col-6 text-end fw-semibold text-dark">2 Hari</div>
+                                    <div class="col-6 col-md-4 text-muted">Cuti Diambil</div>
+                                    <div class="col-6 col-md-4 text-end fw-semibold text-dark">2 Hari</div>
                                 </div>
                                 <div class="row mb-2 small">
-                                    <div class="col-6 text-muted">Terlambat</div>
-                                    <div class="col-6 text-end fw-semibold text-dark">16 Kali</div>
+                                    <div class="col-6 col-md-4 text-muted">Terlambat</div>
+                                    <div class="col-6 col-md-4 text-end fw-semibold text-dark">16 Kali</div>
                                 </div>
                                 <div class="row small">
-                                    <div class="col-6 text-muted">Izin</div>
-                                    <div class="col-6 text-end fw-semibold text-dark">3 Hari</div>
+                                    <div class="col-6 col-md-4 text-muted">Izin</div>
+                                    <div class="col-6 col-md-4 text-end fw-semibold text-dark">3 Hari</div>
                                 </div>
                             </div>
                         </div>
