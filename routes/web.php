@@ -10,6 +10,8 @@ use App\Livewire\Karyawan\Pengajuan\Pengajuan;
 use App\Livewire\Karyawan\Shifts\TemplateMingguan;
 use App\Livewire\Karyawan\TambahDataKaryawan;
 use App\Livewire\Karyawan\TambahPembagianShift;
+use App\Livewire\ListLokasi;
+use App\Livewire\RoleLokasi;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -26,3 +28,6 @@ Route::get('/pembagian-shift/tambah-pembagian-shift', TambahPembagianShift::clas
 Route::get('/jadwal-shift', JadwalShift::class)->name('jadwal-shift');
 Route::get('/template-mingguan', TemplateMingguan::class)->name('template-mingguan');
 Route::get('/pengajuan', Pengajuan::class)->name('pengajuan');
+
+Route::get('/list-lokasi', ListLokasi::class)->name('list-lokasi');
+Route::get('/role-lokasi', RoleLokasi::class)->name('role-lokasi');
