@@ -84,6 +84,15 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="{{ route('role-lokasi') }}"
+                        class="nav-link {{ request()->routeIs('role-lokasi') ? 'active' : '' }}">
+                        <i class="bi bi-geo-alt"></i>
+                        <p>Role Lokasi Presensi Karyawan</p>
+                    </a>
+                </li>
+                
+
             </ul>
             <!--end::Sidebar Menu-->
         </nav>

@@ -97,8 +97,13 @@
                                         <i class="fas fa-edit"></i>
                                     </button>
 
-                                    <button wire:click="hapusLokasi({{ $lokasi->id }})" class="btn btn-danger btn-sm"><i
-                                            class="fas fa-trash"></i></button>
+                                    <!-- Tombol Buka Modal -->
+                                    <button wire:click.prevent="confirmHapusLokasi({{ $lokasi->id }})"
+                                        class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#hapusLokasiModal">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+
                                 </td>
                             </tr>
                             @endforeach
@@ -108,48 +113,55 @@
             </div>
         </div>
 
-        <div wire:ignore.self class="modal fade" id="editLokasiModal" tabindex="-1"
+        <!-- Modal Edit Lokasi -->
+        <<div wire:ignore.self class="modal fade" id="editLokasiModal" tabindex="-1"
             aria-labelledby="editLokasiModalLabel" aria-hidden="true">
             <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bold text-primary" id="editLokasiModalLabel">Edit Lokasi Presensi</h5>
+                <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
+                        border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
+                    <div class="modal-header" style="border-bottom: none; padding: 1rem 1.5rem;">
+                        <h5 class="modal-title fw-bold" id="editLokasiModalLabel">Edit Lokasi Presensi</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="filter: invert(1);"></button>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                        <div class="row g-3">
-                            <div class="col-md-12">
-                                <label for="namaLokasi" class="form-label fw-bold">Nama Lokasi</label>
-                                <input type="text" id="namaLokasi" wire:model="nama_lokasi" class="form-control"
-                                    placeholder="Head Office (HO)" style="border-radius: 8px;">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="koordinat" class="form-label fw-bold">Koordinat</label>
-                                <button type="button" class="btn btn-primary"
-                                    style="font-size: 10px; padding: 4px 8px; border-radius: 4px; margin-left: 8px;">Google
-                                    Maps</button>
-                                <div class="input-group">
-                                    <input type="text" id="koordinat" wire:model="koordinat" class="form-control"
-                                        placeholder="-8.3489739" style="border-radius: 8px 0 0 8px;">
+                    <form wire:submit.prevent="updateLokasi">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label for="namaLokasi" class="form-label fw-semibold">Nama Lokasi</label>
+                                    <input type="text" id="namaLokasi" wire:model="nama_lokasi" class="form-control"
+                                        placeholder="Head Office (HO)" style="border-radius: 8px;">
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Status</label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="status" wire:model="status">
-                                    <label class="form-check-label" for="status">{{ $status ? 'Aktif' : 'Nonaktif'
-                                        }}</label>
+                                <div class="col-md-6">
+                                    <label for="koordinat" class="form-label fw-semibold">Koordinat</label>
+                                    <button type="button" class="btn btn-primary"
+                                        style="font-size: 10px; padding: 4px 8px; border-radius: 4px; margin-left: 8px;">Google
+                                        Maps</button>
+                                    <div class="input-group">
+                                        <input type="text" id="koordinat" wire:model="koordinat" class="form-control"
+                                            placeholder="-8.3489739" style="border-radius: 8px 0 0 8px;">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-12">
-                                <label for="alamat" class="form-label fw-bold">Lokasi Karyawan</label>
-                                <textarea id="alamat" wire:model="alamat" class="form-control" rows="3"
-                                    placeholder="Jl. Ngantru - Srengat No.550, Dermosari, Pinggirsari, Kec. Ngantru, Kabupaten Tulungagung, Jawa Timur 66252"
-                                    style="border-radius: 8px;"></textarea>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Status</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="status" wire:model="status">
+                                        <label class="form-check-label" for="status">{{ $status ? 'Aktif' :
+                                            'Nonaktif'
+                                            }}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="alamat" class="form-label fw-semibold">Lokasi Karyawan</label>
+                                    <textarea id="alamat" wire:model="alamat" class="form-control" rows="3"
+                                        placeholder="Jl. Ngantru - Srengat No.550, Dermosari, Pinggirsari, Kec. Ngantru, Kabupaten Tulungagung, Jawa Timur 66252"
+                                        style="border-radius: 8px;"></textarea>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
+                    </form>
+                    <div class="card-footer text-end" style="padding: 10px 20px;">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             style="border-radius: 8px;">Kembali</button>
                         <button type="button" class="btn btn-primary" wire:click="updateLokasi"
@@ -157,6 +169,66 @@
                     </div>
                 </div>
             </div>
-        </div>
-
     </div>
+
+    <!-- Modal Hapus Lokasi -->
+    <div wire:ignore.self class="modal fade" id="hapusLokasiModal" tabindex="-1" aria-labelledby="hapusLokasiModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-danger" id="hapusLokasiModalLabel">Hapus Lokasi Presensi
+                        Karyawan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Apakah Anda yakin ingin menghapus lokasi presensi ini?</p>
+                    <p><strong>{{ $nama_lokasi }}</strong></p>
+                    <p>Lokasi ini akan dihapus secara permanen.</p>
+                    <p>Jika lokasi ini sudah digunakan, maka data presensi karyawan yang menggunakan lokasi ini
+                        akan
+                        hilang.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 8px;">Batal</button>
+                    <button type="button" class="btn btn-danger" wire:click="deleteLokasi" style="border-radius: 8px;"
+                        data-bs-dismiss="modal">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // SweetAlert2 untuk notifikasi
+        window.addEventListener('lokasiTerupdate', function (event) {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: event.detail.message,
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // Pastikan modal tertutup setelah alert ditutup
+                const modalElement = document.getElementById('editLokasiModal');
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            });
+        });
+
+        // Manual close modal handler
+        window.addEventListener('closeModal', function () {
+            const modalElement = document.getElementById('editLokasiModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        });
+    });
+    window.addEventListener('lokasiTerhapus', event => {
+        alert('Lokasi berhasil dihapus.');
+    });
+</script>
