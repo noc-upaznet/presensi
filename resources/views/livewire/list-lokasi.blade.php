@@ -55,8 +55,6 @@
                 </div>
             </form>
 
-
-
             <div class="card shadow-sm p-4 bg-white rounded">
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -114,15 +112,13 @@
         </div>
 
         <!-- Modal Edit Lokasi -->
-        <<div wire:ignore.self class="modal fade" id="editLokasiModal" tabindex="-1"
+        <div wire:ignore.self class="modal fade" id="editLokasiModal" tabindex="-1"
             aria-labelledby="editLokasiModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                     <div class="modal-header" style="border-bottom: none; padding: 1rem 1.5rem;">
-                        <h5 class="modal-title fw-bold" id="editLokasiModalLabel">Edit Lokasi Presensi</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                            style="filter: invert(1);"></button>
+                        <h5 class="modal-title fw-bold text-primary" id="editLokasiModalLabel">Edit Lokasi Presensi</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form wire:submit.prevent="updateLokasi">
@@ -144,7 +140,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Status</label>
+                                    <label class="form-label fw-semibold">Status</label>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="status" wire:model="status">
                                         <label class="form-check-label" for="status">{{ $status ? 'Aktif' :
@@ -169,13 +165,15 @@
                     </div>
                 </div>
             </div>
+        </div>
     </div>
 
     <!-- Modal Hapus Lokasi -->
     <div wire:ignore.self class="modal fade" id="hapusLokasiModal" tabindex="-1" aria-labelledby="hapusLokasiModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #d51a1a; border-left: 1px solid #dee2e6;
+                        border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-danger" id="hapusLokasiModalLabel">Hapus Lokasi Presensi
                         Karyawan</h5>
@@ -229,6 +227,13 @@
         });
     });
     window.addEventListener('lokasiTerhapus', event => {
-        alert('Lokasi berhasil dihapus.');
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil',
+        text: 'Lokasi berhasil dihapus.',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'OK'
     });
+});
+
 </script>
