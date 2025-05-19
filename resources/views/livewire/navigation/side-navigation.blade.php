@@ -28,22 +28,23 @@
             data-accordion="false"
         >
             <li class="nav-item menu-open">
-            <a href="#" class="nav-link active">
-                <i class="nav-icon bi bi-speedometer"></i>
-                <p>
-                Dashboard
-                <i class="nav-arrow bi bi-chevron-right"></i>
-                </p>
-            </a>
-            <ul class="nav nav-treeview">
-                <li class="nav-item">
-                    <a href="{{ route('dashboard') }}" 
-                       class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                        <i class="nav-icon bi bi-circle"></i>
-                        <p>Dashboard v1</p>
-                    </a>
-                </li>
-            </ul>
+                <a href="#" class="nav-link active">
+                    <i class="nav-icon bi bi-speedometer"></i>
+                    <p>
+                    Dashboard
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="{{ route('dashboard') }}" 
+                        class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                            <p>Dashboard v1</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
             
             <li class="nav-item">
                 <a href="{{ route('data-karyawan') }}" 
@@ -77,13 +78,33 @@
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a href="{{ route('pengajuan') }}" 
-                   class="nav-link {{ request()->routeIs('pengajuan') ? 'active' : '' }}">
-                   <i class="bi bi-clipboard-plus"></i>
-                    <p>Pengajuan</p>
+            <li class="nav-item menu-open">
+                <a href="#" class="nav-link active">
+                    <i class="bi bi-clipboard-plus"></i>
+                    <p>
+                    Pengajuan
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                    </p>
                 </a>
+                <ul class="nav nav-treeview ml-4">
+                    <li class="nav-item">
+                        <a href="{{ route('pengajuan') }}" 
+                        class="nav-link {{ request()->routeIs('pengajuan') ? 'active' : '' }}">
+                        <i class="bi bi-clipboard-plus"></i>
+                            <p>Pengajuan Cuti/Izin</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('pengajuan-lembur') }}" 
+                        class="nav-link {{ request()->routeIs('pengajuan-lembur') ? 'active' : '' }}">
+                        <i class="bi bi-clipboard-plus"></i>
+                            <p>Pengajuan Lembur</p>
+                        </a>
+                    </li>
+                </ul>
             </li>
+
         </ul>
         <!--end::Sidebar Menu-->
         </nav>

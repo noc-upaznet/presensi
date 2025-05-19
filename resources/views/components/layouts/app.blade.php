@@ -61,7 +61,7 @@
     />
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     @livewireStyles
   </head>
@@ -351,6 +351,7 @@
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     @livewireScripts
     @stack('scripts')
@@ -438,6 +439,56 @@
         });
       })();
     </script>
+
+    {{-- <script>
+      const vapidPublicKey = "{{ config('webpush.vapid.public_key') }}";
+
+      async function subscribeUser() {
+          // Pastikan browser mendukung Service Worker
+          if (!('serviceWorker' in navigator)) {
+              console.error("Service Worker tidak didukung di browser ini.");
+              return;
+          }
+
+          try {
+              const registration = await navigator.serviceWorker.register('/sw.js');
+              console.log(registration);
+              
+              const subscription = await registration.pushManager.subscribe({
+                  userVisibleOnly: true,
+                  applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+              });
+
+              // await fetch('/api/subscriptions', {
+              //     method: 'POST',
+              //     headers: {
+              //         'Content-Type': 'application/json',
+              //         // Jika tidak pakai Sanctum, bisa kosongkan Authorization
+              //         // 'Authorization': 'Bearer {{ auth()->check() ? auth()->user()->createToken("webpush")->plainTextToken : "" }}'
+              //     },
+              //     body: JSON.stringify(subscription)
+              // });
+
+              alert('Berhasil subscribe notifikasi!');
+          } catch (e) {
+              console.error("Gagal subscribe:", e);
+          }
+      }
+
+      function urlBase64ToUint8Array(base64String) {
+          const padding = '='.repeat((4 - base64String.length % 4) % 4);
+          const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+          const rawData = window.atob(base64);
+          return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
+      }
+
+      // Panggil saat halaman siap
+      window.addEventListener('load', subscribeUser);
+    </script> --}}
+
+    @auth
+      <script src="{{ asset('js/enable-push.js') }}" defer></script>
+    @endauth
 
     <!-- Bootstrap Datepicker -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet"/>
