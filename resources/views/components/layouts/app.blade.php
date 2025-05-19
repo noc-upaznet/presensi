@@ -51,6 +51,13 @@
 <!-- Tambahkan ini di layout utama Anda (misalnya, app.blade.php) -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<!-- Bootstrap Datepicker CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/css/bootstrap-datepicker.min.css"
+  rel="stylesheet">
+
+<!-- Bootstrap Datepicker JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js"></script>
+
 
 <!--end::Head-->
 <!--begin::Body-->

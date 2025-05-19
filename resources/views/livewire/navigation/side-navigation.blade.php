@@ -91,7 +91,15 @@
                         <p>Role Lokasi Presensi Karyawan</p>
                     </a>
                 </li>
-                
+
+                <li class="nav-item">
+                    <a href="{{ route('pencairan-gaji') }}"
+                        class="nav-link {{ request()->routeIs('pencairan-gaji') ? 'active' : '' }}">
+                        <i class="bi bi-cash coin"></i>
+                        <p>Pencairan Gaji Karyawan</p>
+                    </a>
+                </li>
+
 
             </ul>
             <!--end::Sidebar Menu-->
