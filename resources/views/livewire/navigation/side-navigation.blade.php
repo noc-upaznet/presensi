@@ -35,7 +35,7 @@
                     <i class="nav-arrow bi bi-chevron-right"></i>
                     </p>
                 </a>
-                <ul class="nav nav-treeview">
+                <ul class="nav nav-treeview" style="margin-left: 20px;">
                     <li class="nav-item">
                         <a href="{{ route('dashboard') }}" 
                         class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -86,11 +86,11 @@
                     <i class="nav-arrow bi bi-chevron-right"></i>
                     </p>
                 </a>
-                <ul class="nav nav-treeview ml-4">
+                <ul class="nav nav-treeview" style="margin-left: 20px;">
                     <li class="nav-item">
                         <a href="{{ route('pengajuan') }}" 
                         class="nav-link {{ request()->routeIs('pengajuan') ? 'active' : '' }}">
-                        <i class="bi bi-clipboard-plus"></i>
+                        <i class="nav-icon bi bi-circle"></i>
                             <p>Pengajuan Cuti/Izin</p>
                         </a>
                     </li>
@@ -98,7 +98,7 @@
                     <li class="nav-item">
                         <a href="{{ route('pengajuan-lembur') }}" 
                         class="nav-link {{ request()->routeIs('pengajuan-lembur') ? 'active' : '' }}">
-                        <i class="bi bi-clipboard-plus"></i>
+                        <i class="nav-icon bi bi-circle"></i>
                             <p>Pengajuan Lembur</p>
                         </a>
                     </li>
