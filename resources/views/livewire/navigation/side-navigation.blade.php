@@ -100,6 +100,14 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="{{ route('payroll') }}"
+                        class="nav-link {{ request()->routeIs('payroll') ? 'active' : '' }}">
+                        <i class="bi bi-cash coin"></i>
+                        <p>Payroll</p>
+                    </a>
+                </li>
+
 
             </ul>
             <!--end::Sidebar Menu-->
