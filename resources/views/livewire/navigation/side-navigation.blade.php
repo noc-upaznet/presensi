@@ -108,6 +108,21 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="{{ route('presensi-karyawan') }}"
+                        class="nav-link {{ request()->routeIs('presensi-karyawan') ? 'active' : '' }}">
+                        <i class="bi bi-calendar-check"></i>
+                        <p>List Presensi</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('dashboard-admin') }}"
+                        class="nav-link {{ request()->routeIs('dashboard-admin') ? 'active' : '' }}">
+                       <i class="fas fa-tachometer-alt"></i>
+                        <p>Dashboard Admin</p>
+                    </a>
+                </li>
 
             </ul>
             <!--end::Sidebar Menu-->

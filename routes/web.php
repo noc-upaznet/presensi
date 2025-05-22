@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Dashboard;
+use App\Livewire\DashboardAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Karyawan\JadwalShift;
 use App\Livewire\Karyawan\DataKaryawan;
@@ -11,6 +12,7 @@ use App\Livewire\Karyawan\Shifts\TemplateMingguan;
 use App\Livewire\Karyawan\TambahDataKaryawan;
 use App\Livewire\Karyawan\TambahPembagianShift;
 use App\Livewire\ListLokasi;
+use App\Livewire\ListPresensiAdm;
 use App\Livewire\PencairanGaji;
 use App\Livewire\RoleLokasi;
 use App\Livewire\Payroll;
@@ -35,3 +37,5 @@ Route::get('/list-lokasi', ListLokasi::class)->name('list-lokasi');
 Route::get('/role-lokasi', RoleLokasi::class)->name('role-lokasi');
 Route::get('/pencairan-gaji', PencairanGaji::class)->name('pencairan-gaji'); 
 Route::get('/payroll', Payroll::class)->name('payroll');
+Route::get('/presensi-karyawan', ListPresensiAdm::class)->name('presensi-karyawan');
+Route::get('/dashboard-admin', DashboardAdmin::class)->name('dashboard-admin');
