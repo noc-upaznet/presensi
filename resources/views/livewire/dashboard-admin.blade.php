@@ -1,129 +1,167 @@
-<div>
-    <div class="container-fluid">
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="card shadow-sm text-center">
-                    <div class="card-body">
-                        <div class="mb-2">
-                            <i class="fas fa-users fa-2x text-warning"></i>
+<div class="container-fluid">
+    {{-- Summary Cards --}}
+    <div class="row g-3 mb-4">
+        @php
+        $cards = [
+        ['title' => 'TOTAL PEGAWAI', 'value' => '104', 'icon' => 'fa-users', 'color' => 'warning'],
+        ['title' => 'TOTAL GAJI KARYAWAN', 'value' => 'Rp. 75.985.069', 'icon' => 'fa-money-bill-wave', 'color' =>
+        'info', 'note' => '▲ -5% dari bulan sebelumnya'],
+        ['title' => 'IZIN/CUTI', 'value' => '6', 'icon' => 'fa-calendar-times', 'color' => 'danger'],
+        ['title' => 'MASUK', 'value' => '98', 'icon' => 'fa-user-check', 'color' => 'success'],
+        ];
+        @endphp
+
+        @foreach ($cards as $card)
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm h-100 d-flex flex-column">
+                <div class="card-body text-center flex-grow-1">
+                    <div class="d-flex justify-content-center mb-2">
+                        <div class="rounded-circle bg-{{ $card['color'] }} d-flex align-items-center justify-content-center"
+                            style="width: 45px; height: 45px;">
+                            <i class="fas {{ $card['icon'] }} text-white"></i>
                         </div>
-                        <h6 class="card-title text-muted mb-1">TOTAL PEGAWAI</h6>
-                        <h3 class="fw-bold mb-2">104</h3>
-                        <a href="#" class="small text-primary">More Info <i class="fas fa-arrow-right"></i></a>
                     </div>
+                    <h6 class="text-muted text-uppercase mb-1">{{ $card['title'] }}</h6>
+                    <h3 class="fw-bold mb-2">{{ $card['value'] }}</h3>
+                    @isset($card['note'])
+                    <p class="text-danger small mb-0">{{ $card['note'] }}</p>
+                    @endisset
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card shadow-sm text-center">
-                    <div class="card-body">
-                        <div class="mb-2">
-                            <i class="fas fa-money-bill-wave fa-2x text-success"></i>
-                        </div>
-                        <h6 class="card-title text-muted mb-1">TOTAL GAJI KARYAWAN</h6>
-                        <h5 class="fw-bold mb-1">Rp. 75.985.069</h5>
-                        <p class="text-danger small mb-1">▲ -5% dari bulan sebelumnya</p>
-                        <a href="#" class="small text-primary">More Info <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card shadow-sm text-center">
-                    <div class="card-body">
-                        <div class="mb-2">
-                            <i class="fas fa-calendar-times fa-2x text-danger"></i>
-                        </div>
-                        <h6 class="card-title text-muted mb-1">IZIN/CUTI</h6>
-                        <h3 class="fw-bold mb-2">6</h3>
-                        <a href="#" class="small text-primary">More Info <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card shadow-sm text-center">
-                    <div class="card-body">
-                        <div class="mb-2">
-                            <i class="fas fa-user-check fa-2x text-primary"></i>
-                        </div>
-                        <h6 class="card-title text-muted mb-1">MASUK</h6>
-                        <h3 class="fw-bold mb-2">98</h3>
-                        <a href="#" class="small text-primary">More Info <i class="fas fa-arrow-right"></i></a>
-                    </div>
+                <div class="card-footer bg-primary text-white py-2 text-center">
+                    <a href="#" class="text-white text-decoration-none fw-medium">
+                        More Info <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
                 </div>
             </div>
         </div>
-
-
-        {{-- Grafik Presensi & Pie Chart Pendidikan/Status --}}
-        <div class="row mt-4">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header"><strong>PRESENSI PERBULAN</strong></div>
-                    <div class="card-body">
-                        <canvas id="grafikPresensi"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                {{-- Pie Chart Pendidikan --}}
-                <div class="card mb-3">
-                    <div class="card-header"><strong>PENDIDIKAN</strong></div>
-                    <div class="card-body">
-                        <canvas id="chartPendidikan"></canvas>
-                    </div>
-                </div>
-
-                {{-- Status Karyawan --}}
-                <div class="card">
-                    <div class="card-header"><strong>STATUS KARYAWAN</strong></div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            @foreach ($statusKaryawan as $status => $jumlah)
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {{ $status }}
-                                <span class="badge bg-primary rounded-pill">{{ $jumlah }}</span>
-                            </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @endforeach
     </div>
-    <style>
-        .card {
-            border-radius: 12px;
-        }
 
-        .card-body {
-            padding: 1.5rem;
-        }
-    </style>
 
+    {{-- Grafik dan Status --}}
+    <div class="row">
+        {{-- Grafik Presensi --}}
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-white fw-bold">PRESENSI PERBULAN</div>
+                    <div class="card-body" style="height: 320px;">
+                        <canvas id="grafikPresensi" class="w-100 h-100"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-white fw-bold">PENDIDIKAN</div>
+                    <div class="card-body d-flex justify-content-center align-items-center" style="height: 320px;">
+                        <canvas id="chartPendidikan" style="max-height: 250px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            {{-- Status Karyawan --}}
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white fw-bold">STATUS KARYAWAN</div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between small mb-2">
+                        <span>Total</span>
+                        <span>104</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 14px;">
+                        <div class="progress-bar bg-primary" style="width: 87.5%"></div>
+                        <div class="progress-bar bg-warning" style="width: 8.65%"></div>
+                        <div class="progress-bar bg-danger" style="width: 3.85%"></div>
+                    </div>
+                    <ul class="list-unstyled small mb-2">
+                        <li class="d-flex align-items-center"><i class="fas fa-square text-primary me-2"></i> Tetap
+                            (91
+                            - 87.5%)</li>
+                        <li class="d-flex align-items-center"><i class="fas fa-square text-warning me-2"></i>
+                            Kontrak (9
+                            - 8.65%)</li>
+                        <li class="d-flex align-items-center"><i class="fas fa-square text-danger me-2"></i>
+                            Probation
+                            (4 - 3.85%)</li>
+                    </ul>
+                    <a href="#" class="small text-primary">More Info <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            {{-- Jadwal Shift --}}
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white fw-bold">JADWAL SHIFT HARI INI</div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <div><strong>Shift Pagi</strong></div>
+                        <div>07:00 - 15:00</div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <div><strong>Shift Siang</strong></div>
+                        <div>15:00 - 23:00</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div><strong>Shift Malam</strong></div>
+                        <div>23:00 - 07:00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            {{-- Insight SDM --}}
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white fw-bold">INSIGHT SDM</div>
+                <div class="card-body small">
+                    <p>👥 Rata-rata usia karyawan: <strong>29 tahun</strong></p>
+                    <p>👩‍🏫 Pendidikan tertinggi terbanyak: <strong>S1</strong></p>
+                    <p>📈 Pertumbuhan karyawan bulan ini: <strong>+2 orang</strong></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
-
+</div>
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('grafikPresensi');
-    new Chart(ctx, {
+    const presensiCtx = document.getElementById('grafikPresensi');
+    new Chart(presensiCtx, {
         type: 'bar',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             datasets: [
-                { label: 'Tepat Waktu', data: [74, 102, 75, 86, 98, 100], backgroundColor: '#4bc0c0' },
-                { label: 'Terlambat', data: [17, 6, 16, 10, 5, 4], backgroundColor: '#ffcd56' },
-                { label: 'Tidak Absen', data: [13, 9, 8, 6, 7, 6], backgroundColor: '#ff6384' },
+                { label: 'Tepat Waktu', backgroundColor: '#9966ff', data: [74, 102, 88, 75, 98, 99, 102, 95, 90, 99, 99, 103] },
+                { label: 'Terlambat', backgroundColor: '#ff6384', data: [17, 0, 8, 16, 15, 0, 0, 0, 5, 5, 3, 0] },
+                { label: 'Tidak Absen', backgroundColor: '#36a2eb', data: [13, 0, 2, 1, 3, 1, 0, 2, 0, 1, 3, 0] }
             ]
         },
-        options: { responsive: true }
+       options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            layout: {
+                padding: 10
+            }
+        }
     });
 
-    const ctxPie = document.getElementById('chartPendidikan');
-    new Chart(ctxPie, {
+    const pendidikanCtx = document.getElementById('chartPendidikan');
+    new Chart(pendidikanCtx, {
         type: 'pie',
         data: {
             labels: ['SMK', 'D3', 'S1', 'S2'],
             datasets: [{
-                data: [45, 23, 29, 7],
+                data: [45, 17, 29, 13],
                 backgroundColor: ['#36a2eb', '#ffcd56', '#4bc0c0', '#9966ff']
             }]
         }
