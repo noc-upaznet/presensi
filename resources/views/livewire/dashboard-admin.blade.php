@@ -27,9 +27,9 @@
                     <p class="text-danger small mb-0">{{ $card['note'] }}</p>
                     @endisset
                 </div>
-                <div class="card-footer bg-primary text-white py-2 text-center">
+                <div class="card-footer bg-info text-white py-2 text-center">
                     <a href="#" class="text-white text-decoration-none fw-medium">
-                        More Info <i class="fas fa-arrow-right ms-1"></i>
+                        More Info <i class="fa-solid fa-circle-chevron-right"></i>
                     </a>
                 </div>
             </div>
@@ -86,7 +86,11 @@
                             Probation
                             (4 - 3.85%)</li>
                     </ul>
-                    <a href="#" class="small text-primary">More Info <i class="fas fa-arrow-right"></i></a>
+                    <div class="card-footer bg-info text-white py-2 text-center">
+                        <a href="#" class="text-white text-decoration-none fw-medium">
+                            More Info <i class="fa-solid fa-circle-chevron-right"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
