@@ -16,6 +16,7 @@ use App\Livewire\ListPresensiAdm;
 use App\Livewire\PencairanGaji;
 use App\Livewire\RoleLokasi;
 use App\Livewire\Payroll;
+use App\Livewire\SalarySlip\CreateSalarySlip;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -39,3 +40,4 @@ Route::get('/pencairan-gaji', PencairanGaji::class)->name('pencairan-gaji');
 Route::get('/payroll', Payroll::class)->name('payroll');
 Route::get('/presensi-karyawan', ListPresensiAdm::class)->name('presensi-karyawan');
 Route::get('/dashboard-admin', DashboardAdmin::class)->name('dashboard-admin');
+Route::get('/create-slip-gaji', CreateSalarySlip::class)->name('create-slip-gaji');

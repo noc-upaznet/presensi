@@ -24,7 +24,6 @@
                         <i class="fa-solid fa-plus"></i>
                         Tambah Role Presensi
                     </button>
-
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -127,7 +126,7 @@
                     <!-- Lokasi Karyawan -->
                     <div class="mb-3">
                         <label for="lokasi" class="form-label fw-semibold">Lokasi Karyawan</label>
-                        <select class="form-select" disabled>
+                        <select class="form-select">
                             <option value="">-- Pilih Lokasi Presensi --</option>
                             <option value="Head Office">Head Office</option>
                             <option value="UNB">UNB</option>
@@ -137,7 +136,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary">Simpan</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
@@ -173,9 +172,8 @@
                     <div class="mb-3">
                         <label for="lock" class="form-label fw-semibold">Lock Lokasi Presensi</label>
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="editLockSwitch" wire:model="lock"
-                                wire:click="toggleLock">
-                            <label class="form-check-label" for="editLockSwitch">
+                            <input class="form-check-input" type="checkbox" id="lockSwitch" wire:model="lock">
+                            <label class="form-check-label" for="lockSwitch">
                                 {{ $lock ? 'Aktif' : 'Tidak Aktif' }}
                             </label>
                         </div>
@@ -191,7 +189,7 @@
                             <option value="UNR Selatan">UNR Selatan</option>
                             <option value="UNR Utara">UNR Utara</option>
                         </select>
-                    </div>
+                    </div> 
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" wire:click="update">Update</button>
@@ -243,4 +241,5 @@
             confirmButtonText: 'OK'
         });
     });
+
 </script>

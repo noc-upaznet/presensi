@@ -1,6 +1,6 @@
 <div class="container-fluid">
     {{-- Summary Cards --}}
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-3">
         @php
         $cards = [
         ['title' => 'TOTAL PEGAWAI', 'value' => '104', 'icon' => 'fa-users', 'color' => 'warning'],
@@ -37,12 +37,11 @@
         @endforeach
     </div>
 
-
     {{-- Grafik dan Status --}}
     <div class="row">
         {{-- Grafik Presensi --}}
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-12 col-md-8">
                 <div class="card shadow-sm h-100">
                     <div class="card-header bg-white fw-bold">PRESENSI PERBULAN</div>
                     <div class="card-body" style="height: 320px;">
@@ -51,7 +50,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-6 col-md-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-header bg-white fw-bold">PENDIDIKAN</div>
                     <div class="card-body d-flex justify-content-center align-items-center" style="height: 320px;">
@@ -61,9 +60,9 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-6 col-md-4">
             {{-- Status Karyawan --}}
-            <div class="card shadow-sm mt-4">
+            <div class="card shadow-sm mt-3">
                 <div class="card-header bg-white fw-bold">STATUS KARYAWAN</div>
                 <div class="card-body">
                     <div class="d-flex justify-content-between small mb-2">
@@ -86,18 +85,18 @@
                             Probation
                             (4 - 3.85%)</li>
                     </ul>
-                    <div class="card-footer bg-info text-white py-2 text-center">
-                        <a href="#" class="text-white text-decoration-none fw-medium">
-                            More Info <i class="fa-solid fa-circle-chevron-right"></i>
-                        </a>
-                    </div>
+                </div>
+                <div class="card-footer bg-info text-white py-2 text-center">
+                    <a href="#" class="text-white text-decoration-none fw-medium">
+                        More Info <i class="fa-solid fa-circle-chevron-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-6 col-md-4">
             {{-- Jadwal Shift --}}
-            <div class="card shadow-sm mt-4">
+            <div class="card shadow-sm mt-3">
                 <div class="card-header bg-white fw-bold">JADWAL SHIFT HARI INI</div>
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
@@ -116,9 +115,9 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-6 col-md-4">
             {{-- Insight SDM --}}
-            <div class="card shadow-sm mt-4">
+            <div class="card shadow-sm mt-3">
                 <div class="card-header bg-white fw-bold">INSIGHT SDM</div>
                 <div class="card-body small">
                     <p>👥 Rata-rata usia karyawan: <strong>29 tahun</strong></p>

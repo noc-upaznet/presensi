@@ -124,6 +124,14 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="{{ route('create-slip-gaji') }}"
+                        class="nav-link {{ request()->routeIs('create-slip-gaji') ? 'active' : '' }}">
+                        <i class="bi bi-cash-coin"></i>
+                        <p>Create Salary Slip</p>
+                    </a>
+                </li>
+
             </ul>
             <!--end::Sidebar Menu-->
         </nav>

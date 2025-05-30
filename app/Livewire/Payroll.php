@@ -10,6 +10,7 @@ class Payroll extends Component
 {
     use WithPagination;
 
+    public $search = '';
     public $selectedYear;
     public $selectedMonth;
     public $periode;
