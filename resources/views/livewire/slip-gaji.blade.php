@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="row p-3 p-md-4">
-                    <div class="col-12 col-md-6 mb-4 mb-md-0">
+                    <div class="col-12 col-md-4 mb-4 mb-md-0">
                         <h6 class="fw-bold text-primary">Pendapatan</h6>
                         <ul class="list-unstyled">
                             <li class="d-flex justify-content-between"><span>Upah
@@ -52,28 +52,42 @@
                             <li class="d-flex justify-content-between"><span>Bonus</span><strong>Rp0</strong></li>
                             <li class="d-flex justify-content-between"><span>Tunjangan
                                     Kebudayaan</span><strong>Rp0</strong></li>
+                            <li class="d-flex justify-content-between"><span> Fee Belajar</span><strong>Rp0</strong>
+                            </li>
                         </ul>
                     </div>
 
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-4">
                         <h6 class="fw-bold text-danger">Potongan</h6>
                         <ul class="list-unstyled">
                             <li class="d-flex justify-content-between"><span>Potongan
-                                    Terlambat</span><strong>Rp0</strong></li>
+                                    Terlambat</span><strong>Rp20.000</strong></li>
                             <li class="d-flex justify-content-between"><span>Potongan
-                                    Izin</span><strong>Rp0</strong>
+                                    Izin</span><strong>Rp40.000</strong>
                             </li>
                             <li class="d-flex justify-content-between"><span>Kas Bon</span><strong>Rp0</strong></li>
-                            <li class="d-flex justify-content-between"><span>JKK</span><strong>-Rp20.000</strong>
+                            <li class="d-flex justify-content-between"><span>JKK</span><strong>Rp15.000</strong>
                             </li>
-                            <li class="d-flex justify-content-between"><span>PPh21</span><strong>-Rp25.000</strong>
+                            <li class="d-flex justify-content-between"><span>JKM</span><strong>Rp0</strong>
                             </li>
-                            <li class="d-flex justify-content-between"><span>JHT</span><strong>-Rp40.000</strong>
+                            <li class="d-flex justify-content-between"><span>JHT Karyawan</span><strong>Rp0</strong>
                             </li>
                             <li class="d-flex justify-content-between">
-                                <span>Kesehatan</span><strong>-Rp20.000</strong>
+                                <span>Kesehatan</span><strong>Rp0</strong>
                             </li>
-                            <li class="d-flex justify-content-between"><span>Voucher</span><strong>Rp0</strong></li>
+                            <li class="d-flex justify-content-between"><span>Voucher</span><strong>Rp100.000</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <h6 class="fw-bold text-info">Kehadiran</h6>
+                        <ul class="list-unstyled">
+                            <li class="d-flex justify-content-between"><span>Terlambat</span><strong>0</strong></li>
+                            <li class="d-flex justify-content-between"><span>Izin</span><strong>1</strong></li>
+                            <li class="d-flex justify-content-between"><span>Cuti</span><strong>0</strong></li>
+                            <li class="d-flex justify-content-between"><span>Kehadiran</span><strong>25</strong>
+                            </li>
+                            <li class="d-flex justify-content-between"><span>Lembur</span><strong>0</strong></li>
                         </ul>
                     </div>
                 </div>
@@ -81,7 +95,7 @@
                 <div class="px-3 px-md-4 pb-4 text-center">
                     <hr>
                     <h6 class="fw-bold text-primary">Gaji Bersih</h6>
-                    <h4 class="fw-bold">Rp2.655.000</h4>
+                    <h4 class="fw-bold">Rp2.585.000</h4>
                     <button wire:click="downloadSlip" class="btn btn-primary mt-2">
                         Download Slip Gaji Maret 2025
                     </button>
