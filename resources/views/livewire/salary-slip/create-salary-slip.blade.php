@@ -26,11 +26,26 @@
                     </div>
                     <div class="col-md-4">
                         <label>Nama</label>
-                        <input type="text" class="form-control" placeholder="Contoh: Nadia Safira">
+                        <div class="input-group">
+                            <select class="form-select">
+                                <option value="">Pilih Karyawan</option>
+                                <option value="1">John Doe</option>
+                                <option value="2">Jane Smith</option>
+                                <option value="3">Alice Johnson</option>
+                            </select>
+                        </div>
                     </div>
+
                     <div class="col-md-4">
                         <label>Departemen</label>
-                        <input type="text" class="form-control" placeholder="Contoh: HR & GA">
+                        <div class="input-group">
+                            <select class="form-select">
+                                <option value="">Pilih Departemen</option>
+                                <option value="1">IT</option>
+                                <option value="2">HR</option>
+                                <option value="3">Finance</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -129,24 +144,35 @@
         </div>
 
         <div class="card mb-3">
-            <div class="card-header bg-light fw-bold">Attendance Summary</div>
+            <div class="card-header bg-info text-white">KEHADIRAN</div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4">
-                        <label>Working Days</label>
-                        <input type="number" class="form-control" placeholder="26">
+                        <label>Terlambat</label>
+                        <input type="number" class="form-control" placeholder="2">
                     </div>
                     <div class="col-md-4">
-                        <label>Days Off</label>
+                        <label>Izin</label>
+                        <input type="number" class="form-control" placeholder="1">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Cuti</label>
                         <input type="number" class="form-control" placeholder="0">
                     </div>
+                </div>
+                <div class="row mt-3">
                     <div class="col-md-4">
-                        <label>National Holiday</label>
-                        <input type="number" class="form-control" placeholder="2">
+                        <label>Kehadiran</label>
+                        <input type="number" class="form-control" placeholder="25">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Lembur</label>
+                        <input type="number" class="form-control" placeholder="0">
                     </div>
                 </div>
             </div>
         </div>
+
 
         <div class="text-end">
             <button class="btn btn-primary">Simpan Slip Gaji</button>
