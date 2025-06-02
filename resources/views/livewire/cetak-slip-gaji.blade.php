@@ -143,14 +143,21 @@
 
     <table style="width: 100%; font-size: 12px; margin-top: 5px; border-collapse: collapse;">
         <tr>
-            <td style="width: 50%; padding: 2px 2px 2px 20px; border: none;"><strong>NPK/NIP:</strong>
-                241209872</td>
+            <td style="width: 50%; padding: 2px 2px 2px 20px; border: none;"><strong>Payroll cut off:</strong> 1 Mar –
+                31 Mar 2025</td>
+            <td style="width: 50%; padding: 2px; border: none;"><strong>Jabatan:</strong> Admin HR</td>
         </tr>
         <tr>
-            <td style="padding: 2px 2px 2px 20px; border: none;"><strong>Nama:</strong> Nadia Safira</td>
+            <td style="padding: 2px 2px 2px 20px; border: none;"><strong>ID / Nama:</strong> UZ01 / Nadia Safira</td>
+            <td style="padding: 2px; border: none;"><strong>PTKP:</strong> TK/0</td>
         </tr>
         <tr>
             <td style="padding: 2px 2px 2px 20px; border: none;"><strong>Departemen:</strong> HR & GA</td>
+            <td style="padding: 2px; border: none;"><strong>NPWP:</strong> -</td>
+        </tr>
+        <tr>
+            <td style="padding: 2px 2px 2px 20px; border: none;"><strong>Grade / Level:</strong> Staf</td>
+            <td style="padding: 2px; border: none;"><strong>Tanggal Masuk:</strong> 22 Jan 2022</td>
         </tr>
     </table>
 
@@ -158,12 +165,12 @@
     <table style="width: calc(100% - 40px); margin: 10px 20px 0 20px; border-collapse: collapse;">
         <thead>
             <tr>
-                <th class="green" colspan="2" style="text-align: left;">PENDAPATAN</th>
+                <th class="green" colspan="2" style="text-align: left;">Earnings</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Upah Pokok</td>
+                <td>Gaji Pokok</td>
                 <td>Rp2.000.000</td>
             </tr>
             <tr>
@@ -171,32 +178,16 @@
                 <td>Rp500.000</td>
             </tr>
             <tr>
-                <td>Tunjangan Kehadiran</td>
+                <td>Uang Makan</td>
                 <td>Rp260.000</td>
             </tr>
             <tr>
-                <td>UpahLembur</td>
-                <td>Rp0</td>
+                <td>Lembur</td>
+                <td>-</td>
             </tr>
             <tr>
-                <td>Uang Makan</td>
-                <td>Rp0</td>
-            </tr>
-            <tr>
-                <td>Uang Transport</td>
-                <td>Rp0</td>
-            </tr>
-            <tr>
-                <td>Bonus</td>
-                <td>Rp0</td>
-            </tr>
-            <tr>
-                <td>Tunjangan Kebudayaan</td>
-                <td>Rp0</td>
-            </tr>
-            <tr>
-                <td>Fee Belajar</td>
-                <td>Rp0</td>
+                <td>Bonus/PPh 21 DTP</td>
+                <td>-</td>
             </tr>
             <tr>
                 <th>Total</th>
@@ -209,46 +200,34 @@
     <table style="width: calc(100% - 40px); margin: 10px 20px 0 20px; border-collapse: collapse;">
         <thead>
             <tr>
-                <th colspan="2" style="text-align: left; background-color: #dc3545; color: white;">Potongan</th>
+                <th colspan="2" style="text-align: left; background-color: #dc3545; color: white;">Deductions</th>
 
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Potongan Terlambat</td>
+                <td>BPJS Kesehatan</td>
                 <td>Rp20.000</td>
             </tr>
             <tr>
-                <td>Potongan Ijin</td>
+                <td>BPJS TK JHT</td>
                 <td>Rp40.000</td>
             </tr>
             <tr>
-                <td>Kasbon</td>
-                <td>Rp0</td>
+                <td>BPJS TK JP</td>
+                <td>Rp30.000</td>
             </tr>
             <tr>
-                <td>JKK</td>
+                <td>PPh 21</td>
                 <td>Rp15.000</td>
             </tr>
             <tr>
-                <td>JKM</td>
-                <td>Rp0</td>
-            </tr>
-            <tr>
-                <td>JHT Karyawan</td>
-                <td>Rp0</td>
-            </tr>
-            <tr>
-                <td>Kesehatan</td>
-                <td>Rp0</td>
-            </tr>
-            <tr>
-                <td>Voucher</td>
-                <td>Rp100.000</td>
+                <td>Potongan Absen</td>
+                <td>-</td>
             </tr>
             <tr>
                 <th>Total</th>
-                <th>Rp175.000</th>
+                <th>Rp105.000</th>
             </tr>
         </tbody>
     </table>
@@ -260,40 +239,73 @@
                 <div
                     style="background-color: #007bff; color: white; padding: 8px 16px; font-weight: bold; font-size: 16px; display: flex; justify-content: space-between;">
                     <span>Total Take Home Pay</span>
-                    <span>Rp2.585.000</span>
+                    <span>Rp2.655.000</span>
                 </div>
             </td>
         </tr>
     </table>
 
+
     <table
         style="width: calc(100% - 40px); margin: 20px 20px 0 20px; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 12px;">
-        <td style="vertical-align: top; width: 50%; padding: 0 8px;">
-            <div style="font-weight: bold; border-bottom: 1px solid #74125b; padding-bottom: 4px; margin-bottom: 6px;">
-                Attendance Summary</div>
-            <table style="width: 100%; border-collapse: collapse; border: none;">
-                <tr>
-                    <td style="border: none;">Terlambat</td>
-                    <td style="text-align: right; border: none;">0</td>
-                </tr>
-                <tr>
-                    <td style="border: none;">Ijin</td>
-                    <td style="text-align: right; border: none;">1</td>
-                </tr>
-                <tr>
-                    <td style="border: none;">Cuti</td>
-                    <td style="text-align: right; border: none;">0</td>
-                </tr>
-                <tr>
-                    <td style="border: none;">Kehadiran</td>
-                    <td style="text-align: right; border: none;">24</td>
-                </tr>
-                <tr>
-                    <td style="border: none;">Lembur</td>
-                    <td style="text-align: right; border: none;">0</td>
-                </tr>
-            </table>
-        </td>
+        <tr>
+            <td style="vertical-align: top; width: 50%; padding: 0 8px;">
+                <div style="font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin-bottom: 6px;">
+                    Benefits</div>
+                <table style="width: 100%; border-collapse: collapse; border: none;">
+                    <tr>
+                        <td style="border: none;">Total PPh 21 DTP Received</td>
+                        <td style="text-align: right; border: none;">Rp0</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">JKK</td>
+                        <td style="text-align: right; border: none;">Rp50.000</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">JKM</td>
+                        <td style="text-align: right; border: none;">Rp50.000</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">JHT Company</td>
+                        <td style="text-align: right; border: none;">Rp100.000</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">JP Company</td>
+                        <td style="text-align: right; border: none;">Rp80.000</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">BPJS Kesehatan Company</td>
+                        <td style="text-align: right; border: none;">Rp120.000</td>
+                    </tr>
+                </table>
+            </td>
+            <td style="vertical-align: top; width: 50%; padding: 0 8px;">
+                <div style="font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin-bottom: 6px;">
+                    Attendance Summary</div>
+                <table style="width: 100%; border-collapse: collapse; border: none;">
+                    <tr>
+                        <td style="border: none;">Working Days</td>
+                        <td style="text-align: right; border: none;">23</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Days Off</td>
+                        <td style="text-align: right; border: none;">0</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">National Holiday</td>
+                        <td style="text-align: right; border: none;">0</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Company Holiday</td>
+                        <td style="text-align: right; border: none;">0</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Attendance Code</td>
+                        <td style="text-align: right; border: none;">H:1 A:0 SL:2</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
     </table>
 
 

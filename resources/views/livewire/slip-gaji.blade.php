@@ -16,7 +16,7 @@
     </div>
 
     <div class="mt-3 bg-light">
-        <div class="container px-0 px-md-3" style="max-width: 900px;">
+        <div class="container px-0 px-md-3" style="max-width: 1100px;">
             <div class="bg-white p-3 p-md-4 shadow rounded border border-light-subtle">
                 <div class="bg-primary text-white px-3 px-md-4 py-2 rounded-top d-flex justify-content-between">
                     <div><strong>Slip Number : DJB/HR/130</strong></div>
@@ -75,7 +75,8 @@
                             <li class="d-flex justify-content-between">
                                 <span>Kesehatan</span><strong>Rp0</strong>
                             </li>
-                            <li class="d-flex justify-content-between"><span>Voucher</span><strong>Rp100.000</strong></li>
+                            <li class="d-flex justify-content-between"><span>Voucher</span><strong>Rp100.000</strong>
+                            </li>
                         </ul>
                     </div>
 
