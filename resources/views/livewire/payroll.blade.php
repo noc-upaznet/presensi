@@ -18,6 +18,17 @@
 
     <div class="container">
         <div class="card">
+            <div class="card-header">
+                <a href="{{ route('create-slip-gaji') }}" class="btn btn-sm btn-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    Tambah
+                </a>
+                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
+                    data-bs-target="#importPayrollModal">   
+                    <i class="fa-solid fa-file-import"></i>
+                    Import
+                </button>   
+            </div>
             <div class="card-body">
                 <div class="d-flex mb-3 align-items-center">
                     {{-- Dropdown Tahun --}}

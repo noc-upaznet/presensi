@@ -197,7 +197,7 @@
         </div>
     </div>
 </div>
-</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // SweetAlert2 untuk notifikasi

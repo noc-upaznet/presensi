@@ -131,6 +131,20 @@
                         <p>Create Salary Slip</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('jenis-tunjangan') }}"
+                        class="nav-link {{ request()->routeIs('jenis-tunjangan') ? 'active' : '' }}">
+                        <i class="bi bi-clipboard-plus"></i>
+                        <p>Jenis Tunjangan</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('jenis-potongan') }}"
+                        class="nav-link {{ request()->routeIs('jenis-potongan') ? 'active' : '' }}">
+                        <i class="bi bi-clipboard-minus"></i>
+                        <p>Jenis Potongan</p>
+                    </a>
+                </li>
 
             </ul>
             <!--end::Sidebar Menu-->

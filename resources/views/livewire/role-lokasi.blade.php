@@ -20,7 +20,7 @@
             <!--begin::Container-->
             <div class="container-fluid">
                 <div class="mb-4">
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#rolePresensiModal">
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#rolePresensiModal">
                         <i class="fa-solid fa-plus"></i>
                         Tambah Role Presensi
                     </button>

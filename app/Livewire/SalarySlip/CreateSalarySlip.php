@@ -3,13 +3,17 @@
 namespace App\Livewire\SalarySlip;
 
 use Livewire\Component;
-use App\Models\SalarySlip; 
+use App\Models\SalarySlip;
 use Illuminate\Validation\Rule;
+use App\Models\jenis_tunjangan as JenisTunjangan;
+use App\Models\jenis_potongan as JenisPotongan;
 
 class CreateSalarySlip extends Component
 {
     public $employee_name, $position, $period;
     public $basic_salary = 0, $allowance = 0, $deduction = 0;
+    public $jenis_tunjangan;
+    public $jenis_potongan;
 
     public function getTotalSalaryProperty()
     {
@@ -40,6 +44,11 @@ class CreateSalarySlip extends Component
         session()->flash('success', 'Slip gaji berhasil disimpan.');
         $this->reset(); // Kosongkan form
     }
+    public function mount()
+    {
+        $this->jenis_tunjangan = JenisTunjangan::all();
+        $this->jenis_potongan = JenisPotongan::all();
+    }
 
     public function render()
     {
@@ -48,4 +57,3 @@ class CreateSalarySlip extends Component
         ]);
     }
 }
-
