@@ -9,9 +9,6 @@ class PengajuanForm extends Form
 {
     public $id;
 
-    #[Validate('required', 'Nama Karyawan')]
-    public $nama_karyawan = '';
-
     #[Validate('required', 'Pengajuan')]
     public $pengajuan = '';
     

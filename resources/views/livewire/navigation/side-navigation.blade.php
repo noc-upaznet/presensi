@@ -27,54 +27,91 @@
             role="menu"
             data-accordion="false"
         >
-            <li class="nav-item menu-open">
-                <a href="#" class="nav-link active">
-                    <i class="nav-icon bi bi-speedometer"></i>
-                    <p>
-                    Dashboard
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                    </p>
-                </a>
-                <ul class="nav nav-treeview" style="margin-left: 20px;">
-                    <li class="nav-item">
-                        <a href="{{ route('dashboard') }}" 
-                        class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+             @if (auth()->user()->role == 'admin')
+                <li class="nav-item">
+                    <a href="{{ route('dashboard') }}" 
+                    class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <i class="bi bi-speedometer"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+            @endif
+            @if (auth()->user()->role == 'user')
+                <li class="nav-item">
+                    <a href="{{ route('clock-in') }}" 
+                    class="nav-link {{ request()->routeIs('clock-in') ? 'active' : '' }}">
+                    <i class="bi bi-speedometer"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+            @endif
+            
+            @if (auth()->user()->role == 'admin')
+                <li class="nav-item">
+                    <a href="{{ route('data-karyawan') }}" 
+                    class="nav-link {{ request()->routeIs('data-karyawan') ? 'active' : '' }}">
+                    <i class="bi bi-person-add"></i>
+                        <p>Data Karyawan</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('template-mingguan') }}" 
+                    class="nav-link {{ request()->routeIs('template-mingguan') ? 'active' : '' }}">
+                    <i class="bi bi-calendar2-plus"></i>
+                        <p>Template Mingguan</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('pembagian-shift') }}" 
+                    class="nav-link {{ request()->routeIs('pembagian-shift') ? 'active' : '' }}">
+                    <i class="bi bi-calendar2-plus"></i>
+                        <p>Pembagian Shift</p>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="{{ route('jadwal-shift') }}" 
+                    class="nav-link {{ request()->routeIs('jadwal-shift') ? 'active' : '' }}">
+                    <i class="bi bi-calendar-range"></i>
+                        <p>Jadwal Shift</p>
+                    </a>
+                </li>
+
+                <li class="nav-item menu-open">
+                    <a href="#" class="nav-link active">
+                        <i class="bi bi-map"></i>
+                        <p>
+                        Lokasi
+                        <i class="nav-arrow bi bi-chevron-right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="margin-left: 20px;">
+                        <li class="nav-item">
+                            <a href="{{ route('list-lokasi') }}" 
+                            class="nav-link {{ request()->routeIs('list-lokasi') ? 'active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
-                            <p>Dashboard v1</p>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            
-            <li class="nav-item">
-                <a href="{{ route('data-karyawan') }}" 
-                   class="nav-link {{ request()->routeIs('data-karyawan') ? 'active' : '' }}">
-                   <i class="bi bi-person-add"></i>
-                    <p>Data Karyawan</p>
-                </a>
-            </li>
+                                <p>List Lokasi</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('role-lokasi') }}" 
+                            class="nav-link {{ request()->routeIs('role-lokasi') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>Role Lokasi Presensi</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
 
             <li class="nav-item">
-                <a href="{{ route('template-mingguan') }}" 
-                   class="nav-link {{ request()->routeIs('template-mingguan') ? 'active' : '' }}">
-                   <i class="bi bi-calendar2-plus"></i>
-                    <p>Template Mingguan</p>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a href="{{ route('pembagian-shift') }}" 
-                   class="nav-link {{ request()->routeIs('pembagian-shift') ? 'active' : '' }}">
-                   <i class="bi bi-calendar2-plus"></i>
-                    <p>Pembagian Shift</p>
-                </a>
-            </li>
-            
-            <li class="nav-item">
-                <a href="{{ route('jadwal-shift') }}" 
-                   class="nav-link {{ request()->routeIs('jadwal-shift') ? 'active' : '' }}">
-                   <i class="bi bi-calendar-range"></i>
-                    <p>Jadwal Shift</p>
+                <a href="{{ route('riwayat-presensi') }}" 
+                   class="nav-link {{ request()->routeIs('riwayat-presensi') ? 'active' : '' }}">
+                   <i class="bi bi-list-task"></i>
+                    <p>Riwayat Presensi</p>
                 </a>
             </li>
 
@@ -103,6 +140,22 @@
                         </a>
                     </li>
                 </ul>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('profile') }}" 
+                   class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}">
+                   <i class="bi bi-person-circle"></i>
+                    <p>Profile</p>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('logout') }}" 
+                   class="nav-link {{ request()->routeIs('logout') ? 'active' : '' }}">
+                   <i class="bi bi-box-arrow-left"></i>
+                    <p>Logout</p>
+                </a>
             </li>
 
         </ul>

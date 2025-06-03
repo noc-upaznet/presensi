@@ -71,7 +71,11 @@ class PengajuanLembur extends Component
 
     public function render()
     {
-        $pengajuanLembur = M_Lembur::with(['getKaryawan'])->latest()->get();
+        // $pengajuanLembur = M_Lembur::with(['getUser'])->latest()->get();
+        $pengajuanLembur = M_Lembur::with(['getUser'])
+        ->where('user_id', auth()->id())
+        ->latest()
+        ->get();
         return view('livewire.karyawan.pengajuan.pengajuan-lembur', [
             'pengajuanLembur' => $pengajuanLembur,
         ]);

@@ -1,11 +1,4 @@
 <?php return array (
-  'laravel-notification-channels/webpush' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'NotificationChannels\\WebPush\\WebPushServiceProvider',
-    ),
-  ),
   'laravel/breeze' => 
   array (
     'providers' => 
@@ -20,30 +13,11 @@
       0 => 'Laravel\\Pail\\PailServiceProvider',
     ),
   ),
-  'laravel/reverb' => 
-  array (
-    'aliases' => 
-    array (
-      'Output' => 'Laravel\\Reverb\\Output',
-    ),
-    'providers' => 
-    array (
-      0 => 'Laravel\\Reverb\\ApplicationManagerServiceProvider',
-      1 => 'Laravel\\Reverb\\ReverbServiceProvider',
-    ),
-  ),
   'laravel/sail' => 
   array (
     'providers' => 
     array (
       0 => 'Laravel\\Sail\\SailServiceProvider',
-    ),
-  ),
-  'laravel/sanctum' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Laravel\\Sanctum\\SanctumServiceProvider',
     ),
   ),
   'laravel/socialite' => 

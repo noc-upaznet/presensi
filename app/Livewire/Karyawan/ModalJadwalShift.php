@@ -3,6 +3,7 @@
 namespace App\Livewire\Karyawan;
 
 use Carbon\Carbon;
+use App\Models\User;
 use Livewire\Component;
 use App\Models\M_Jadwal;
 use App\Models\M_JadwalShift;
@@ -13,9 +14,9 @@ use Illuminate\Support\Facades\Crypt;
 class ModalJadwalShift extends Component
 {
     public $karyawans;
+    public $users;
     public $jadwalShifts;
     public $templateWeeks;
-    public $id_karyawan;
     public $bulan;
     public $bulan_tahun;
     public $selectedKaryawan;
@@ -41,11 +42,6 @@ class ModalJadwalShift extends Component
     {
         $this->bulan = $value;
     }
-
-    // public function updatedSelectedTemplateId()
-    // {
-    //     $this->fillCalendarFromTemplate();
-    // }
 
     public function fillCalendarFromTemplate()
     {
@@ -95,7 +91,7 @@ class ModalJadwalShift extends Component
    
         $dataJadwal = array_merge([
             'bulan_tahun' => $this->bulan_tahun,
-            'id_karyawan' => $this->selectedKaryawan,
+            'user_id' => $this->selectedKaryawan,
         ], $dataHari);
         // dd($dataJadwal);
         M_Jadwal::Create(
@@ -120,7 +116,7 @@ class ModalJadwalShift extends Component
     {
         $this->jadwal_id = $data['id'];
         $this->bulan_tahun = $data['bulan_tahun'] ?? '';
-        $this->selectedKaryawan = $data['id_karyawan'] ?? '';
+        $this->selectedKaryawan = $data['user_id'] ?? '';
         $this->dispatch('$refresh');
 
         // dd($this->selectedKaryawan);
@@ -156,7 +152,7 @@ class ModalJadwalShift extends Component
         // update data
         $dataJadwal = array_merge([
             'bulan_tahun' => $this->bulan_tahun,
-            'id_karyawan' => $this->selectedKaryawan,
+            'user_id' => $this->selectedKaryawan,
         ], $dataHari);
         // dd($dataJadwal);
         $jadwal->update($dataJadwal);
@@ -191,7 +187,8 @@ class ModalJadwalShift extends Component
     public function mount()
     {
         $this->bulan_tahun = now()->format('Y-m');
-        $this->karyawans = M_DataKaryawan::orderBy('nama_karyawan')->get();
+        // $this->karyawans = M_DataKaryawan::orderBy('nama_karyawan')->get();
+        $this->users = User::where('role', 'user')->orderBy('name')->get();
         $this->jadwalShifts = M_JadwalShift::orderBy('nama_shift')->get();
         $this->templateWeeks = M_TemplateWeek::orderBy('nama_template')->get();
 

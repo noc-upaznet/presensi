@@ -45,4 +45,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function karyawan()
+    {
+        return $this->hasOne(M_DataKaryawan::class, 'nama_karyawan', 'name');
+        // atau: return $this->belongsTo(DataKaryawan::class, 'karyawan_id');
+    }
 }

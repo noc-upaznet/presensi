@@ -6,7 +6,6 @@ use App\Models\User;
 use Livewire\Component;
 use App\Models\M_Lembur;
 use Livewire\WithFileUploads;
-use App\Models\M_DataKaryawan;
 use App\Events\PengajuanBaruEvent;
 use App\Livewire\Forms\LemburForm;
 use Illuminate\Support\Facades\Crypt;
@@ -19,11 +18,6 @@ class ModalPengajuanLembur extends Component
     public $karyawans;
     public $file_bukti;
     protected $listeners = ['refreshTable' => 'refresh'];
-
-    public function mount()
-    {
-        $this->karyawans = M_DataKaryawan::orderBy('nama_karyawan')->get();
-    }
 
     public function store()
     {
@@ -39,7 +33,7 @@ class ModalPengajuanLembur extends Component
         }
 
         $data = [
-            'karyawan_id' => $this->form->nama_karyawan,
+            'user_id' => auth()->id(),
             'tanggal' => $this->form->tanggal,
             'keterangan' => $this->form->keterangan,
             'waktu_mulai' => $this->form->waktu_mulai,
@@ -51,7 +45,7 @@ class ModalPengajuanLembur extends Component
 
         // Simpan data ke database
         // M_Pengajuan::create($data);
-        $pengajuan = M_Lembur::create($data)->load('getKaryawan');
+        $pengajuan = M_Lembur::create($data)->load('getUser');
 
         // Kirim event
         // broadcast(new PengajuanBaruEvent($pengajuan))->toOthers();

@@ -8,9 +8,6 @@ use Livewire\Attributes\Validate;
 class LemburForm extends Form
 {
     public $id;
-
-    #[Validate('required', 'Nama Karyawan')]
-    public $nama_karyawan = '';
     
     #[Validate('required', 'tanggal')]
     public $tanggal = '';

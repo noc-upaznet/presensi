@@ -18,8 +18,8 @@
                     <label class="form-label fw-semibold">Karyawan</label>
                     <select class="form-select" wire:model="selectedKaryawan">
                         <option value="">-- Pilih Karyawan --</option>
-                        @foreach($karyawans as $karyawan)
-                            <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -119,9 +119,9 @@
                         <label class="form-label fw-semibold">Karyawan</label>
                         <select class="form-select" wire:model="selectedKaryawan">
                             <option value="">-- Pilih Karyawan --</option>
-                            @foreach($karyawans as $karyawan)
-                            <option value="{{ $karyawan->id }}">
-                                {{ $karyawan->nama_karyawan }}
+                            @foreach($users as $user)
+                            <option value="{{ $user->id }}">
+                                {{ $user->name }}
                             </option>
                             @endforeach
                         </select>

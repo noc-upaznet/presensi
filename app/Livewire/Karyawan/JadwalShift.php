@@ -2,12 +2,13 @@
 
 namespace App\Livewire\Karyawan;
 
-use App\Livewire\Forms\TambahDataKaryawanForm;
+use App\Models\User;
 use Livewire\Component;
 use App\Models\M_Jadwal;
 use App\Models\M_DataKaryawan;
 use App\Models\M_TemplateWeek;
 use Illuminate\Support\Facades\Crypt;
+use App\Livewire\Forms\TambahDataKaryawanForm;
 
 class JadwalShift extends Component
 {
@@ -20,6 +21,7 @@ class JadwalShift extends Component
     public $selectedKaryawan;
     public $namaKaryawan;
     public $karyawans;
+    public $users;
     public $filterJadwals = [];
     public $filterKaryawan;
 
@@ -46,7 +48,7 @@ class JadwalShift extends Component
         $jadwal = M_Jadwal::findOrFail(Crypt::decrypt($id));
         $this->bulan_tahun = substr($jadwal->bulan_tahun, 0, 7); 
         // dd($this->bulan_tahun);
-        $this->selectedKaryawan = (string) $jadwal->id_karyawan;
+        $this->selectedKaryawan = (string) $jadwal->user_id;
 
         // Load shift harian
         $this->kalender = [];
@@ -77,16 +79,17 @@ class JadwalShift extends Component
     {
         $this->bulan_tahun = now()->format('Y-m');
         $this->filterBulan = now()->format('Y-m');
-        $this->karyawans = M_DataKaryawan::orderBy('nama_karyawan')->get();
+        // $this->karyawans = M_DataKaryawan::orderBy('nama_karyawan')->get();
+        $this->users = User::where('role', 'user')->orderBy('name')->get();
         $this->applyFilters();
     }
 
     public function applyFilters()
     {
-        $query = M_Jadwal::with('getKaryawan');
+        $query = M_Jadwal::with('getUser');
 
         if (!empty($this->filterKaryawan)) {
-            $query->where('id_karyawan', $this->filterKaryawan);
+            $query->where('user_id', $this->filterKaryawan);
         }
 
         if (!empty($this->filterBulan)) {

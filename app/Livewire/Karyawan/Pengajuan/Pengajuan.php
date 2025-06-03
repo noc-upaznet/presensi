@@ -10,11 +10,18 @@ use Illuminate\Support\Facades\Crypt;
 
 class Pengajuan extends Component
 {
+    public $detail;
     protected $listeners = ['refreshTable' => 'refresh'];
     public function showAdd()
     {
         // Dispatch event ke modal
         $this->dispatch('modalTambahPengajuan', action: 'show');
+    }
+
+    public function showDetail($id)
+    {
+        // Dispatch event ke modal
+        $this->dispatch('modalDetailPengajuan', action: 'show', id: $id);
     }
     
     public function updateStatus($id, $status)
@@ -35,7 +42,7 @@ class Pengajuan extends Component
             $hari = 'd' . $tanggal->day;
             $bulanTahun = $tanggal->format('Y-m');
 
-            $jadwal = M_Jadwal::where('id_karyawan', $pengajuan->karyawan_id)
+            $jadwal = M_Jadwal::where('user_id', $pengajuan->user_id)
                 ->where('bulan_tahun', $bulanTahun)
                 ->first();
 
@@ -52,7 +59,7 @@ class Pengajuan extends Component
                 $pengajuan->save();
     
                 $jadwalBaru = new M_Jadwal([
-                    'id_karyawan' => $pengajuan->karyawan_id,
+                    'user_id' => $pengajuan->user_id,
                     'bulan_tahun' => $bulanTahun,
                     $hari => $pengajuan->shift_id,
                 ]);
@@ -70,11 +77,13 @@ class Pengajuan extends Component
         $this->dispatch('refresh');
     }
 
-   
-
     public function render()
     {
-        $pengajuan = M_Pengajuan::with(['getKaryawan', 'getShift'])->latest()->get();
+        // $pengajuan = M_Pengajuan::with(['getUser', 'getShift'])->latest()->get();
+        $pengajuan = M_Pengajuan::with(['getUser', 'getShift'])
+        ->where('user_id', auth()->id()) // Filter berdasarkan user yang login
+        ->latest()
+        ->get();
         return view('livewire.karyawan.pengajuan.pengajuan', [
             'pengajuans' => $pengajuan,
         ]);

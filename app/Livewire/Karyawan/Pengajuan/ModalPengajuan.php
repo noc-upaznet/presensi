@@ -10,6 +10,7 @@ use App\Models\M_JadwalShift;
 use App\Models\M_DataKaryawan;
 use App\Livewire\Forms\PengajuanForm;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Auth;
 
 class ModalPengajuan extends Component
 {
@@ -20,24 +21,36 @@ class ModalPengajuan extends Component
     public $pengajuan;
     public $tanggal;
     public $keterangan;
+    public $file;
+    public $detail;
 
     protected $listeners = ['refreshTable' => 'refresh'];
 
     public function mount()
     {
-        $this->karyawans = M_DataKaryawan::orderBy('nama_karyawan')->get();
-        $this->shifts = M_JadwalShift::orderBy('nama_shift')->get();
+        $this->shifts = M_JadwalShift::whereIn('nama_shift', ['Izin', 'Cuti'])->orderBy('nama_shift')->get();
+
     }
 
     public function store()
     {
         $this->form->validate();
 
+        $this->validate([
+            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5048',
+        ]);
+
+        $path = null;
+        if ($this->file) {
+            $path = $this->file->store('file', 'public');
+        }
+        // dd(auth()->id());
         $data = [
-            'karyawan_id' => $this->form->nama_karyawan,
+            'user_id' => auth()->id(),
             'shift_id' => $this->form->pengajuan,
             'tanggal' => $this->form->tanggal,
             'keterangan' => $this->form->keterangan,
+            'file' => $path ? str_replace('public/', 'storage/', $path) : null,
             'satatus' => 0, // Status default 0 (pending)
         ];
         // dd($data);
@@ -70,7 +83,7 @@ class ModalPengajuan extends Component
             $hari = 'd' . $tanggal->day;
             $bulanTahun = $tanggal->format('Y-m');
 
-            $jadwal = M_Jadwal::where('id_karyawan', $pengajuan->karyawan_id)
+            $jadwal = M_Jadwal::where('user_id', $pengajuan->user_id)
                 ->where('bulan_tahun', $bulanTahun)
                 ->first();
 

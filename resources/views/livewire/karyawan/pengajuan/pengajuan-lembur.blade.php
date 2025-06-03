@@ -20,9 +20,11 @@
     <div class="container mt-4">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <button class="btn btn-primary" wire:click="showAdd">
-                <i class="bi bi-plus"></i> Tambah
-            </button>
+            @if (auth()->user()->role == 'user')
+                <button class="btn btn-primary" wire:click="showAdd">
+                    <i class="bi bi-plus"></i> Tambah
+                </button>
+            @endif
         </div>
     
         <div class="table-responsive">
@@ -31,7 +33,9 @@
                     <tr>
                         <th>Tanggal</th>
                         <th>Diajukan Pada</th>
-                        <th>Nama</th>
+                        @if (auth()->user()->role == 'admin')
+                            <th>Nama Karyawan</th>
+                        @endif
                         <th>Waktu Lembur</th>
                         <th>Keterangan</th>
                         <th>Approve</th>
@@ -45,7 +49,9 @@
                         <tr>
                             <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
                             <td style="color: var(--bs-body-color);">{{ $key->created_at }}</td>
-                            <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}</td>
+                            @if (auth()->user()->role == 'admin')
+                                <td style="color: var(--bs-body-color);">{{ $key->getUser->name }}</td>
+                            @endif
                             <td style="color: var(--bs-body-color);">{{ $key->waktu_mulai }} - {{ $key->waktu_akhir }}</td>
                             <td style="color: var(--bs-body-color);">{{ $key->keterangan }}</td>
                             <td style="color: var(--bs-body-color);">-</td>
@@ -71,10 +77,15 @@
                                 @endif
                             </td>
                             <td class="text-center" style="color: var(--bs-body-color);">
-                                @if ($key->status == 0)
-                                    <button class="btn btn-sm btn-success text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">Terima</button>
-                                    <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">Tolak</button>
+                                <button class="btn btn-sm btn-info mb-2" wire:click="showEdit({{ $key->id }})"><i class="fa fa-eye"></i></button>
+
+                                @if (auth()->user()->role == 'admin')
+                                    @if ($key->status == 0)
+                                        <button class="btn btn-sm btn-success text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">Terima</button>
+                                        <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">Tolak</button>
+                                    @endif
                                 @endif
+
                                 <button class="btn btn-sm btn-danger mb-2" wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"><i class="fa fa-trash"></i></button>
                             </td>
                         </tr>
