@@ -32,6 +32,14 @@ class Payroll extends Component
         }
     }
 
+    public function editPayroll($id)
+    {
+        $payroll = PayrollModel::find($id);
+        if ($payroll) {
+            $this->dispatch('editPayroll', $payroll);
+        }
+    }
+    
     public function confirmHapusPayroll($id)
     {
         $this->payrollIdToDelete = $id;

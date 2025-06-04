@@ -15,7 +15,6 @@
         </div>
     </div>
 
-
     <div class="container">
         <div class="card">
             <div class="card-header">
@@ -24,11 +23,12 @@
                     Tambah
                 </a>
                 <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
-                    data-bs-target="#importPayrollModal">   
-                    <i class="fa-solid fa-file-import"></i>
+                    data-bs-target="#importPayrollModal">
+                    <i class="fa-solid fa-file-excel"></i>
                     Import
-                </button>   
+                </button>
             </div>
+
             <div class="card-body">
                 <div class="d-flex mb-3 align-items-center">
                     {{-- Dropdown Tahun --}}
@@ -48,9 +48,18 @@
                     </select>
 
                     {{-- Tombol Search --}}
-                    <button class="btn btn-light" wire:click="setPeriode">
+                    <button class="btn btn-light me-2" wire:click="setPeriode">
                         <i class="fa fa-search"></i>
                     </button>
+
+                    <div class="ms-auto">
+                        {{-- Tombol Export --}}
+                        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
+                            data-bs-target="#exportPayrollModal">
+                            <i class="fas fa-file-export"></i>
+                            Export
+                        </button>
+                    </div>
                 </div>
 
                 <h5 class="text-secondary mb-3">
@@ -78,7 +87,7 @@
                                 <th>No</th>
                                 <th>No Gaji</th>
                                 <th>Nama</th>
-                                <th>Jabatan</th>
+                                <th>Departemen</th>
                                 <th>Bulan</th>
                                 <th>Kasbon</th>
                                 <th>Grand Total</th>
@@ -92,7 +101,7 @@
                                 <td>{{ $data->firstItem() + $i }}</td>
                                 <td>{{ $payroll->no_gaji }}</td>
                                 <td>{{ $payroll->nama }}</td>
-                                <td>{{ $payroll->jabatan }}</td>
+                                <td>{{ $payroll->divisi }}</td>
                                 <td>{{ \Carbon\Carbon::parse($payroll->created_at)->translatedFormat('F') }}</td>
                                 <td>Rp. {{ number_format($payroll->kasbon, 0, ',', '.') }}</td>
                                 <td>Rp. {{ number_format($payroll->total, 0, ',', '.') }}</td>
@@ -107,6 +116,10 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-info"><i class="fas fa-print"></i></button>
+                                    <button wire:click.prevent="editPayroll({{ $payroll->id }})"
+                                        class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#editPayrollModal"><i class="fas fa-edit"></i>
+                                    </button>
                                     <button wire:click.prevent="confirmHapusPayroll({{ $payroll->id }})"
                                         class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#hapusPayrollModal"><i class="fas fa-trash"></i>
@@ -127,6 +140,213 @@
                         Showing {{ $data->firstItem() }} to {{ $data->lastItem() }} of {{ $data->total() }} entries
                     </span>
                     {{ $data->links() }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Import Payroll -->
+    <div wire:ignore.self class="modal fade" id="importPayrollModal" tabindex="-1"
+        aria-labelledby="importPayrollModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
+                        border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-primary" id="importPayrollModalLabel">Import Data Payroll</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form wire:submit.prevent="importPayroll">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Pilih File Excel</label>
+                            <input type="file" class="form-control" id="file" wire:model="file"
+                                accept=".xlsx, .xls, .csv">
+                            @error('file') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Format file harus .xlsx, .xls, atau .csv. Pastikan data sesuai
+                                dengan format yang telah ditentukan.</small>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                style="border-radius: 8px;">Batal</button>
+                            <button type="submit" class="btn btn-primary" style="border-radius: 8px;">Import</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Export Payroll -->
+    <div wire:ignore.self class="modal fade" id="exportPayrollModal" tabindex="-1"
+        aria-labelledby="exportPayrollModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
+                        border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-primary" id="exportPayrollModalLabel">Export Data Payroll</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body  text-center">
+                    <p>Silakan pilih format file untuk diekspor:</p>
+                    <div class="d-flex justify-content-center">
+                        <button class="btn btn-outline-success me-2" wire:click="exportExcel">
+                            <i class="fa-solid fa-file-excel"></i> Excel
+                        </button>
+                        <button class="btn btn-outline-danger" wire:click="exportPdf">
+                            <i class="fa-solid fa-file-pdf"></i> PDF
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 8px;">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Payroll-->
+    <div wire:ignore.self class="modal fade" id="editPayrollModal" tabindex="-1" aria-labelledby="editPayrollModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
+                        border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-primary" id="editPayrollModalLabel">Edit Data Payroll</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="employee" class="form-label fw-semibold">Karyawan</label>
+                            <select id="employee" class="form-select" wire:model="employee_id">
+                                <option value="">Pilih Karyawan</option>
+                                @if(isset($employees) && is_iterable($employees))
+                                @foreach($employees as $employee)
+                                <option value="{{ $employee->id }}">{{ $employee->nama }}</option>
+                                @endforeach
+                                @endif
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="month" class="form-label fw-semibold">Bulan & Tahun</label>
+                            <input type="month" id="month" class="form-control" wire:model="bulan_tahun">
+                        </div>
+                        <div class="mb-3">
+                            <label for="nip" class="form-label fw-semibold">NPK/NIP</label>
+                            <input type="text" class="form-control" id="nip" wire:model="nip" placeholder="12345678"
+                                disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label for="departemen" class="form-label fw-semibold">Departemen</label>
+                            <div class="input-group">
+                                <select class="form-select" id="departemen" wire:model="departemen_id" disabled>
+                                    <option value="">Finance</option>
+                                    @if(isset($departemens) && is_iterable($departemens))
+                                    @foreach($departemens as $departemen)
+                                    <option value="{{ $departemen->id }}">{{ $departemen->nama }}</option>
+                                    @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
+                            <input type="number" id="gaji_pokok" class="form-control" wire:model="gaji_pokok"
+                                placeholder="1000000" disabled>
+                        </div>
+                        <div class="mb-3 mt-4">
+                            <label class="form-label fw-semibold">Tunjangan</label>
+
+                            <div class="input-group mb-2 tunjangan-item">
+                                <div class="row w-100">
+                                    <div class="col-md-6">
+                                        <select class="form-select">
+                                            <option value="">Voucher</option>
+                                            @if(isset($jenis_tunjangan) && is_iterable($jenis_tunjangan))
+                                            @foreach($jenis_tunjangan as $tunj)
+                                            <option value="{{ $tunj->id }}">{{ $tunj->nama_tunjangan }}</option>
+                                            @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text" style="pointer-events: none;">Rp</span>
+                                            <input type="number" class="form-control" placeholder="100000">
+                                        </div>
+                                        <small class="text-muted">Contoh: 500000</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Potongan</label>
+                            <div id="potongan-list">
+                                <div class="input-group mb-2 potongan-item">
+                                    <div class="row w-100">
+                                        <div class="col-md-6">
+                                            <select class="form-select">
+                                                <option value="">Terlambat</option>
+                                                @if(isset($jenis_potongan) && is_iterable($jenis_potongan))
+                                                @foreach($jenis_potongan as $pot)
+                                                <option value="{{ $pot->id }}">{{ $pot->nama_potongan }}</option>
+                                                @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                <span class="input-group-text" style="pointer-events: none;">Rp</span>
+                                                <input type="number" class="form-control" placeholder="52000"
+                                                    wire:model="potongan">
+                                            </div>
+                                            <small class="text-muted">Contoh: 500000</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="terlambat" class="form-label fw-semibold">Terlambat</label>
+                                <input type="number" id="terlambat" class="form-control" wire:model="terlambat"
+                                    placeholder="Contoh: 2">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="izin" class="form-label fw-semibold">Izin</label>
+                                <input type="number" id="izin" class="form-control" wire:model="izin"
+                                    placeholder="Contoh: 1">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="cuti" class="form-label fw-semibold">Cuti</label>
+                                <input type="number" id="cuti" class="form-control" wire:model="cuti"
+                                    placeholder="Contoh: 0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="kehadiran" class="form-label fw-semibold">Kehadiran</label>
+                                <input type="number" id="kehadiran" class="form-control" wire:model="kehadiran"
+                                    placeholder="Contoh: 25">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="lembur" class="form-label fw-semibold">Lembur</label>
+                                <input type="number" id="lembur" class="form-control" wire:model="lembur"
+                                    placeholder="Contoh: 0">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                style="border-radius: 8px;">Simpan</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                style="border-radius: 8px;">Tutup</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -158,7 +378,47 @@
 </div>
 
 <script>
-    window.addEventListener('dataPayrollTerhapus', event => {
+    window.addEventListener('dataPayrollAdded', event => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: 'Data payroll berhasil ditambahkan.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3085d6',
+        });
+    });
+
+    window.addEventListener('dataPayrollImported', event => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: 'Data payroll berhasil diimpor.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3085d6',
+        });
+    });
+
+    window.addEventListener('dataPayrollExported', event => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: 'Data payroll berhasil diekspor.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3085d6',
+        });
+    });
+
+    window.addEventListener('dataPayrollUpdated', event => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: 'Data payroll berhasil diperbarui.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3085d6',
+        });
+    });
+
+    window.addEventListener('dataPayrollDeleted', event => {
         Swal.fire({
             icon: 'success',
             title: 'Berhasil',

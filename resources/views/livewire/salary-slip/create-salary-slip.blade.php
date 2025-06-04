@@ -41,12 +41,12 @@
                             </div>
                             <div class="mb-3">
                                 <label for="nip" class="form-label fw-semibold">NPK/NIP</label>
-                                <input type="text" class="form-control" placeholder="Contoh: 241120901">
+                                <input type="text" class="form-control" placeholder="Contoh: 241120901" disabled>
                             </div>
                             <div class="mb-3">
                                 <label for="departemen" class="form-label fw-semibold">Departemen</label>
                                 <div class="input-group">
-                                    <select class="form-select">
+                                    <select class="form-select" id="departemen" disabled>
                                         <option value="">Pilih Departemen</option>
                                         <option value="1">IT</option>
                                         <option value="2">HR</option>
@@ -56,7 +56,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
-                                <input type="number" id="gaji_pokok" class="form-control" placeholder="Contoh: 5000000">
+                                <input type="number" id="gaji_pokok" class="form-control" placeholder="Contoh: 5000000" disabled>
                             </div>
                             <div class="mb-3 mt-4">
                                 <label for="tunjangan" class="form-label fw-semibold">Tunjangan</label>

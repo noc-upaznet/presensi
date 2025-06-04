@@ -9,7 +9,7 @@ class Payroll extends Model
     protected $fillable = [
         'no_gaji',
         'nama',
-        'jabatan',
+        'divisi',
         'bulan',
         'tahun',
         'kasbon',
