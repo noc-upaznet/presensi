@@ -19,6 +19,7 @@ use App\Livewire\Payroll;
 use App\Livewire\SalarySlip\CreateSalarySlip;
 use App\Livewire\SalarySlip\JenisPotongan;
 use App\Livewire\SalarySlip\JenisTunjangan;
+use App\Http\Controllers\SlipGajiController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -45,3 +46,6 @@ Route::get('/dashboard-admin', DashboardAdmin::class)->name('dashboard-admin');
 Route::get('/create-slip-gaji', CreateSalarySlip::class)->name('create-slip-gaji');
 Route::get('/jenis-tunjangan', JenisTunjangan::class)->name('jenis-tunjangan');
 Route::get('/jenis-potongan', JenisPotongan::class)->name('jenis-potongan'); 
+
+Route::get('/slip-gaji/download', [SlipGajiController::class, 'download'])->name('slip-gaji.download');
+Route::get('/slip-gaji/download/{id}', [SlipGajiController::class, 'downloadSlip'])->name('slip-gaji.download-slip');

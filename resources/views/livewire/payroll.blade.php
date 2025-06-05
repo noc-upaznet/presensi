@@ -115,7 +115,9 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-info"><i class="fas fa-print"></i></button>
+                                    <button wire:click="downloadSlip({{ $payroll->id }})" class="btn btn-sm btn-info">
+                                        <i class="fas fa-print"></i>
+                                    </button>
                                     <button wire:click.prevent="editPayroll({{ $payroll->id }})"
                                         class="btn btn-warning btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#editPayrollModal"><i class="fas fa-edit"></i>
@@ -144,6 +146,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Modal Import Payroll -->
     <div wire:ignore.self class="modal fade" id="importPayrollModal" tabindex="-1"
@@ -375,7 +378,9 @@
             </div>
         </div>
     </div>
+
 </div>
+
 
 <script>
     window.addEventListener('dataPayrollAdded', event => {
@@ -427,4 +432,8 @@
             confirmButtonColor: '#3085d6',
         });
     });
+
+    window.addEventListener('redirect-download', event => {
+            window.open(event.detail.url, '_blank');
+        });
 </script>
