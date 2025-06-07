@@ -6,6 +6,8 @@ use Livewire\Component;
 use App\Models\Payroll as PayrollModel;
 use Livewire\WithPagination;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\PayrollExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Payroll extends Component
 {
@@ -17,7 +19,8 @@ class Payroll extends Component
     public $periode;
     public $perPage = 10;
     public $payrollIdToDelete;
-
+    public $startDate;
+    public $endDate;
 
     public function mount()
     {
@@ -85,6 +88,17 @@ class Payroll extends Component
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="slip-gaji.pdf"',
         ]);
+    }
+
+    public function exportExcel()
+    {
+        // Validasi tanggal (optional)
+        $this->validate([
+            'startDate' => 'required|date',
+            'endDate' => 'required|date|after_or_equal:startDate',
+        ]);
+
+        return Excel::download(new PayrollExport($this->startDate, $this->endDate), 'payroll.xlsx');
     }
 
     public function render()

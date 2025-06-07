@@ -53,13 +53,12 @@
                     </button>
 
                     <div class="ms-auto">
-                        {{-- Tombol Export --}}
                         <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
                             data-bs-target="#exportPayrollModal">
-                            <i class="fas fa-file-export"></i>
-                            Export
+                            <i class="fas fa-file-export"></i> Export
                         </button>
                     </div>
+
                 </div>
 
                 <h5 class="text-secondary mb-3">
@@ -91,7 +90,7 @@
                                 <th>Bulan</th>
                                 <th>Kasbon</th>
                                 <th>Grand Total</th>
-                                <th>Status</th>
+                                {{-- <th>Status</th> --}}
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -105,7 +104,7 @@
                                 <td>{{ \Carbon\Carbon::parse($payroll->created_at)->translatedFormat('F') }}</td>
                                 <td>Rp. {{ number_format($payroll->kasbon, 0, ',', '.') }}</td>
                                 <td>Rp. {{ number_format($payroll->total, 0, ',', '.') }}</td>
-                                <td>
+                                {{-- <td>
                                     @if ($payroll->status === 'Success')
                                     <span class="badge bg-success"><i
                                             class="fas fa-check-circle me-1"></i>Success</span>
@@ -113,7 +112,7 @@
                                     <span class="badge bg-secondary"><i class="fas fa-sync-alt me-1"></i>On
                                         Process</span>
                                     @endif
-                                </td>
+                                </td> --}}
                                 <td>
                                     <button wire:click="downloadSlip({{ $payroll->id }})" class="btn btn-sm btn-info">
                                         <i class="fas fa-print"></i>
@@ -185,26 +184,32 @@
     <div wire:ignore.self class="modal fade" id="exportPayrollModal" tabindex="-1"
         aria-labelledby="exportPayrollModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
-                        border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
+            <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff;">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-primary" id="exportPayrollModalLabel">Export Data Payroll</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body  text-center">
+                <div class="modal-body text-center">
                     <p>Silakan pilih format file untuk diekspor:</p>
+
+                    <div class="mb-3">
+                        <label for="startDate" class="form-label">Tanggal Mulai</label>
+                        <input type="date" id="startDate" wire:model="startDate" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="endDate" class="form-label">Tanggal Akhir</label>
+                        <input type="date" id="endDate" wire:model="endDate" class="form-control">
+                    </div>
+
                     <div class="d-flex justify-content-center">
                         <button class="btn btn-outline-success me-2" wire:click="exportExcel">
                             <i class="fa-solid fa-file-excel"></i> Excel
                         </button>
-                        <button class="btn btn-outline-danger" wire:click="exportPdf">
-                            <i class="fa-solid fa-file-pdf"></i> PDF
-                        </button>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                        style="border-radius: 8px;">Tutup</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>

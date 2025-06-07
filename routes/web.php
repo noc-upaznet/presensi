@@ -20,6 +20,8 @@ use App\Livewire\SalarySlip\CreateSalarySlip;
 use App\Livewire\SalarySlip\JenisPotongan;
 use App\Livewire\SalarySlip\JenisTunjangan;
 use App\Http\Controllers\SlipGajiController;
+use App\Exports\PayrollExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -49,3 +51,7 @@ Route::get('/jenis-potongan', JenisPotongan::class)->name('jenis-potongan');
 
 Route::get('/slip-gaji/download', [SlipGajiController::class, 'download'])->name('slip-gaji.download');
 Route::get('/slip-gaji/download/{id}', [SlipGajiController::class, 'downloadSlip'])->name('slip-gaji.download-slip');
+
+Route::get('/payroll/export', function() {
+    return Excel::download(new PayrollExport, 'payroll.xlsx');
+});
