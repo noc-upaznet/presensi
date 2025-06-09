@@ -58,7 +58,6 @@
                             <i class="fas fa-file-export"></i> Export
                         </button>
                     </div>
-
                 </div>
 
                 <h5 class="text-secondary mb-3">
@@ -88,7 +87,7 @@
                                 <th>Nama</th>
                                 <th>Departemen</th>
                                 <th>Bulan</th>
-                                <th>Kasbon</th>
+                                {{-- <th>Kasbon</th> --}}
                                 <th>Grand Total</th>
                                 {{-- <th>Status</th> --}}
                                 <th>Action</th>
@@ -102,7 +101,7 @@
                                 <td>{{ $payroll->nama }}</td>
                                 <td>{{ $payroll->divisi }}</td>
                                 <td>{{ \Carbon\Carbon::parse($payroll->created_at)->translatedFormat('F') }}</td>
-                                <td>Rp. {{ number_format($payroll->kasbon, 0, ',', '.') }}</td>
+                                {{-- <td>Rp. {{ number_format($payroll->kasbon, 0, ',', '.') }}</td> --}}
                                 <td>Rp. {{ number_format($payroll->total, 0, ',', '.') }}</td>
                                 {{-- <td>
                                     @if ($payroll->status === 'Success')
@@ -135,13 +134,7 @@
                         </tbody>
                     </table>
                 </div>
-
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <span>
-                        Showing {{ $data->firstItem() }} to {{ $data->lastItem() }} of {{ $data->total() }} entries
-                    </span>
-                    {{ $data->links() }}
-                </div>
+                {{ $data->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>
@@ -158,7 +151,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form wire:submit.prevent="importPayroll">
+                    <form wire:submit.prevent="importExcel">
                         <div class="mb-3">
                             <label for="file" class="form-label">Pilih File Excel</label>
                             <input type="file" class="form-control" id="file" wire:model="file"
@@ -170,9 +163,8 @@
                                 dengan format yang telah ditentukan.</small>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                                style="border-radius: 8px;">Batal</button>
-                            <button type="submit" class="btn btn-primary" style="border-radius: 8px;">Import</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Import</button>
                         </div>
                     </form>
                 </div>
@@ -190,7 +182,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <p>Silakan pilih format file untuk diekspor:</p>
+                    <p>Silakan pilih rentang waktu untuk diekspor:</p>
 
                     <div class="mb-3">
                         <label for="startDate" class="form-label">Tanggal Mulai</label>
@@ -202,14 +194,17 @@
                         <input type="date" id="endDate" wire:model="endDate" class="form-control">
                     </div>
 
-                    <div class="d-flex justify-content-center">
+                    {{-- <div class="d-flex justify-content-center">
                         <button class="btn btn-outline-success me-2" wire:click="exportExcel">
                             <i class="fa-solid fa-file-excel"></i> Excel
                         </button>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                   <button class="btn btn-outline-success" wire:click="exportExcel">
+                            <i class="fa-solid fa-file-excel"></i> Export
+                        </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 </div>
             </div>
         </div>
@@ -396,6 +391,9 @@
             confirmButtonText: 'OK',
             confirmButtonColor: '#3085d6',
         });
+        // Tutup modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editPayrollModal'));
+        if (modal) modal.hide();
     });
 
     window.addEventListener('dataPayrollImported', event => {
@@ -406,6 +404,9 @@
             confirmButtonText: 'OK',
             confirmButtonColor: '#3085d6',
         });
+        // Tutup modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('importPayrollModal'));
+        if (modal) modal.hide();
     });
 
     window.addEventListener('dataPayrollExported', event => {
@@ -416,6 +417,9 @@
             confirmButtonText: 'OK',
             confirmButtonColor: '#3085d6',
         });
+        // Tutup modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('exportPayrollModal'));
+        if (modal) modal.hide();
     });
 
     window.addEventListener('dataPayrollUpdated', event => {
@@ -426,6 +430,9 @@
             confirmButtonText: 'OK',
             confirmButtonColor: '#3085d6',
         });
+        // Tutup modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editPayrollModal'));
+        if (modal) modal.hide();
     });
 
     window.addEventListener('dataPayrollDeleted', event => {
@@ -436,6 +443,9 @@
             confirmButtonText: 'OK',
             confirmButtonColor: '#3085d6',
         });
+        // Tutup modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('hapusPayrollModal'));
+        if (modal) modal.hide();
     });
 
     window.addEventListener('redirect-download', event => {

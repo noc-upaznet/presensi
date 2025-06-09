@@ -7,10 +7,14 @@ use App\Models\Payroll as PayrollModel;
 use Livewire\WithPagination;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\PayrollExport;
+use App\Imports\PayrollImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Livewire\WithFileUploads;
+
 
 class Payroll extends Component
 {
+    use WithFileUploads;
     use WithPagination;
 
     public $search = '';
@@ -21,6 +25,8 @@ class Payroll extends Component
     public $payrollIdToDelete;
     public $startDate;
     public $endDate;
+    public $file;
+    
 
     public function mount()
     {
@@ -53,10 +59,6 @@ class Payroll extends Component
     {
         if ($this->payrollIdToDelete) {
             \App\Models\Payroll::find($this->payrollIdToDelete)?->delete();
-
-            // Bisa tambahkan refresh/pagination data di sini kalau perlu
-            // $this->data = Payroll::latest()->paginate($this->perPage);
-
             $this->dispatch('dataPayrollTerhapus');
             $this->payrollIdToDelete = null;
         }
@@ -99,6 +101,22 @@ class Payroll extends Component
         ]);
 
         return Excel::download(new PayrollExport($this->startDate, $this->endDate), 'payroll.xlsx');
+        $this->dispatch('dataPayrollExported');
+    }
+
+    public function importExcel()
+    {
+        $this->validate([
+            'file' => 'required|file|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new PayrollImport, $this->file->getRealPath());
+
+        session()->flash('success', 'Data payroll berhasil diimport.');
+
+        // Reset input & close modal jika perlu
+        $this->reset('file');
+        $this->dispatch('dataPayrollImported');
     }
 
     public function render()
