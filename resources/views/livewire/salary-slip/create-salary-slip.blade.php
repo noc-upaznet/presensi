@@ -58,6 +58,9 @@
                                 <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
                                 <input type="number" id="gaji_pokok" class="form-control" placeholder="Contoh: 5000000" disabled>
                             </div>
+                            <div class="mb-3">
+                                <label for="tunjangan" class="form-label fw-semibold">Tunjangan Jabatan</label>
+                                <input type="number" id="tunjangan" class="form-control" placeholder="Contoh: 500000" disabled>
                             <div class="mb-3 mt-4">
                                 <label for="tunjangan" class="form-label fw-semibold">Tunjangan</label>
                                 <div id="tunjangan-list">

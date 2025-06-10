@@ -14,15 +14,42 @@
             </div>
         </div>
     </div>
-
+    <div class="app-content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-3 col-6">
+                    <!--begin::Small Box Widget 3-->
+                    <div class="small-box text-bg-warning">
+                        <div class="inner pe-5">
+                            <!-- Tambahkan padding end/right -->
+                            <h3>22</h3>
+                            <p>Slip Gaji Belum Dibuat</p>
+                        </div>
+                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path
+                                d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
+                            </path>
+                        </svg>
+                        <a href="#" wire:click="$dispatch('openSlipGajiModal')"
+                            class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+                            More info <i class="bi bi-arrow-right-circle"></i>
+                        </a>
+                        <livewire:salary-slip.slip-gaji-belum-dibuat />
+                    </div>
+                    <!--end::Small Box Widget 3-->
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container">
         <div class="card">
             <div class="card-header">
-                <a href="{{ route('create-slip-gaji') }}" class="btn btn-sm btn-primary">
+                <a href="{{ route('create-slip-gaji') }}" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i>
                     Tambah
                 </a>
-                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
+                <button type="button" class="btn btn-success" data-bs-toggle="modal"
                     data-bs-target="#importPayrollModal">
                     <i class="fa-solid fa-file-excel"></i>
                     Import
@@ -42,7 +69,8 @@
                     <select wire:model="selectedMonth" class="form-select me-2" style="width: 150px;">
                         <option value="">Bulan</option>
                         @foreach (range(1, 12) as $m)
-                        <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
+                        <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->translatedFormat('F')
+                            }}
                         </option>
                         @endforeach
                     </select>
@@ -53,7 +81,7 @@
                     </button>
 
                     <div class="ms-auto">
-                        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
                             data-bs-target="#exportPayrollModal">
                             <i class="fas fa-file-export"></i> Export
                         </button>
@@ -100,7 +128,8 @@
                                 <td>{{ $payroll->no_gaji }}</td>
                                 <td>{{ $payroll->nama }}</td>
                                 <td>{{ $payroll->divisi }}</td>
-                                <td>{{ \Carbon\Carbon::parse($payroll->created_at)->translatedFormat('F') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($payroll->created_at)->translatedFormat('F') }}
+                                </td>
                                 {{-- <td>Rp. {{ number_format($payroll->kasbon, 0, ',', '.') }}</td> --}}
                                 <td>Rp. {{ number_format($payroll->total, 0, ',', '.') }}</td>
                                 {{-- <td>
@@ -147,7 +176,9 @@
             <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-primary" id="importPayrollModalLabel">Import Data Payroll</h5>
+                    <h5 class="modal-title fw-bold text-primary" id="importPayrollModalLabel">Import Data
+                        Payroll
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -159,7 +190,8 @@
                             @error('file') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
                         <div class="mb-3">
-                            <small class="text-muted">Format file harus .xlsx, .xls, atau .csv. Pastikan data sesuai
+                            <small class="text-muted">Format file harus .xlsx, .xls, atau .csv. Pastikan data
+                                sesuai
                                 dengan format yang telah ditentukan.</small>
                         </div>
                         <div class="modal-footer">
@@ -178,7 +210,9 @@
         <div class="modal-dialog">
             <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff;">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-primary" id="exportPayrollModalLabel">Export Data Payroll</h5>
+                    <h5 class="modal-title fw-bold text-primary" id="exportPayrollModalLabel">Export Data
+                        Payroll
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
@@ -201,9 +235,9 @@
                     </div> --}}
                 </div>
                 <div class="modal-footer">
-                   <button class="btn btn-outline-success" wire:click="exportExcel">
-                            <i class="fa-solid fa-file-excel"></i> Export
-                        </button>
+                    <button class="btn btn-outline-success" wire:click="exportExcel">
+                        <i class="fa-solid fa-file-excel"></i> Export
+                    </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 </div>
             </div>
@@ -217,7 +251,8 @@
             <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-primary" id="editPayrollModalLabel">Edit Data Payroll</h5>
+                    <h5 class="modal-title fw-bold text-primary" id="editPayrollModalLabel">Edit Data Payroll
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -297,7 +332,8 @@
                                                 <option value="">Terlambat</option>
                                                 @if(isset($jenis_potongan) && is_iterable($jenis_potongan))
                                                 @foreach($jenis_potongan as $pot)
-                                                <option value="{{ $pot->id }}">{{ $pot->nama_potongan }}</option>
+                                                <option value="{{ $pot->id }}">{{ $pot->nama_potongan }}
+                                                </option>
                                                 @endforeach
                                                 @endif
                                             </select>
@@ -362,7 +398,8 @@
             <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #dc3545; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-danger" id="hapusPayrollModalLabel">Hapus Data Payroll</h5>
+                    <h5 class="modal-title fw-bold text-danger" id="hapusPayrollModalLabel">Hapus Data Payroll
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
