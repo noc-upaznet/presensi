@@ -10,7 +10,8 @@
                 <div class="modal-body">
                     <div class="mb-3 d-flex justify-content-end">
                         <div style="width: 250px;">
-                            <input type="text" class="form-control" placeholder="Cari nama atau bulan..." wire:model.debounce.300ms="search">
+                            <input wire:model.debounce.300ms="search" type="text" class="form-control"
+                                placeholder="Cari nama pegawai...">
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -30,18 +31,21 @@
                                     <td>{{ $item->periode }}</td>
                                     <td><span class="badge bg-danger">Belum Dibuat</span></td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary" wire:click="createSlipGaji({{ $item->id }})">
+                                        <a href="{{ route('create-slip-gaji', ['id' => $item->id]) }}"
+                                            class="btn btn-sm btn-primary">
                                             Buat Slip Gaji
-                                        </button>
+                                        </a>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="4" class="text-center">Tidak ada data</td>
+                                    <td colspan="4" class="text-center">Data tidak ditemukan.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
                         </table>
+                        <div class="mt-3">
+                        </div>
                     </div>
                 </div>
             </div>

@@ -48,6 +48,8 @@ class Payroll extends Component
         if ($payroll) {
             $this->dispatch('editPayroll', $payroll);
         }
+
+        $this->dispatch('dataPayrollEdited', $id);
     }
 
     public function confirmHapusPayroll($id)
@@ -59,7 +61,7 @@ class Payroll extends Component
     {
         if ($this->payrollIdToDelete) {
             \App\Models\Payroll::find($this->payrollIdToDelete)?->delete();
-            $this->dispatch('dataPayrollTerhapus');
+            $this->dispatch('dataPayrollDeleted');
             $this->payrollIdToDelete = null;
         }
     }
