@@ -81,7 +81,7 @@
                     </button>
 
                     <div class="ms-auto">
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
                             data-bs-target="#exportPayrollModal">
                             <i class="fas fa-file-export"></i> Export
                         </button>
