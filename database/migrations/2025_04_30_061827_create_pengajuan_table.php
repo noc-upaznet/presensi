@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('keterangan');
             $table->string('file')->nullable();
             $table->integer('status')->default(0)->comment('0 = menunggu, 1 = diterima, 2 = ditolak');
-            $table->int('jadwal_sebelumnya')->nullable();
+            $table->integer('jadwal_sebelumnya')->nullable();
             $table->timestamps();
         });
     }

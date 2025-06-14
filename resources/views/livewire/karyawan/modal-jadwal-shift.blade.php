@@ -209,6 +209,124 @@
         </div>
     </div>
 
+    <div wire:ignore.self class="modal fade" id="modalDetailJadwal" tabindex="-1" aria-labelledby="modalDetailJadwalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="background-color: var(--bs-body-bg);">
+                <div class="modal-header border-bottom" style="color: var(--bs-body-color);">
+                    <h5 class="modal-title text-primary fw-bold" id="modalDetailJadwalLabel">Detail Jadwal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body" style="color: var(--bs-body-color);">
+                    {{-- Pilih Bulan --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Bulan</label>
+                        <input type="month" id="bulan2" wire:model="bulan_tahun" class="form-control" disabled>
+                    </div>
+                    {{-- Pilih Karyawan --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Karyawan</label>
+                        <select class="form-select" wire:model="selectedKaryawan" disabled>
+                            <option value="">-- Pilih Karyawan --</option>
+                            @foreach($users as $user)
+                            <option value="{{ $user->id }}">
+                                {{ $user->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+        
+                    {{-- Kalender Jadwal --}}
+                    <div>
+                        <label class="form-label fw-semibold">Kalender</label>
+                        <div class="table-responsive">
+                            @php
+                                $bulan = $this->bulanTahun['bulan'];
+                                $tahun = $this->bulanTahun['tahun'];
+
+                                $totalHari = \Carbon\Carbon::create($tahun, $bulan)->daysInMonth;
+                                $hariPertama = \Carbon\Carbon::create($tahun, $bulan, 1)->dayOfWeek;
+                                $totalCell = $hariPertama + $totalHari;
+                                $jumlahBaris = ceil($totalCell / 7);
+                                $tanggal = 1;
+
+                                
+                            @endphp
+                            <table class="table table-bordered" wire:key="kalender-{{ $this->bulan_tahun }}">
+                                <thead>
+                                    <tr>
+                                        <th>Minggu</th>
+                                        <th>Senin</th>
+                                        <th>Selasa</th>
+                                        <th>Rabu</th>
+                                        <th>Kamis</th>
+                                        <th>Jumat</th>
+                                        <th>Sabtu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for ($i = 0; $i < $jumlahBaris; $i++)
+                                        <tr>
+                                            @for ($j = 0; $j < 7; $j++)
+                                                @php
+                                                    $cellIndex = $i * 7 + $j;
+                                                    $statusPresensi = $presensiHadir[$tanggal] ?? null;
+                                                    $cellClass = match($statusPresensi) {
+                                                        0 => 'bg-success text-white',
+                                                        1 => 'bg-danger text-white',
+                                                        2 => 'bg-primary text-dark',
+                                                        default => ''
+                                                    };
+                                                @endphp
+
+                                                @if ($cellIndex < $hariPertama || $tanggal > $totalHari)
+                                                    <td></td>
+                                                @else
+                                                    <td class="{{ $cellClass }}">
+                                                        <div class="fw-semibold small">{{ $tanggal }}</div>
+                                                        <select class="form-select form-select-sm mt-1 text-center" name="shift[{{ $tanggal }}]" wire:model="kalender.{{ $tanggal }}">
+                                                            <option value="">-- Pilih Shift --</option>
+                                                            @foreach($jadwalShifts as $shift)
+                                                                <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        @php $tanggal++; @endphp
+                                                    </td>
+                                                @endif
+                                            @endfor
+                                        </tr>
+                                    @endfor
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div>
+                        <strong>Rekap</strong>
+                        <div class="row">
+                            <div class="col-md-2"><strong>Izin</strong></div>
+                            <div class="col-md-1">{{ $rekap['izin'] ?? 0 }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2"><strong>Cuti</strong></div>
+                            <div class="col-md-1">{{ $rekap['cuti'] ?? 0 }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2"><strong>Terlambat</strong></div>
+                            <div class="col-md-1">{{ $rekap['terlambat'] ?? 0 }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2"><strong>Kehadiran</strong></div>
+                            <div class="col-md-1">{{ $rekap['kehadiran'] ?? 0 }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="modal-confirm-delete" tabindex="-1" wire:ignore.self data-bs-backdrop="static"
         data-bs-keyboard="false" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">

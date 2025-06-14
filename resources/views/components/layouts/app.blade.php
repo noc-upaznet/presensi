@@ -471,14 +471,8 @@
               });
           }
       });
+
       
-      // document.addEventListener('livewire:load', () => {
-      //     Livewire.hook('message.processed', (message, component) => {
-      //         $('.selectLokasi').select2({
-      //             dropdownParent: $('#rolePresensiModal') // tetap wajib kalau di dalam modal
-      //         });
-      //     });
-      // });
     </script>
     @livewireScripts
     @stack('scripts')

@@ -36,7 +36,7 @@
                     </a>
                 </li>
             @endif
-            @if (auth()->user()->role == 'user')
+            @if (auth()->user()->role == 'user' || auth()->user()->role == 'hr' || auth()->user()->role == 'spv')
                 <li class="nav-item">
                     <a href="{{ route('clock-in') }}" 
                     class="nav-link {{ request()->routeIs('clock-in') ? 'active' : '' }}">
@@ -46,7 +46,7 @@
                 </li>
             @endif
             
-            @if (auth()->user()->role == 'admin')
+            @if (auth()->user()->role == 'admin' || auth()->user()->role == 'hr' || auth()->user()->role == 'spv')
                 <li class="nav-item">
                     <a href="{{ route('data-karyawan') }}" 
                     class="nav-link {{ request()->routeIs('data-karyawan') ? 'active' : '' }}">
@@ -105,6 +105,46 @@
                         </li>
                     </ul>
                 </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('role-users') }}" 
+                        class="nav-link {{ request()->routeIs('role-users') ? 'active' : '' }}">
+                        <i class="bi bi-person-fill-gear"></i>
+                            <p>Role Users</p>
+                    </a>
+                </li>
+                <li class="nav-item menu-open">
+                    <a href="#" class="nav-link active">
+                        <i class="bi bi-clipboard-plus"></i>
+                        <p>
+                            Slip Gaji
+                        <i class="nav-arrow bi bi-chevron-right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="margin-left: 20px;">
+                        <li class="nav-item">
+                            <a href="{{ route('create-slip-gaji') }}" 
+                            class="nav-link {{ request()->routeIs('create-slip-gaji') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>Create Slip</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('jenis-tunjangan') }}" 
+                            class="nav-link {{ request()->routeIs('jenis-tunjangan') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>Jenis Tunjangan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('jenis-potongan') }}" 
+                            class="nav-link {{ request()->routeIs('jenis-potongan') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>Jenis Potongan</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             @endif
 
             <li class="nav-item">
@@ -128,7 +168,12 @@
                         <a href="{{ route('pengajuan') }}" 
                         class="nav-link {{ request()->routeIs('pengajuan') ? 'active' : '' }}">
                         <i class="nav-icon bi bi-circle"></i>
-                            <p>Pengajuan Cuti/Izin</p>
+                            <p>
+                                Pengajuan Cuti/Izin
+                            </p>
+                            @if ($pengajuanMenungguCount > 0)
+                                <span class="badge bg-danger ms-2">{{ $pengajuanMenungguCount }}</span>
+                            @endif
                         </a>
                     </li>
 

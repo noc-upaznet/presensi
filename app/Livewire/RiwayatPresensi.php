@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\M_Presensi;
 use Illuminate\Support\Facades\Auth;
@@ -59,12 +60,43 @@ class RiwayatPresensi extends Component
         $this->dispatch('editModal', action: 'hide');
     }
 
+    public function delete($id)
+    {
+        $jadwal = M_Presensi::findOrFail(Crypt::decrypt($id));
+        // dd($jadwal);
+        $jadwal->delete();
+        $this->dispatch('swal', params: [
+            'title' => 'Data Deleted',
+            'icon' => 'success',
+            'text' => 'Data has been deleted successfully'
+        ]);
+        $this->dispatch('modal-confirm-delete', action: 'show');
+    }
+
+    public function confirmHapusPresensi($id)
+    {
+        $decryptedId = Crypt::decrypt($id);
+        $this->editId = $decryptedId;
+        // dd($decryptedId);
+        $data = M_Presensi::find($decryptedId);
+        // $this->lokasi_id = $lokasi->id;
+        // $this->nama_lokasi = $lokasi->nama;
+    }
+
     public function render()
     {
-        if (Auth::user()->role === 'admin') {
-            $datas = M_Presensi::orderBy('created_at', 'desc')->get();
-        }elseif (Auth::user()->role === 'user') {
-            $datas = M_Presensi::where('user_id', Auth::id())->orderBy('created_at', 'desc')->get();
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'spv' || Auth::user()->role == 'hr') {
+            // admin dan hr
+            $datas = M_Presensi::with('getUser')
+                ->whereMonth('created_at', Carbon::now()->month)
+                ->whereYear('created_at', Carbon::now()->year)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } elseif (Auth::user()->role == 'user') {
+            // user
+            $datas = M_Presensi::where('user_id', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->get();
         }
         // dd($dataPresensi);
         return view('livewire.riwayat-presensi', [

@@ -8,6 +8,7 @@ class M_DataKaryawan extends Model
 {
     protected $table = 'data_karyawan';
     protected $fillable = [
+        'user_id',
         'nama_karyawan',
         'email',
         'no_hp',
@@ -50,6 +51,21 @@ class M_DataKaryawan extends Model
 
     public function getJadwal()
     {
-        return $this->hasMany(M_Jadwal::class, 'id_karyawan');
+        return $this->hasMany(M_Jadwal::class, 'user_id', 'id_karyawan');
     }
+
+    public function getDivisi()
+    {
+        return $this->belongsTo(M_Divisi::class, 'divisi'); // atau 'id_divisi' jika itu nama kolom foreign key-nya
+    }
+
+    public function getPresensi()
+    {
+        return $this->hasMany(M_Presensi::class, 'user_id', 'user_id');
+    }
+
+    // public function jadwal()
+    // {
+    //     return $this->hasOne(M_Jadwal::class, 'id_karyawan', 'id');
+    // }
 }

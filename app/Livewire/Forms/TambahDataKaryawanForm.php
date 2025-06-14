@@ -18,6 +18,9 @@ class TambahDataKaryawanForm extends Form
     #[Validate('required', 'No HP')]
     public $no_hp = '';
 
+    #[Validate('required', 'Penanggung')]   
+    public $penanggung = '';
+
     #[Validate('required', 'Tempat Lahir')]
     public $tempat_lahir = '';
 
@@ -57,14 +60,8 @@ class TambahDataKaryawanForm extends Form
     #[Validate('required', 'Jabatan')]
     public $jabatan = '';
 
-    #[Validate('required', 'Posisi')]
-    public $posisi = '';
-
     #[Validate('required', 'Sistem Kerja')]
     public $sistem_kerja = '';
-
-    #[Validate('required', 'SPV')]
-    public $spv = '';
 
     #[Validate('required', 'Gaji Pokok')]
     public $gaji_pokok = '';
@@ -104,8 +101,6 @@ class TambahDataKaryawanForm extends Form
     #[Validate('required', 'tanggal Aktif BPJS Kesehatan')]
     public $tgl_aktif_bpjs = '';
 
-    #[Validate('required', 'Penanggung')]   
-    public $penanggung = '';
     
     public $status_perkawinan;
     public $gol_darah;

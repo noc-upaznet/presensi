@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['admin', 'user'])->default('user')->after('email');
+        Schema::table('pengajuan', function (Blueprint $table) {
+            $table->boolean('approve_spv')->nullable()->after('status');
+            $table->boolean('approve_hr')->nullable()->after('approve_spv');
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
+        Schema::table('pengajuan', function (Blueprint $table) {
+            $table->dropColumn(['approve_spv', 'approve_hr']);
         });
     }
 };

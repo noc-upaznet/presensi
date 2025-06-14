@@ -8,6 +8,24 @@ class Dashboard extends Component
 {
     public function render()
     {
-        return view('livewire.dashboard');
+        // Nanti bisa ganti ini pakai data dari DB
+        return view('livewire.dashboard', [
+            'totalPegawai' => 104,
+            'totalGaji' => 75985069,
+            'kenaikanGaji' => -5,
+            'izinCuti' => 6,
+            'masuk' => 98,
+            'statusKaryawan' => [
+                'Tetap' => 91,
+                'Kontrak' => 9,
+                'Probation' => 4,
+            ],
+            'pendidikan' => [
+                'SMK' => 45,
+                'D3' => 23,
+                'S1' => 29,
+                'S2' => 7,
+            ],
+        ]);
     }
 }

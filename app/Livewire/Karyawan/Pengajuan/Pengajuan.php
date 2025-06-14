@@ -3,15 +3,41 @@
 namespace App\Livewire\Karyawan\Pengajuan;
 
 use Carbon\Carbon;
+use App\Models\User;
 use Livewire\Component;
 use App\Models\M_Jadwal;
 use App\Models\M_Pengajuan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Livewire\WithPagination;
 
 class Pengajuan extends Component
 {
+    use WithPagination;
     public $detail;
     protected $listeners = ['refreshTable' => 'refresh'];
+
+    public $filterPengajuan = '';
+    public $filterBulan = '';
+    public $status = [];
+
+    public function mount()
+    {
+        // Ambil semua status unik dari database
+        $this->status = M_Pengajuan::select('status')->distinct()->get();
+        $this->filterBulan = now()->format('Y-m');
+    }
+
+    public function updatingFilterPengajuan()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFilterBulan()
+    {
+        $this->resetPage();
+    }
+
     public function showAdd()
     {
         // Dispatch event ke modal
@@ -24,7 +50,7 @@ class Pengajuan extends Component
         $this->dispatch('modalDetailPengajuan', action: 'show', id: $id);
     }
     
-    public function updateStatus($id, $status)
+    public function updateStatus($id, $status = null)
     {
         $pengajuan = M_Pengajuan::find($id);
 
@@ -32,13 +58,55 @@ class Pengajuan extends Component
             return;
         }
 
-        $pengajuan->status = $status;
+        $userRole = Auth::user()->role;
+
+        // Update approve field berdasarkan role dan status
+        if ($userRole === 'spv') {
+            if ($status == 1) {
+                $pengajuan->approve_spv = 1;
+            } elseif ($status == 2) {
+                $pengajuan->approve_spv = 2;
+                $pengajuan->status = 2; // langsung ditolak jika SPV tolak
+            }
+        } elseif ($userRole === 'hr') {
+            if ($pengajuan->approve_spv == 1) {
+                if ($status == 1) {
+                    $pengajuan->approve_hr = 1;
+                    $pengajuan->status = 1; // misal set status jadi diterima penuh
+                } elseif ($status == 2) {
+                    $pengajuan->approve_hr = 2;
+                    $pengajuan->status = 2;
+                }
+            } elseif ($pengajuan->approve_spv == 2) {
+                $pengajuan->status = 2;
+                    $this->dispatch('swal', params: [
+                        'title' => 'Gagal Menyimpan',
+                        'icon' => 'error',
+                        'text' => 'SPV sudah menolak pengajuan ini.'
+                    ]);
+                    return;
+            } else {
+                $this->dispatch('swal', params: [
+                    'title' => 'Gagal Menyimpan',
+                    'icon' => 'error',
+                    'text' => 'Pengajuan belum disetujui oleh SPV.'
+                ]);
+                return;
+            }
+        } else {
+            return;
+        }
+
+        // Cek jika kedua approver sudah menyetujui, maka status jadi 1
+        if ($pengajuan->approve_spv == 1 && $pengajuan->approve_hr == 1) {
+            $pengajuan->status = 1;
+        }
+
         $pengajuan->save();
 
-        if ($status === 1) {
-            // Ambil jadwal berdasarkan karyawan dan bulan dari tanggal pengajuan
+        // Jika status jadi 1, update jadwal
+        if ($pengajuan->status == 1) {
             $tanggal = \Carbon\Carbon::parse($pengajuan->tanggal);
-            // dd($tanggal);
             $hari = 'd' . $tanggal->day;
             $bulanTahun = $tanggal->format('Y-m');
 
@@ -47,17 +115,15 @@ class Pengajuan extends Component
                 ->first();
 
             if ($jadwal) {
-                // Simpan shift sebelumnya
                 $pengajuan->jadwal_sebelumnya = $jadwal->$hari;
                 $pengajuan->save();
-    
+
                 $jadwal->$hari = $pengajuan->shift_id;
                 $jadwal->save();
             } else {
-                // Belum ada jadwal, jadwal sebelumnya = null
                 $pengajuan->jadwal_sebelumnya = null;
                 $pengajuan->save();
-    
+
                 $jadwalBaru = new M_Jadwal([
                     'user_id' => $pengajuan->user_id,
                     'bulan_tahun' => $bulanTahun,
@@ -67,23 +133,43 @@ class Pengajuan extends Component
             }
         }
 
-
         $this->dispatch('swal', params: [
-            'title' => 'Status & Jadwal Updated',
+            'title' => 'Status Diperbarui',
             'icon' => 'success',
-            'text' => 'Status & Jadwal has been updated successfully'
+            'text' => 'Status dan jadwal berhasil diperbarui.'
         ]);
 
         $this->dispatch('refresh');
     }
 
+
     public function render()
     {
-        // $pengajuan = M_Pengajuan::with(['getUser', 'getShift'])->latest()->get();
-        $pengajuan = M_Pengajuan::with(['getUser', 'getShift'])
-        ->where('user_id', auth()->id()) // Filter berdasarkan user yang login
-        ->latest()
-        ->get();
+        $query = M_Pengajuan::with(['getUser', 'getShift']);
+
+        // Role: Admin atau selain 'user'
+        if (Auth::user()->role !== 'user') {
+            // Tidak ada filter user_id
+        }
+        // Role: user
+        elseif (Auth::user()->role === 'user') {
+            $query->where('user_id', Auth::id());
+        }
+
+        // Filter Status
+        if (in_array($this->filterPengajuan, ['0', '1', '2'], true)) {
+            $query->where('status', (int) $this->filterPengajuan);
+        }
+
+        // Filter Bulan
+        if (!empty($this->filterBulan)) {
+            $bulan = date('m', strtotime($this->filterBulan));
+            $tahun = date('Y', strtotime($this->filterBulan));
+            $query->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
+        }
+
+        $pengajuan = $query->latest()->get();
+
         return view('livewire.karyawan.pengajuan.pengajuan', [
             'pengajuans' => $pengajuan,
         ]);

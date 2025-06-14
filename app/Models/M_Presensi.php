@@ -25,4 +25,14 @@ class M_Presensi extends Model
     {
         return RoleLokasiModel::whereIn('id', $this->lokasi_presensi ?? [])->get();
     }
+
+    public function getKaryawan()
+    {
+        return $this->belongsTo(M_DataKaryawan::class, 'user_id', 'id');
+    }
+
+    public function getUser()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

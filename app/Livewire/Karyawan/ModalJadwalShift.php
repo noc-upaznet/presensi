@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use Livewire\Component;
 use App\Models\M_Jadwal;
+use App\Models\M_Presensi;
 use App\Models\M_JadwalShift;
 use App\Models\M_DataKaryawan;
 use App\Models\M_TemplateWeek;
@@ -26,8 +27,12 @@ class ModalJadwalShift extends Component
     public $selectedTemplateId;
     public $kalender = []; // format: ['minggu' => '', 'senin' => '', dst]
     public $kalenderVersion = 0;
+    public $rekap = [];
+    public $presensiHadir = [];
 
-    protected $listeners = ['setKaryawan', 'bulanChanged' => 'setBulan', 'edit-data' => 'loadData'];
+    // public $userId;
+
+    protected $listeners = ['setKaryawan', 'bulanChanged' => 'setBulan', 'edit-data' => 'loadData', 'detail-data' => 'loadDetail'];
 
     public function getBulanTahunProperty()
     {
@@ -117,7 +122,7 @@ class ModalJadwalShift extends Component
         $this->jadwal_id = $data['id'];
         $this->bulan_tahun = $data['bulan_tahun'] ?? '';
         $this->selectedKaryawan = $data['user_id'] ?? '';
-        $this->dispatch('$refresh');
+        // $this->dispatch('$refresh');
 
         // dd($this->selectedKaryawan);
         $this->kalender = [];
@@ -128,6 +133,36 @@ class ModalJadwalShift extends Component
             }
         }
         $this->dispatch('$refresh');
+    }
+
+    public function loadDetail($data)
+    {
+        $this->presensiHadir = $data['presensiHadir'] ?? [];
+        $this->rekap = $data['rekap'] ?? $this->rekap;
+        $this->jadwal_id = $data['id'];
+        $this->bulan_tahun = $data['bulan_tahun'] ?? '';
+        $this->selectedKaryawan = $data['user_id'] ?? '';
+        $this->dispatch('$refresh');
+
+        // dd($this->selectedKaryawan);
+        $this->kalender = [];
+        for ($i = 1; $i <= 31; $i++) {
+            $field = 'd' . $i;
+            if (isset($data[$field])) {
+                $this->kalender[$i] = $data[$field];
+            }
+        }
+    }
+
+    public function loadRekap($id)
+    {
+        $presensi = M_Presensi::where('user_id', $id)
+            ->whereMonth('tanggal', now()->month)
+            ->get();
+        $this->rekap['izin'] = $presensi->where('status', 3)->count();
+        $this->rekap['cuti'] = $presensi->where('status', 2)->count();
+        $this->rekap['terlambat'] = $presensi->where('status', 1)->count();
+        $this->rekap['kehadiran'] = $presensi->where('status', '!=', '')->count();
     }
 
     public function saveEdit()

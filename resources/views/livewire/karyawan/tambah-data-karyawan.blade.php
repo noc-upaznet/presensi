@@ -109,6 +109,13 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="text" class="form-control" id="password" name="password" wire:model="password">
+                                @error('password') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
                                 <label for="tempat-lahir" class="form-label">Tempat Lahir</label>
                                 <input type="text" class="form-control" id="tempat-lahir" name="tempat_lahir" wire:model="form.tempat_lahir" required>
                                 @error('form.tempat_lahir') <span class="text-danger">{{ $message }}</span> @enderror
@@ -272,10 +279,9 @@
                                 <label for="entitas" class="form-label">Entitas</label>
                                 <select class="form-select" id="entitas" wire:model="form.entitas">
                                     <option selected disabled value="">-- Pilih Entitas --</option>
-                                    <option value="DJB">DJB</option>
-                                    <option value="UNR">UNR</option>
-                                    <option value="UNB">UNB</option>
-                                    <option value="MC">MC</option>
+                                     @foreach ($entitas as $key)
+                                        <option value="{{ $key->id }}">{{ $key->nama }}</option>
+                                    @endforeach
                                 </select>
                                 @error('form.entitas') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
@@ -283,10 +289,9 @@
                                 <label for="divisi" class="form-label">Divisi</label>
                                 <select class="form-select" id="divisi" wire:model="form.divisi">
                                     <option selected disabled value="">-- Pilih Divisi --</option>
-                                    <option value="Finance">Finance</option>
-                                    <option value="HRD">HRD</option>
-                                    <option value="NOC">NOC</option>
-                                    <option value="Teknisi">Teknisi</option>
+                                     @foreach ($divisi as $key)
+                                        <option value="{{ $key->id }}">{{ $key->nama }}</option>
+                                    @endforeach
                                 </select>
                                 @error('form.divisi') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
@@ -296,26 +301,12 @@
                                 <label for="jabatan" class="form-label">Jabatan</label>
                                 <select class="form-select" id="jabatan" wire:model="form.jabatan">
                                     <option selected disabled value="">-- Pilih Jabatan --</option>
-                                    <option value="Billing">Billing</option>
-                                    <option value="UNR">UNR</option>
-                                    <option value="UNB">UNB</option>
-                                    <option value="MC">MC</option>
+                                     @foreach ($jabatan as $key)
+                                        <option value="{{ $key->id }}">{{ $key->nama_jabatan }}</option>
+                                    @endforeach
                                 </select>
                                 @error('form.jabatan') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="posisi" class="form-label">Posisi</label>
-                                <select class="form-select" id="posisi" wire:model="form.posisi">
-                                    <option selected disabled value="">-- Pilih Posisi --</option>
-                                    <option value="Staff">Staff</option>
-                                    <option value="HRD">HRD</option>
-                                    <option value="NOC">NOC</option>
-                                    <option value="Teknisi">Teknisi</option>
-                                </select>
-                                @error('form.posisi') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="sistem-kerja" class="form-label">Sistem Kerja</label>
                                 <select class="form-select" id="sistem-kerja" wire:model="form.sistem_kerja">
@@ -325,11 +316,6 @@
                                     <option value="Work From Anywhere(WFA)">Work From Anywhere(WFA)</option>
                                 </select>
                                 @error('form.sistem_kerja') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="spv" class="form-label">SPV</label>
-                                <input class="form-control" id="spv" wire:model="form.spv">
-                                @error('form.spv') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
                         <div align="right">
@@ -355,7 +341,13 @@
                                 <label for="gaji-pokok" class="form-label">Gaji Pokok</label>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text" id="gaji-pokok">Rp.</span>
-                                    <input type="text" class="form-control" aria-describedby="gaji-pokok" wire:model="form.gaji_pokok"/>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="gaji_pokok"
+                                        oninput="formatRupiah(this)"
+                                        wire:model.lazy="form.gaji_pokok"
+                                    />
                                 </div>
                                 @error('form.gaji_pokok') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
@@ -363,7 +355,13 @@
                                 <label for="tunjangan-jabatan" class="form-label">Tunjangan Jabatan</label>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text" id="tunjangan-jabatan">Rp.</span>
-                                    <input type="text" class="form-control" aria-describedby="tunjangan-jabatan" wire:model="form.tunjangan_jabatan"/>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="tunjangan_jabatan"
+                                        oninput="formatRupiah(this)"
+                                        wire:model.lazy="form.tunjangan_jabatan"
+                                    />
                                 </div>
                                 @error('form.tunjangan_jabatan') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
@@ -373,7 +371,13 @@
                                 <label for="bonus" class="form-label">Bonus (Jika Memenuhi Target)</label>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text" id="bonus">Rp.</span>
-                                    <input type="text" class="form-control" wire:model="form.bonus" aria-describedby="bonus"/>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="bonus"
+                                        oninput="formatRupiah(this)"
+                                        wire:model.lazy="form.bonus"
+                                    />
                                 </div>
                                 @error('form.bonus') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
@@ -499,6 +503,22 @@
         Livewire.on('swal', (e) => {
             Swal.fire(e.params);
         });
+
+        function formatRupiah(input) {
+            let value = input.value.replace(/[^,\d]/g, '').toString();
+            let split = value.split(',');
+            let sisa = split[0].length % 3;
+            let rupiah = split[0].substr(0, sisa);
+            let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+            input.value = rupiah;
+        }
     </script>
     
 @endpush

@@ -109,7 +109,7 @@
                         <select class="form-select" wire:model="selectedKaryawan">
                             <option value="">-- Pilih Karyawan --</option>
                             @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                <option value="{{ $user->id }}">{{ $user->id }} |{{ $user->name }}</option>
                             @endforeach
                         </select>
                         @error('selectedKaryawan')

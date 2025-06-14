@@ -35,6 +35,7 @@
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
+                                <th>Nama Karyawan</th>
                                 <th>Clock In</th>
                                 <th>Clock Out</th>
                                 <th>File</th>
@@ -48,6 +49,7 @@
                             @foreach($datas as $key)
                                 <tr>
                                     <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
+                                    <td style="color: var(--bs-body-color);">{{ $key->getUser->name }}</td>
                                     <td style="color: var(--bs-body-color);">{{ $key->clock_in }}</td>
                                     <td style="color: var(--bs-body-color);">{{ $key->clock_out }}</td>
                                     <td style="color: var(--bs-body-color);">
@@ -72,9 +74,9 @@
                                             </button>
     
                                             <!-- Tombol Buka Modal -->
-                                            <button wire:click.prevent="confirmHapusLokasi({{ $key->id }})"
+                                            <button wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"
                                                 class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#hapusLokasiModal">
+                                                data-bs-target="#hapusPresensiModal">
                                                 <i class="fas fa-trash"></i>
                                             </button>
     
@@ -117,6 +119,31 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modal-confirm-delete" tabindex="-1" wire:ignore.self data-bs-backdrop="static"
+        data-bs-keyboard="false" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Perhatian!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Anda yakin ingin menghapus shift ini?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-danger" wire:ignore.self id="btn-confirm-delete"
+                        wire:loading.attr="disabled">
+                        <div wire:loading class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        Ya, Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -124,6 +151,16 @@
     Livewire.on('editModal', (event) => {
         $('#editModal').modal(event.action);
     });
+
+    Livewire.on('modal-confirm-delete', (event) => {
+        $('#modal-confirm-delete').modal(event.action);
+        $('#btn-confirm-delete').attr('wire:click', 'delete("' + event.id + '")');
+        $('#modal-confirm-delete').modal('hide');
+    });
+
+  Livewire.on('swal', (e) => {
+      Swal.fire(e.params);
+  });
 </script>
     
 @endpush

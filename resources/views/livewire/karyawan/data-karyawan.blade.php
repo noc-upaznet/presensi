@@ -3,7 +3,7 @@
     <!--begin::Container-->
     <div class="container-fluid">
       <!--begin::Row-->
-      <div class="row">
+      <div class="row mt-5">
         <div class="col-sm-6"><h3 class="mb-0" style="color: var(--bs-body-color);">Data Karyawan</h3></div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-end">
@@ -32,9 +32,6 @@
         <table class="table table-striped table-hover mb-0" style="background-color: var(--bs-body-bg);">
           <thead>
             <tr class="users-table-info">
-              <th>
-                Foto
-              </th>
               <th>Nama Karyawan</th>
               <th>Jenis Kelamin</th>
               <th>Entitas</th>
@@ -50,9 +47,6 @@
           <tbody>
             @foreach ($datas as $key)
               <tr>
-                <td>
-                  <picture><img src="assets/img/categories/01.jpg" alt="category"></picture>
-                </td>
                 <td style="color: var(--bs-body-color);">
                   {{ $key->nama_karyawan }}
                 </td>

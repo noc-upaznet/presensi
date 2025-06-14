@@ -112,6 +112,9 @@ class ListLokasi extends Component
     public function render()
     {
         $lokasis = Lokasi::all();
-        return view('livewire.list-lokasi', compact('lokasis'));
+        // return view('livewire.list-lokasi', compact('lokasis'));
+        return view('livewire.list-lokasi', [
+            'lokasis' => $lokasis,
+        ]);
     }
 }

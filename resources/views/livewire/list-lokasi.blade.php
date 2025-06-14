@@ -56,7 +56,7 @@
             </form>
 
             <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
-                <div class="mb-4">
+                <div class="mb-4 table-responsive">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <label>Show <select class="form-select form-select-sm d-inline-block w-auto">

@@ -4,15 +4,12 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
     public function up(): void
     {
         Schema::create('data_karyawan', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('nama_karyawan');
             $table->string('email');
             $table->string('no_hp', 20);
@@ -34,9 +31,9 @@ return new class extends Migration
             $table->string('entitas', 100);
             $table->string('divisi', 100);
             $table->string('jabatan', 100);
-            $table->string('posisi', 100);
+            $table->string('posisi', 100)->nullable();
             $table->string('sistem_kerja');
-            $table->string('spv');
+            $table->string('spv')->nullable();
             $table->string('gaji_pokok');
             $table->string('tunjangan_jabatan');
             $table->string('bonus');
@@ -55,9 +52,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('data_karyawan');

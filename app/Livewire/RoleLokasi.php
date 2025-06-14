@@ -37,7 +37,7 @@ class RoleLokasi extends Component
     public function store()
     {
         $this->validate([
-            'selectedKaryawan' => 'required|exists:data_karyawan,id',
+            'selectedKaryawan' => 'required',
             'lokasi_presensi' => 'required|array|min:1',
         ]);
 
@@ -85,7 +85,7 @@ class RoleLokasi extends Component
     public function saveEdit()
     {
         $this->validate([
-            'selectedKaryawan' => 'required|exists:data_karyawan,id',
+            'selectedKaryawan' => 'required',
             'lokasi_presensi' => 'required|array|min:1',
         ]);
 

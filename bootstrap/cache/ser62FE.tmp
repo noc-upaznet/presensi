@@ -1,0 +1,63 @@
+<?php return array (
+  'providers' => 
+  array (
+    0 => 'Laravel\\Breeze\\BreezeServiceProvider',
+    1 => 'Laravel\\Pail\\PailServiceProvider',
+    2 => 'Laravel\\Sail\\SailServiceProvider',
+    3 => 'Laravel\\Socialite\\SocialiteServiceProvider',
+    4 => 'Laravel\\Tinker\\TinkerServiceProvider',
+    5 => 'Livewire\\LivewireServiceProvider',
+    6 => 'Livewire\\Volt\\VoltServiceProvider',
+    7 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
+    8 => 'Carbon\\Laravel\\ServiceProvider',
+    9 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
+    10 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    11 => 'SocialiteProviders\\Manager\\ServiceProvider',
+    12 => 'Spatie\\GoogleCalendar\\GoogleCalendarServiceProvider',
+    13 => 'Spatie\\Permission\\PermissionServiceProvider',
+    14 => 'App\\Providers\\SpatiePermissionMiddlewareProvider',
+    15 => 'App\\Providers\\AppServiceProvider',
+    16 => 'App\\Providers\\VoltServiceProvider',
+  ),
+  'eager' => 
+  array (
+    0 => 'Laravel\\Pail\\PailServiceProvider',
+    1 => 'Livewire\\LivewireServiceProvider',
+    2 => 'Livewire\\Volt\\VoltServiceProvider',
+    3 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
+    4 => 'Carbon\\Laravel\\ServiceProvider',
+    5 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
+    6 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    7 => 'Spatie\\GoogleCalendar\\GoogleCalendarServiceProvider',
+    8 => 'Spatie\\Permission\\PermissionServiceProvider',
+    9 => 'App\\Providers\\SpatiePermissionMiddlewareProvider',
+    10 => 'App\\Providers\\AppServiceProvider',
+    11 => 'App\\Providers\\VoltServiceProvider',
+  ),
+  'deferred' => 
+  array (
+    'Laravel\\Breeze\\Console\\InstallCommand' => 'Laravel\\Breeze\\BreezeServiceProvider',
+    'Laravel\\Sail\\Console\\InstallCommand' => 'Laravel\\Sail\\SailServiceProvider',
+    'Laravel\\Sail\\Console\\PublishCommand' => 'Laravel\\Sail\\SailServiceProvider',
+    'Laravel\\Socialite\\Contracts\\Factory' => 'SocialiteProviders\\Manager\\ServiceProvider',
+    'command.tinker' => 'Laravel\\Tinker\\TinkerServiceProvider',
+  ),
+  'when' => 
+  array (
+    'Laravel\\Breeze\\BreezeServiceProvider' => 
+    array (
+    ),
+    'Laravel\\Sail\\SailServiceProvider' => 
+    array (
+    ),
+    'Laravel\\Socialite\\SocialiteServiceProvider' => 
+    array (
+    ),
+    'Laravel\\Tinker\\TinkerServiceProvider' => 
+    array (
+    ),
+    'SocialiteProviders\\Manager\\ServiceProvider' => 
+    array (
+    ),
+  ),
+);

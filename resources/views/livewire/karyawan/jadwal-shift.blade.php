@@ -52,7 +52,7 @@
                             <td style="color: var(--bs-body-color);">{{ $key->bulan_tahun }}</td>
                             <td style="color: var(--bs-body-color);">{{ $key->getUser->name }}</td>
                             <td class="text-center" style="color: var(--bs-body-color);">
-                                <button class="btn btn-sm btn-info text-white"><i class="fa fa-eye"></i></button>
+                                <button class="btn btn-sm btn-info text-white" wire:click="showDetail('{{ Crypt::encrypt($key->id) }}')"><i class="fa fa-eye"></i></button>
                                 <button class="btn btn-sm btn-warning" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
                                 <button class="btn btn-sm btn-danger" wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"><i class="fa fa-trash"></i></button>
                             </td>
@@ -85,6 +85,10 @@
 
         Livewire.on('modalEditJadwal', (event) => {
             $('#modalEditJadwal').modal(event.action);
+        });
+
+        Livewire.on('modalDetailJadwal', (event) => {
+            $('#modalDetailJadwal').modal(event.action);
         });
 
         Livewire.on('modal-confirm-delete', (event) => {
