@@ -14,7 +14,6 @@ use Livewire\WithPagination;
 class Pengajuan extends Component
 {
     use WithPagination;
-    public $detail;
     protected $listeners = ['refreshTable' => 'refresh'];
 
     public $filterPengajuan = '';
@@ -26,16 +25,6 @@ class Pengajuan extends Component
         // Ambil semua status unik dari database
         $this->status = M_Pengajuan::select('status')->distinct()->get();
         $this->filterBulan = now()->format('Y-m');
-    }
-
-    public function updatingFilterPengajuan()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingFilterBulan()
-    {
-        $this->resetPage();
     }
 
     public function showAdd()
@@ -168,8 +157,18 @@ class Pengajuan extends Component
             $query->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
         }
 
-        $pengajuan = $query->latest()->get();
+        // $pengajuan = $query->latest()->get();
+        
 
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'spv' || Auth::user()->role == 'hr') {
+            // admin dan hr
+            $pengajuan = $query->latest()->get();
+        } elseif (Auth::user()->role == 'user') {
+            // user
+            $pengajuan = M_Pengajuan::where('user_id', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
         return view('livewire.karyawan.pengajuan.pengajuan', [
             'pengajuans' => $pengajuan,
         ]);

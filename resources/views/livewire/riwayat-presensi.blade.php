@@ -40,7 +40,7 @@
                                 <th>Clock Out</th>
                                 <th>File</th>
                                 <th>Status</th>
-                                @if (auth()->user()->role == 'admin')
+                                @if (auth()->user()->role == 'hr')
                                     <th>Action</th>
                                 @endif
                             </tr>
@@ -67,7 +67,7 @@
                                             <span class="badge bg-secondary">Unknown</span>
                                         @endif
                                     </td>
-                                    @if (auth()->user()->role == 'admin')
+                                    @if (auth()->user()->role == 'hr')
                                         <td>
                                             <button class="btn btn-warning btn-sm" wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
                                                 <i class="fas fa-edit"></i>

@@ -64,6 +64,11 @@ class M_DataKaryawan extends Model
         return $this->hasMany(M_Presensi::class, 'user_id', 'user_id');
     }
 
+    public function payrolls()
+    {
+        return $this->hasMany(PayrollModel::class, 'karyawan_id');
+    }
+
     // public function jadwal()
     // {
     //     return $this->hasOne(M_Jadwal::class, 'id_karyawan', 'id');

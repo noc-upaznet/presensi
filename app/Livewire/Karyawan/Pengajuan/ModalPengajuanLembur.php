@@ -5,9 +5,11 @@ namespace App\Livewire\Karyawan\Pengajuan;
 use App\Models\User;
 use Livewire\Component;
 use App\Models\M_Lembur;
+use App\Models\M_Pengajuan;
 use Livewire\WithFileUploads;
 use App\Events\PengajuanBaruEvent;
 use App\Livewire\Forms\LemburForm;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
 class ModalPengajuanLembur extends Component
@@ -18,6 +20,28 @@ class ModalPengajuanLembur extends Component
     public $karyawans;
     public $file_bukti;
     protected $listeners = ['refreshTable' => 'refresh'];
+
+    public function updated($propertyName)
+    {
+        if (in_array($propertyName, ['form.waktu_mulai', 'form.waktu_akhir'])) {
+            $this->hitungJamLembur();
+        }
+    }
+
+    public function hitungJamLembur()
+    {
+        $mulai = strtotime($this->form->waktu_mulai);
+        $akhir = strtotime($this->form->waktu_akhir);
+        if ($mulai !== false && $akhir !== false) {
+            $hasilLembur = ($akhir - $mulai) / 3600; // hasil dalam jam
+            if ($hasilLembur < 0) {
+                $hasilLembur += 24;
+            }
+        } else {
+            $hasilLembur = 0;
+        }
+        $this->form->total_jam = $hasilLembur;
+    }
 
     public function store()
     {
@@ -33,11 +57,12 @@ class ModalPengajuanLembur extends Component
         }
 
         $data = [
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'tanggal' => $this->form->tanggal,
             'keterangan' => $this->form->keterangan,
             'waktu_mulai' => $this->form->waktu_mulai,
             'waktu_akhir' => $this->form->waktu_akhir,
+            'total_jam' => $this->form->total_jam,
             'file_bukti' => $path ? str_replace('public/', 'storage/', $path) : null,
             'satatus' => 0,
         ];
@@ -46,12 +71,6 @@ class ModalPengajuanLembur extends Component
         // Simpan data ke database
         // M_Pengajuan::create($data);
         $pengajuan = M_Lembur::create($data)->load('getUser');
-
-        // Kirim event
-        // broadcast(new PengajuanBaruEvent($pengajuan))->toOthers();
-        // $user = User::first();
-        // $user->notify(new \App\Notifications\PushDemo('Pengajuan baru telah dibuat!'));
-        // event(new PengajuanBaruEvent($pengajuan));
 
         // Reset input
         $this->form->reset();

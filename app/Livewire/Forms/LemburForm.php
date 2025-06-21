@@ -18,6 +18,8 @@ class LemburForm extends Form
     #[Validate('required', 'Waktu Akhir')]
     public $waktu_akhir = '';
 
+    public $total_jam = 0;
+
     #[Validate('required', 'Keterangan')]
     public $keterangan = '';
 }

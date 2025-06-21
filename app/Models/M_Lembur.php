@@ -12,6 +12,7 @@ class M_Lembur extends Model
         'tanggal',
         'waktu_mulai',
         'waktu_akhir',
+        'total_jam',
         'keterangan',
         'file_bukti',
         'status',

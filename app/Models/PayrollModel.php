@@ -14,6 +14,9 @@ class PayrollModel extends Model
         'divisi',
         'gaji_pokok',
         'tunjangan_jabatan',
+        'lembur',
+        'izin',
+        'terlambat',
         'tunjangan',
         'potongan',
         'bpjs',
@@ -22,4 +25,9 @@ class PayrollModel extends Model
         'total_gaji',
         'periode',
     ];
+
+    public function getKaryawan()
+    {
+        return $this->belongsTo(M_DataKaryawan::class, 'karyawan_id');
+    }
 }

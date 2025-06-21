@@ -26,7 +26,7 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="no_slip" class="form-label fw-semibold">No. Slip</label>
-                            <input type="text" id="no_slip" class="form-control @error('no_slip') is-invalid @enderror" wire:model="no_slip" placeholder=" DJB/HR/SG/25/I/001">
+                            <input type="text" id="no_slip" class="form-control @error('no_slip') is-invalid @enderror" wire:model="no_slip" readonly>
                             @error('no_slip') 
                                 <small class="text-danger">{{ $message }}</small> 
                             @enderror
@@ -42,7 +42,7 @@
 
                         <div class="mb-3">
                             <label for="employee" class="form-label fw-semibold">Karyawan</label>
-                            <select id="employee" class="form-select @error('user_id') is-invalid @enderror" wire:model="user_id" wire:change="loadDataKaryawan">
+                            <select id="employee" class="form-select" wire:model="user_id" wire:change="loadDataKaryawan">
                                 <option value="">Pilih Karyawan</option>
                                 @foreach($karyawan as $item)
                                     <option value="{{ $item->id }}">{{ $item->nama_karyawan }}</option>
@@ -65,12 +65,27 @@
                         </div>
                         <div class="mb-3">
                             <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
-                            <input type="text" id="gaji_pokok" class="form-control" placeholder="Contoh: 5000000" disabled wire:model="gaji_pokok">
+                            <input type="text" id="gaji_pokok" class="form-control" disabled wire:model="gaji_pokok">
                         </div>
 
                         <div class="mb-3">
                             <label for="tunjangan_jabatan" class="form-label fw-semibold">Tunjangan Jabatan</label>
-                            <input type="text" id="tunjangan_jabatan" class="form-control" placeholder="Contoh: 5000000" disabled wire:model="tunjangan_jabatan">
+                            <input type="text" id="tunjangan_jabatan" class="form-control" disabled wire:model="tunjangan_jabatan">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lembur_nominal" class="form-label fw-semibold">Lembur</label>
+                            <input type="text" id="lembur_nominal" class="form-control" disabled wire:model="lembur_nominal">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="izin_nominal" class="form-label fw-semibold">Potongan Izin</label>
+                            <input type="text" id="izin_nominal" class="form-control" disabled wire:model="izin_nominal">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="terlambat_nominal" class="form-label fw-semibold">Potongan Terlambat</label>
+                            <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
                         </div>
 
                         <div class="mb-3">
@@ -156,34 +171,28 @@
                                 </div>
                             </div>
                         @endif
-
-                        {{-- <div class="mt-3">
-                            <span>
-                                BPJS ({{ $persentase_bpjs }}%) Rp {{ number_format($bpjs_nominal, 0, ',', '.') }}, BPJS JHT ({{ $persentase_bpjs_jht }}%) Rp {{ number_format($bpjs_jht_nominal, 0, ',', '.') }}
-                            </span>
-                        </div> --}}
                         
                         <div class="row mt-3">
                             <div class="col-md-2 mb-3">
-                                <label for="kehadiran" class="form-label fw-semibold">Kehadiran</label>
+                                <label for="kehadiran" class="form-label fw-semibold">Kehadiran (Hari)</label>
                                 <input type="text" class="form-control" value="{{ $rekap['kehadiran'] }}" readonly>
                             </div>
                             <div class="col-md-2 mb-3">
-                                <label for="terlambat" class="form-label fw-semibold">Terlambat</label>
+                                <label for="terlambat" class="form-label fw-semibold">Terlambat (Hari)</label>
                                 <input type="text" class="form-control" value="{{ $rekap['terlambat'] }}" readonly>
                             </div>
                             <div class="col-md-2 mb-3">
-                                <label for="izin" class="form-label fw-semibold">Izin</label>
+                                <label for="izin" class="form-label fw-semibold">Izin (Hari)</label>
                                 <input type="text" class="form-control" value="{{ $rekap['izin'] }}" readonly>
                             </div>
                             <div class="col-md-2 mb-3">
-                                <label for="cuti" class="form-label fw-semibold">Cuti</label>
+                                <label for="cuti" class="form-label fw-semibold">Cuti (Hari)</label>
                                 <input type="text" class="form-control" value="{{ $rekap['cuti'] }}" readonly>
                             </div>
                             
                             <div class="col-md-2 mb-3">
-                                <label for="lembur" class="form-label fw-semibold">Lembur</label>
-                                <input type="text" class="form-control" value="{{ $rekap['lembur'] }}" readonly>
+                                <label for="lembur" class="form-label fw-semibold">Lembur (Jam)</label>
+                                <input type="text" class="form-control" value="{{ $rekap['lembur'] }}" wire:model="lembur" readonly>
                             </div>
                         </div>
                         <div class="row">
@@ -196,8 +205,15 @@
                         </div>
 
                         <div class="footer text-end">
-                            <button wire:click="store" class="btn btn-primary">Simpan</button>
-                            <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                            <button type="button" wire:click="store" class="btn btn-primary"
+                                wire:loading.attr="disabled">
+                                <div wire:loading class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <span wire:loading.remove><i class="fa fa-save"></i> Simpan</span>
+                                <span wire:loading>Loading...</span>
+                            </button>
+                            <a href="{{ route('payroll') }}" class="btn btn-secondary">Kembali</a>
                         </div>
                     </div>
                 </div>
@@ -207,6 +223,8 @@
 </div>
 @push('scripts')
 <script>
-    
+    Livewire.on('swal', (e) => {
+        Swal.fire(e.params);
+    });
 </script>
 @endpush

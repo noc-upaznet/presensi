@@ -3,13 +3,15 @@
 use App\Livewire\Divisi;
 use App\Livewire\ClockIn;
 use App\Livewire\Entitas;
+use App\Livewire\Payroll;
 use App\Livewire\Dashboard;
 use App\Livewire\RoleUsers;
 use App\Livewire\ListLokasi;
 use App\Livewire\RoleLokasi;
 use App\Livewire\ClockInSelfie;
-use App\Livewire\CreateSlipGaji;
 use App\Livewire\JenisPotongan;
+use App\Livewire\CreateSlipGaji;
+use App\Livewire\JenisTunjangan;
 use App\Livewire\RiwayatPresensi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -17,14 +19,13 @@ use App\Livewire\Karyawan\JadwalShift;
 use App\Livewire\Karyawan\DataKaryawan;
 use Illuminate\Support\Facades\Session;
 use App\Livewire\Karyawan\PembagianShift;
+use App\Http\Controllers\PayrollController;
 use App\Livewire\Karyawan\DetailDataKaryawan;
 use App\Livewire\Karyawan\TambahDataKaryawan;
 use App\Livewire\Karyawan\Pengajuan\Pengajuan;
 use App\Livewire\Karyawan\TambahPembagianShift;
 use App\Livewire\Karyawan\Shifts\TemplateMingguan;
 use App\Livewire\Karyawan\Pengajuan\PengajuanLembur;
-use App\Livewire\Payroll;
-use App\Livewire\JenisTunjangan;
 
 Route::view('/', 'welcome');
 Route::group(['middleware' => 'auth'], function () {
@@ -48,7 +49,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/divisi', Divisi::class)->name('divisi');
     Route::get('/entitas', Entitas::class)->name('entitas');
     Route::get('/payroll', Payroll::class)->name('payroll');
-    Route::get('/create-slip-gaji', CreateSlipGaji::class)->name('create-slip-gaji');
+    Route::get('/create-slip-gaji/{id?}', CreateSlipGaji::class)->name('create-slip-gaji');
+    Route::get('/slip-gaji/html/{id}', [PayrollController::class, 'html'])->name('slip.html');
+    Route::get('/slip-gaji/download/{id}', [PayrollController::class, 'download'])->name('slip-gaji.download');
     Route::get('/jenis-tunjangan', JenisTunjangan::class)->name('jenis-tunjangan');
     Route::get('/jenis-potongan', JenisPotongan::class)->name('jenis-potongan');
     // Route::get('/notification-bell', NotificationBell::class)->name('notification-bell');

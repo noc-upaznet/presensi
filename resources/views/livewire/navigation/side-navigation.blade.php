@@ -123,10 +123,10 @@
                     </a>
                     <ul class="nav nav-treeview" style="margin-left: 20px;">
                         <li class="nav-item">
-                            <a href="{{ route('create-slip-gaji') }}" 
-                            class="nav-link {{ request()->routeIs('create-slip-gaji') ? 'active' : '' }}">
+                            <a href="{{ route('payroll') }}" 
+                            class="nav-link {{ request()->routeIs('payroll') ? 'active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
-                                <p>Create Slip</p>
+                                <p>Payroll</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -182,6 +182,9 @@
                         class="nav-link {{ request()->routeIs('pengajuan-lembur') ? 'active' : '' }}">
                         <i class="nav-icon bi bi-circle"></i>
                             <p>Pengajuan Lembur</p>
+                            @if ($lemburMenungguCount > 0)
+                                <span class="badge bg-danger ms-2">{{ $lemburMenungguCount }}</span>
+                            @endif
                         </a>
                     </li>
                 </ul>

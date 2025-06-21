@@ -3,12 +3,19 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use App\Models\M_Jadwal;
+use App\Models\M_Lembur;
 use App\Models\M_Presensi;
 use App\Models\PayrollModel;
+use App\Models\M_JadwalShift;
 use App\Models\M_DataKaryawan;
 use Illuminate\Support\Carbon;
 use App\Models\JenisPotonganModel;
+use Illuminate\Support\Facades\DB;
 use App\Models\JenisTunjanganModel;
+use Illuminate\Support\Facades\Crypt;
+use App\Livewire\Karyawan\JadwalShift;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 class CreateSlipGaji extends Component
 {
@@ -37,7 +44,7 @@ class CreateSlipGaji extends Component
         'terlambat' => 0,
         'izin' => 0,
         'cuti' => 0,
-        'kehadiran' => 0,
+        'kehadiran' => 26,
         'lembur' => 0,
     ];
 
@@ -52,19 +59,87 @@ class CreateSlipGaji extends Component
     public $bpjs_jht_nominal = 0;
     public $no_slip;
 
-    public function mount()
+    public $selectedMonth;
+    public $selectedYear;
+    public $periode;
+    public $karyawanId;
+    public $lembur_nominal;
+    public $izin_nominal;
+    public $terlambat_nominal;
+
+    public function mount($id = null, $month = null, $year = null)
     {
-        $this->karyawan = M_DataKaryawan::all();
+        // $this->karyawan = M_DataKaryawan::all(); // semua karyawan untuk dropdown
+            
         $this->jenis_tunjangan = JenisTunjanganModel::all();
         $this->jenis_potongan = JenisPotonganModel::all();
+
+        $this->selectedMonth = $month ?? now()->subMonth()->format('n');
+        $this->selectedYear = $year ?? now()->year;
+        $this->karyawan = $this->loadAvailableKaryawanByPeriode();
+        // dd($this->karyawan);
+
+        $this->bulanTahun = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+
+        // Set user_id langsung dari $id
+        if ($id) {
+            try {
+                $this->user_id = Crypt::decrypt($id);
+                $dataKaryawanId = Crypt::decrypt($id);
+                $dataKaryawan = M_DataKaryawan::findOrFail($dataKaryawanId);
+                $this->karyawanId = $dataKaryawan->user_id;
+                // dd($this->karyawanId);
+
+                $this->loadDataKaryawan(); // load data karyawan jika ID valid
+                $this->rekap = $this->hitungRekapPresensi($this->user_id, $this->bulanTahun);
+                // dd($this->rekap);
+                
+                // Hitung nominal lembur dan simpan ke property jika ingin ditampilkan di view
+                $gajiPokok = $this->numericValue($this->gaji_pokok);
+                $tunjanganJabatan = $this->numericValue($this->tunjangan_jabatan);
+                $jamLembur = M_Lembur::where('user_id', $this->karyawanId)
+                    ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
+                    ->whereNotNull('total_jam')
+                    ->sum('total_jam');
+                $this->lembur_nominal = 0;
+                if (($gajiPokok > 0 || $tunjanganJabatan > 0) && $jamLembur > 0) {
+                    $this->lembur_nominal = round((1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur);
+                }
+                $this->izin_nominal = 0;
+                if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
+                    $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
+                    $this->izin_nominal = round($perHari * ($this->rekap['izin'] ?? 0));
+                }
+                $this->terlambat_nominal = 0;
+                if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
+                    $this->terlambat_nominal = ($this->rekap['terlambat'] ?? 0) > 0 ? 25000 : 0;
+                }
+            } catch (DecryptException $e) {
+                abort(403, 'ID tidak valid');
+            }
+        }
+
+        $this->no_slip = $this->generateNoSlip();
+
         $this->hitungTotalGaji();
     }
 
-    public function updatedKaryawanId($value)
+    public function loadAvailableKaryawanByPeriode()
+    {
+        $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        $periode = $this->selectedYear . '-' . $bulanFormatted;
+
+        return M_DataKaryawan::whereDoesntHave('payrolls', function ($query) use ($periode) {
+            $query->where('periode', $periode);
+        })->get();
+    }
+
+    public function updatedUserId($value)
     {
         $this->loadDataKaryawan();
         if ($this->bulanTahun) {
             $this->rekap = $this->hitungRekapPresensi($this->user_id, $this->bulanTahun);
+            // dd($this->rekap);
             $this->hitungTotalGaji();
         }
     }
@@ -110,12 +185,16 @@ class CreateSlipGaji extends Component
             return Carbon::parse($item->tanggal)->between($startDate, $endDate);
         });
 
-        $kehadiran = $presensi->count();
+        // $kehadiran = $presensi->count();
         $terlambat = $presensi->where('status', 1)->count();
 
-        $bulanFormat = $tahun . '-' . str_pad($bulan, 2, '0', STR_PAD_LEFT);
-        $jadwal = $karyawan->getJadwal->where('bulan_tahun', $bulanFormat)->first();
+        $jadwal = M_Jadwal::where('user_id', $this->karyawanId)
+            ->where('bulan_tahun', $this->bulanTahun)
+            ->first();
 
+        // Sekarang $nama_shift berisi nama shift dari kode shift (misal 3) pada hari ke-1
+        // dd($jadwalShift);
+        
         $izin = 0;
         $cuti = 0;
 
@@ -123,26 +202,29 @@ class CreateSlipGaji extends Component
             foreach (range(1, 31) as $i) {
                 $kode = $jadwal->{'d' . $i};
 
-                if ($kode == 2) {
+                if ($kode == 3) {
                     $izin++;
-                } elseif ($kode == 3) {
+                } elseif ($kode == 2) {
                     $cuti++;
                 }
             }
         }
 
-        $lembur = $presensi->filter(function ($p) use ($jadwal) {
-            if (!$jadwal) return false;
-            $day = (int) Carbon::parse($p->tanggal)->day;
-            return !isset($jadwal->{'d' . $day}) || $jadwal->{'d' . $day} === null;
-        })->count();
+        // ✅ Ambil daftar lembur
+        $dataLembur = M_Lembur::where('user_id', $karyawan->user_id)
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->whereNotNull('total_jam')
+            ->get(['tanggal', 'total_jam']);
+
+
+        $totalJamLembur = $dataLembur->sum('total_jam');
 
         return [
-            'kehadiran' => $kehadiran,
+            'kehadiran' => 26 - $izin - $cuti,
             'terlambat' => $terlambat,
             'izin' => $izin,
             'cuti' => $cuti,
-            'lembur' => $lembur,
+            'lembur' => $totalJamLembur,
         ];
     }
 
@@ -187,7 +269,7 @@ class CreateSlipGaji extends Component
         $this->hitungTotalGaji();
     }
 
-    public function hitungTotalGaji()
+    public function hitungTotalGaji($id = null)
     {
         $gajiPokok = $this->numericValue($this->gaji_pokok);
         $tunjanganJabatan = $this->numericValue($this->tunjangan_jabatan);
@@ -208,9 +290,24 @@ class CreateSlipGaji extends Component
 
         if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
             $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
+        // dd($perHari);
+
             $potonganIzin = $perHari * ($this->rekap['izin'] ?? 0);
-            $potonganTerlambat = 25000;
+            $potonganTerlambat = $this->rekap['terlambat'] > 0 ? 25000 : 0;
         }
+
+        $jamLembur = M_Lembur::where('user_id', $this->karyawanId)
+            ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
+            ->whereNotNull('total_jam')
+            ->sum('total_jam');
+
+        // dd($jamLembur);
+        // Hitung nominal lembur
+        $lemburNominal = 0;
+        if (($gajiPokok > 0 || $tunjanganJabatan > 0) && $jamLembur > 0) {
+            $lemburNominal = (1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur;
+        }
+        // dd($lemburNominal);
 
         // Hitung BPJS
         $dasar_bpjs = $gajiPokok + $tunjanganJabatan;
@@ -234,6 +331,7 @@ class CreateSlipGaji extends Component
         $this->total_gaji = $gajiPokok
             + $tunjanganJabatan
             + $totalTunjangan
+            + $lemburNominal
             - $totalPotonganManual
             - $potonganIzin
             - $potonganTerlambat
@@ -269,19 +367,41 @@ class CreateSlipGaji extends Component
     protected function messages()
     {
         return [
-            'no_slip.required' => 'Nomor slip wajib diisi.',
             'bulanTahun.required' => 'Bulan dan tahun wajib dipilih.',
             'user_id.required' => 'Pilih karyawan terlebih dahulu.',
         ];
     }
 
+    public function generateNoSlip()
+    {
+        // Ambil periode
+        $periode = $this->bulanTahun; // format: "2025-06"
+        $tahun = \Carbon\Carbon::createFromFormat('Y-m', $periode)->format('y'); // jadi "25"
+        $bulanAngka = \Carbon\Carbon::createFromFormat('Y-m', $periode)->format('n'); // jadi 6
+        $bulanRomawi = $this->toRoman($bulanAngka); // jadi "VI"
+
+        // Hitung jumlah slip yang sudah dicetak untuk periode tersebut
+        $count = \App\Models\PayrollModel::where('periode', $periode)->count() + 1;
+        $nomorUrut = str_pad($count, 3, '0', STR_PAD_LEFT); // jadi "006" jika slip ke-6
+
+        return "DJB/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+    }
+
+    public function toRoman($month)
+    {
+        $romawi = [1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+                7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII'];
+        return $romawi[$month] ?? $month;
+    }
+
     public function store()
     {
         $this->validate([
-            'no_slip' => 'required|string|max:50',
             'bulanTahun' => 'required|date_format:Y-m',
             'user_id' => 'required|exists:data_karyawan,id',
         ]);
+
+        $this->no_slip = $this->generateNoSlip();
         
         $data = [
             'karyawan_id' => $this->user_id,
@@ -290,6 +410,9 @@ class CreateSlipGaji extends Component
             'divisi' => $this->divisi,
             'gaji_pokok' => $this->numericValue($this->gaji_pokok),
             'tunjangan_jabatan' => $this->numericValue($this->tunjangan_jabatan),
+            'lembur' => $this->numericValue($this->lembur_nominal),
+            'izin' => $this->numericValue($this->izin_nominal),
+            'terlambat' => $this->numericValue($this->terlambat_nominal),
             'tunjangan' => json_encode($this->tunjangan),
             'potongan' => json_encode($this->potongan),
             'bpjs' => $this->bpjs_nominal,
@@ -302,10 +425,15 @@ class CreateSlipGaji extends Component
 
         PayrollModel::create($data);
 
-
-
-        session()->flash('message', 'Slip gaji berhasil disimpan!');
-        return redirect()->route('payroll'); // ganti dengan rute yang kamu pakai
+        $this->dispatch(
+            'swal', params: [
+            'title' => 'Data Saved',
+            'icon' => 'success',
+            'text' => 'Data has been saved successfully',
+            'showConfirmButton' => false,
+            'timer' => 1500
+        ]);
+        return redirect()->route('payroll');
     }
 
     public function render()

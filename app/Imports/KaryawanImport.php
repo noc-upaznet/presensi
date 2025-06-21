@@ -3,20 +3,31 @@
 namespace App\Imports;
 
 use App\Models\M_DataKaryawan;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class KaryawanImport implements ToModel, WithHeadingRow
 {
-    /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
     public function model(array $row)
     {
+        // Cek apakah user dengan email ini sudah ada
+        $user = User::where('email', $row['email'])->first();
+
+        if (!$user) {
+            $user = User::create([
+                'name' => $row['nama_karyawan'],
+                'email' => $row['email'],
+                'password' => Hash::make($row['nip_karyawan']), // default password
+                'role' => 'user',
+            ]);
+        }
+
+        // Simpan ke tabel data_karyawan dan hubungkan dengan user
         return new M_DataKaryawan([
+            'user_id' => $user->id, // simpan user_id di sini
             'nama_karyawan' => $row['nama_karyawan'],
             'email' => $row['email'],
             'no_hp' => $row['no_hp'],
@@ -64,9 +75,9 @@ class KaryawanImport implements ToModel, WithHeadingRow
             if (is_numeric($value)) {
                 return Date::excelToDateTimeObject($value)->format('Y-m-d');
             }
-            return $value; // sudah string 'yyyy-mm-dd' atau kosong
+            return $value;
         } catch (\Exception $e) {
-            return null; // biar tidak error
+            return null;
         }
     }
 }
