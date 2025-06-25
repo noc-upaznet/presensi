@@ -3,11 +3,18 @@
     <div class="row g-3 mb-3 mt-5" syle="background-color: var(--bs-body-bg);">
         @php
         $cards = [
-        ['title' => 'TOTAL PEGAWAI', 'value' => '104', 'icon' => 'fa-users', 'color' => 'warning'],
-        ['title' => 'TOTAL GAJI KARYAWAN', 'value' => 'Rp. 75.985.069', 'icon' => 'fa-money-bill-wave', 'color' =>
-        'info', 'note' => '▲ -5% dari bulan sebelumnya'],
-        ['title' => 'IZIN/CUTI', 'value' => '6', 'icon' => 'fa-calendar-times', 'color' => 'danger'],
-        ['title' => 'MASUK', 'value' => '98', 'icon' => 'fa-user-check', 'color' => 'success'],
+        ['title' => 'TOTAL PEGAWAI', 'value' => $totalPegawai ?? '0', 'icon' => 'fa-users', 'color' => 'warning', 'href' => '<a href="' . route('data-karyawan') . '" class="text-white text-decoration-none fw-medium">
+            More Info <i class="fa-solid fa-circle-chevron-right"></i>
+        </a>'],
+        ['title' => 'TOTAL GAJI KARYAWAN', 'value' => 'Rp.' . number_format($totalGaji) ?? '0', 'icon' => 'fa-money-bill-wave', 'color' => 'info', 'note' => '▲ -5% dari bulan sebelumnya', 'href' => '<a href="' . route('payroll') . '" class="text-white text-decoration-none fw-medium">
+            More Info <i class="fa-solid fa-circle-chevron-right"></i>
+        </a>'],
+        ['title' => 'IZIN/CUTI', 'value' => $izinCuti ?? '0', 'icon' => 'fa-calendar-times', 'color' => 'danger', 'href' => '<a href="' . route('pengajuan') . '" class="text-white text-decoration-none fw-medium">
+            More Info <i class="fa-solid fa-circle-chevron-right"></i>
+        </a>'],
+        ['title' => 'MASUK', 'value' => $totalPresensi ?? '0', 'icon' => 'fa-user-check', 'color' => 'success', 'href' => '<a href="' . route('riwayat-presensi') . '" class="text-white text-decoration-none fw-medium">
+            More Info <i class="fa-solid fa-circle-chevron-right"></i>
+        </a>'],
         ];
         @endphp
 
@@ -28,9 +35,9 @@
                     @endisset
                 </div>
                 <div class="card-footer bg-info text-white py-2 text-center">
-                    <a href="#" class="text-white text-decoration-none fw-medium">
-                        More Info <i class="fa-solid fa-circle-chevron-right"></i>
-                    </a>
+                    @isset($card['href'])
+                        {!! $card['href'] !!}
+                    @endisset
                 </div>
             </div>
         </div>

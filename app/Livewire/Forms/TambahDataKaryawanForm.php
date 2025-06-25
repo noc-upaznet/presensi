@@ -63,6 +63,9 @@ class TambahDataKaryawanForm extends Form
     #[Validate('required', 'Sistem Kerja')]
     public $sistem_kerja = '';
 
+    // #[Validate('required', 'Total Upah')]
+    // public $total_upah = '';
+
     #[Validate('required', 'Gaji Pokok')]
     public $gaji_pokok = '';
 

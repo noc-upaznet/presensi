@@ -27,7 +27,7 @@
             role="menu"
             data-accordion="false"
         >
-             @if (auth()->user()->role == 'admin')
+            @if (auth()->user()->role == 'admin')
                 <li class="nav-item">
                     <a href="{{ route('dashboard') }}" 
                     class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -113,38 +113,41 @@
                             <p>Role Users</p>
                     </a>
                 </li>
-                <li class="nav-item menu-open">
-                    <a href="#" class="nav-link active">
-                        <i class="bi bi-clipboard-plus"></i>
-                        <p>
-                            Slip Gaji
-                        <i class="nav-arrow bi bi-chevron-right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="margin-left: 20px;">
-                        <li class="nav-item">
-                            <a href="{{ route('payroll') }}" 
-                            class="nav-link {{ request()->routeIs('payroll') ? 'active' : '' }}">
-                            <i class="nav-icon bi bi-circle"></i>
-                                <p>Payroll</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('jenis-tunjangan') }}" 
-                            class="nav-link {{ request()->routeIs('jenis-tunjangan') ? 'active' : '' }}">
-                            <i class="nav-icon bi bi-circle"></i>
-                                <p>Jenis Tunjangan</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('jenis-potongan') }}" 
-                            class="nav-link {{ request()->routeIs('jenis-potongan') ? 'active' : '' }}">
-                            <i class="nav-icon bi bi-circle"></i>
-                                <p>Jenis Potongan</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+
+                @if (auth()->user()->role == 'hr')
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link active">
+                            <i class="bi bi-clipboard-plus"></i>
+                            <p>
+                                Slip Gaji
+                            <i class="nav-arrow bi bi-chevron-right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview" style="margin-left: 20px;">
+                            <li class="nav-item">
+                                <a href="{{ route('payroll') }}" 
+                                class="nav-link {{ request()->routeIs('payroll') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-circle"></i>
+                                    <p>Payroll</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('jenis-tunjangan') }}" 
+                                class="nav-link {{ request()->routeIs('jenis-tunjangan') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-circle"></i>
+                                    <p>Jenis Tunjangan</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('jenis-potongan') }}" 
+                                class="nav-link {{ request()->routeIs('jenis-potongan') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-circle"></i>
+                                    <p>Jenis Potongan</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
             @endif
 
             <li class="nav-item">

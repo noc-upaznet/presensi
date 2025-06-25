@@ -12,6 +12,9 @@ class LemburForm extends Form
     #[Validate('required', 'tanggal')]
     public $tanggal = '';
 
+    #[Validate('required', 'Jenis')]
+    public $jenis = '';
+
     #[Validate('required', 'Waktu Mulai')]
     public $waktu_mulai = '';
 

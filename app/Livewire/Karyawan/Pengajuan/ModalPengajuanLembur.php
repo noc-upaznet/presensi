@@ -59,6 +59,7 @@ class ModalPengajuanLembur extends Component
         $data = [
             'user_id' => Auth::id(),
             'tanggal' => $this->form->tanggal,
+            'jenis' => $this->form->jenis,
             'keterangan' => $this->form->keterangan,
             'waktu_mulai' => $this->form->waktu_mulai,
             'waktu_akhir' => $this->form->waktu_akhir,

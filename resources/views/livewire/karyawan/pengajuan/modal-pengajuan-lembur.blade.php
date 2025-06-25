@@ -16,6 +16,16 @@
                     </div>
 
                     <div class="mb-3">
+                        <label class="form-label fw-semibold">Jenis Lembur <small class="text-danger">*</small></label>
+                        <select class="form-select" wire:model="form.jenis">
+                            <option value="">-- Pilih Jenis Lembur --</option>
+                            <option value="1">Hari Biasa</option>
+                            <option value="2">Hari Libur</option>
+                        </select>
+                        @error('form.jenis') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label fw-semibold">Rentang Waktu</label>
                         <div class="row">
                             <div class="col">

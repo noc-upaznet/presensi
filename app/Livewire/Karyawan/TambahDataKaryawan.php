@@ -26,6 +26,7 @@ class TambahDataKaryawan extends Component
     public $divisi;
     public $jabatan;
     public $password;
+    public $total_upah;
 
     public function mount()
     {
@@ -56,6 +57,13 @@ class TambahDataKaryawan extends Component
 
     public function prevStep() {
         $this->step--;
+    }
+
+    public function UpdatedTotalUpah($value)
+    {
+        $value = (int) str_replace('.', '', $value); // buang titik pemisah ribuan
+        $this->form->gaji_pokok = $value * 0.75;
+        $this->form->tunjangan_jabatan = $value * 0.25;
     }
 
     public function store() {
@@ -95,6 +103,7 @@ class TambahDataKaryawan extends Component
             'divisi' => $this->form->divisi,
             'jabatan' => $this->form->jabatan,
             'sistem_kerja' => $this->form->sistem_kerja,
+            'total_upah' => $this->total_upah,
             'gaji_pokok' => $this->form->gaji_pokok,
             'tunjangan_jabatan' => $this->form->tunjangan_jabatan,
             'bonus' => $this->form->bonus,

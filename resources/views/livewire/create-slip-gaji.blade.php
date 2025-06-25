@@ -89,6 +89,27 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="potongan" class="form-label fw-semibold">Uang Transport</label>
+                            {{-- <div class="input-group mb-2">
+                                <select name="transport[]" class="form-select" wire:model="transport.{{ $index }}.nama">
+                                    <option value="">-- Pilih Transport --</option>
+                                    @if(!empty($jenis_tunjangan) && $jenis_tunjangan->count())
+                                        @foreach($jenis_tunjangan as $tunjangan)
+                                            @if (!in_array($tunjangan->id, $tunjangan_terpilih ?? []))
+                                                <option value="{{ $tunjangan->nama_tunjangan }}">{{ $tunjangan->nama_tunjangan }}</option>
+                                            @endif
+                                        @endforeach
+                                    @else
+                                        <option value="">Data tidak tersedia</option>
+                                    @endif
+                                </select>
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" class="form-control" wire:model.lazy="transport.{{ $index }}.nominal">
+                                <button type="button" class="btn btn-danger" wire:click="removeTransport({{ $index }})">Hapus</button>
+                            </div> --}}
+                        </div>
+
+                        <div class="mb-3">
                             <label for="potongan" class="form-label fw-semibold">Tunjangan</label>
                             @foreach ($tunjangan as $index => $item)
                                 <div class="input-group mb-2">

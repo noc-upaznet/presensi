@@ -28,8 +28,12 @@ class ModalPengajuan extends Component
 
     public function mount()
     {
-        $this->shifts = M_JadwalShift::whereIn('nama_shift', ['Izin', 'Cuti'])->orderBy('nama_shift')->get();
-
+        $this->shifts = M_JadwalShift::whereIn('nama_shift', 
+        [
+            'Izin', 
+            'Cuti', 
+            'Izin Setengah Hari',
+        ])->orderBy('nama_shift')->get();
     }
 
     public function store()
@@ -46,7 +50,7 @@ class ModalPengajuan extends Component
         }
         // dd(auth()->id());
         $data = [
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'shift_id' => $this->form->pengajuan,
             'tanggal' => $this->form->tanggal,
             'keterangan' => $this->form->keterangan,

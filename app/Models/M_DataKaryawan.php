@@ -33,6 +33,7 @@ class M_DataKaryawan extends Model
         'posisi',
         'sistem_kerja',
         'spv',
+        'total_upah',
         'gaji_pokok',
         'tunjangan_jabatan',
         'bonus',

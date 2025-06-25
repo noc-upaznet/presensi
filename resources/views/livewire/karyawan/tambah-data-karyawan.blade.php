@@ -336,6 +336,11 @@
                             <p>Silahkan isi data penggajian di bawah ini.</p>
                         </div>
                         <h4 style="color: blue; margin-bottom: 20px;">Penggajian</h4>
+                        <div class="mb-3">
+                            <label for="total-upah" class="form-label">Total Upah</label>
+                            <input class="form-control" type="text" id="total-upah" wire:model.lazy="total_upah">
+                            @error('form.total_upah') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="gaji-pokok" class="form-label">Gaji Pokok</label>
@@ -347,6 +352,7 @@
                                         id="gaji_pokok"
                                         oninput="formatRupiah(this)"
                                         wire:model.lazy="form.gaji_pokok"
+                                        readonly
                                     />
                                 </div>
                                 @error('form.gaji_pokok') <span class="text-danger">{{ $message }}</span> @enderror
@@ -361,6 +367,7 @@
                                         id="tunjangan_jabatan"
                                         oninput="formatRupiah(this)"
                                         wire:model.lazy="form.tunjangan_jabatan"
+                                        readonly
                                     />
                                 </div>
                                 @error('form.tunjangan_jabatan') <span class="text-danger">{{ $message }}</span> @enderror

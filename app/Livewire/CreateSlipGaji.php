@@ -100,10 +100,21 @@ class CreateSlipGaji extends Component
                 $jamLembur = M_Lembur::where('user_id', $this->karyawanId)
                     ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
                     ->whereNotNull('total_jam')
+                    ->where('status', 1)
                     ->sum('total_jam');
+                $jenisLembur = M_Lembur::where('user_id', $this->karyawanId)
+                    ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
+                    ->whereNotNull('total_jam')
+                    ->where('status', 1)
+                    ->orderByDesc('tanggal')
+                    ->value('jenis');
                 $this->lembur_nominal = 0;
                 if (($gajiPokok > 0 || $tunjanganJabatan > 0) && $jamLembur > 0) {
+                    if ($jenisLembur == 2) {
+                    $this->lembur_nominal = round((1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur * 2);
+                    } else {
                     $this->lembur_nominal = round((1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur);
+                    }
                 }
                 $this->izin_nominal = 0;
                 if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
@@ -214,6 +225,7 @@ class CreateSlipGaji extends Component
         $dataLembur = M_Lembur::where('user_id', $karyawan->user_id)
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->whereNotNull('total_jam')
+            ->where('status', 1)
             ->get(['tanggal', 'total_jam']);
 
 
@@ -299,14 +311,31 @@ class CreateSlipGaji extends Component
         $jamLembur = M_Lembur::where('user_id', $this->karyawanId)
             ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
             ->whereNotNull('total_jam')
+            ->where('status', 1)
             ->sum('total_jam');
 
         // dd($jamLembur);
         // Hitung nominal lembur
+        // Default lemburNominal
         $lemburNominal = 0;
+
+        $jenisLembur = M_Lembur::where('user_id', $this->karyawanId)
+            ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
+            ->whereNotNull('total_jam')
+            ->where('status', 1)
+            ->orderByDesc('tanggal')
+            ->value('jenis');
+
         if (($gajiPokok > 0 || $tunjanganJabatan > 0) && $jamLembur > 0) {
+            if ($jenisLembur == 2) {
+            $lemburNominal = (1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur * 2;
+            } else {
             $lemburNominal = (1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur;
+            }
         }
+        // if (($gajiPokok > 0 || $tunjanganJabatan > 0) && $jamLembur > 0) {
+        //     $lemburNominal = (1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur;
+        // }
         // dd($lemburNominal);
 
         // Hitung BPJS
