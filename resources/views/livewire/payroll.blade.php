@@ -216,6 +216,12 @@
                             disabled>
                     </div>
                     <div class="mb-3">
+                        <label for="jabatan" class="form-label fw-semibold">Jabatan</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" disabled wire:model="jabatan">
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
                         <input type="number" id="gaji_pokok" class="form-control" wire:model="gaji_pokok"
                             disabled>
@@ -230,14 +236,29 @@
                         <input type="number" id="lembur_nominal" class="form-control" wire:model="lembur_nominal"
                             disabled>
                     </div>
-                    <div class="mb-3">
-                        <label for="izin_nominal" class="form-label fw-semibold">Potongan Izin</label>
-                        <input type="text" id="izin_nominal" class="form-control" disabled wire:model="izin_nominal">
+                    @if ($this->isSalesPosition())
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="jml_psb" class="form-label fw-semibold">Jml. PSB</label>
+                                <input type="text" id="jml_psb" class="form-control" disabled wire:model="jml_psb">
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="terlambat_nominal" class="form-label fw-semibold">Insentif</label>
+                                <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
+                            </div>
+                        </div>
+                    @endif
+                    <div class="row">
+                        <div class="mb-3 col-md-6">
+                            <label for="izin_nominal" class="form-label fw-semibold">Potongan Izin</label>
+                            <input type="text" id="izin_nominal" class="form-control" disabled wire:model="izin_nominal">
+                        </div>
+                        <div class="mb-3 col-md-6">
+                            <label for="terlambat_nominal" class="form-label fw-semibold">Potongan Terlambat</label>
+                            <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="terlambat_nominal" class="form-label fw-semibold">Potongan Terlambat</label>
-                        <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
-                    </div>
+                    
                     <div class="mb-3">
                         <label for="potongan" class="form-label fw-semibold">Tunjangan</label>
                         @foreach ($tunjangan as $index => $item)
@@ -289,6 +310,10 @@
                             <button type="button" class="btn btn-success mb-2" wire:click="addPotongan">+ Tambah Potongan</button>
                         </div>
                     </div>
+                    <div class="mb-2">
+                        <label>Bonus Fee Sharing</label>
+                        <input type="number" class="form-control" wire:model.lazy="fee_sharing_nominal">
+                    </div>
                     <div class="row mt-2 mb-2">
                         <div class="col-md-6">
                             <label>Nominal BPJS Kesehatan (1%)</label>
@@ -300,30 +325,7 @@
                             <input type="number" class="form-control" wire:model.lazy="bpjs_jht_nominal">
                         </div>
                     </div>
-                    {{-- <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="terlambat" class="form-label fw-semibold">Terlambat</label>
-                            <input type="number" id="terlambat" class="form-control" wire:model="terlambat">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="izin" class="form-label fw-semibold">Izin</label>
-                            <input type="number" id="izin" class="form-control" wire:model="izin">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="cuti" class="form-label fw-semibold">Cuti</label>
-                            <input type="number" id="cuti" class="form-control" wire:model="cuti">
-                        </div>
-                    </div> --}}
-                    {{-- <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="kehadiran" class="form-label fw-semibold">Kehadiran</label>
-                            <input type="number" id="kehadiran" class="form-control" wire:model="kehadiran">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="lembur" class="form-label fw-semibold">Lembur</label>
-                            <input type="number" id="lembur" class="form-control" wire:model="lembur">
-                        </div>
-                    </div> --}}
+                    
                     <div class="mb-3">
                         <label for="terlambat" class="form-label fw-semibold">Total gaji</label>
                         <input type="number" id="terlambat" class="form-control" wire:model="total_gaji" readonly>

@@ -27,7 +27,8 @@
             role="menu"
             data-accordion="false"
         >
-            @if (auth()->user()->role == 'admin')
+            @php $user = auth()->user(); @endphp
+            @if ($user->role == 'admin')
                 <li class="nav-item">
                     <a href="{{ route('dashboard') }}" 
                     class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -36,7 +37,7 @@
                     </a>
                 </li>
             @endif
-            @if (auth()->user()->role == 'user' || auth()->user()->role == 'hr' || auth()->user()->role == 'spv')
+            @if ($user && $user->role == 'user' || $user->role == 'hr' || $user->role == 'spv')
                 <li class="nav-item">
                     <a href="{{ route('clock-in') }}" 
                     class="nav-link {{ request()->routeIs('clock-in') ? 'active' : '' }}">

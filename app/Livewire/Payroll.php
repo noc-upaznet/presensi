@@ -29,7 +29,7 @@ class Payroll extends Component
     public $startDate;
     public $endDate;
 
-    public $payroll_id, $no_slip, $karyawan_id, $bulan_tahun, $nip_karyawan, $divisi, $nama_karyawan;
+    public $payroll_id, $no_slip, $karyawan_id, $bulan_tahun, $nip_karyawan, $divisi, $nama_karyawan, $jabatan;
     public $gaji_pokok, $tunjangan = [], $potongan = [], $total_gaji, $tunjangan_jabatan, $lembur_nominal, $izin_nominal, $terlambat_nominal;
     public $terlambat, $izin, $cuti, $kehadiran, $lembur;
     public $jenis_tunjangan, $jenis_potongan;
@@ -193,6 +193,11 @@ class Payroll extends Component
             - $bpjsJht;
     }
 
+    public function isSalesPosition()
+    {
+        return in_array(strtolower($this->jabatan), ['sales', 'sm', 'sales marketing']);
+    }
+
     public function editPayroll($id)
     {
         $payroll = PayrollModel::with('getKaryawan')->find($id);
@@ -205,6 +210,7 @@ class Payroll extends Component
             $this->bulan_tahun = $payroll->periode;
             $this->nip_karyawan = $payroll->nip_karyawan;
             $this->divisi = $payroll->divisi;
+            $this->jabatan = $payroll->getNamaJabatan();
             $this->gaji_pokok = $payroll->gaji_pokok;
             $this->tunjangan_jabatan = $payroll->tunjangan_jabatan;
             $this->lembur_nominal = $payroll->lembur;

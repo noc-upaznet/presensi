@@ -21,6 +21,11 @@ class PayrollModel extends Model
         'potongan',
         'bpjs',
         'bpjs_jht',
+        'uang_makan',
+        'transport',
+        'fee_sharing',
+        'insentif',
+        'jml_psb',
         'rekap',
         'total_gaji',
         'periode',
@@ -30,4 +35,15 @@ class PayrollModel extends Model
     {
         return $this->belongsTo(M_DataKaryawan::class, 'karyawan_id');
     }
+
+    public function getJabatan()
+    {
+        return $this->getKaryawan()->first()->jabatan();
+    }
+
+    public function getNamaJabatan()
+    {
+        return $this->getKaryawan()->first()->getJabatan()->first()->nama_jabatan ?? null;
+    }
+    
 }

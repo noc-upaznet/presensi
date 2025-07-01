@@ -21,6 +21,7 @@ class CreateSlipGaji extends Component
 {
     public $karyawan;
     public $divisi;
+    public $jabatan;
     public $gaji_pokok = 0;
     public $user_id;
     public $nip_karyawan;
@@ -44,7 +45,7 @@ class CreateSlipGaji extends Component
         'terlambat' => 0,
         'izin' => 0,
         'cuti' => 0,
-        'kehadiran' => 26,
+        'kehadiran' => 0,
         'lembur' => 0,
     ];
 
@@ -63,9 +64,19 @@ class CreateSlipGaji extends Component
     public $selectedYear;
     public $periode;
     public $karyawanId;
-    public $lembur_nominal;
-    public $izin_nominal;
-    public $terlambat_nominal;
+    public $lembur_nominal = 0;
+    public $izin_nominal = 0;
+    public $terlambat_nominal = 0;
+    public $jml_psb = 0;
+    public $insentif = 0;
+    public $tunjangan_kehadiran = 0;
+    public $transport = 0;
+    public $uang_makan = 0;
+    
+    public $fee_sharing_digunakan = false;
+    public $fee_sharing_nominal = 0;
+    public $jml_psb_spv = 0;
+    public $insentif_spv = 0;
 
     public function mount($id = null, $month = null, $year = null)
     {
@@ -168,16 +179,87 @@ class CreateSlipGaji extends Component
         $karyawan = M_DataKaryawan::find($this->user_id);
         if ($karyawan) {
             $this->divisi = $karyawan->getDivisi?->nama;
+            $this->jabatan = $karyawan->getjabatan?->nama_jabatan;
             $this->gaji_pokok = $karyawan->gaji_pokok;
             $this->nip_karyawan = $karyawan->nip_karyawan;
             $this->tunjangan_jabatan = $karyawan->tunjangan_jabatan;
         } else {
             $this->divisi = '';
+            $this->jabatan = '';
             $this->gaji_pokok = '';
             $this->nip_karyawan = '';
             $this->tunjangan_jabatan = '';
         }
     }
+
+    public function isSalesPosition()
+    {
+        return in_array(strtolower($this->jabatan), ['sales', 'sm', 'sales marketing']);
+    }
+    public function isSalesPositionSpv()
+    {
+        return in_array(strtolower($this->jabatan), ['spv sales marketing', 'spv sales']);
+    }
+
+    public function updatedJmlPsb()
+    {
+        if ($this->isSalesPosition()) {
+            $insentifMapping = [
+                1 => [1000000, 50000],
+                2 => [1000000, 100000],
+                3 => [1000000, 150000],
+                4 => [1000000, 200000],
+                5 => [1000000, 250000],
+                6 => [1160000, 300000],
+                7 => [1160000, 350000],
+                8 => [1160000, 400000],
+                9 => [1160000, 450000],
+                10 => [1160000, 500000],
+                11 => [1508000, 825000],
+                12 => [1508000, 900000],
+                13 => [1508000, 975000],
+                14 => [1508000, 1050000],
+                15 => [1508000, 1125000],
+                16 => [1508000, 1200000],
+                17 => [1508000, 1275000],
+                18 => [1508000, 1350000],
+                19 => [1508000, 1425000],
+                20 => [2320000, 1700000],
+                21 => [2320000, 1785000],
+                22 => [2320000, 1870000],
+                23 => [2320000, 1955000],
+                24 => [2320000, 2040000],
+                25 => [2320000, 2125000],
+                26 => [2320000, 2210000],
+                27 => [2320000, 2295000],
+                28 => [2320000, 2380000],
+                29 => [2320000, 2465000],
+                30 => [2320000, 2550000],
+            ];
+
+            if (isset($insentifMapping[$this->jml_psb])) {
+                [$upah, $insentif] = $insentifMapping[$this->jml_psb];
+
+                // gaji pokok = 75% dari upah, tunjangan jabatan = 25% dari upah
+                $this->gaji_pokok = round($upah * 0.75);
+                $this->tunjangan_jabatan = round($upah * 0.25);
+                $this->insentif = $insentif;
+
+                $this->hitungTotalGaji();
+            } else {
+                $this->insentif = 0;
+            }
+        }
+    }
+
+    public function updatedJmlPsbSpv()
+    {
+        if ($this->isSalesPositionSpv()) {
+            $this->insentif_spv = 10000 * ((int) ($this->jml_psb_spv ?? 0));
+            $this->hitungTotalGaji();
+        }
+    }
+
 
     public function hitungRekapPresensi($karyawanId, $bulanTahun)
     {
@@ -271,6 +353,11 @@ class CreateSlipGaji extends Component
         }
     }
 
+    public function updatedFeeSharingDigunakan()
+    {
+        $this->hitungTotalGaji();
+    }
+
     public function updatedBpjsDigunakan()
     {
         $this->hitungTotalGaji();
@@ -283,6 +370,22 @@ class CreateSlipGaji extends Component
 
     public function hitungTotalGaji($id = null)
     {
+        // Tambahan: Uang Transport dan Uang Makan
+        $transport = $this->numericValue($this->transport ?? 0);
+        $uangMakan = $this->numericValue($this->uang_makan ?? 0);
+
+        // Tunjangan kehadiran: 2000/hari jika tidak terlambat, jika ada terlambat maka hangus (0)
+        $tunjanganKehadiran = 0;
+        if (($this->rekap['terlambat'] ?? 0) == 0) {
+            $tunjanganKehadiran = ($this->rekap['kehadiran'] ?? 0) * 2000;
+        }
+        // $this->tunjangan_kehadiran = $tunjanganKehadiran;
+
+        if ($this->user_id) {
+            $this->rekap['kehadiran'] == 0;
+        }
+
+        //gaji pokok jabatan sales 
         $gajiPokok = $this->numericValue($this->gaji_pokok);
         $tunjanganJabatan = $this->numericValue($this->tunjangan_jabatan);
 
@@ -333,9 +436,6 @@ class CreateSlipGaji extends Component
             $lemburNominal = (1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur;
             }
         }
-        // if (($gajiPokok > 0 || $tunjanganJabatan > 0) && $jamLembur > 0) {
-        //     $lemburNominal = (1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur;
-        // }
         // dd($lemburNominal);
 
         // Hitung BPJS
@@ -357,10 +457,20 @@ class CreateSlipGaji extends Component
                 : 0;
         }
 
+        $this->fee_sharing_nominal = $this->fee_sharing_digunakan
+            ? 100000
+            : 0;
+
         $this->total_gaji = $gajiPokok
             + $tunjanganJabatan
             + $totalTunjangan
             + $lemburNominal
+            + $this->insentif
+            + $this->insentif_spv
+            + $this->tunjangan_kehadiran
+            + ($this->fee_sharing_digunakan ? $this->fee_sharing_nominal : 0)
+            + $transport
+            + $uangMakan
             - $totalPotonganManual
             - $potonganIzin
             - $potonganTerlambat
@@ -372,18 +482,79 @@ class CreateSlipGaji extends Component
     public function addTunjangan()
     {
         $this->tunjangan[] = ['nama' => '', 'nominal' => 0];
+        $this->tunjangan_terpilih = array_column($this->tunjangan, 'nama');
+    }
+
+    public function updatedTunjangan($value, $key)
+    {
+        [$index, $property] = explode('.', $key);
+
+        if ($property === 'nama') {
+            $namaDipilih = $value;
+
+            // Isi nominal otomatis jika "Tunjangan Kehadiran"
+            if ($namaDipilih === 'Tunjangan Kehadiran') {
+                $tunjanganKehadiran = 0;
+                if (($this->rekap['terlambat'] ?? 0) == 0) {
+                    $tunjanganKehadiran = ($this->rekap['kehadiran'] ?? 0) * 2000;
+                }
+                $this->tunjangan[$index]['nominal'] = $tunjanganKehadiran;
+            }else if ($namaDipilih === 'Tunjangan Kebudayaan') {
+                $tunjanganKebudayaan = 100000;
+                $this->tunjangan[$index]['nominal'] = $tunjanganKebudayaan;
+            }else {
+                // default: ambil dari DB jika bukan "Tunjangan Kehadiran"
+                $tunjangan = JenisTunjanganModel::where('nama_tunjangan', $namaDipilih)->first();
+                if ($tunjangan) {
+                    $this->tunjangan[$index]['nominal'] = $tunjangan->nominal;
+                }
+            }
+
+            // Perbarui daftar terpilih
+            $this->tunjangan_terpilih = array_column($this->tunjangan, 'nama');
+        }
+
+        $this->hitungTotalGaji();
     }
 
     public function removeTunjangan($index)
     {
         unset($this->tunjangan[$index]);
         $this->tunjangan = array_values($this->tunjangan);
+        $this->tunjangan_terpilih = array_column($this->tunjangan, 'nama');
         $this->hitungTotalGaji();
     }
 
     public function addPotongan()
     {
         $this->potongan[] = ['nama' => '', 'nominal' => 0];
+
+    }
+
+    public function updatedPotongan($value, $key)
+    {
+        [$index, $property] = explode('.', $key);
+
+        if ($property === 'nama') {
+            $namaDipilih = $value;
+
+            // Isi nominal otomatis jika "Voucher"
+            if ($namaDipilih === 'Voucher') {
+                $voucher = 100000;
+                $this->potongan[$index]['nominal'] = $voucher;
+            }else {
+                // default: ambil dari DB jika bukan "Tunjangan Kehadiran"
+                $potongan = JenisPotonganModel::where('nama_potongan', $namaDipilih)->first();
+                if ($potongan) {
+                    $this->potongan[$index]['nominal'] = $potongan->nominal;
+                }
+            }
+
+            // Perbarui daftar terpilih
+            $this->tunjangan_terpilih = array_column($this->tunjangan, 'nama');
+        }
+
+        $this->hitungTotalGaji();
     }
 
     public function removePotongan($index)
@@ -446,6 +617,11 @@ class CreateSlipGaji extends Component
             'potongan' => json_encode($this->potongan),
             'bpjs' => $this->bpjs_nominal,
             'bpjs_jht' => $this->bpjs_jht_nominal,
+            'uang_makan' => $this->numericValue($this->uang_makan),
+            'transport' => $this->numericValue($this->transport),
+            'fee_sharing' => $this->numericValue($this->fee_sharing_nominal),
+            'insentif' => $this->numericValue($this->insentif),
+            'jml_psb' => $this->jml_psb,
             'rekap' => json_encode($this->rekap),
             'total_gaji' => (int) $this->total_gaji,
             'periode' => $this->bulanTahun,

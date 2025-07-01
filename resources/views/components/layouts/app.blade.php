@@ -472,6 +472,30 @@
           }
       });
 
+      $('#modalAdd').on('shown.bs.modal', function () {
+          const $select = $('#selectJabatan');
+
+          if ($select.length) {
+              $select.select2({
+                  dropdownParent: $('#modalAdd')
+              });
+
+              // Set nilai awal dari Livewire ke Select2
+              const livewireInstance = Livewire.find($select.closest('[wire\\:id]').attr('wire:id'));
+              if (livewireInstance) {
+                  const selected = livewireInstance.get('nama_jabatan');
+                  $select.val(selected).trigger('change');
+              }
+
+              $select.on('change', function () {
+                  const selectedValues = ($(this).val() || []).map(Number);
+                  livewireInstance.set('nama_jabatan', selectedValues);
+                  console.log('Dikirim ke Livewire:', selectedValues);
+              });
+          }
+      });
+
+
       
     </script>
     @livewireScripts

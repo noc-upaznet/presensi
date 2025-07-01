@@ -109,7 +109,7 @@
                         <select class="form-select" wire:model="selectedKaryawan">
                             <option value="">-- Pilih Karyawan --</option>
                             @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->id }} |{{ $user->name }}</option>
+                                <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endforeach
                         </select>
                         @error('selectedKaryawan')
@@ -130,7 +130,7 @@
                     <div class="mb-3" wire:ignore>
                         <label class="form-label fw-semibold">Lokasi Karyawan</label>
                         <select
-                            class="form-select selectLokasi"
+                            class="form-select"
                             id="lokasiSelect"
                             multiple
                             style="width: 100%;"

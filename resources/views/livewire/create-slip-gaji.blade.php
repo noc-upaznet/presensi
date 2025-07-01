@@ -64,56 +64,118 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
-                            <input type="text" id="gaji_pokok" class="form-control" disabled wire:model="gaji_pokok">
+                            <label for="jabatan" class="form-label fw-semibold">Jabatan</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" disabled wire:model="jabatan">
+                            </div>
                         </div>
-
+                        @if ($this->isSalesPosition())
+                            <div class="row">
+                                <div class="mb-3 col-md-6">
+                                    <label for="jumlah-psb" class="form-label fw-semibold">Jumlah PSB</label>
+                                    <input type="number" wire:model.lazy="jml_psb" class="form-control" id="jumlah-psb" placeholder="Masukkan Jml. PSB sales">
+                                </div>
+                                <div class="mb-3 col-md-6">
+                                    <label for="insentif" class="form-label fw-semibold">Insentif</label>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="text" id="insentif" class="form-control" disabled wire:model="insentif">
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        @if ($this->isSalesPositionSpv())
+                            <div class="row">
+                                <div class="mb-3 col-md-6">
+                                    <label for="jumlah-psb-spv" class="form-label fw-semibold">Jumlah PSB</label>
+                                    <input type="number" wire:model.lazy="jml_psb_spv" class="form-control" id="jumlah-psb-spv" placeholder="Masukkan Jml. PSB sales">
+                                </div>
+                                <div class="mb-3 col-md-6">
+                                    <label for="insentif-spv" class="form-label fw-semibold">Insentif</label>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="text" id="insentif-spv" class="form-control" disabled wire:model="insentif_spv">
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        <div class="mb-3">
+                            <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" id="gaji_pokok" class="form-control" disabled wire:model="gaji_pokok">
+                            </div>
+                        </div>
                         <div class="mb-3">
                             <label for="tunjangan_jabatan" class="form-label fw-semibold">Tunjangan Jabatan</label>
-                            <input type="text" id="tunjangan_jabatan" class="form-control" disabled wire:model="tunjangan_jabatan">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="lembur_nominal" class="form-label fw-semibold">Lembur</label>
-                            <input type="text" id="lembur_nominal" class="form-control" disabled wire:model="lembur_nominal">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="izin_nominal" class="form-label fw-semibold">Potongan Izin</label>
-                            <input type="text" id="izin_nominal" class="form-control" disabled wire:model="izin_nominal">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="terlambat_nominal" class="form-label fw-semibold">Potongan Terlambat</label>
-                            <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="potongan" class="form-label fw-semibold">Uang Transport</label>
-                            {{-- <div class="input-group mb-2">
-                                <select name="transport[]" class="form-select" wire:model="transport.{{ $index }}.nama">
-                                    <option value="">-- Pilih Transport --</option>
-                                    @if(!empty($jenis_tunjangan) && $jenis_tunjangan->count())
-                                        @foreach($jenis_tunjangan as $tunjangan)
-                                            @if (!in_array($tunjangan->id, $tunjangan_terpilih ?? []))
-                                                <option value="{{ $tunjangan->nama_tunjangan }}">{{ $tunjangan->nama_tunjangan }}</option>
-                                            @endif
-                                        @endforeach
-                                    @else
-                                        <option value="">Data tidak tersedia</option>
-                                    @endif
-                                </select>
+                            <div class="input-group mb-2">
                                 <span class="input-group-text">Rp</span>
-                                <input type="text" class="form-control" wire:model.lazy="transport.{{ $index }}.nominal">
-                                <button type="button" class="btn btn-danger" wire:click="removeTransport({{ $index }})">Hapus</button>
-                            </div> --}}
+                                <input type="text" id="tunjangan_jabatan" class="form-control" disabled wire:model="tunjangan_jabatan">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="lembur_nominal" class="form-label fw-semibold">Lembur</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="lembur_nominal" class="form-control" disabled wire:model="lembur_nominal">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="potongan" class="form-label fw-semibold">Uang Transport</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    {{-- <input type="text" class="form-control" wire:model.lazy="transport_nominal"> --}}
+                                    <select name="transport" class="form-select" wire:model.lazy="transport">
+                                        <option value="">-- Pilih Nominal --</option>
+                                        <option value="5000">5.000</option>
+                                        <option value="10000">10.000</option>
+                                        <option value="15000">15.000</option>
+                                        <option value="25000">25.000</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="potongan" class="form-label fw-semibold">Uang Makan</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <select name="uang_makan" class="form-select" wire:model.lazy="uang_makan">
+                                        <option value="">-- Pilih Nominal --</option>
+                                        <option value="5000">5.000</option>
+                                        <option value="10000">10.000</option>
+                                        <option value="15000">15.000</option>
+                                        <option value="25000">25.000</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="izin_nominal" class="form-label fw-semibold">Potongan Izin</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="izin_nominal" class="form-control" disabled wire:model="izin_nominal">
+                                </div>
+                            </div>
+
+                            <div class="mb-3 col-md-6">
+                                <label for="terlambat_nominal" class="form-label fw-semibold">Potongan Terlambat</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="potongan" class="form-label fw-semibold">Tunjangan</label>
                             @foreach ($tunjangan as $index => $item)
                                 <div class="input-group mb-2">
-                                    <select name="tunjangan[]" class="form-select" wire:model="tunjangan.{{ $index }}.nama">
+                                    <select name="tunjangan[]" class="form-select" wire:model.lazy="tunjangan.{{ $index }}.nama">
                                         <option value="">-- Pilih Tunjangan --</option>
                                         @if(!empty($jenis_tunjangan) && $jenis_tunjangan->count())
                                             @foreach($jenis_tunjangan as $tunjangan)
@@ -137,7 +199,7 @@
                             <label for="potongan" class="form-label fw-semibold">Potongan</label>
                             @foreach ($potongan as $index => $item)
                                 <div class="input-group mb-2">
-                                    <select name="potongan[]" class="form-select" wire:model="potongan.{{ $index }}.nama">
+                                    <select name="potongan[]" class="form-select" wire:model.lazy="potongan.{{ $index }}.nama">
                                         <option value="">-- Pilih Potongan --</option>
                                         @if(!empty($jenis_potongan) && $jenis_potongan->count())
                                             @foreach($jenis_potongan as $potongan)
@@ -158,8 +220,20 @@
                         </div>
 
                         <div class="form-check">
+                            <input type="checkbox" wire:model.lazy="fee_sharing_digunakan" class="form-check-input" id="bonusCheckbox">
+                            <label class="form-check-label" for="bonusCheckbox">Bonus Fee Sharing</label>
+                        </div>
+
+                        @if($fee_sharing_digunakan)
+                            <div class="mt-2 mb-2">
+                                <label>Nominal Bonus Fee Sharing</label>
+                                <input type="text" class="form-control" readonly value="{{ number_format($fee_sharing_nominal, 0, ',', '.') }}">
+                            </div>
+                        @endif
+
+                        <div class="form-check">
                             <input type="checkbox" wire:model.lazy="bpjs_digunakan" class="form-check-input" id="bpjsCheckbox">
-                            <label class="form-check-label" for="bpjsCheckbox">Gunakan BPJS Kesehatan</label>
+                            <label class="form-check-label" for="bpjsCheckbox">BPJS Kesehatan</label>
                         </div>
 
                         @if($bpjs_digunakan)
@@ -177,7 +251,7 @@
 
                         <div class="form-check">
                             <input type="checkbox" wire:model.lazy="bpjs_jht_digunakan" class="form-check-input" id="bpjsJhtCheckbox">
-                            <label class="form-check-label" for="bpjsJhtCheckbox">Gunakan BPJS JHT</label>
+                            <label class="form-check-label" for="bpjsJhtCheckbox">BPJS JHT</label>
                         </div>
 
                         @if($bpjs_jht_digunakan)

@@ -60,6 +60,11 @@ class M_DataKaryawan extends Model
         return $this->belongsTo(M_Divisi::class, 'divisi'); // atau 'id_divisi' jika itu nama kolom foreign key-nya
     }
 
+    public function getJabatan()
+    {
+        return $this->belongsTo(M_Jabatan::class, 'jabatan'); // atau 'id_divisi' jika itu nama kolom foreign key-nya
+    }
+
     public function getPresensi()
     {
         return $this->hasMany(M_Presensi::class, 'user_id', 'user_id');

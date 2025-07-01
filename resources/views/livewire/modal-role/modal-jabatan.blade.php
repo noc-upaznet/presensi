@@ -10,7 +10,42 @@
                 <div class="modal-body" style="color: var(--bs-body-color);">
                     <div class="mb-3">
                         <label for="jabatan" class="form-label">Jabatan</label>
-                        <input type="text" class="form-control" id="jabatan" wire:model="nama_jabatan" placeholder="Masukkan Jabatan">
+                        {{-- <select class="form-select"  id="selectJabatan" name="state">
+                            <option value="">-- Pilih Jabatan --</option>
+                            <option value="SPV NOC">SPV NOC</option>
+                            <option value="SPV HR">SPV HR</option>
+                            <option value="SPV Teknisi">SPV Teknisi</option>
+                            <option value="SPV Finance">SPV Finance</option>
+                            <option value="SPV Sales Marketing">SPV Sales Marketing</option>
+                            <option value="SPV Helpdesk">SPV Helpdesk</option>
+                            <option value="Billing">Billing</option>
+                            <option value="Asisten NOC">Asisten NOC</option>
+                            <option value="Staff NOC">Staff NOC</option>
+                            <option value="Admin HR">Admin HR</option>
+                            <option value="Recruitment HR">Recruitment HR</option>
+                            <option value="Teknisi">Teknisi</option>
+                            <option value="Sales Marketing">Sales Marketing</option>
+                            <option value="Digital Marketing">Digital Marketing</option>
+                            <option value="Helpdesk">Helpdesk</option>
+                        </select> --}}
+                        <select type="text" class="form-select" id="jabatan" wire:model="nama_jabatan">
+                            <option value="">-- Pilih Jabatan --</option>
+                            <option value="SPV NOC">SPV NOC</option>
+                            <option value="SPV HR">SPV HR</option>
+                            <option value="SPV Teknisi">SPV Teknisi</option>
+                            <option value="SPV Finance">SPV Finance</option>
+                            <option value="SPV Sales Marketing">SPV Sales Marketing</option>
+                            <option value="SPV Helpdesk">SPV Helpdesk</option>
+                            <option value="Billing">Billing</option>
+                            <option value="Asisten NOC">Asisten NOC</option>
+                            <option value="Staff NOC">Staff NOC</option>
+                            <option value="Admin HR">Admin HR</option>
+                            <option value="Recruitment HR">Recruitment HR</option>
+                            <option value="Teknisi">Teknisi</option>
+                            <option value="Sales Marketing">Sales Marketing</option>
+                            <option value="Digital Marketing">Digital Marketing</option>
+                            <option value="Helpdesk">Helpdesk</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="deskripsi" class="form-label">Deskripsi</label>
@@ -54,7 +89,13 @@
                 <div class="modal-body" style="color: var(--bs-body-color);">
                     <div class="mb-3">
                         <label for="jabatan" class="form-label">Jabatan</label>
-                        <input type="text" class="form-control" id="jabatan" wire:model="nama_jabatan" placeholder="Masukkan Jabatan">
+                        <select type="text" class="form-select" id="jabatan" wire:model="nama_jabatan">
+                            <option value="">-- Pilih Jabatan --</option>
+                            <option value="">SPV NOC</option>
+                            <option value="">SPV HR</option>
+                            <option value="">SPV Teknisi</option>
+                            <option value="">SPV Finance</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="deskripsi" class="form-label">Deskripsi</label>
