@@ -1,5 +1,5 @@
 <div>
-    <div class="app-content-header mb-3">
+    <div class="app-content-header mb-3" style="padding-top: 60px;">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-6">
@@ -22,7 +22,7 @@
                     <div class="card shadow-sm rounded-4 border-0">
                         <form wire:submit.prevent="updatePassword">
                             <div class="card-body p-4">
-                                <h5 class="fw-bold mb-4">Ubah Password</h5>
+                                <h5 class="fw-bold mb-4">Ganti Password</h5>
 
                                 @if (session()->has('success'))
                                     <div class="alert alert-success">{{ session('success') }}</div>

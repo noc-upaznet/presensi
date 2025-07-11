@@ -57,7 +57,7 @@
         </div>
 
         <div class="text mb-4" style="color: var(--bs-body-color); justify-content: center; align-items: center;">
-            <h1 class="fw-bold">Welcome!</h1>
+            {{-- <h1 class="fw-bold">Welcome!</h1> --}}
             <p class="fs-5">Halo, {{ $userName }}</p>
         </div>
 
@@ -86,7 +86,7 @@
                                 <i class="fas fa-arrow-right-to-bracket me-2"></i> Clock In
                             </button>
                         @elseif (!$hasClockedOut)
-                            <button class="btn btn-danger px-4 me-2" wire:click="showClockOutModal">
+                            <button class="btn btn-primary px-4 me-2" wire:click="showClockOutModal">
                                 <i class="fas fa-arrow-right-from-bracket me-2"></i> Clock Out
                             </button>
                         @else
@@ -154,7 +154,7 @@
                 <div class="modal-footer justify-content-center">
                     <input type="hidden" wire:model.live="latitude">
                     <input type="hidden" wire:model.live="longitude">
-                    <button type="button" id="btnTake" class="btn btn-primary" wire:click="clockOut">Clock Out</button>
+                    <button type="button" id="btnTake" class="btn btn-danger" wire:click="clockOut">Clock Out</button>
                 </div>
             </div>
         </div>

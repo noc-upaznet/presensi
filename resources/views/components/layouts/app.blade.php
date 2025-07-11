@@ -75,6 +75,14 @@
       <!--begin::Header-->
       <livewire:navigation.side-navigation />
       <livewire:navigation.navbar />
+      <footer class="app-footer fixed-bottom" align="right">
+        <strong>
+          Copyright &copy; {{ date('Y') }}.&nbsp;
+          {{-- <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>. --}}
+        </strong>
+        All rights reserved.
+        <!--end::Copyright-->
+      </footer>
       <!--end::Header-->
       <!--begin::Sidebar-->
       

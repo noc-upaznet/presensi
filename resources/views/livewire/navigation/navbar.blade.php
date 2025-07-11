@@ -55,8 +55,8 @@
       @endif
       <li class="nav-item dropdown user-menu">
         <li class="nav-item dropdown user-menu">
-            <a href="#" class="nav-link dropdown-toggle text-secondary" data-bs-toggle="dropdown" role="button" aria-expanded="false">
-                <div>{{ auth()->user()->name }}</div>
+            <a href="#" class="nav-link dropdown-toggle text-secondary" data-bs-toggle="dropdown" role="button" aria-expanded="false">  
+              <div><i class="bi bi-person-fill"></i> {{ auth()->user()->name }}</div>
             </a>
           <ul class="dropdown-menu dropdown-menu-end shadow rounded-3" style="min-width: 6rem; padding: 0.25rem 0;">
             <li>

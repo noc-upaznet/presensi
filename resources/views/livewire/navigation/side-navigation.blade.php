@@ -11,7 +11,7 @@
         />
         <!--end::Brand Image-->
         <!--begin::Brand Text-->
-        <span class="brand-text fw-light">Sistem Presensi</span>
+        <span class="brand-text fw-light"><b>Sistem Presensi</b></span>
         <!--end::Brand Text-->
         </a>
         <!--end::Brand Link-->
