@@ -7,6 +7,7 @@ use Livewire\Component;
 use App\Models\M_Presensi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use App\Models\M_DataKaryawan;
 
 class RiwayatPresensi extends Component
 {
@@ -86,17 +87,23 @@ class RiwayatPresensi extends Component
     public function render()
     {
         if (Auth::user()->role == 'admin' || Auth::user()->role == 'spv' || Auth::user()->role == 'hr') {
-            // admin dan hr
             $datas = M_Presensi::with('getUser')
                 ->whereMonth('created_at', Carbon::now()->month)
                 ->whereYear('created_at', Carbon::now()->year)
                 ->orderBy('created_at', 'desc')
                 ->get();
+                // dd($datas);
         } elseif (Auth::user()->role == 'user') {
-            // user
-            $datas = M_Presensi::where('user_id', Auth::id())
+            $userId = Auth::id();
+            $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
+            $karyawanId = $karyawan ? $karyawan->id : null;
+
+            $datas = M_Presensi::where('user_id', $karyawanId)
+                ->whereMonth('created_at', Carbon::now()->month)
+                ->whereYear('created_at', Carbon::now()->year)
                 ->orderBy('created_at', 'desc')
                 ->get();
+            // dd($datas);
         }
         // dd($dataPresensi);
         return view('livewire.riwayat-presensi', [

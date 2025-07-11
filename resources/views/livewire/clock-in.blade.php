@@ -2,8 +2,19 @@
     <style>
         .clock-card {
             border-radius: 15px;
-            background-color: #a32020;
             color: white;
+        }
+
+        .clock-before {
+            background-color: #0d6efd; /* Biru - sebelum Clock In */
+        }
+
+        .clock-in-progress {
+            background-color: #28a745; /* Hijau - setelah Clock In */
+        }
+
+        .clock-done {
+            background-color: #dc3545; /* Merah - setelah Clock Out */
         }
 
         .history-card {
@@ -18,10 +29,9 @@
         }
 
         #video {
-            transform: scaleX(-1); /* Ini memastikan tidak mirror */
+            transform: scaleX(-1);
         }
 
-        /* Responsif untuk mobile */
         @media (max-width: 576px) {
             .content-wrapper {
                 padding: 2rem 1rem;
@@ -38,6 +48,8 @@
         }
     </style>
 
+
+
     <div class="content-wrapper p-4">
         <div class="d-flex justify-content-between align-items-center mb-3" style="color: var(--bs-body-color); margin-top: 50px;">
             <h3>Dashboard</h3>
@@ -50,7 +62,18 @@
         </div>
 
         <div class="d-flex flex-column justify-content-center" style="justify-content: center; align-items: center;">
-            <div class="clock-card p-4 text-center w-100" style="max-width: 500px;" wire:ignore>
+            @php
+                if (!$hasClockedIn) {
+                    $cardClass = 'clock-before'; // Biru
+                } elseif ($hasClockedIn && !$hasClockedOut) {
+                    $cardClass = 'clock-in-progress'; // Hijau
+                } else {
+                    $cardClass = 'clock-done'; // Merah
+                }
+            @endphp
+
+            <div class="clock-card {{ $cardClass }} p-4 text-center w-100"
+                style="max-width: 500px;" wire:ignore>
                 <h6 class="text-white mb-3">Live Attendance</h6>
                 <h1 class="fw-bold" id="live-clock">--:--:--</h1>
                 <p class="mb-4" id="live-date">Tanggal</p>
@@ -59,55 +82,17 @@
                     <div class="fw-bold fs-5 mb-3">{{ \Carbon\Carbon::parse($jamMasuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($jamKeluar)->format('H:i') }}</div>
                     <div class="d-flex justify-content-center flex-wrap">
                         @if (!$hasClockedIn)
-                            <button class="btn btn-primary px-4 me-2" wire:click="showCamera">
+                            <button class="btn btn-success px-4 me-2" wire:click="showCamera">
                                 <i class="fas fa-arrow-right-to-bracket me-2"></i> Clock In
                             </button>
                         @elseif (!$hasClockedOut)
-                            <button class="btn btn-success px-4 me-2" wire:click="showClockOutModal">
+                            <button class="btn btn-danger px-4 me-2" wire:click="showClockOutModal">
                                 <i class="fas fa-arrow-right-from-bracket me-2"></i> Clock Out
                             </button>
                         @else
                             <span class="badge bg-primary text-light me-2 px-2" style="font-size: 20px;">Presensi selesai</span>
                         @endif
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="d-flex flex-column justify-content-center" style="justify-content: center; align-items: center;">
-            <div class="history-card p-4 text-center w-100" style="max-width: 500px; background-color: var(--bs-body-bg);">
-                <h6 class="mb-3" style="color: var(--bs-body-color);">Attendance Log</h6>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped" style="color: var(--bs-body-color);">
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Clock In</th>
-                                <th>Clock Out</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($datas as $log)
-                                <tr>
-                                    <td style="color: var(--bs-body-color);">{{ $log->tanggal }}</td>
-                                    <td style="color: var(--bs-body-color);">{{ $log->clock_in }}</td>
-                                    <td style="color: var(--bs-body-color);">{{ $log->clock_out }}</td>
-                                    <td>
-                                        @if ($log->status == "0")
-                                            <span class="badge bg-success">Tepat Waktu</span>
-                                        @elseif ($log->status == "1")
-                                            <span class="badge bg-danger">Terlambat</span>
-                                        @elseif ($log->status == "2")
-                                            <span class="badge bg-primary">Dispensasi</span>
-                                        @else
-                                            <span class="badge bg-secondary">Unknown</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>

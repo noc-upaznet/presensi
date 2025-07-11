@@ -33,7 +33,10 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="month" class="form-label fw-semibold">Bulan & Tahun</label>
+                            <label for="month" class="form-label fw-semibold">
+                                Periode: 
+                                {{ $cutoffStart->translatedFormat('d M Y') }} - {{ $cutoffEnd->translatedFormat('d M Y') }}
+                            </label>
                             <input type="month" id="month" class="form-control @error('bulanTahun') is-invalid @enderror" wire:model="bulanTahun">
                             @error('bulanTahun') 
                                 <small class="text-danger">{{ $message }}</small>
@@ -42,7 +45,7 @@
 
                         <div class="mb-3">
                             <label for="employee" class="form-label fw-semibold">Karyawan</label>
-                            <select id="employee" class="form-select" wire:model="user_id" wire:change="loadDataKaryawan">
+                            <select id="employee" class="form-select" wire:model.lazy="user_id">
                                 <option value="">Pilih Karyawan</option>
                                 @foreach($karyawan as $item)
                                     <option value="{{ $item->id }}">{{ $item->nama_karyawan }}</option>
@@ -278,7 +281,7 @@
                             </div>
                             <div class="col-md-2 mb-3">
                                 <label for="izin" class="form-label fw-semibold">Izin (Hari)</label>
-                                <input type="text" class="form-control" value="{{ $rekap['izin'] }}" readonly>
+                                <input type="text" class="form-control" value="{{ ($rekap['izin'] ?? 0) + 0.5 * ($rekap['izin setengah hari'] ?? 0) }}" readonly>
                             </div>
                             <div class="col-md-2 mb-3">
                                 <label for="cuti" class="form-label fw-semibold">Cuti (Hari)</label>

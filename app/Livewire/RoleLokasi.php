@@ -24,7 +24,7 @@ class RoleLokasi extends Component
     public $lokasis;
     public $selectedKaryawan;
     public $lokasi;
-    public $karyawan;
+    public $karyawans;
     public $editId;
 
     protected $listeners = ['updatedLock'];
@@ -136,7 +136,8 @@ class RoleLokasi extends Component
     public function mount()
     {
         // Load lokasi saat komponen pertama kali di-mount
-        $this->users = User::where('role', '!=', 'admin')->orderBy('name')->get();
+        // $this->users = User::where('role', '!=', 'admin')->orderBy('name')->get();
+        $this->karyawans = M_DataKaryawan::orderBy('nama_karyawan')->get();
         $this->lokasis = Lokasi::orderBy('nama_lokasi')->get();
         $this->lokasi_list = RoleLokasiModel::all();
 
@@ -146,7 +147,7 @@ class RoleLokasi extends Component
     public function render()
     {
         // $lokasiList = RoleLokasiModel::where('nama_karyawan', 'like', '%' . $this->search . '%')->paginate(10);
-        $lokasiList = RoleLokasiModel::with(['getUser'])->latest()->paginate(10);
+        $lokasiList = RoleLokasiModel::with(['getKaryawan'])->latest()->paginate(10);
         return view('livewire.role-lokasi', [
             'lokasiList' => $lokasiList,
         ]);

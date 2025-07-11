@@ -53,7 +53,7 @@
                             <tbody>
                                 @foreach($lokasiList as $roleLokasi)
                                 <tr>
-                                    <td style="color: var(--bs-body-color);">{{ $roleLokasi->getUser->name }}</td>
+                                    <td style="color: var(--bs-body-color);">{{ $roleLokasi->getKaryawan->nama_karyawan }}</td>
                                     <td>
                                         <span
                                             class="badge bg-{{ $roleLokasi->lock ? 'primary' : 'secondary' }} text-white">
@@ -108,8 +108,8 @@
                         <label for="nama_karyawan" class="form-label fw-semibold">Pilih Karyawan</label>
                         <select class="form-select" wire:model="selectedKaryawan">
                             <option value="">-- Pilih Karyawan --</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @foreach($karyawans as $karyawan)
+                                <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
                             @endforeach
                         </select>
                         @error('selectedKaryawan')
@@ -171,8 +171,8 @@
                         <label for="nama_karyawan" class="form-label fw-semibold">Pilih Karyawan</label>
                         <select class="form-select" wire:model="selectedKaryawan">
                             <option value="">-- Pilih Karyawan --</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @foreach($karyawans as $karyawan)
+                                <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
                             @endforeach
                         </select>
                         @error('selectedKaryawan')

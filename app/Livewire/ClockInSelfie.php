@@ -114,7 +114,9 @@ class ClockInSelfie extends Component
 
     public function clockIn()
     {
-        $user = Auth::user();
+        $user = Auth::user()->id;
+        $karyawanId = M_DataKaryawan::where('user_id', $user)->value('id');
+        // dd($karyawanId);
         $tanggal = now()->toDateString();
         $clockInTime = now()->toTimeString();
     
@@ -131,19 +133,27 @@ class ClockInSelfie extends Component
         }
     
         // Ambil data role_lokasi
-        $roleLokasi = DB::table('role_lokasi')
-            ->where('karyawan_id', $user->id)
+        $roleLokasi = RoleLokasiModel::where('karyawan_id', $karyawanId)
             ->first();
+            // dd($roleLokasi);
     
         if (!$roleLokasi) {
             session()->flash('error', 'Role lokasi Anda tidak ditemukan.');
             return;
         }
     
-        $lokasiIds = collect(json_decode($roleLokasi->lokasi_presensi ?? '[]', true))
-            ->filter()
-            ->values()
-            ->toArray();
+        $lokasiPresensi = $roleLokasi->lokasi_presensi ?? '[]';
+        if (is_array($lokasiPresensi)) {
+            $lokasiIds = collect($lokasiPresensi)
+                ->filter()
+                ->values()
+                ->toArray();
+        } else {
+            $lokasiIds = collect(json_decode($lokasiPresensi, true))
+                ->filter()
+                ->values()
+                ->toArray();
+        }
     
         if (empty($lokasiIds)) {
             session()->flash('error', 'Anda belum memiliki lokasi presensi yang ditentukan.');
@@ -192,7 +202,7 @@ class ClockInSelfie extends Component
         // Ambil jadwal shift
         $hari = 'd' . now()->day;
         $bulanTahun = now()->format('Y-m');
-        $jadwal = M_Jadwal::where('user_id', $user->id)
+        $jadwal = M_Jadwal::where('karyawan_id', $karyawanId)
             ->where('bulan_tahun', $bulanTahun)
             ->first();
     
@@ -210,7 +220,7 @@ class ClockInSelfie extends Component
     
         // Simpan presensi
         M_Presensi::create([
-            'user_id'   => $user->id,
+            'user_id'   => $karyawanId,
             'tanggal'   => $tanggal,
             'clock_in'  => $clockInTime,
             'clock_out' => "00:00:00",

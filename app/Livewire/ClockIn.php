@@ -9,9 +9,11 @@ use App\Models\M_Jadwal;
 use App\Models\M_Presensi;
 use Livewire\Attributes\On;
 use App\Models\M_JadwalShift;
+use App\Models\M_DataKaryawan;
+use App\Models\RoleLokasiModel;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 
 class ClockIn extends Component
 {
@@ -26,19 +28,29 @@ class ClockIn extends Component
     public $lokasis;
     public $lokasiId;
 
+    public $shouldRedirect = false;
+
     protected $listeners = ['photoTaken' => 'handlePhoto', 'refreshTable' => 'refresh'];
     
     public function mount()
     {
+        if (!Auth::check()) {
+            session(['redirect_after_login' => url()->current()]);
+            return redirect()->to(route('login'));
+        }
+
         $this->userName = Auth::user()->name ?? 'Guest';
 
         $userId = Auth::user()->id;
+        $karyawanId = M_DataKaryawan::where('user_id', $userId)->value('id');
+        // dd($karyawanId);
+
         $tanggal = Carbon::now();
         $hari = 'd' . $tanggal->day; // contoh: d24
         $bulanTahun = $tanggal->format('Y-m');
 
         // ambil jadwal user
-        $jadwal = M_Jadwal::where('user_id', $userId)
+        $jadwal = M_Jadwal::where('karyawan_id', $karyawanId)
             ->where('bulan_tahun', $bulanTahun)
             ->first();
 
@@ -52,9 +64,10 @@ class ClockIn extends Component
         $user = Auth::user();
         $today = now()->toDateString();
 
-        $presensi = M_Presensi::where('user_id', $user->id)
+        $presensi = M_Presensi::where('user_id', $karyawanId)
             ->where('tanggal', $today)
             ->first();
+        // dd($presensi);
 
         if ($presensi) {
             $this->hasClockedIn = $presensi->clock_in !== '00:00:00';
@@ -84,13 +97,6 @@ class ClockIn extends Component
         return redirect()->to('/clock-in-selfie')->with('selfie_path', $this->photo);
     }
 
-    // public function clockIn()
-    // {
-    //     // Simpan ke DB (logika clock-in)
-    //     // session()->flash('message', 'Clocked In!');
-    //     return redirect('/clock-in-selfie');
-    // }
-
     public function showClockOutModal()
     {
         // Emit event untuk membuka modal clock-out
@@ -114,7 +120,8 @@ class ClockIn extends Component
 
     public function clockOut()
     {
-        $user = Auth::user();
+        $user = Auth::user()->id;
+        $karyawanId = M_DataKaryawan::where('user_id', $user)->value('id');
         $tanggal = now()->toDateString();
         $clockOutTime = now()->toTimeString();
     
@@ -125,7 +132,7 @@ class ClockIn extends Component
         }
     
         // Ambil data presensi hari ini
-        $presensi = M_Presensi::where('user_id', $user->id)
+        $presensi = M_Presensi::where('user_id', $karyawanId)
             ->where('tanggal', $tanggal)
             ->first();
     
@@ -140,8 +147,7 @@ class ClockIn extends Component
         }
     
         // Ambil role lokasi
-        $roleLokasi = DB::table('role_lokasi')
-            ->where('karyawan_id', $user->id)
+        $roleLokasi = RoleLokasiModel::where('karyawan_id', $karyawanId)
             ->first();
     
         $lock = $roleLokasi->lock ?? 1; // default ke 1 (aktifkan radius)

@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\M_Jadwal;
 use App\Models\M_Lembur;
+use App\Models\M_Entitas;
 use App\Models\M_Presensi;
 use App\Models\PayrollModel;
 use App\Models\M_JadwalShift;
@@ -13,6 +14,7 @@ use Illuminate\Support\Carbon;
 use App\Models\JenisPotonganModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\JenisTunjanganModel;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use App\Livewire\Karyawan\JadwalShift;
 use Illuminate\Contracts\Encryption\DecryptException;
@@ -47,6 +49,7 @@ class CreateSlipGaji extends Component
         'cuti' => 0,
         'kehadiran' => 0,
         'lembur' => 0,
+        'izin setengah hari' => 0,
     ];
 
     public $total_gaji = 0;
@@ -77,9 +80,16 @@ class CreateSlipGaji extends Component
     public $fee_sharing_nominal = 0;
     public $jml_psb_spv = 0;
     public $insentif_spv = 0;
+    public $cutoffStart;
+    public $cutoffEnd;
+    public $entitasId;
 
     public function mount($id = null, $month = null, $year = null)
     {
+        if (!Auth::check()) {
+            session(['redirect_after_login' => url()->current()]);
+            return redirect()->to(route('login'));
+        }
         // $this->karyawan = M_DataKaryawan::all(); // semua karyawan untuk dropdown
             
         $this->jenis_tunjangan = JenisTunjanganModel::all();
@@ -90,7 +100,18 @@ class CreateSlipGaji extends Component
         $this->karyawan = $this->loadAvailableKaryawanByPeriode();
         // dd($this->karyawan);
 
-        $this->bulanTahun = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        // $this->bulanTahun = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+
+        // Hitung cut-off: dari tanggal 26 bulan sebelumnya sampai 25 bulan yang dipilih
+        $cutoffEnd = \Carbon\Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 25);
+        $cutoffStart = $cutoffEnd->copy()->subMonthNoOverflow()->setDay(26);
+
+        // Simpan sebagai property jika mau dipakai di view atau hitungan lain
+        $this->cutoffStart = $cutoffStart;
+        $this->cutoffEnd = $cutoffEnd;
+
+        // Tetap simpan bulanTahun sebagai penanda periode gaji
+        $this->bulanTahun = $cutoffEnd->format('Y-m');
 
         // Set user_id langsung dari $id
         if ($id) {
@@ -101,20 +122,20 @@ class CreateSlipGaji extends Component
                 $this->karyawanId = $dataKaryawan->user_id;
                 // dd($this->karyawanId);
 
-                $this->loadDataKaryawan(); // load data karyawan jika ID valid
+                $this->loadDataKaryawan($dataKaryawanId); // load data karyawan jika ID valid
                 $this->rekap = $this->hitungRekapPresensi($this->user_id, $this->bulanTahun);
                 // dd($this->rekap);
                 
                 // Hitung nominal lembur dan simpan ke property jika ingin ditampilkan di view
                 $gajiPokok = $this->numericValue($this->gaji_pokok);
                 $tunjanganJabatan = $this->numericValue($this->tunjangan_jabatan);
-                $jamLembur = M_Lembur::where('user_id', $this->karyawanId)
-                    ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
+                $jamLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
+                    ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
                     ->whereNotNull('total_jam')
                     ->where('status', 1)
                     ->sum('total_jam');
-                $jenisLembur = M_Lembur::where('user_id', $this->karyawanId)
-                    ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
+                $jenisLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
+                    ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
                     ->whereNotNull('total_jam')
                     ->where('status', 1)
                     ->orderByDesc('tanggal')
@@ -130,7 +151,8 @@ class CreateSlipGaji extends Component
                 $this->izin_nominal = 0;
                 if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
                     $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
-                    $this->izin_nominal = round($perHari * ($this->rekap['izin'] ?? 0));
+                    $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0);
+                    $this->izin_nominal = round($perHari * $totalHariIzin);
                 }
                 $this->terlambat_nominal = 0;
                 if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
@@ -146,40 +168,57 @@ class CreateSlipGaji extends Component
         $this->hitungTotalGaji();
     }
 
+    // public function loadAvailableKaryawanByPeriode()
+    // {
+    //     $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+    //     $periode = $this->selectedYear . '-' . $bulanFormatted;
+
+    //     return M_DataKaryawan::whereDoesntHave('payrolls', function ($query) use ($periode) {
+    //         $query->where('periode', $periode);
+    //     })->get();
+    // }
+
     public function loadAvailableKaryawanByPeriode()
     {
-        $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
-        $periode = $this->selectedYear . '-' . $bulanFormatted;
+        // Hitung cut-off akhir (tanggal 25 bulan terpilih)
+        $cutoffEnd = Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 25);
+        
+        // Format periode payroll berdasarkan bulan di tanggal 25 (YYYY-MM)
+        $periode = $cutoffEnd->format('Y-m');
 
         return M_DataKaryawan::whereDoesntHave('payrolls', function ($query) use ($periode) {
             $query->where('periode', $periode);
         })->get();
     }
 
+
     public function updatedUserId($value)
     {
-        $this->loadDataKaryawan();
+         // jika perlu
+        // $this->hitungRekapPresensi();
+        // $this->hitungTotalGaji();
+
         if ($this->bulanTahun) {
-            $this->rekap = $this->hitungRekapPresensi($this->user_id, $this->bulanTahun);
-            // dd($this->rekap);
+            $this->loadDataKaryawan($value);
+            $this->rekap = $this->hitungRekapPresensi();
+            dd($this->rekap);
             $this->hitungTotalGaji();
         }
     }
 
     public function updatedBulanTahun($value)
     {
-        if ($this->user_id) {
-            $this->rekap = $this->hitungRekapPresensi($this->user_id, $this->bulanTahun);
-            $this->hitungTotalGaji();
-        }
+        
+        $this->hitungRekapPresensi();
+        $this->hitungTotalGaji();
     }
 
-    public function loadDataKaryawan()
+    public function loadDataKaryawan($dataKaryawanId)
     {
-        $karyawan = M_DataKaryawan::find($this->user_id);
+        $karyawan = M_DataKaryawan::find($dataKaryawanId);
         if ($karyawan) {
-            $this->divisi = $karyawan->getDivisi?->nama;
-            $this->jabatan = $karyawan->getjabatan?->nama_jabatan;
+            $this->divisi = $karyawan->divisi;
+            $this->jabatan = $karyawan->jabatan;
             $this->gaji_pokok = $karyawan->gaji_pokok;
             $this->nip_karyawan = $karyawan->nip_karyawan;
             $this->tunjangan_jabatan = $karyawan->tunjangan_jabatan;
@@ -261,66 +300,148 @@ class CreateSlipGaji extends Component
     }
 
 
-    public function hitungRekapPresensi($karyawanId, $bulanTahun)
+    public function hitungRekapPresensi()
     {
-        [$tahun, $bulan] = explode('-', $bulanTahun);
-        return $this->rekapKehadiran($karyawanId, $bulan, $tahun);
+        if (!$this->user_id || !$this->bulanTahun) {
+            $this->rekap = [];
+            return $this->rekap;
+        }
+
+        [$tahun, $bulan] = explode('-', $this->bulanTahun);
+
+        $cutoffEnd = Carbon::createFromDate($tahun, $bulan, 25);
+        $cutoffStart = $cutoffEnd->copy()->subMonthNoOverflow()->setDay(26);
+
+        $this->cutoffStart = $cutoffStart;
+        $this->cutoffEnd = $cutoffEnd;
+
+        $this->rekap = $this->rekapKehadiran($this->user_id, $bulan, $tahun);
+        // dd($this->rekap);
+        return $this->rekap;
     }
+
+    // public function rekapKehadiran($idKaryawan, $bulan, $tahun)
+    // {
+    //     $karyawan = M_DataKaryawan::with(['getPresensi', 'getJadwal'])->findOrFail($idKaryawan);
+    //     $startDate = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
+    //     $endDate = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth();
+
+    //     $presensiCollection = $karyawan->getPresensi ?? collect();
+    //     $presensi = $presensiCollection->filter(function ($item) use ($startDate, $endDate) {
+    //         return Carbon::parse($item->tanggal)->between($startDate, $endDate);
+    //     });
+
+    //     // $kehadiran = $presensi->count();
+    //     $terlambat = $presensi->where('status', 1)->count();
+
+    //     $jadwal = M_Jadwal::where('karyawan_id', $idKaryawan)
+    //         ->where('bulan_tahun', $this->bulanTahun)
+    //         ->first();
+    //         // dd($jadwal);
+
+    //     // Sekarang $nama_shift berisi nama shift dari kode shift (misal 3) pada hari ke-1
+    //     // dd($jadwalShift);
+        
+    //     $izin = 0;
+    //     $cuti = 0;
+    //     $izinSetengahHari = 0;
+
+    //     if ($jadwal) {
+    //         foreach (range(1, 31) as $i) {
+    //             $kode = $jadwal->{'d' . $i};
+
+    //             if ($kode == 3) {
+    //                 $izin++;
+    //             } elseif ($kode == 2) {
+    //                 $cuti++;
+    //             } elseif ($kode == 8) {
+    //                 $izinSetengahHari++;
+    //             }
+    //         }
+    //     }
+
+    //     // Ambil daftar lembur
+    //     $dataLembur = M_Lembur::where('user_id', $karyawan->user_id)
+    //         ->whereBetween('tanggal', [$startDate, $endDate])
+    //         ->whereNotNull('total_jam')
+    //         ->where('status', 1)
+    //         ->get(['tanggal', 'total_jam']);
+
+
+    //     $totalJamLembur = $dataLembur->sum('total_jam');
+
+    //     return [
+    //         'kehadiran' => 26 - $izin - $cuti - (0.5 * $izinSetengahHari),
+    //         'terlambat' => $terlambat,
+    //         'izin' => $izin,
+    //         'cuti' => $cuti,
+    //         'lembur' => $totalJamLembur,
+    //         'izin setengah hari' => $izinSetengahHari,
+    //     ];
+    // }
 
     public function rekapKehadiran($idKaryawan, $bulan, $tahun)
     {
-        $karyawan = M_DataKaryawan::with(['getPresensi', 'getJadwal'])->findOrFail($idKaryawan);
-        $startDate = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
-        $endDate = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth();
+        // dd(M_DataKaryawan::where('user_id', $this->karyawanId)->exists());
+        $karyawan = M_DataKaryawan::with(['getPresensi', 'getJadwal'])->where('user_id', $this->karyawanId)->firstOrFail();
+
+        // CUT OFF GAJI: dari 26 bulan sebelumnya s/d 25 bulan ini
+        $startDate = Carbon::createFromDate($tahun, $bulan, 26)->subMonthNoOverflow();
+        $endDate = Carbon::createFromDate($tahun, $bulan, 25);
 
         $presensiCollection = $karyawan->getPresensi ?? collect();
         $presensi = $presensiCollection->filter(function ($item) use ($startDate, $endDate) {
             return Carbon::parse($item->tanggal)->between($startDate, $endDate);
         });
 
-        // $kehadiran = $presensi->count();
         $terlambat = $presensi->where('status', 1)->count();
 
-        $jadwal = M_Jadwal::where('user_id', $this->karyawanId)
-            ->where('bulan_tahun', $this->bulanTahun)
+        $bulanTahun = sprintf('%04d-%02d', $tahun, $bulan);
+        $jadwal = M_Jadwal::where('karyawan_id', $idKaryawan)
+            ->where('bulan_tahun', $bulanTahun)
             ->first();
 
-        // Sekarang $nama_shift berisi nama shift dari kode shift (misal 3) pada hari ke-1
-        // dd($jadwalShift);
-        
         $izin = 0;
         $cuti = 0;
+        $izinSetengahHari = 0;
+        // dd($idKaryawan, $bulanTahun);
+        foreach (range(1, 31) as $i) {
+            $kode = $jadwal->{'d' . $i};
+            // buat tanggal lengkap berdasarkan hari ke-i
+            $tanggal = Carbon::createFromFormat('Y-m-d', "{$tahun}-{$bulan}-" . str_pad($i, 2, '0', STR_PAD_LEFT));
 
-        if ($jadwal) {
-            foreach (range(1, 31) as $i) {
-                $kode = $jadwal->{'d' . $i};
+            // skip jika tanggal tidak dalam periode cut-off
+            if (!$tanggal->between($startDate, $endDate)) {
+                continue;
+            }
 
-                if ($kode == 3) {
-                    $izin++;
-                } elseif ($kode == 2) {
-                    $cuti++;
-                }
+            if ($kode == 3) {
+                $izin++;
+            } elseif ($kode == 2) {
+                $cuti++;
+            } elseif ($kode == 8) {
+                $izinSetengahHari++;
             }
         }
-
-        // ✅ Ambil daftar lembur
-        $dataLembur = M_Lembur::where('user_id', $karyawan->user_id)
+        // dd($karyawan->user_id, $startDate, $endDate);
+        $dataLembur = M_Lembur::where('karyawan_id', $idKaryawan)
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->whereNotNull('total_jam')
             ->where('status', 1)
             ->get(['tanggal', 'total_jam']);
-
-
         $totalJamLembur = $dataLembur->sum('total_jam');
-
         return [
-            'kehadiran' => 26 - $izin - $cuti,
+            'kehadiran' => 26 - $izin - $cuti - (0.5 * $izinSetengahHari),
             'terlambat' => $terlambat,
             'izin' => $izin,
             'cuti' => $cuti,
             'lembur' => $totalJamLembur,
+            'izin setengah hari' => $izinSetengahHari,
+            'cutoff_start' => $startDate->format('Y-m-d'),
+            'cutoff_end' => $endDate->format('Y-m-d'),
         ];
     }
+
 
     private function numericValue($value)
     {
@@ -402,16 +523,17 @@ class CreateSlipGaji extends Component
         // Potongan otomatis
         $potonganIzin = 0;
         $potonganTerlambat = 0;
+        $potonganIzin2 = 0;
 
         if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
             $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
         // dd($perHari);
-
-            $potonganIzin = $perHari * ($this->rekap['izin'] ?? 0);
+            $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0);
+            $potonganIzin = $perHari * $totalHariIzin;
             $potonganTerlambat = $this->rekap['terlambat'] > 0 ? 25000 : 0;
         }
 
-        $jamLembur = M_Lembur::where('user_id', $this->karyawanId)
+        $jamLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
             ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
             ->whereNotNull('total_jam')
             ->where('status', 1)
@@ -422,7 +544,7 @@ class CreateSlipGaji extends Component
         // Default lemburNominal
         $lemburNominal = 0;
 
-        $jenisLembur = M_Lembur::where('user_id', $this->karyawanId)
+        $jenisLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
             ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
             ->whereNotNull('total_jam')
             ->where('status', 1)
@@ -574,18 +696,46 @@ class CreateSlipGaji extends Component
 
     public function generateNoSlip()
     {
+        // Ambil entitas dari session
+        $entitasNama = session('selected_entitas', 'UHO'); // default UHO jika tidak dipilih
+
+        // Cari entitas dari tabel
+        $entitasModel = M_Entitas::where('nama', $entitasNama)->first();
+        $entitasId = $entitasModel?->id;
+
+        // Jika tidak ditemukan, fallback ke default UHO
+        $entitasKode = $entitasModel?->nama ?? 'UHO';
+
         // Ambil periode
         $periode = $this->bulanTahun; // format: "2025-06"
-        $tahun = \Carbon\Carbon::createFromFormat('Y-m', $periode)->format('y'); // jadi "25"
-        $bulanAngka = \Carbon\Carbon::createFromFormat('Y-m', $periode)->format('n'); // jadi 6
-        $bulanRomawi = $this->toRoman($bulanAngka); // jadi "VI"
+        $tahun = Carbon::createFromFormat('Y-m', $periode)->format('y'); // "25"
+        $bulanAngka = Carbon::createFromFormat('Y-m', $periode)->format('n'); // "6"
+        $bulanRomawi = $this->toRoman($bulanAngka); // "VI"
 
-        // Hitung jumlah slip yang sudah dicetak untuk periode tersebut
-        $count = \App\Models\PayrollModel::where('periode', $periode)->count() + 1;
-        $nomorUrut = str_pad($count, 3, '0', STR_PAD_LEFT); // jadi "006" jika slip ke-6
+        // Hitung jumlah slip yang sudah dicetak untuk periode tersebut (per entitas)
+        $count = PayrollModel::where('periode', $periode)
+            ->when($entitasModel, function ($query) use ($entitasModel) {
+                return $query->where('entitas_id', $entitasModel->id);
+            })->count() + 1;
 
-        return "DJB/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+        $nomorUrut = str_pad($count, 3, '0', STR_PAD_LEFT);
+
+        // Format slip berdasarkan nama entitas
+        switch (strtoupper($entitasKode)) {
+            case 'UHO':
+                return "DJB/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+            case 'UNR':
+                return "UNR/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+            case 'UNB':
+                return "UNB/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+            case 'UGR':
+                return "UGR/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+            default:
+                return "{$entitasKode}/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+        }
     }
+
+
 
     public function toRoman($month)
     {
@@ -596,6 +746,9 @@ class CreateSlipGaji extends Component
 
     public function store()
     {
+        $entitasNama = session('selected_entitas', 'UHO');
+        $entitasModel = M_Entitas::where('nama', $entitasNama)->first();
+        $entitasId = $entitasModel?->id;
         $this->validate([
             'bulanTahun' => 'required|date_format:Y-m',
             'user_id' => 'required|exists:data_karyawan,id',
@@ -605,6 +758,7 @@ class CreateSlipGaji extends Component
         
         $data = [
             'karyawan_id' => $this->user_id,
+            'entitas_id' => $entitasId,
             'nip_karyawan' => $this->nip_karyawan,
             'no_slip' => $this->no_slip,
             'divisi' => $this->divisi,

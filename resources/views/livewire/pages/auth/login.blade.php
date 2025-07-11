@@ -71,11 +71,11 @@ new #[Layout('layouts.guest')] class extends Component
                 </div>
 
                 {{-- Forgot Password --}}
-                {{-- <div class="mt-3 text-center">
+                <div class="mt-3 text-center">
                     @if (Route::has('password.request'))
                         <a href="{{ route('password.request') }}" class="text-muted">Lupa Password?</a>
                     @endif
-                </div> --}}
+                </div>
             </form>
         </div>
     </div>

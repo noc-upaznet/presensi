@@ -38,42 +38,72 @@ new class extends Component
     }
 }; ?>
 
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Update Password') }}
+<section class="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-200">
+    <header class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <i class="fas fa-lock text-indigo-600"></i> Ganti Password
         </h2>
-
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Ensure your account is using a long, random password to stay secure.') }}
+        <p class="text-sm text-gray-500 mt-1">
+            Gunakan kombinasi password yang kuat dan unik untuk menjaga keamanan akun Anda.
         </p>
     </header>
 
-    <form wire:submit="updatePassword" class="mt-6 space-y-6">
+    <form wire:submit="updatePassword" class="space-y-5">
+        <!-- Password saat ini -->
         <div>
-            <x-input-label for="update_password_current_password" :value="__('Current Password')" />
-            <x-text-input wire:model="current_password" id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
+            <x-input-label for="update_password_current_password" :value="'Password Saat Ini'" />
+            <x-text-input
+                wire:model.defer="current_password"
+                id="update_password_current_password"
+                name="current_password"
+                type="password"
+                class="mt-1 block w-full"
+                placeholder="Masukkan password sekarang"
+                autocomplete="current-password"
+            />
             <x-input-error :messages="$errors->get('current_password')" class="mt-2" />
         </div>
 
+        <!-- Password baru -->
         <div>
-            <x-input-label for="update_password_password" :value="__('New Password')" />
-            <x-text-input wire:model="password" id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+            <x-input-label for="update_password_password" :value="'Password Baru'" />
+            <x-text-input
+                wire:model.defer="password"
+                id="update_password_password"
+                name="password"
+                type="password"
+                class="mt-1 block w-full"
+                placeholder="Masukkan password baru"
+                autocomplete="new-password"
+            />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
+        <!-- Konfirmasi password -->
         <div>
-            <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input wire:model="password_confirmation" id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+            <x-input-label for="update_password_password_confirmation" :value="'Konfirmasi Password Baru'" />
+            <x-text-input
+                wire:model.defer="password_confirmation"
+                id="update_password_password_confirmation"
+                name="password_confirmation"
+                type="password"
+                class="mt-1 block w-full"
+                placeholder="Ulangi password baru"
+                autocomplete="new-password"
+            />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+        <!-- Tombol simpan -->
+        <div class="flex items-center justify-between pt-4 border-t mt-6">
+            <x-primary-button class="px-6 py-2">
+                <i class="fas fa-save me-2"></i> Simpan Perubahan
+            </x-primary-button>
 
-            <x-action-message class="me-3" on="password-updated">
-                {{ __('Saved.') }}
+            <x-action-message class="text-green-600 text-sm font-semibold" on="password-updated">
+                <i class="fas fa-check-circle me-1"></i> Password berhasil diperbarui!
             </x-action-message>
         </div>
     </form>
 </section>
+

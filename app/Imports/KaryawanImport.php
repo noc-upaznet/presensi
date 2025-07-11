@@ -15,14 +15,14 @@ class KaryawanImport implements ToModel, WithHeadingRow
     {
         // Cek apakah user dengan email ini sudah ada
         $user = User::where('email', $row['email'])->first();
-
         if (!$user) {
             $user = User::create([
                 'name' => $row['nama_karyawan'],
                 'email' => $row['email'],
-                'password' => Hash::make($row['nip_karyawan']), // default password
+                'password' => Hash::make('12345678'), // default password
                 'role' => 'user',
             ]);
+            // dd('User created: ' . $user->name);
         }
 
         // Simpan ke tabel data_karyawan dan hubungkan dengan user

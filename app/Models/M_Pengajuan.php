@@ -8,7 +8,7 @@ class M_Pengajuan extends Model
 {
     protected $table = 'pengajuan';
     protected $fillable = [
-        'user_id',
+        'karyawan_id',
         'shift_id',
         'tanggal',
         'keterangan',
@@ -31,8 +31,8 @@ class M_Pengajuan extends Model
         return $this->hasOne(M_Jadwal::class, 'id_karyawan', 'karyawan_id');
     }
 
-    public function getUser()
+    public function getKaryawan()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(M_DataKaryawan::class, 'karyawan_id');
     }
 }

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('jadwal', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->after('bulan_tahun')->nullable(); // tambahkan kolom user_id
-            $table->dropColumn('id_karyawan');
+            $table->unsignedBigInteger('karyawan_id')->after('bulan_tahun')->nullable(); // tambahkan kolom karyawan_id
+            $table->dropColumn('user_id');
         });
     }
 
@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('jadwal', function (Blueprint $table) {
-            $table->dropColumn('user_id');
-            $table->unsignedBigInteger('id_karyawan')->nullable();
+            $table->dropColumn('karyawan_id');
+            $table->unsignedBigInteger('user_id')->nullable();
         });
     }
 };

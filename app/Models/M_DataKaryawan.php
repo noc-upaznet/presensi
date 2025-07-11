@@ -30,7 +30,7 @@ class M_DataKaryawan extends Model
         'entitas',
         'divisi',
         'jabatan',
-        'posisi',
+        'level',
         'sistem_kerja',
         'spv',
         'total_upah',
@@ -52,7 +52,7 @@ class M_DataKaryawan extends Model
 
     public function getJadwal()
     {
-        return $this->hasMany(M_Jadwal::class, 'user_id', 'id_karyawan');
+        return $this->hasMany(M_Jadwal::class, 'karyawan_id', 'user_id');
     }
 
     public function getDivisi()
@@ -63,6 +63,11 @@ class M_DataKaryawan extends Model
     public function getJabatan()
     {
         return $this->belongsTo(M_Jabatan::class, 'jabatan'); // atau 'id_divisi' jika itu nama kolom foreign key-nya
+    }
+
+    public function getEntitas()
+    {
+        return $this->belongsTo(M_Entitas::class, 'entitas'); // atau 'id_divisi' jika itu nama kolom foreign key-nya
     }
 
     public function getPresensi()

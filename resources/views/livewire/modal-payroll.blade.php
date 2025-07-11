@@ -34,7 +34,7 @@
                                         <td>{{ $item->nip_karyawan }}</td>
                                         <td>
                                             <a href="{{ route('create-slip-gaji', ['id' => encrypt($item->id)]) }}" class="btn btn-sm btn-primary">
-                                                Buat Slip Gaji
+                                                <i class="fa-solid fa-money-bill"></i> Slip Gaji
                                             </a>
                                         </td>
                                     </tr>

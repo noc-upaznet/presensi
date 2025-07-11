@@ -90,45 +90,45 @@
                             <p>Silahkan isi data karyawan di bawah ini.</p>
                         </div>
                         <h4 style="color: blue; margin-bottom: 20px;">Data Personal</h4>
-                        <div class="mb-3">
-                            <label for="nama_karyawan" class="form-label">Nama Karyawan</label>
-                            <input type="text" class="form-control" id="nama_karyawan" name="nama_karyawan" wire:model="form.nama_karyawan" required>
-                            @error('form.nama_karyawan') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" wire:model="form.email" required>
-                                @error('form.email') <span class="text-danger">{{ $message }}</span> @enderror
+                            <div class="mb-3 col-md-6">
+                                <label for="nama_karyawan" class="form-label">Nama Karyawan <small class="text-danger">*</small></label>
+                                <input type="text" class="form-control" id="nama_karyawan" name="nama_karyawan" wire:model="form.nama_karyawan" required>
+                                @error('form.nama_karyawan') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="no-hp" class="form-label">No HP</label>
+                                <label for="no-hp" class="form-label">No HP <small class="text-danger">*</small></label>
                                 <input type="text" class="form-control" id="no-hp" name="no_hp" wire:model="form.no_hp" required>
                                 @error('form.no_hp') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label">Password</label>
+                                <label for="email" class="form-label">Email <small class="text-danger">*</small></label>
+                                <input type="email" class="form-control" id="email" name="email" wire:model="form.email" required>
+                                @error('form.email') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password <small class="text-danger">*</small></label>
                                 <input type="text" class="form-control" id="password" name="password" wire:model="password">
                                 @error('password') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="tempat-lahir" class="form-label">Tempat Lahir</label>
+                                <label for="tempat-lahir" class="form-label">Tempat Lahir <small class="text-danger">*</small></label>
                                 <input type="text" class="form-control" id="tempat-lahir" name="tempat_lahir" wire:model="form.tempat_lahir" required>
                                 @error('form.tempat_lahir') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="tgl-lahir" class="form-label">Tanggal Lahir</label>
+                                <label for="tgl-lahir" class="form-label">Tanggal Lahir <small class="text-danger">*</small></label>
                                 <input type="date" class="form-control" id="tgl-lahir" name="tanggal_lahir" wire:model="form.tanggal_lahir">
                                 @error('form.tanggal_lahir') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="jenis-kelamin" class="form-label">Jenis Kelamin</label>
+                                <label for="jenis-kelamin" class="form-label">Jenis Kelamin <small class="text-danger">*</small></label>
                                 <div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" id="laki-laki" value="Laki-laki" wire:model="form.jenis_kelamin" name="jenis_kelamin">
@@ -138,14 +138,18 @@
                                         <input class="form-check-input" type="radio" id="perempuan" value="Perempuan" name="jenis_kelamin" wire:model="form.jenis_kelamin">
                                         <label class="form-check-label" for="perempuan">Perempuan</label>
                                     </div>
+                                    <div>
+                                        @error('form.jenis_kelamin') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="status_perkawinan" class="form-label">Status Perkawinan</label>
+                                <label for="status_perkawinan" class="form-label">Status Perkawinan <small class="text-danger">*</small></label>
                                 <select class="form-select" id="status_perkawinan" wire:model="form.status_perkawinan" name="status_perkawinan">
                                     <option selected value="">-- Pilih Status Perkawinan --</option>
-                                    <option value="Menikah">Menikah</option>
-                                    <option value="Belum Menikah">Belum Menikah</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Widow/Widower">Widow/Widower</option>
                                 </select>
                                 @error('form.status_perkawinan') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
@@ -157,7 +161,7 @@
                                 @error('form.gol_darah') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="agama" class="form-label">Agama</label>
+                                <label for="agama" class="form-label">Agama <small class="text-danger">*</small></label>
                                 <select class="form-select" wire:model="form.agama" id="agama" name="agama">
                                     <option selected>-- Pilih Agama --</option>
                                     <option value="Islam">Islam</option>
@@ -173,16 +177,19 @@
                         <h4 style="color: blue; margin-bottom: 20px;">Identitas & Alamat</h4>
                         <div class="row" x-data="{ jenis: @entangle('form.jenis_identitas'), nomorKTP: @entangle('form.nomorKTP'), errorKTP: '' }">
                             <div class="col-md-6 mb-3">
-                                <label for="jenisIdentitas" class="form-label">Jenis Identitas</label>
+                                <label for="jenisIdentitas" class="form-label">Jenis Identitas <small class="text-danger">*</small></label>
                                 <select class="form-select" id="jenisIdentitas" x-model="jenis">
                                     <option value="">-- Pilih Jenis Identitas --</option>
                                     <option value="KTP">KTP</option>
                                     <option value="VISA">VISA</option>
                                 </select>
+                                <div>
+                                    @error('form.jenis_identitas') <span class="text-danger">{{ $message }}</span> @enderror
+                                </div>
                             </div>
                 
                             <div class="col-md-6 mb-3" x-show="jenis === 'KTP'">
-                                <label for="nomorKTP" class="form-label">Nomor KTP/ NIK</label>
+                                <label for="nomorKTP" class="form-label">Nomor KTP/ NIK <small class="text-danger">*</small></label>
                                 <input type="text" class="form-control" maxlength="16" placeholder="Masukkan Nomor KTP / NIK" wire:model="form.nomorKTP" x-on:input="
                                 if($el.value.match(/[^0-9]/g)) {
                                     errorKTP = 'Nomor KTP / NIK hanya boleh angka!';
@@ -194,7 +201,7 @@
                             </div>
                 
                             <div class="col-md-6 mb-3" x-show="jenis === 'VISA'">
-                                <label for="nomorVISA" class="form-label">Nomor VISA</label>
+                                <label for="nomorVISA" class="form-label">Nomor VISA <small class="text-danger">*</small></label>
                                 <input type="text" class="form-control" placeholder="Masukkan Nomor VISA" wire:model="form.nomorVISA">
                             </div>
                         </div>
@@ -208,20 +215,20 @@
                             }
                         }" x-init="$watch(() => $wire.form.gunakanAlamatKTP, value => syncAlamat())">
                             <div class="mb-3">
-                                <label for="alamatKTP" class="form-label">Alamat Sesuai KTP</label>
+                                <label for="alamatKTP" class="form-label">Alamat Sesuai KTP <small class="text-danger">*</small></label>
                                 <textarea class="form-control" id="alamatKTP" wire:model.defer="form.alamatKTP"></textarea>
                                 @error('form.alamatKTP') <span class="text-danger">{{ $message }}</span> @enderror
                         
                                 <div class="form-check mt-2">
                                     <input class="form-check-input" type="checkbox" id="copyAlamat" wire:model="form.gunakanAlamatKTP">
                                     <label class="form-check-label" for="copyAlamat">
-                                        Gunakan alamat KTP sebagai alamat domisili
+                                        Gunakan alamat KTP sebagai alamat domisili 
                                     </label>
                                 </div>
                             </div>
                         
                             <div class="mb-3">
-                                <label for="alamatDomisili" class="form-label">Alamat Domisili</label>
+                                <label for="alamatDomisili" class="form-label">Alamat Domisili <small class="text-danger">*</small></label>
                                 <textarea class="form-control" id="alamatDomisili"
                                         wire:model.defer="form.alamatDomisili"
                                         :readonly="$wire.form.gunakanAlamatKTP"></textarea>
@@ -248,49 +255,50 @@
                         <h4 style="color: blue; margin-bottom: 20px;">Data Ketenagakerjaan</h4>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="nip-karyawan" class="form-label">NPK/NIP Karyawan</label>
+                                <label for="nip-karyawan" class="form-label">NPK/NIP Karyawan <small class="text-danger">*</small></label>
                                 <input type="text" class="form-control" id="nip-karyawan" wire:model="form.nip_karyawan" name="nip_karyawan">
                                 @error('form.nip_karyawan') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="status-karyawan" class="form-label">Status Karyawan</label>
+                                <label for="status-karyawan" class="form-label">Status Karyawan <small class="text-danger">*</small></label>
                                 <select class="form-select" id="status-karyawan" wire:model="form.status_karyawan">
                                     <option selected disabled value="">-- Pilih Status Karyawan --</option>
-                                    <option value="Pegawai Kontrak(PKWT)">Pegawai Kontrak(PKWT)</option>
-                                    <option value="Pegawai Tetap">Pegawai Tetap</option>
+                                    <option value="PKWT Kontrak">PKWT Kontrak</option>
+                                    <option value="Probation">Probation</option>
+                                    <option value="OJT">OJT</option>
                                 </select>
                                 @error('form.status_karyawan') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="tgl-masuk" class="form-label">Tanggal Masuk Kerja</label>
+                                <label for="tgl-masuk" class="form-label">Tanggal Masuk Kerja <small class="text-danger">*</small></label>
                                 <input type="date" class="form-control" id="tgl-masuk" wire:model="form.tgl_masuk" required>
                                 @error('form.tgl_masuk') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="tgl-keluar" class="form-label">Tanggal Berakhir Kerja</label>
+                                <label for="tgl-keluar" class="form-label">Tanggal Berakhir Kerja <small class="text-danger">*</small></label>
                                 <input type="date" class="form-control" id="tgl-keluar" wire:model="form.tgl_keluar" required>
                                 @error('form.tgl_keluar') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="entitas" class="form-label">Entitas</label>
+                                <label for="entitas" class="form-label">Entitas <small class="text-danger">*</small></label>
                                 <select class="form-select" id="entitas" wire:model="form.entitas">
                                     <option selected disabled value="">-- Pilih Entitas --</option>
                                      @foreach ($entitas as $key)
-                                        <option value="{{ $key->id }}">{{ $key->nama }}</option>
+                                        <option value="{{ $key->nama }}">{{ $key->nama }}</option>
                                     @endforeach
                                 </select>
                                 @error('form.entitas') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="divisi" class="form-label">Divisi</label>
+                                <label for="divisi" class="form-label">Divisi <small class="text-danger">*</small></label>
                                 <select class="form-select" id="divisi" wire:model="form.divisi">
                                     <option selected disabled value="">-- Pilih Divisi --</option>
                                      @foreach ($divisi as $key)
-                                        <option value="{{ $key->id }}">{{ $key->nama }}</option>
+                                        <option value="{{ $key->nama }}">{{ $key->nama }}</option>
                                     @endforeach
                                 </select>
                                 @error('form.divisi') <span class="text-danger">{{ $message }}</span> @enderror
@@ -298,15 +306,27 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="jabatan" class="form-label">Jabatan</label>
+                                <label for="jabatan" class="form-label">Jabatan <small class="text-danger">*</small></label>
                                 <select class="form-select" id="jabatan" wire:model="form.jabatan">
                                     <option selected disabled value="">-- Pilih Jabatan --</option>
-                                     @foreach ($jabatan as $key)
-                                        <option value="{{ $key->id }}">{{ $key->nama_jabatan }}</option>
+                                    @foreach ($jabatan as $key)
+                                        <option value="{{ $key->nama_jabatan }}">{{ $key->nama_jabatan }}</option>
                                     @endforeach
                                 </select>
                                 @error('form.jabatan') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="level" class="form-label">Level <small class="text-danger">*</small></label>
+                                <select class="form-select" id="level" wire:model="form.level">
+                                    <option selected disabled value="">-- Pilih Level --</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="SPV">SPV</option>
+                                    <option value="Staff">Staff</option>
+                                </select>
+                                @error('form.level') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="sistem-kerja" class="form-label">Sistem Kerja</label>
                                 <select class="form-select" id="sistem-kerja" wire:model="form.sistem_kerja">
@@ -337,13 +357,13 @@
                         </div>
                         <h4 style="color: blue; margin-bottom: 20px;">Penggajian</h4>
                         <div class="mb-3">
-                            <label for="total-upah" class="form-label">Total Upah</label>
+                            <label for="total-upah" class="form-label">Total Upah <small class="text-danger">*</small></label>
                             <input class="form-control" type="text" id="total-upah" wire:model.lazy="total_upah">
                             @error('form.total_upah') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="gaji-pokok" class="form-label">Gaji Pokok</label>
+                                <label for="gaji-pokok" class="form-label">Gaji Pokok <small class="text-danger">*</small></label>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text" id="gaji-pokok">Rp.</span>
                                     <input
@@ -358,7 +378,7 @@
                                 @error('form.gaji_pokok') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="tunjangan-jabatan" class="form-label">Tunjangan Jabatan</label>
+                                <label for="tunjangan-jabatan" class="form-label">Tunjangan Jabatan <small class="text-danger">*</small></label>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text" id="tunjangan-jabatan">Rp.</span>
                                     <input
@@ -389,7 +409,7 @@
                                 @error('form.bonus') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="jenis-penggajian" class="form-label">Jenis Penggajian</label>
+                                <label for="jenis-penggajian" class="form-label">Jenis Penggajian <small class="text-danger">*</small></label>
                                 <div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" name="jenis_penggajian" id="bulanan" value="Bulanan" wire:model="form.jenis_penggajian">
@@ -405,7 +425,7 @@
                         </div>
                         <h4 style="color: blue; margin-bottom: 20px;">Rekening Bank</h4>
                         <div class="mb-3">
-                            <label for="nama-bank" class="form-label">Nama Bank</label>
+                            <label for="nama-bank" class="form-label">Nama Bank <small class="text-danger">*</small></label>
                             <select class="form-select" id="nama-bank" wire:model="form.nama_bank">
                                 <option selected disabled value="">-- Pilih Bank --</option>
                                 <option value="BCA">Bank Central Asia (BCA)</option>
@@ -418,12 +438,12 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="no-rek" class="form-label">Nomor Rekening</label>
+                                <label for="no-rek" class="form-label">Nomor Rekening <small class="text-danger">*</small></label>
                                 <input class="form-control" id="no-rek" wire:model="form.no_rek">
                                 @error('form.no_rek') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="nama-pemilik-rekening" class="form-label">Nama Pemilik Rekening</label>
+                                <label for="nama-pemilik-rekening" class="form-label">Nama Pemilik Rekening <small class="text-danger">*</small></label>
                                 <input class="form-control" id="nama-pemilik-rekening" wire:model="form.nama_pemilik_rekening">
                                 @error('form.nama_pemilik_rekening') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>

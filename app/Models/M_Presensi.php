@@ -33,6 +33,6 @@ class M_Presensi extends Model
 
     public function getUser()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(M_DataKaryawan::class, 'user_id', 'id');
     }
 }

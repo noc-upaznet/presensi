@@ -29,7 +29,7 @@ class Payroll extends Component
     public $startDate;
     public $endDate;
 
-    public $payroll_id, $no_slip, $karyawan_id, $bulan_tahun, $nip_karyawan, $divisi, $nama_karyawan, $jabatan;
+    public $payroll_id, $no_slip, $karyawan_id, $bulan_tahun, $nip_karyawan, $divisi, $nama_karyawan, $jabatan, $jml_psb, $insentif;
     public $gaji_pokok, $tunjangan = [], $potongan = [], $total_gaji, $tunjangan_jabatan, $lembur_nominal, $izin_nominal, $terlambat_nominal;
     public $terlambat, $izin, $cuti, $kehadiran, $lembur;
     public $jenis_tunjangan, $jenis_potongan;
@@ -40,29 +40,48 @@ class Payroll extends Component
     public $bpjs_jht_nominal = 0;
 
     public $jumlahBelumPunyaSlip;
+    public $cutoffStart;
+    public $cutoffEnd;
 
     public function mount()
     {
         $this->selectedYear = now()->year;
         $this->selectedMonth = now()->subMonth()->format('n');
-        $this->periode = now()->format('Y-m');
-        $this->jenis_tunjangan = JenisTunjanganModel::all();
-        $this->jenis_potongan = JenisPotonganModel::all();
 
+        // Format periode (YYYY-MM) dari bulan yang dipilih
         $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
         $this->periode = $this->selectedYear . '-' . $bulanFormatted;
 
-        $periode = $this->periode;
+        // Hitung tanggal cutoff
+        $cutoffEnd = \Carbon\Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 25);
+        $cutoffStart = $cutoffEnd->copy()->subMonthNoOverflow()->setDay(26);
+
+        $this->cutoffStart = $cutoffStart->format('Y-m-d');
+        $this->cutoffEnd = $cutoffEnd->format('Y-m-d');
+
+        $this->jenis_tunjangan = JenisTunjanganModel::all();
+        $this->jenis_potongan = JenisPotonganModel::all();
+
+        // Entitas (misalnya: UHO)
+        $selectedEntitas = session('selected_entitas', 'UHO');
+        if (!session()->has('selected_entitas')) {
+            session(['selected_entitas' => 'UHO']);
+            $selectedEntitas = 'UHO';
+        }
 
         // Hitung jumlah karyawan yang belum punya slip gaji di periode tersebut
-        $this->jumlahBelumPunyaSlip = DB::table('data_karyawan')
-            ->leftJoin('payroll', function($join) use ($periode) {
+        $karyawanQuery = DB::table('data_karyawan')->where('entitas', $selectedEntitas);
+
+        $this->jumlahBelumPunyaSlip = $karyawanQuery
+            ->leftJoin('payroll', function ($join) {
                 $join->on('data_karyawan.id', '=', 'payroll.karyawan_id')
-                    ->where('payroll.periode', '=', $periode);
+                    ->where('payroll.periode', '=', $this->periode);
             })
             ->whereNull('payroll.id')
             ->count();
     }
+
+
 
     public function export()
     {
@@ -174,20 +193,71 @@ class Payroll extends Component
         }
     }
 
+    public function updatedJmlPsb()
+    {
+        if ($this->isSalesPosition()) {
+            $insentifMapping = [
+                1 => [1000000, 50000],
+                2 => [1000000, 100000],
+                3 => [1000000, 150000],
+                4 => [1000000, 200000],
+                5 => [1000000, 250000],
+                6 => [1160000, 300000],
+                7 => [1160000, 350000],
+                8 => [1160000, 400000],
+                9 => [1160000, 450000],
+                10 => [1160000, 500000],
+                11 => [1508000, 825000],
+                12 => [1508000, 900000],
+                13 => [1508000, 975000],
+                14 => [1508000, 1050000],
+                15 => [1508000, 1125000],
+                16 => [1508000, 1200000],
+                17 => [1508000, 1275000],
+                18 => [1508000, 1350000],
+                19 => [1508000, 1425000],
+                20 => [2320000, 1700000],
+                21 => [2320000, 1785000],
+                22 => [2320000, 1870000],
+                23 => [2320000, 1955000],
+                24 => [2320000, 2040000],
+                25 => [2320000, 2125000],
+                26 => [2320000, 2210000],
+                27 => [2320000, 2295000],
+                28 => [2320000, 2380000],
+                29 => [2320000, 2465000],
+                30 => [2320000, 2550000],
+            ];
+
+            if (isset($insentifMapping[$this->jml_psb])) {
+                [$upah, $insentif] = $insentifMapping[$this->jml_psb];
+
+                // gaji pokok = 75% dari upah, tunjangan jabatan = 25% dari upah
+                $this->gaji_pokok = round($upah * 0.75);
+                $this->tunjangan_jabatan = round($upah * 0.25);
+                $this->insentif = $insentif;
+
+                $this->hitungTotalGaji();
+            } else {
+                $this->insentif = 0;
+            }
+        }
+    }
+
     public function hitungTotalGaji()
     {
         $totalTunjangan = collect($this->tunjangan)->sum(fn($item) => (int) $item['nominal']);
         $totalPotongan = collect($this->potongan)->sum(fn($item) => (int) $item['nominal']);
 
-        // Jangan hitung otomatis BPJS kalau kamu ingin input manual
-        // Tapi validasi bahwa nilai sudah ada
         $bpjs = (int) $this->bpjs_nominal;
         $bpjsJht = (int) $this->bpjs_jht_nominal;
+        $insentif = (int) $this->insentif;
 
-        // Hitung total gaji akhir
+        // Hitung total gaji akhir, tambahkan insentif
         $this->total_gaji = (int) $this->gaji_pokok
             + $totalTunjangan
             + (int) $this->tunjangan_jabatan
+            + $insentif
             - $totalPotongan
             - $bpjs
             - $bpjsJht;
@@ -210,7 +280,9 @@ class Payroll extends Component
             $this->bulan_tahun = $payroll->periode;
             $this->nip_karyawan = $payroll->nip_karyawan;
             $this->divisi = $payroll->divisi;
-            $this->jabatan = $payroll->getNamaJabatan();
+            $this->jabatan = $payroll->getKaryawan->jabatan;
+            $this->jml_psb = $payroll->jml_psb;
+            $this->insentif = $payroll->insentif;
             $this->gaji_pokok = $payroll->gaji_pokok;
             $this->tunjangan_jabatan = $payroll->tunjangan_jabatan;
             $this->lembur_nominal = $payroll->lembur;
@@ -251,6 +323,7 @@ class Payroll extends Component
             'gaji_pokok' => $this->gaji_pokok,
             'tunjangan_jabatan' => $this->tunjangan_jabatan,
             'lembur' => $this->lembur_nominal,
+            'insentif' => $this->insentif,
             'izin' => $this->izin_nominal,
             'terlambat' => $this->terlambat_nominal,
             'tunjangan' => json_encode($this->tunjangan),
@@ -317,9 +390,17 @@ class Payroll extends Component
 
     public function render()
     {
-        
         $query = PayrollModel::with('getKaryawan');
 
+        // Ambil entitas dari session
+        $entitasNama = session('selected_entitas', 'UHO');
+        $entitas = \App\Models\M_Entitas::where('nama', $entitasNama)->first();
+
+        if ($entitas && $entitasNama !== 'All' && $entitasNama !== 'All Branch') {
+            $query->where('entitas_id', $entitas->id);
+        }
+
+        // Filter periode
         if ($this->selectedMonth && $this->selectedYear) {
             $periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
             $query->where('periode', $periode);
@@ -331,4 +412,5 @@ class Payroll extends Component
             'data' => $data
         ]);
     }
+
 }

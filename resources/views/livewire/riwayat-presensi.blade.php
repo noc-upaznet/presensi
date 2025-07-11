@@ -27,7 +27,7 @@
                             </select> entries per page</label>
                     </div>
                     <div>
-                        <input type="search" class="form-control form-control-sm" placeholder="Search...">
+                        <input type="search" class="form-control form-control-sm" placeholder="Search..." wire:model.live="search">
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -35,55 +35,65 @@
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
-                                <th>Nama Karyawan</th>
+                                @if (auth()->user()->role != 'user')
+                                    <th>Nama Karyawan</th>
+                                @endif
                                 <th>Clock In</th>
                                 <th>Clock Out</th>
                                 <th>File</th>
                                 <th>Status</th>
-                                @if (auth()->user()->role == 'hr')
+                                @if (auth()->user()->role == 'admin' || auth()->user()->role == 'hr')
                                     <th>Action</th>
                                 @endif
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($datas as $key)
+                            @if ($datas->isEmpty())
                                 <tr>
-                                    <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
-                                    <td style="color: var(--bs-body-color);">{{ $key->getUser->name }}</td>
-                                    <td style="color: var(--bs-body-color);">{{ $key->clock_in }}</td>
-                                    <td style="color: var(--bs-body-color);">{{ $key->clock_out }}</td>
-                                    <td style="color: var(--bs-body-color);">
-                                        <img src="{{ asset('storage/' . $key->file) }}" style="max-width: 100px;" alt="Selfie" class="img-fluid" />
-                                        {{-- {{ $key->file }} --}}
-                                    </td>
-                                    <td>
-                                        @if ($key->status == "0")
-                                            <span class="badge bg-success">Tepat Waktu</span>
-                                        @elseif ($key->status == "1")
-                                            <span class="badge bg-danger">Terlambat</span>
-                                        @elseif ($key->status == "2")
-                                            <span class="badge bg-primary">Dispensasi</span>
-                                        @else
-                                            <span class="badge bg-secondary">Unknown</span>
-                                        @endif
-                                    </td>
-                                    @if (auth()->user()->role == 'hr')
-                                        <td>
-                                            <button class="btn btn-warning btn-sm" wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-    
-                                            <!-- Tombol Buka Modal -->
-                                            <button wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"
-                                                class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#hapusPresensiModal">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-    
-                                        </td>
-                                    @endif
+                                    <td colspan="9" class="text-center" style="color: var(--bs-body-color);">Data tidak ditemukan</td>
                                 </tr>
-                            @endforeach
+                            @else
+                                @foreach($datas as $key)
+                                    <tr>
+                                        <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
+                                        @if (auth()->user()->role != 'user')
+                                            <td style="color: var(--bs-body-color);">{{ $key->getUser->nama_karyawan }}</td>
+                                        @endif
+                                        <td style="color: var(--bs-body-color);">{{ $key->clock_in }}</td>
+                                        <td style="color: var(--bs-body-color);">{{ $key->clock_out }}</td>
+                                        <td style="color: var(--bs-body-color);">
+                                            <img src="{{ asset('storage/' . $key->file) }}" style="max-width: 100px;" alt="Selfie" class="img-fluid" />
+                                            {{-- {{ $key->file }} --}}
+                                        </td>
+                                        <td>
+                                            @if ($key->status == "0")
+                                                <span class="badge bg-success">Tepat Waktu</span>
+                                            @elseif ($key->status == "1")
+                                                <span class="badge bg-danger">Terlambat</span>
+                                            @elseif ($key->status == "2")
+                                                <span class="badge bg-primary">Dispensasi</span>
+                                            @else
+                                                <span class="badge bg-secondary">Unknown</span>
+                                            @endif
+                                        </td>
+                                        @if (auth()->user()->role == 'admin' || auth()->user()->role == 'hr')
+                                            <td>
+                                                <button class="btn btn-warning btn-sm" wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+        
+                                                <!-- Tombol Buka Modal -->
+                                                <button wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"
+                                                    class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#hapusPresensiModal">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+        
+                                            </td>
+                                        @endif
+                                    </tr>
+                                @endforeach
+                            @endif
                         </tbody>
                     </table>
                 </div>

@@ -52,7 +52,43 @@ class TambahDataKaryawan extends Component
     // }
 
     public function nextStep() {
+        // Validasi field yang wajib diisi pada step saat ini
+        if ($this->step === 1) {
+            if (
+                empty($this->form->nama_karyawan) ||
+                empty($this->form->email) ||
+                empty($this->form->no_hp) ||
+                empty($this->password) ||
+                empty($this->form->tempat_lahir) ||
+                empty($this->form->tanggal_lahir) ||
+                empty($this->form->jenis_kelamin) ||
+                empty($this->form->status_perkawinan) ||
+                empty($this->form->agama) ||
+                empty($this->form->jenis_identitas) ||
+                empty($this->form->alamatKTP) ||
+                empty($this->form->alamatDomisili)
+            ) {
+                $this->validate();
+                return;
+            }
+        } else if ($this->step === 2) {
+            if (
+                empty($this->form->nip_karyawan) ||
+                empty($this->form->status_karyawan) ||
+                empty($this->form->tgl_masuk) ||
+                empty($this->form->tgl_keluar) ||
+                empty($this->form->entitas) ||
+                empty($this->form->divisi) ||
+                empty($this->form->jabatan) ||
+                empty($this->form->level) ||
+                empty($this->form->sistem_kerja)
+            ) {
+                $this->validate();
+                return;
+            }
+        }
         $this->step++;
+        // Tambahkan validasi untuk step lain jika diperlukan
     }
 
     public function prevStep() {
@@ -102,8 +138,9 @@ class TambahDataKaryawan extends Component
             'entitas' => $this->form->entitas,
             'divisi' => $this->form->divisi,
             'jabatan' => $this->form->jabatan,
+            'level' => $this->form->level,
             'sistem_kerja' => $this->form->sistem_kerja,
-            'total_upah' => $this->total_upah,
+            'total_upah' => $this->form->total_upah,
             'gaji_pokok' => $this->form->gaji_pokok,
             'tunjangan_jabatan' => $this->form->tunjangan_jabatan,
             'bonus' => $this->form->bonus,
@@ -113,10 +150,10 @@ class TambahDataKaryawan extends Component
             'nama_pemilik_rekening' => $this->form->nama_pemilik_rekening,
             'no_bpjs_tk' => $this->form->no_bpjs_tk,
             'npp_bpjs_tk' => $this->form->npp_bpjs_tk,
-            'tgl_aktif_bpjstk' => $this->form->tgl_aktif_bpjstk,
+            'tgl_aktif_bpjstk' => $this->form->tgl_aktif_bpjstk ?: null,
             'no_bpjs' => $this->form->no_bpjs,
             'anggota_bpjs' => $this->form->anggota_bpjs,
-            'tgl_aktif_bpjs' => $this->form->tgl_aktif_bpjs,
+            'tgl_aktif_bpjs' => $this->form->tgl_aktif_bpjs ?: null,
             'penanggung' => $this->form->penanggung,
         ];
 

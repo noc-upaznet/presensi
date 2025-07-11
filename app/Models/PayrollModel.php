@@ -9,6 +9,7 @@ class PayrollModel extends Model
     protected $table = 'payroll';
     protected $fillable = [
         'karyawan_id',
+        'entitas_id',
         'nip_karyawan',
         'no_slip',
         'divisi',
@@ -44,6 +45,11 @@ class PayrollModel extends Model
     public function getNamaJabatan()
     {
         return $this->getKaryawan()->first()->getJabatan()->first()->nama_jabatan ?? null;
+    }
+
+    public function entitas()
+    {
+        return $this->belongsTo(M_Entitas::class, 'entitas_id');
     }
     
 }

@@ -5,6 +5,7 @@ namespace App\Livewire\Navigation;
 use Livewire\Component;
 use App\Models\M_Lembur;
 use App\Models\M_Pengajuan;
+use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Auth;
 
 class SideNavigation extends Component
@@ -17,15 +18,28 @@ class SideNavigation extends Component
 
         if ($user) {
             if ($user->role === 'spv') {
-                // Untuk pengajuan cuti/izin
-                $countPengajuan = M_Pengajuan::whereNull('approve_spv')
-                    ->where('status', 0)
-                    ->count();
+                $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
 
-                // Untuk pengajuan lembur
-                $countLembur = M_Lembur::whereNull('approve_spv')
-                    ->where('status', 0)
-                    ->count();
+                if ($dataKaryawan) {
+                    $karyawanIds = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
+                        ->where('entitas', $dataKaryawan->entitas) // opsional jika perlu filter entitas juga
+                        ->pluck('id');
+
+                    // Untuk pengajuan cuti/izin dari karyawan satu divisi
+                    $countPengajuan = M_Pengajuan::whereNull('approve_spv')
+                        ->where('status', 0)
+                        ->whereIn('karyawan_id', $karyawanIds)
+                        ->count();
+
+                    // Untuk pengajuan lembur dari karyawan satu divisi
+                    $countLembur = M_Lembur::whereNull('approve_spv')
+                        ->where('status', 0)
+                        ->whereIn('karyawan_id', $karyawanIds)
+                        ->count();
+                } else {
+                    $countPengajuan = 0;
+                    $countLembur = 0;
+                }
 
             } elseif ($user->role === 'hr') {
                 // Untuk pengajuan cuti/izin
@@ -41,6 +55,7 @@ class SideNavigation extends Component
                     ->count();
             }
         }
+
 
         return view('livewire.navigation.side-navigation', [
             'pengajuanMenungguCount' => $countPengajuan,

@@ -74,27 +74,36 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between small mb-2">
                         <span>Total</span>
-                        <span>104</span>
+                        <span>{{ array_sum($statusKaryawan ?? []) }}</span>
                     </div>
+                    @php
+                        $totalStatus = array_sum($statusKaryawan ?? []);
+                        $persen = function($jumlah) use ($totalStatus) {
+                            return $totalStatus > 0 ? round(($jumlah / $totalStatus) * 100) : 0;
+                        };
+                    @endphp
                     <div class="progress mb-2" style="height: 14px;">
-                        <div class="progress-bar bg-primary" style="width: 87.5%"></div>
-                        <div class="progress-bar bg-warning" style="width: 8.65%"></div>
-                        <div class="progress-bar bg-danger" style="width: 3.85%"></div>
+                        <div class="progress-bar bg-primary" style="width: {{ $persen($statusKaryawan['OJT'] ?? 0) }}%"></div>
+                        <div class="progress-bar bg-warning" style="width: {{ $persen($statusKaryawan['PKWT Kontrak'] ?? 0) }}%"></div>
+                        <div class="progress-bar bg-danger" style="width: {{ $persen($statusKaryawan['Probation'] ?? 0) }}%"></div>
                     </div>
                     <ul class="list-unstyled small mb-2">
-                        <li class="d-flex align-items-center"><i class="fas fa-square text-primary me-2"></i> Tetap
-                            (91
-                            - 87.5%)</li>
-                        <li class="d-flex align-items-center"><i class="fas fa-square text-warning me-2"></i>
-                            Kontrak (9
-                            - 8.65%)</li>
-                        <li class="d-flex align-items-center"><i class="fas fa-square text-danger me-2"></i>
-                            Probation
-                            (4 - 3.85%)</li>
+                        <li class="d-flex align-items-center">
+                            <i class="fas fa-square text-primary me-2"></i>
+                            OJT ({{ $statusKaryawan['OJT'] ?? 0 }} - {{ $persen($statusKaryawan['OJT'] ?? 0) }}%)
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="fas fa-square text-warning me-2"></i>
+                            PKWT Kontrak ({{ $statusKaryawan['PKWT Kontrak'] ?? 0 }} - {{ $persen($statusKaryawan['PKWT Kontrak'] ?? 0) }}%)
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="fas fa-square text-danger me-2"></i>
+                            Probation ({{ $statusKaryawan['Probation'] ?? 0 }} - {{ $persen($statusKaryawan['Probation'] ?? 0) }}%)
+                        </li>
                     </ul>
                 </div>
                 <div class="card-footer bg-info text-white py-2 text-center">
-                    <a href="#" class="text-white text-decoration-none fw-medium">
+                    <a href="{{ route('data-karyawan') }}" class="text-white text-decoration-none fw-medium">
                         More Info <i class="fa-solid fa-circle-chevron-right"></i>
                     </a>
                 </div>
@@ -102,22 +111,20 @@
         </div>
 
         <div class="col-6 col-md-4">
-            {{-- Jadwal Shift --}}
             <div class="card shadow-sm mt-3" style="background-color: var(--bs-body-bg);">
                 <div class="card-header fw-bold">JADWAL SHIFT HARI INI</div>
                 <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <div><strong>Shift Pagi</strong></div>
-                        <div>07:00 - 15:00</div>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <div><strong>Shift Siang</strong></div>
-                        <div>15:00 - 23:00</div>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <div><strong>Shift Malam</strong></div>
-                        <div>23:00 - 07:00</div>
-                    </div>
+                    @foreach ($shiftKategori as $kategori => $shifts)
+                        <div class="mb-3">
+                            <div class="fw-bold mb-2" style="color: var(--bs-body-color);">{{ $kategori }}</div>
+                            @foreach ($shifts as $shift)
+                                <div class="d-flex justify-content-between mb-1">
+                                    <div>{{ $shift['label'] }}</div>
+                                    <div>{{ $shift['jam'] }}</div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -140,24 +147,34 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const presensiCtx = document.getElementById('grafikPresensi');
+    const presensiCtx = document.getElementById('grafikPresensi').getContext('2d');
     new Chart(presensiCtx, {
         type: 'bar',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            labels: @json($labels),
             datasets: [
-                { label: 'Tepat Waktu', backgroundColor: '#9966ff', data: [74, 102, 88, 75, 98, 99, 102, 95, 90, 99, 99, 103] },
-                { label: 'Terlambat', backgroundColor: '#ff6384', data: [17, 0, 8, 16, 15, 0, 0, 0, 5, 5, 3, 0] },
-                { label: 'Tidak Absen', backgroundColor: '#36a2eb', data: [13, 0, 2, 1, 3, 1, 0, 2, 0, 1, 3, 0] }
+                {
+                    label: 'Tepat Waktu',
+                    backgroundColor: '#9966ff',
+                    data: @json($tepatWaktu)
+                },
+                {
+                    label: 'Terlambat',
+                    backgroundColor: '#ff6384',
+                    data: @json($terlambat)
+                },
+                {
+                    label: 'Tidak Absen',
+                    backgroundColor: '#36a2eb',
+                    data: @json($tidakAbsen)
+                },
             ]
         },
-       options: {
+        options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    position: 'top',
-                }
+                legend: { position: 'top' }
             },
             layout: {
                 padding: 10

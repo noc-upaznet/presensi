@@ -30,13 +30,19 @@ class SSOLoginController extends Controller
                 [
                     'name' => $remoteUser['name'],
                     'password' => bcrypt(Str::random()), // Password acak agar valid
-                    'role' => 'admin', // Default role, bisa kamu sesuaikan
+                    'role' => 'user', // Default role, bisa kamu sesuaikan
                 ]
             );
 
             Auth::login($localUser);
 
-            return redirect()->intended('/dashboard');
+            if ($localUser->role === 'user') {
+                return redirect()->intended('/clock-in');
+            } elseif (in_array($localUser->role, ['admin', 'hr'])) {
+                return redirect()->intended('/dashboard');
+            } else {
+                return redirect()->intended('/');
+            }
         }
 
         return redirect('http://127.0.0.1:8000/login')->withErrors(['Token invalid']);

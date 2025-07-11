@@ -2,26 +2,36 @@
 
 namespace App\Livewire\Karyawan\Pengajuan;
 
+use App\Livewire\Forms\PengajuanForm;
 use Carbon\Carbon;
 use App\Models\User;
 use Livewire\Component;
 use App\Models\M_Jadwal;
 use App\Models\M_Pengajuan;
+use Livewire\WithPagination;
+use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use Livewire\WithPagination;
 
 class Pengajuan extends Component
 {
+    public PengajuanForm $form;
     use WithPagination;
     protected $listeners = ['refreshTable' => 'refresh'];
 
     public $filterPengajuan = '';
     public $filterBulan = '';
     public $status = [];
+    public $search;
+    public $tanggal;
+    public $keterangan;
 
     public function mount()
     {
+        if (!Auth::check()) {
+            session(['redirect_after_login' => url()->current()]);
+            return redirect()->to(route('login'));
+        }
         // Ambil semua status unik dari database
         $this->status = M_Pengajuan::select('status')->distinct()->get();
         $this->filterBulan = now()->format('Y-m');
@@ -33,10 +43,19 @@ class Pengajuan extends Component
         $this->dispatch('modalTambahPengajuan', action: 'show');
     }
 
-    public function showDetail($id)
+    public function showEdit($id)
     {
-        // Dispatch event ke modal
-        $this->dispatch('modalDetailPengajuan', action: 'show', id: $id);
+        $this->form->resetValidation();
+        $dataPengajuan = M_Pengajuan::find(Crypt::decrypt($id));
+        // dd($dataPengajuan);
+        if (!$dataPengajuan) {
+            session()->flash('error', 'Data tiket tidak ditemukan!');
+            return;
+        }
+
+        // Kirim data ke komponen ModalKunjungan
+        $this->dispatch('edit-pengajuan', data: $dataPengajuan->toArray());
+        $this->dispatch('modalEditPengajuan', action: 'show');
     }
     
     public function updateStatus($id, $status = null)
@@ -99,7 +118,7 @@ class Pengajuan extends Component
             $hari = 'd' . $tanggal->day;
             $bulanTahun = $tanggal->format('Y-m');
 
-            $jadwal = M_Jadwal::where('user_id', $pengajuan->user_id)
+            $jadwal = M_Jadwal::where('karyawan_id', $pengajuan->karyawan_id)
                 ->where('bulan_tahun', $bulanTahun)
                 ->first();
 
@@ -114,7 +133,7 @@ class Pengajuan extends Component
                 $pengajuan->save();
 
                 $jadwalBaru = new M_Jadwal([
-                    'user_id' => $pengajuan->user_id,
+                    'karyawan_id' => $pengajuan->karyawan_id,
                     'bulan_tahun' => $bulanTahun,
                     $hari => $pengajuan->shift_id,
                 ]);
@@ -134,15 +153,31 @@ class Pengajuan extends Component
 
     public function render()
     {
-        $query = M_Pengajuan::with(['getUser', 'getShift']);
+        $query = M_Pengajuan::with(['getKaryawan', 'getShift']);
+        $user = Auth::user();
+        $entitas = session('selected_entitas', 'UHO'); // default ke 'UHO'
 
-        // Role: Admin atau selain 'user'
-        if (Auth::user()->role !== 'user') {
-            // Tidak ada filter user_id
-        }
-        // Role: user
-        elseif (Auth::user()->role === 'user') {
-            $query->where('user_id', Auth::id());
+        if ($user->role === 'user') {
+            // User biasa hanya melihat datanya sendiri
+            $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
+            if ($dataKaryawan) {
+                $query->where('karyawan_id', $dataKaryawan->id);
+            }
+
+        } elseif ($user->role === 'admin') {
+            // Admin atau HR melihat semua karyawan dalam entitas
+            $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
+            $query->whereIn('karyawan_id', $karyawanIdList);
+
+        } elseif ($user->role === 'spv') {
+            // SPV hanya melihat karyawan yang berada dalam divisinya dan entitas yang sama
+            $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
+            if ($dataKaryawan) {
+                $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
+                    ->where('entitas', $dataKaryawan->entitas) // pastikan tetap dalam entitas yang sama
+                    ->pluck('id');
+                $query->whereIn('karyawan_id', $karyawanIdList);
+            }
         }
 
         // Filter Status
@@ -157,20 +192,19 @@ class Pengajuan extends Component
             $query->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
         }
 
-        // $pengajuan = $query->latest()->get();
-        
-
-        if (Auth::user()->role == 'admin' || Auth::user()->role == 'spv' || Auth::user()->role == 'hr') {
-            // admin dan hr
-            $pengajuan = $query->latest()->get();
-        } elseif (Auth::user()->role == 'user') {
-            // user
-            $pengajuan = M_Pengajuan::where('user_id', Auth::id())
-                ->orderBy('created_at', 'desc')
-                ->get();
+        // Search + Pagination
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('id', 'like', '%' . $this->search . '%')
+                ->orWhere('tanggal', 'like', '%' . $this->search . '%');
+            });
         }
+
+        $pengajuan = $query->latest()->paginate(10);
+
         return view('livewire.karyawan.pengajuan.pengajuan', [
             'pengajuans' => $pengajuan,
         ]);
     }
+
 }

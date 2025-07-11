@@ -4,9 +4,11 @@ namespace App\Livewire\Karyawan\Pengajuan;
 
 use App\Models\User;
 use Livewire\Component;
+use App\Models\M_Jadwal;
 use App\Models\M_Lembur;
 use App\Models\M_Pengajuan;
 use Livewire\WithFileUploads;
+use App\Models\M_DataKaryawan;
 use App\Events\PengajuanBaruEvent;
 use App\Livewire\Forms\LemburForm;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +21,10 @@ class ModalPengajuanLembur extends Component
 
     public $karyawans;
     public $file_bukti;
-    protected $listeners = ['refreshTable' => 'refresh'];
+    protected $listeners = ['refreshTable' => 'refresh', 'edit-pengajuan' => 'loadData'];
+    public $pengajuanId;
+    public $file;
+
 
     public function updated($propertyName)
     {
@@ -57,7 +62,7 @@ class ModalPengajuanLembur extends Component
         }
 
         $data = [
-            'user_id' => Auth::id(),
+            'karyawan_id' => M_DataKaryawan::where('user_id', Auth::id())->value('id'),
             'tanggal' => $this->form->tanggal,
             'jenis' => $this->form->jenis,
             'keterangan' => $this->form->keterangan,
@@ -71,7 +76,7 @@ class ModalPengajuanLembur extends Component
 
         // Simpan data ke database
         // M_Pengajuan::create($data);
-        $pengajuan = M_Lembur::create($data)->load('getUser');
+        $pengajuan = M_Lembur::create($data);
 
         // Reset input
         $this->form->reset();
@@ -86,6 +91,68 @@ class ModalPengajuanLembur extends Component
         $this->dispatch('modalTambahPengajuanLembur', action: 'hide');
         $this->dispatch('refresh');
         
+    }
+
+    public function loadData($data)
+    {
+        // dd($data['id']);
+        $this->pengajuanId = $data['id'];
+        $this->form->fill($data);
+        $this->form->tanggal = $data['tanggal'] ? \Carbon\Carbon::parse($data['tanggal'])->format('Y-m-d') : null;
+        $this->form->waktu_mulai = $data['waktu_mulai'] ? \Carbon\Carbon::parse($data['waktu_mulai'])->format('H:i') : null;
+        $this->form->waktu_akhir = $data['waktu_akhir'] ? \Carbon\Carbon::parse($data['waktu_akhir'])->format('H:i') : null;
+        $this->form->total_jam = $data['total_jam'] ? $data['total_jam'] : 0;
+        $this->form->jenis = $data['jenis'] ?? 'Lembur';
+        $this->form->keterangan = $data['keterangan'] ?? '';
+        $this->file = $data['file_bukti'] ? str_replace('storage/', '', $data['file']) : null;
+    }
+
+    public function saveEdit()
+    {
+        $dataPengajuan = M_Lembur::find($this->pengajuanId);
+        // dd($dataPengajuan);
+        if (!$dataPengajuan) {
+            session()->flash('error', 'Data pengajuan tidak ditemukan!');
+            return;
+        }
+        // $this->form->validate();
+
+        // $this->validate([
+        //     'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5048',
+        // ]);
+
+        $path = null;
+        if ($this->file) {
+            $path = $this->file->store('file', 'public');
+        }
+
+        $data = [
+            // 'karyawan_id' => M_DataKaryawan::where('user_id', Auth::id())->value('id'),
+            'tanggal' => $this->form->tanggal,
+            'jenis' => $this->form->jenis,
+            'keterangan' => $this->form->keterangan,
+            'waktu_mulai' => $this->form->waktu_mulai,
+            'waktu_akhir' => $this->form->waktu_akhir,
+            'total_jam' => $this->form->total_jam,
+            'file_bukti' => $path ? str_replace('public/', 'storage/', $path) : null,
+        ];
+        // dd($data);
+
+        $dataPengajuan->update($data);
+        // M_Pengajuan::where('id', Crypt::decrypt($this->form->id))->update($data);
+
+        // Reset input
+        $this->form->reset();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Updated',
+            'icon' => 'success',
+            'text' => 'Data has been updated successfully'
+        ]);
+
+        // Tutup modal
+        $this->dispatch('modalEditPengajuan', action: 'hide');
+        $this->dispatch('refresh');
     }
 
     public function delete($id)

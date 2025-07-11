@@ -7,7 +7,6 @@ use App\Models\User;
 
 Route::post('/login', function (Request $request) {
     $user = User::where('email', $request->email)->first();
-
     if (! $user || ! Hash::check($request->password, $user->password)) {
         return response()->json(['message' => 'Login gagal'], 401);
     }

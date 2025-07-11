@@ -46,8 +46,43 @@
                     </a>
                 </li>
             @endif
+
+            @if (auth()->user()->role == 'admin')
+                <li class="nav-item menu-open">
+                    <a href="#" class="nav-link active">
+                        <i class="bi bi-clipboard-plus"></i>
+                        <p>
+                            Payroll
+                        <i class="nav-arrow bi bi-chevron-right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="margin-left: 20px;">
+                        <li class="nav-item">
+                            <a href="{{ route('payroll') }}" 
+                            class="nav-link {{ request()->routeIs('payroll') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>Slip Gaji</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('jenis-tunjangan') }}" 
+                            class="nav-link {{ request()->routeIs('jenis-tunjangan') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>Jenis Tunjangan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('jenis-potongan') }}" 
+                            class="nav-link {{ request()->routeIs('jenis-potongan') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>Jenis Potongan</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
             
-            @if (auth()->user()->role == 'admin' || auth()->user()->role == 'hr' || auth()->user()->role == 'spv')
+            @if (auth()->user()->role == 'admin')
                 <li class="nav-item">
                     <a href="{{ route('data-karyawan') }}" 
                     class="nav-link {{ request()->routeIs('data-karyawan') ? 'active' : '' }}">
@@ -111,44 +146,9 @@
                     <a href="{{ route('role-users') }}" 
                         class="nav-link {{ request()->routeIs('role-users') ? 'active' : '' }}">
                         <i class="bi bi-person-fill-gear"></i>
-                            <p>Role Users</p>
+                            <p>Data Master</p>
                     </a>
                 </li>
-
-                @if (auth()->user()->role == 'hr')
-                    <li class="nav-item menu-open">
-                        <a href="#" class="nav-link active">
-                            <i class="bi bi-clipboard-plus"></i>
-                            <p>
-                                Slip Gaji
-                            <i class="nav-arrow bi bi-chevron-right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview" style="margin-left: 20px;">
-                            <li class="nav-item">
-                                <a href="{{ route('payroll') }}" 
-                                class="nav-link {{ request()->routeIs('payroll') ? 'active' : '' }}">
-                                <i class="nav-icon bi bi-circle"></i>
-                                    <p>Payroll</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('jenis-tunjangan') }}" 
-                                class="nav-link {{ request()->routeIs('jenis-tunjangan') ? 'active' : '' }}">
-                                <i class="nav-icon bi bi-circle"></i>
-                                    <p>Jenis Tunjangan</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('jenis-potongan') }}" 
-                                class="nav-link {{ request()->routeIs('jenis-potongan') ? 'active' : '' }}">
-                                <i class="nav-icon bi bi-circle"></i>
-                                    <p>Jenis Potongan</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                @endif
             @endif
 
             <li class="nav-item">
@@ -158,47 +158,87 @@
                     <p>Riwayat Presensi</p>
                 </a>
             </li>
+            
 
-            <li class="nav-item menu-open">
-                <a href="#" class="nav-link active">
-                    <i class="bi bi-clipboard-plus"></i>
-                    <p>
-                    Pengajuan
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                    </p>
-                </a>
-                <ul class="nav nav-treeview" style="margin-left: 20px;">
-                    <li class="nav-item">
-                        <a href="{{ route('pengajuan') }}" 
-                        class="nav-link {{ request()->routeIs('pengajuan') ? 'active' : '' }}">
-                        <i class="nav-icon bi bi-circle"></i>
-                            <p>
-                                Pengajuan Cuti/Izin
-                            </p>
-                            @if ($pengajuanMenungguCount > 0)
-                                <span class="badge bg-danger ms-2">{{ $pengajuanMenungguCount }}</span>
-                            @endif
-                        </a>
-                    </li>
+            @if (auth()->user()->role == 'hr' || auth()->user()->role == 'spv')
+                <li class="nav-item menu-open">
+                    <a href="#" class="nav-link active">
+                        <i class="bi bi-clipboard-plus"></i>
+                        <p>
+                        Approval
+                        <i class="nav-arrow bi bi-chevron-right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="margin-left: 20px;">
+                        <li class="nav-item">
+                            <a href="{{ route('pengajuan') }}" 
+                            class="nav-link {{ request()->routeIs('pengajuan') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>
+                                    Pengajuan Cuti/Izin
+                                </p>
+                                @if ($pengajuanMenungguCount > 0)
+                                    <span class="badge bg-danger ms-2">{{ $pengajuanMenungguCount }}</span>
+                                @endif
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="{{ route('pengajuan-lembur') }}" 
-                        class="nav-link {{ request()->routeIs('pengajuan-lembur') ? 'active' : '' }}">
-                        <i class="nav-icon bi bi-circle"></i>
-                            <p>Pengajuan Lembur</p>
-                            @if ($lemburMenungguCount > 0)
-                                <span class="badge bg-danger ms-2">{{ $lemburMenungguCount }}</span>
-                            @endif
-                        </a>
-                    </li>
-                </ul>
-            </li>
+                        <li class="nav-item">
+                            <a href="{{ route('pengajuan-lembur') }}" 
+                            class="nav-link {{ request()->routeIs('pengajuan-lembur') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>Pengajuan Lembur</p>
+                                @if ($lemburMenungguCount > 0)
+                                    <span class="badge bg-danger ms-2">{{ $lemburMenungguCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
+            
+            @if (auth()->user()->role == 'user')
+                <li class="nav-item menu-open">
+                    <a href="#" class="nav-link active">
+                        <i class="bi bi-clipboard-plus"></i>
+                        <p>
+                        Pengajuan
+                        <i class="nav-arrow bi bi-chevron-right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="margin-left: 20px;">
+                        <li class="nav-item">
+                            <a href="{{ route('pengajuan') }}" 
+                            class="nav-link {{ request()->routeIs('pengajuan') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>
+                                    Pengajuan Cuti/Izin
+                                </p>
+                                @if ($pengajuanMenungguCount > 0)
+                                    <span class="badge bg-danger ms-2">{{ $pengajuanMenungguCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('pengajuan-lembur') }}" 
+                            class="nav-link {{ request()->routeIs('pengajuan-lembur') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>Pengajuan Lembur</p>
+                                @if ($lemburMenungguCount > 0)
+                                    <span class="badge bg-danger ms-2">{{ $lemburMenungguCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
 
             <li class="nav-item">
-                <a href="{{ route('profile') }}" 
-                   class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}">
-                   <i class="bi bi-person-circle"></i>
-                    <p>Profile</p>
+                <a href="{{ route('ganti-password') }}" 
+                   class="nav-link {{ request()->routeIs('ganti-password') ? 'active' : '' }}">
+                   <i class="bi bi-key"></i>
+                    <p>Ganti Password</p>
                 </a>
             </li>
 

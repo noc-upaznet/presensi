@@ -22,9 +22,9 @@ class RoleLokasiModel extends Model
     //     return $this->belongsTo(M_DataKaryawan::class, 'karyawan_id');
     // }
 
-    public function getUser()
+    public function getKaryawan()
     {
-        return $this->belongsTo(User::class, 'karyawan_id');
+        return $this->belongsTo(M_DataKaryawan::class, 'karyawan_id');
     }
 
     protected $casts = [

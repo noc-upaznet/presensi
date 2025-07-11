@@ -28,46 +28,69 @@
         </div>
         <!-- /.card-header -->
       </div>
-      <div class="p-0 table-responsive">
-        <table class="table table-striped table-hover mb-0" style="background-color: var(--bs-body-bg);">
-          <thead>
-            <tr class="users-table-info">
-              <th>Nama Karyawan</th>
-              <th>Jenis Kelamin</th>
-              <th>Entitas</th>
-              <th>Divisi</th>
-              <th>Tanggal Masuk</th>
-              <th>Tanggal Keluar (PKWT)</th>
-              <th>Status</th>
-              <th>Email</th>
-              {{-- <th>Password</th> --}}
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach ($datas as $key)
-              <tr>
-                <td style="color: var(--bs-body-color);">
-                  {{ $key->nama_karyawan }}
-                </td>
-                <td style="color: var(--bs-body-color);">
-                  {{ $key->jenis_kelamin }}
-                </td>
-                <td style="color: var(--bs-body-color);">{{ $key->entitas }}</td>
-                <td style="color: var(--bs-body-color);">{{ $key->divisi }}</td>
-                <td style="color: var(--bs-body-color);">{{ $key->tgl_masuk }}</td>
-                <td style="color: var(--bs-body-color);">{{ $key->tgl_keluar }}</td>
-                <td style="color: var(--bs-body-color);"><span class="badge-success">{{ $key->status_karyawan }}</span></td>
-                <td style="color: var(--bs-body-color);">{{ $key->email }}</td>
-                {{-- <td style="color: var(--bs-body-color);">password123</td> --}}
-                <td class="text-center">
-                  <button type="button" wire:click="DetailDataKaryawan({{ $key->id }})" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></button>
-                  <button type="button" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')" class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                </td>
-              </tr>
-            @endforeach
-          </tbody>
-        </table>
+      <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <label>Show 
+                  <select class="form-select form-select-sm d-inline-block w-auto" wire:model.lazy="perPage">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                  </select> 
+                  entries per page
+                </label>
+            </div>
+            <div>
+                <input type="text" class="form-control form-control-sm rounded-end-0" placeholder="Search" wire:model.live="search">
+            </div>
+          </div>
+          <div class="p-0 table-responsive">
+            <table class="table table-striped table-hover mb-0" style="background-color: var(--bs-body-bg);">
+              <thead>
+                <tr class="users-table-info">
+                  <th>Nama Karyawan</th>
+                  <th>Jenis Kelamin</th>
+                  <th>Entitas</th>
+                  <th>Divisi</th>
+                  <th>Tanggal Masuk</th>
+                  <th>Tanggal Keluar (PKWT)</th>
+                  <th>Status</th>
+                  <th>Email</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if ($datas->isEmpty())
+                  <tr>
+                    <td colspan="9" class="text-center">Data Not Found</td>
+                  </tr>
+                @endif
+                @foreach ($datas as $key)
+                  <tr>
+                    <td style="color: var(--bs-body-color);">
+                      {{ $key->nama_karyawan }}
+                    </td>
+                    <td style="color: var(--bs-body-color);">
+                      {{ $key->jenis_kelamin }}
+                    </td>
+                    <td style="color: var(--bs-body-color);">{{ $key->entitas }}</td>
+                    <td style="color: var(--bs-body-color);">{{ $key->divisi }}</td>
+                    <td style="color: var(--bs-body-color);">{{ $key->tgl_masuk }}</td>
+                    <td style="color: var(--bs-body-color);">{{ $key->tgl_keluar }}</td>
+                    <td style="color: var(--bs-body-color);"><span class="badge-success">{{ $key->status_karyawan }}</span></td>
+                    <td style="color: var(--bs-body-color);">{{ $key->email }}</td>
+                    <td class="text-center">
+                      <button type="button" wire:click="DetailDataKaryawan({{ $key->id }})" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></button>
+                      <button type="button" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')" class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                    </td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+          {{ $datas->links('pagination::bootstrap-5') }}
+        </div>
       </div>
   </div>
 </div>

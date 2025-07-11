@@ -23,8 +23,9 @@ class ModalPengajuan extends Component
     public $keterangan;
     public $file;
     public $detail;
+    public $pengajuanId;
 
-    protected $listeners = ['refreshTable' => 'refresh'];
+    protected $listeners = ['refreshTable' => 'refresh', 'edit-pengajuan' => 'loadData'];
 
     public function mount()
     {
@@ -34,6 +35,61 @@ class ModalPengajuan extends Component
             'Cuti', 
             'Izin Setengah Hari',
         ])->orderBy('nama_shift')->get();
+    }
+
+    public function loadData($data)
+    {
+        // dd($data['id']);
+        $this->pengajuanId = $data['id'];
+        $this->form->fill($data);
+        $this->form->pengajuan = $data['shift_id'];
+        $this->form->tanggal = $data['tanggal'];
+        $this->form->keterangan = $data['keterangan'];
+        $this->file = $data['file'] ? str_replace('storage/', '', $data['file']) : null;
+    }
+    
+    public function saveEdit()
+    {
+        $dataPengajuan = M_Pengajuan::find($this->pengajuanId);
+        // dd($dataPengajuan);
+        if (!$dataPengajuan) {
+            session()->flash('error', 'Data pengajuan tidak ditemukan!');
+            return;
+        }
+        // $this->form->validate();
+
+        // $this->validate([
+        //     'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5048',
+        // ]);
+
+        $path = null;
+        if ($this->file) {
+            $path = $this->file->store('file', 'public');
+        }
+
+        $data = [
+            'shift_id' => $this->form->pengajuan,
+            'tanggal' => $this->form->tanggal,
+            'keterangan' => $this->form->keterangan,
+            'file' => $path ? str_replace('public/', 'storage/', $path) : null,
+        ];
+        // dd($data);
+
+        $dataPengajuan->update($data);
+        // M_Pengajuan::where('id', Crypt::decrypt($this->form->id))->update($data);
+
+        // Reset input
+        $this->form->reset();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Updated',
+            'icon' => 'success',
+            'text' => 'Data has been updated successfully'
+        ]);
+
+        // Tutup modal
+        $this->dispatch('modalEditPengajuan', action: 'hide');
+        $this->dispatch('refresh');
     }
 
     public function store()
@@ -50,7 +106,7 @@ class ModalPengajuan extends Component
         }
         // dd(auth()->id());
         $data = [
-            'user_id' => Auth::id(),
+            'karyawan_id' => M_DataKaryawan::where('user_id', Auth::id())->value('id'),
             'shift_id' => $this->form->pengajuan,
             'tanggal' => $this->form->tanggal,
             'keterangan' => $this->form->keterangan,

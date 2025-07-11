@@ -1,6 +1,4 @@
-<div>
-    
-
+<div> 
     <div wire:ignore.self class="modal fade" id="modalTambahPengajuan" tabindex="-1" aria-labelledby="modalTambahPengajuanLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -57,6 +55,71 @@
                             </div>
                             <span wire:loading.remove wire:target="store"><i class="fa fa-save"></i> Simpan</span>
                             <span wire:loading wire:target="store">Loading...</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary w-100 w-md-auto"
+                            data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div wire:ignore.self class="modal fade" id="modalEditPengajuan" tabindex="-1" aria-labelledby="modalEditPengajuanLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title text-white" id="modalEditPengajuanLabel">Edit Pengajuan Izin/Cuti</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+
+                <form>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Pengajuan <small class="text-danger">*</small></label>
+                            <select class="form-select" wire:model="form.pengajuan">
+                                <option value="">-- Pilih Pengajuan --</option>
+                                @foreach ($shifts as $shift)
+                                    <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
+                                @endforeach
+                            </select>
+                            @error('form.pengajuan') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tanggal" class="form-label fw-semibold">Tanggal <small class="text-danger">*</small></label>
+                            <input type="date" class="form-control" id="tanggal" wire:model="form.tanggal">
+                            @error('form.tanggal') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- <div class="mb-3">
+                            <label for="waktu" class="form-label">Waktu</label>
+                            <select class="form-select" id="waktu">
+                                <option value="full">Sehari Penuh</option>
+                                <option value="half">Setengah Hari</option>
+                            </select>
+                        </div> --}}
+
+                        <div class="mb-3">
+                            <label for="keterangan" class="form-label fw-semibold">Keterangan <small class="text-danger">*</small></label>
+                            <input type="text" class="form-control" id="keterangan" placeholder="Contoh: Demam Tinggi" wire:model="form.keterangan">
+                            @error('form.keterangan') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="file" class="form-label fw-semibold">File</label>
+                            <input type="file" class="form-control" id="file" wire:model="file">
+                            <small class="text-danger">Ukuran maksimal file: 5MB</small>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary  w-100 w-md-auto" wire:click='saveEdit' wire:loading.attr="disabled" wire:target="saveEdit">
+                            <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <span wire:loading.remove wire:target="saveEdit"><i class="fa fa-save"></i> Simpan</span>
+                            <span wire:loading wire:target="saveEdit">Loading...</span>
                         </button>
                         <button type="button" class="btn btn-secondary w-100 w-md-auto"
                             data-bs-dismiss="modal">Cancel</button>

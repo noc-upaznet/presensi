@@ -8,7 +8,7 @@ class M_Lembur extends Model
 {
     protected $table = 'lembur';
     protected $fillable = [
-        'user_id',
+        'karyawan_id',
         'tanggal',
         'jenis',
         'waktu_mulai',
@@ -24,8 +24,12 @@ class M_Lembur extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function getJadwal()
+    // public function getJadwal()
+    // {
+    //     return $this->hasOne(M_Jadwal::class, 'id_karyawan', 'karyawan_id');
+    // }
+    public function getKaryawan()
     {
-        return $this->hasOne(M_Jadwal::class, 'id_karyawan', 'karyawan_id');
+        return $this->belongsTo(M_DataKaryawan::class, 'karyawan_id');
     }
 }

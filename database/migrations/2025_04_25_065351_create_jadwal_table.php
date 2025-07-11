@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('jadwal', function (Blueprint $table) {
             $table->id();
             $table->string('bulan_tahun');
-            $table->integer('id_karyawan');
+            $table->integer('user_id');
             $table->integer('d1')->nullable();
             $table->integer('d2')->nullable();
             $table->integer('d3')->nullable();

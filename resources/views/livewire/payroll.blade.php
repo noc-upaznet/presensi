@@ -45,7 +45,7 @@
     </div>
 
     <div class="container">
-        <div class="card">
+        <div class="card" style="background-color: var(--bs-body-bg);">
             <div class="card-header">
                 @php
                     $month = $selectedMonth ?? now()->subMonth()->format('n');
@@ -60,21 +60,26 @@
             <div class="card-body">
                 <div class="d-flex mb-3 align-items-center">
                     {{-- Dropdown Tahun --}}
-                    <select wire:model.lazy="selectedYear" class="form-select me-2" style="width: 100px;">
-                        @for ($i = now()->year; $i >= 2020; $i--)
-                            <option value="{{ $i }}">{{ $i }}</option>
-                        @endfor
-                    </select>
+                <select wire:model.lazy="selectedYear" class="form-select me-2" style="width: 100px;">
+                    @for ($i = now()->year; $i >= 2020; $i--)
+                        <option value="{{ $i }}">{{ $i }}</option>
+                    @endfor
+                </select>
 
-                    {{-- Dropdown Bulan --}}
-                    <select wire:model.lazy="selectedMonth" class="form-select me-2" style="width: 150px;">
-                        <option value="">Bulan</option>
-                        @foreach (range(1, 12) as $m)
-                            <option value="{{ $m }}">
-                                {{ \Carbon\Carbon::create()->month($m)->locale('id')->translatedFormat('F') }}
-                            </option>
-                        @endforeach
-                    </select>
+                {{-- Dropdown Bulan (dengan label lebih informatif untuk cut-off) --}}
+                <select wire:model.lazy="selectedMonth" class="form-select me-2" style="width: 180px;">
+                    <option value="">Pilih Bulan</option>
+                    @foreach (range(1, 12) as $m)
+                        @php
+                            $bulan = \Carbon\Carbon::create()->month($m)->locale('id');
+                            $namaBulan = $bulan->translatedFormat('F');
+                        @endphp
+                        <option value="{{ $m }}">
+                            {{ $namaBulan }} (cut-off 25 {{ $namaBulan }})
+                        </option>
+                    @endforeach
+                </select>
+
 
                     <div class="ms-auto">
                         <button type="button" class="btn btn-sm btn-success" wire:click="export">
@@ -84,8 +89,23 @@
 
                 </div>
 
-                <h5 class="text-secondary mb-3">
+                {{-- <h5 class="text-secondary mb-3">
                     Periode: {{ $selectedMonth ? \Carbon\Carbon::createFromFormat('m', $selectedMonth)->locale('id')->translatedFormat('F') . ' ' . $selectedYear : 'Semua Periode' }}
+                </h5> --}}
+                @php
+                    use Carbon\Carbon;
+
+                    if ($selectedMonth && $selectedYear) {
+                        $cutoffEnd = Carbon::createFromDate($selectedYear, $selectedMonth, 25);
+                        $cutoffStart = $cutoffEnd->copy()->subMonthNoOverflow()->setDay(26);
+                        $periodeText = $cutoffStart->locale('id')->translatedFormat('d F Y') . ' - ' . $cutoffEnd->locale('id')->translatedFormat('d F Y');
+                    } else {
+                        $periodeText = 'Semua Periode';
+                    }
+                @endphp
+
+                <h5 class="text-secondary mb-3">
+                    Periode: {{ $periodeText }}
                 </h5>
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -119,18 +139,18 @@
                         <tbody>
                             @if ($data->isEmpty())
                                 <tr>
-                                    <td colspan="7" class="text-center">Data tidak ditemukan.</td>
+                                    <td colspan="7" class="text-center" style="color: var(--bs-body-color);">Data tidak ditemukan.</td>
                                 </tr>
                             @else
                                 @foreach ($data as $i => $payroll)
                                     <tr>
                                         {{-- <td>{{ $data->firstItem() + $i }}</td> --}}
-                                        <td>{{ $payroll->no_slip }}</td>
-                                        <td>{{ $payroll->getKaryawan->nama_karyawan }}</td>
-                                        <td>{{ $payroll->nip_karyawan }}</td>
-                                        <td>{{ $payroll->divisi }}</td>
-                                        <td>{{ $payroll->periode }}</td>
-                                        <td>Rp. {{ number_format($payroll->total_gaji, 0, ',', '.') }}</td>
+                                        <td style="color: var(--bs-body-color);">{{ $payroll->no_slip }}</td>
+                                        <td style="color: var(--bs-body-color);">{{ $payroll->getKaryawan->nama_karyawan }}</td>
+                                        <td style="color: var(--bs-body-color);">{{ $payroll->nip_karyawan }}</td>
+                                        <td style="color: var(--bs-body-color);">{{ $payroll->divisi }}</td>
+                                        <td style="color: var(--bs-body-color);">{{ $payroll->periode }}</td>
+                                        <td style="color: var(--bs-body-color);">Rp. {{ number_format($payroll->total_gaji, 0, ',', '.') }}</td>
                                         <td>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview({{ $payroll->id }})"><i class="fa-solid fa-print"></i>
                                             </button>
@@ -240,11 +260,11 @@
                         <div class="row">
                             <div class="mb-3 col-md-6">
                                 <label for="jml_psb" class="form-label fw-semibold">Jml. PSB</label>
-                                <input type="text" id="jml_psb" class="form-control" disabled wire:model="jml_psb">
+                                <input type="text" id="jml_psb" class="form-control" wire:model.lazy="jml_psb">
                             </div>
                             <div class="mb-3 col-md-6">
-                                <label for="terlambat_nominal" class="form-label fw-semibold">Insentif</label>
-                                <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
+                                <label for="insentif" class="form-label fw-semibold">Insentif</label>
+                                <input type="text" id="insentif" class="form-control" disabled wire:model="insentif">
                             </div>
                         </div>
                     @endif

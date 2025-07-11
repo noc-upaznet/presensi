@@ -9,7 +9,7 @@ class M_Jadwal extends Model
     protected $table = 'jadwal';
     protected $fillable = [
         'bulan_tahun',
-        'user_id',
+        'karyawan_id',
         'd1',
         'd2',
         'd3',
@@ -45,11 +45,6 @@ class M_Jadwal extends Model
 
     public function getKaryawan()
     {
-        return $this->belongsTo(M_DataKaryawan::class, 'id_karyawan');
-    }
-
-    public function getUser()
-    {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(M_DataKaryawan::class, 'karyawan_id');
     }
 }

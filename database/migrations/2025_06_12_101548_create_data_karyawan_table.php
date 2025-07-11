@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('data_karyawan', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('karyawan_id')->constrained('data_karyawan')->onDelete('cascade');
             $table->string('nama_karyawan');
             $table->string('email');
             $table->string('no_hp', 20);
@@ -31,7 +31,7 @@ return new class extends Migration {
             $table->string('entitas', 100);
             $table->string('divisi', 100);
             $table->string('jabatan', 100);
-            $table->string('posisi', 100)->nullable();
+            $table->string('level', 100)->nullable();
             $table->string('sistem_kerja');
             $table->string('spv')->nullable();
             $table->string('gaji_pokok');
@@ -41,13 +41,13 @@ return new class extends Migration {
             $table->string('nama_bank');
             $table->string('no_rek');
             $table->string('nama_pemilik_rekening');
-            $table->string('no_bpjs_tk');
-            $table->string('npp_bpjs_tk');
-            $table->date('tgl_aktif_bpjstk');
-            $table->string('no_bpjs');
-            $table->string('anggota_bpjs');
-            $table->date('tgl_aktif_bpjs');
-            $table->string('penanggung');
+            $table->string('no_bpjs_tk')->nullable();
+            $table->string('npp_bpjs_tk')->nullable();
+            $table->date('tgl_aktif_bpjstk')->nullable();
+            $table->string('no_bpjs')->nullable();
+            $table->string('anggota_bpjs')->nullable();
+            $table->date('tgl_aktif_bpjs')->nullable();
+            $table->string('penanggung')->nullable();
             $table->timestamps();
         });
     }

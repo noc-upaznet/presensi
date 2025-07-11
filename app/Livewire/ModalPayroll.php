@@ -16,7 +16,12 @@ class ModalPayroll extends Component
         $existingKaryawanIds = PayrollModel::where('created_at', 'like', $bulanIni.'%')
             ->pluck('karyawan_id');
 
-        $data = M_DataKaryawan::whereNotIn('id', $existingKaryawanIds)->get();
+        $selectedEntitas = session('selected_entitas', 'UHO');
+
+        $data = M_DataKaryawan::where('entitas', $selectedEntitas)
+            ->whereNotIn('id', $existingKaryawanIds)
+            ->orderByDesc('id')
+            ->get();
 
         return view('livewire.modal-payroll', [
             'data' => $data
