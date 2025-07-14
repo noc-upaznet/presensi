@@ -53,12 +53,12 @@
       crossorigin="anonymous"
     />
     <!-- jsvectormap -->
-    <link
+    {{-- <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css"
       integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4="
       crossorigin="anonymous"
-    />
+    /> --}}
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -74,39 +74,26 @@
     <div class="app-wrapper">
       <!--begin::Header-->
       <livewire:navigation.side-navigation />
-      <livewire:navigation.navbar />
-      <footer class="app-footer fixed-bottom" align="right">
-        <strong>
-          Copyright &copy; {{ date('Y') }}.&nbsp;
-          {{-- <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>. --}}
-        </strong>
-        All rights reserved.
-        <!--end::Copyright-->
-      </footer>
       <!--end::Header-->
       <!--begin::Sidebar-->
       
       <!--end::Sidebar-->
       <!--begin::App Main-->
       <main class="app-main">
+      <livewire:navigation.navbar />
         <!--begin::App Content Header-->
         {{ $slot }}
         <!--end::App Content-->
       </main>
       <!--end::App Main-->
       <!--begin::Footer-->
-      {{-- <footer class="app-footer">
-        <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Anything you want</div>
-        <!--end::To the end-->
-        <!--begin::Copyright-->
+      <footer class="app-footer">
         <strong>
-          Copyright &copy; 2014-2024&nbsp;
-          <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
+          Copyright &copy; {{ date('Y') }}.&nbsp;
         </strong>
         All rights reserved.
         <!--end::Copyright-->
-      </footer> --}}
+      </footer>
       <!--end::Footer-->
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
@@ -238,7 +225,7 @@
       sales_chart.render();
     </script> --}}
     <!-- jsvectormap -->
-    <script
+    {{-- <script
       src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"
       integrity="sha256-/t1nN2956BT869E6H4V1dnt0X5pAQHPytli+1nTZm2Y="
       crossorigin="anonymous"
@@ -247,7 +234,7 @@
       src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"
       integrity="sha256-XPpPaZlU8S/HWf7FZLAncLg2SAkP8ScUTII89x9D3lY="
       crossorigin="anonymous"
-    ></script>
+    ></script> --}}
     <!-- jsvectormap -->
     <script>
       const visitorsData = {
@@ -265,10 +252,10 @@
       };
 
       // World map by jsVectorMap
-      const map = new jsVectorMap({
-        selector: '#world-map',
-        map: 'world',
-      });
+      // const map = new jsVectorMap({
+      //   selector: '#world-map',
+      //   map: 'world',
+      // });
 
       // Sparkline charts
       const option_sparkline1 = {
@@ -360,7 +347,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     {{-- alpine.js --}}
-    <script src="//unpkg.com/alpinejs" defer></script>
+    {{-- <script src="//unpkg.com/alpinejs" defer></script> --}}
     
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -643,9 +630,9 @@
       window.addEventListener('load', subscribeUser);
     </script> --}}
 
-    @auth
+    {{-- @auth
       <script src="{{ asset('js/enable-push.js') }}" defer></script>
-    @endauth
+    @endauth --}}
 
     <!-- Bootstrap Datepicker -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet"/>

@@ -28,7 +28,7 @@
             data-accordion="false"
         >
             @php $user = auth()->user(); @endphp
-            @if ($user->role == 'admin')
+            @if ($user->current_role == 'admin')
                 <li class="nav-item">
                     <a href="{{ route('dashboard') }}" 
                     class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -37,7 +37,7 @@
                     </a>
                 </li>
             @endif
-            @if ($user && $user->role == 'user' || $user->role == 'hr' || $user->role == 'spv')
+            @if ($user && $user->current_role == 'user' || $user->current_role == 'hr' || $user->current_role == 'spv')
                 <li class="nav-item">
                     <a href="{{ route('clock-in') }}" 
                     class="nav-link {{ request()->routeIs('clock-in') ? 'active' : '' }}">
@@ -47,42 +47,7 @@
                 </li>
             @endif
 
-            @if (auth()->user()->role == 'admin')
-                <li class="nav-item menu-open">
-                    <a href="#" class="nav-link active">
-                        <i class="bi bi-clipboard-plus"></i>
-                        <p>
-                            Payroll
-                        <i class="nav-arrow bi bi-chevron-right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="margin-left: 20px;">
-                        <li class="nav-item">
-                            <a href="{{ route('payroll') }}" 
-                            class="nav-link {{ request()->routeIs('payroll') ? 'active' : '' }}">
-                            <i class="nav-icon bi bi-circle"></i>
-                                <p>Slip Gaji</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('jenis-tunjangan') }}" 
-                            class="nav-link {{ request()->routeIs('jenis-tunjangan') ? 'active' : '' }}">
-                            <i class="nav-icon bi bi-circle"></i>
-                                <p>Jenis Tunjangan</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('jenis-potongan') }}" 
-                            class="nav-link {{ request()->routeIs('jenis-potongan') ? 'active' : '' }}">
-                            <i class="nav-icon bi bi-circle"></i>
-                                <p>Jenis Potongan</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            @endif
-            
-            @if (auth()->user()->role == 'admin')
+            @if (auth()->user()->current_role == 'admin')
                 <li class="nav-item">
                     <a href="{{ route('data-karyawan') }}" 
                     class="nav-link {{ request()->routeIs('data-karyawan') ? 'active' : '' }}">
@@ -143,11 +108,51 @@
                 </li>
 
                 <li class="nav-item">
+                    <a href="{{ route('data-user') }}" 
+                    class="nav-link {{ request()->routeIs('data-user') ? 'active' : '' }}">
+                    <i class="bi bi-person"></i>
+                        <p>Data User</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a href="{{ route('role-users') }}" 
                         class="nav-link {{ request()->routeIs('role-users') ? 'active' : '' }}">
                         <i class="bi bi-person-fill-gear"></i>
                             <p>Data Master</p>
                     </a>
+                </li>
+                <li class="nav-item menu-open">
+                    <a href="#" class="nav-link active">
+                        <i class="bi bi-clipboard-plus"></i>
+                        <p>
+                            Payroll
+                        <i class="nav-arrow bi bi-chevron-right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="margin-left: 20px;">
+                        <li class="nav-item">
+                            <a href="{{ route('payroll') }}" 
+                            class="nav-link {{ request()->routeIs('payroll') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>Slip Gaji</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('jenis-tunjangan') }}" 
+                            class="nav-link {{ request()->routeIs('jenis-tunjangan') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>Jenis Tunjangan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('jenis-potongan') }}" 
+                            class="nav-link {{ request()->routeIs('jenis-potongan') ? 'active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                                <p>Jenis Potongan</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             @endif
 
@@ -160,7 +165,7 @@
             </li>
             
 
-            @if (auth()->user()->role == 'hr' || auth()->user()->role == 'spv')
+            @if (auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
                 <li class="nav-item menu-open">
                     <a href="#" class="nav-link active">
                         <i class="bi bi-clipboard-plus"></i>
@@ -197,7 +202,7 @@
                 </li>
             @endif
             
-            @if (auth()->user()->role == 'user')
+            @if (auth()->user()->current_role == 'user')
                 <li class="nav-item menu-open">
                     <a href="#" class="nav-link active">
                         <i class="bi bi-clipboard-plus"></i>

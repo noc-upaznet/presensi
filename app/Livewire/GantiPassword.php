@@ -18,12 +18,7 @@ class GantiPassword extends Component
     {
         $user = Auth::user();
 
-        // Debug log untuk melihat password input dan hash dari database
-        logger('Input password: ' . $this->current_password);
-        logger('Hash in DB: ' . $user->password);
-        logger('Hash check result: ' . (Hash::check($this->current_password, $user->password) ? '✅ Cocok' : '❌ Tidak cocok'));
-
-        // Validasi password sekarang
+        // Validasi password lama
         if (!Hash::check($this->current_password, $user->password)) {
             throw ValidationException::withMessages([
                 'current_password' => 'Password yang kamu masukkan salah.',
@@ -36,16 +31,17 @@ class GantiPassword extends Component
             'confirm_password' => ['required'],
         ]);
 
-        // Update password
+        // Update password + password_expired
         $user->update([
             'password' => Hash::make($this->new_password),
+            'password_expired' => false, // ✅ update kolom expired jadi false
         ]);
 
-        // Reset input field
         $this->reset(['current_password', 'new_password', 'confirm_password']);
 
         session()->flash('success', 'Password berhasil diperbarui.');
     }
+
 
     public function render()
     {

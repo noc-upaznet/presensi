@@ -86,14 +86,14 @@ class RiwayatPresensi extends Component
 
     public function render()
     {
-        if (Auth::user()->role == 'admin' || Auth::user()->role == 'spv' || Auth::user()->role == 'hr') {
+        if (Auth::user()->current_role == 'admin' || Auth::user()->current_role == 'spv' || Auth::user()->current_role == 'hr') {
             $datas = M_Presensi::with('getUser')
                 ->whereMonth('created_at', Carbon::now()->month)
                 ->whereYear('created_at', Carbon::now()->year)
                 ->orderBy('created_at', 'desc')
                 ->get();
                 // dd($datas);
-        } elseif (Auth::user()->role == 'user') {
+        } elseif (Auth::user()->current_role == 'user') {
             $userId = Auth::id();
             $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
             $karyawanId = $karyawan ? $karyawan->id : null;

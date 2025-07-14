@@ -8,14 +8,7 @@ class RoleUsers extends Component
 {
     Public $listeners = ['refreshTable' => '$refresh'];
 
-    // public string $activeTab = '#pills-jabatan'; // default
-
-    // public function setActiveTab($tab)
-    // {
-    //     $this->activeTab = $tab;
-    // }
-
-    public $tab = 'pills-user';
+    public $tab = 'pills-jabatan';
 
     public function setTab($tab)
     {

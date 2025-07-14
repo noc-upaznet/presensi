@@ -15,7 +15,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="minggu" class="form-label">Minggu</label>
-                        <select class="form-select form-select" name="minggu" id="minggu" wire:model="form.minggu">
+                        <select class="form-select" name="minggu" id="minggu" wire:model="form.minggu">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -25,7 +25,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="senin" class="form-label">Senin</label>
-                        <select class="form-select form-select" name="senin" id="senin" wire:model="form.senin">
+                        <select class="form-select" name="senin" id="senin" wire:model="form.senin">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -35,7 +35,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="selasa" class="form-label">Selasa</label>
-                        <select class="form-select form-select" name="selasa" id="selasa" wire:model="form.selasa">
+                        <select class="form-select" name="selasa" id="selasa" wire:model="form.selasa">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -45,7 +45,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="rabu" class="form-label">Rabu</label>
-                        <select class="form-select form-select" name="rabu" id="rabu" wire:model="form.rabu">
+                        <select class="form-select" name="rabu" id="rabu" wire:model="form.rabu">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -55,7 +55,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="kamis" class="form-label">Kamis</label>
-                        <select class="form-select form-select" name="kamis" id="kamis" wire:model="form.kamis">
+                        <select class="form-select" name="kamis" id="kamis" wire:model="form.kamis">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -65,7 +65,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="jumat" class="form-label">Jum'at</label>
-                        <select class="form-select form-select" name="jumat" id="jumat" wire:model="form.jumat">
+                        <select class="form-select" name="jumat" id="jumat" wire:model="form.jumat">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -75,7 +75,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="sabtu" class="form-label">Sabtu</label>
-                        <select class="form-select form-select" name="sabtu" id="sabtu" wire:model="form.sabtu">
+                        <select class="form-select" name="sabtu" id="sabtu" wire:model="form.sabtu">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -116,7 +116,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="minggu" class="form-label">Minggu</label>
-                        <select class="form-select form-select" name="minggu" id="minggu" wire:model="form.minggu">
+                        <select class="form-select" name="minggu" id="minggu" wire:model="form.minggu">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -126,7 +126,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="senin" class="form-label">Senin</label>
-                        <select class="form-select form-select" name="senin" id="senin" wire:model="form.senin">
+                        <select class="form-select" name="senin" id="senin" wire:model="form.senin">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -136,7 +136,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="selasa" class="form-label">Selasa</label>
-                        <select class="form-select form-select" name="selasa" id="selasa" wire:model="form.selasa">
+                        <select class="form-select" name="selasa" id="selasa" wire:model="form.selasa">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -146,7 +146,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="rabu" class="form-label">Rabu</label>
-                        <select class="form-select form-select" name="rabu" id="rabu" wire:model="form.rabu">
+                        <select class="form-select" name="rabu" id="rabu" wire:model="form.rabu">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -156,7 +156,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="kamis" class="form-label">Kamis</label>
-                        <select class="form-select form-select" name="kamis" id="kamis" wire:model="form.kamis">
+                        <select class="form-select" name="kamis" id="kamis" wire:model="form.kamis">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -166,7 +166,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="jumat" class="form-label">Jum'at</label>
-                        <select class="form-select form-select" name="jumat" id="jumat" wire:model="form.jumat">
+                        <select class="form-select" name="jumat" id="jumat" wire:model="form.jumat">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
@@ -176,7 +176,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="sabtu" class="form-label">Sabtu</label>
-                        <select class="form-select form-select" name="sabtu" id="sabtu" wire:model="form.sabtu">
+                        <select class="form-select" name="sabtu" id="sabtu" wire:model="form.sabtu">
                             <option value="">-- Pilih Shift --</option>
                             @foreach($jadwalShifts as $shift)
                                 <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>

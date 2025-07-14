@@ -1,5 +1,5 @@
 <div>
-    <div class="app-content-header mt-5 mb-4">
+    <div class="app-content-header mb-4">
         <!--begin::Container-->
         <div class="container-fluid">
             <!--begin::Row-->
@@ -16,7 +16,7 @@
             <div class="app-content" id="tab-role-users">
                 <!--begin::Container-->
                     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist" style="background-color: var(--bs-body-bg);">
-                        <li class="nav-item" role="presentation">
+                        {{-- <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold @if ($tab == 'pills-user') active @endif"
                             wire:click='setTab("pills-user")' id="pills-user-tab" data-bs-toggle="tab"
                             data-bs-target="#pills-user" data-tab-name="pills-user" type="button" role="tab"
@@ -28,7 +28,7 @@
                             wire:click='setTab("pills-roles")' id="pills-roles-tab" data-bs-toggle="tab"
                             data-bs-target="#pills-roles" data-tab-name="pills-roles" type="button" role="tab"
                             aria-controls="pills-roles" aria-selected="true">Roles</button>
-                        </li>
+                        </li> --}}
 
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold @if ($tab == 'pills-jabatan') active @endif"
@@ -52,7 +52,7 @@
                         </li>
                     </ul>
                     <div class="tab-content" id="pills-tabContent">
-                        <div class="tab-pane fade @if ($tab == 'pills-user') active show @endif " id="pills-user"
+                        {{-- <div class="tab-pane fade @if ($tab == 'pills-user') active show @endif " id="pills-user"
                             role="tabpanel" aria-labelledby="pills-user-tab">
 
                             @if ($tab == 'pills-user')
@@ -68,7 +68,7 @@
                                 <livewire:roles />
                             @endif
 
-                        </div>
+                        </div> --}}
 
                         <div class="tab-pane fade @if ($tab == 'pills-jabatan') active show @endif " id="pills-jabatan"
                             role="tabpanel" aria-labelledby="pills-jabatan-tab">

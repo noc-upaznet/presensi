@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'password_expired',
     ];
 
     /**
@@ -56,5 +57,15 @@ class User extends Authenticatable
     public function getPresensi()
     {
         return $this->hasMany(M_Presensi::class);
+    }
+
+    public function roles()
+    {
+        return $this->hasMany(UserRole::class);
+    }
+
+    public function hasRole($role)
+    {
+        return $this->roles->pluck('role')->contains($role);
     }
 }

@@ -1,5 +1,5 @@
 <!--begin::Header-->
-<nav class="navbar navbar-expand fixed-top shadow-sm" style="background-color: var(--bs-body-bg); z-index: 1030;">
+<nav class="navbar navbar-expand shadow-sm" style="background-color: var(--bs-body-bg); z-index: 1030;">
   <!--begin::Container-->
   <div class="container-fluid">
     <!--begin::Start Navbar links-->
@@ -12,7 +12,7 @@
       </li>
 
       {{-- Nama Entitas --}}
-      @if (auth()->user()->role === 'admin')
+      @if (auth()->user()->current_role === 'admin')
         <li class="nav-item">
           <span class="fw-bold fs-4 text-primary ms-auto">
             {{ session('selected_entitas', 'UHO') }}
@@ -24,7 +24,7 @@
 
     <!--begin::End Navbar links-->
     <ul class="navbar-nav ms-auto">
-      @if (auth()->user()->role == 'admin')
+      @if (auth()->user()->current_role == 'admin')
         <li class="nav-item dropdown border border-secondary rounded ms-2">
           <button class="btn btn-link nav-link py-2 px-2 dropdown-toggle d-flex align-items-center rounded text-secondary" 
           id="dropdown-entitas"
@@ -52,6 +52,29 @@
             @endforeach
           </ul>
         </li>
+      @endif
+      @if(Auth::check() && count($roles) > 1)
+          <div class="dropdown ms-3 mt-1">
+              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                  Role: {{ strtoupper($currentRole) }}
+              </button>
+              <ul class="dropdown-menu">
+                  @foreach ($roles as $role)
+                      <li>
+                          <button wire:click="switchRole('{{ $role }}')" class="dropdown-item">
+                              {{ strtoupper($role) }}
+                          </button>
+                      </li>
+                  @endforeach
+              </ul>
+          </div>
+      @endif
+
+      @if (session()->has('success'))
+          <div class="alert alert-success alert-sm mt-2">{{ session('success') }}</div>
+      @endif
+      @if (session()->has('error'))
+          <div class="alert alert-danger alert-sm mt-2">{{ session('error') }}</div>
       @endif
       <li class="nav-item dropdown user-menu">
         <li class="nav-item dropdown user-menu">

@@ -58,7 +58,7 @@ class PengajuanLembur extends Component
             return;
         }
 
-        $userRole = Auth::user()->role;
+        $userRole = Auth::user()->current_role;
 
         // Update approve field berdasarkan role dan status
         if ($userRole === 'spv') {
@@ -150,14 +150,14 @@ class PengajuanLembur extends Component
         // Ambil nama entitas dari session
         $entitas = session('selected_entitas', 'UHO');
     
-        if ($user->role === 'user') {
+        if ($user->current_role === 'user') {
             // Jika user biasa, hanya lihat lembur miliknya
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
                 $query->where('karyawan_id', $dataKaryawan->id);
             }
 
-        } elseif ($user->role === 'admin') {
+        } elseif ($user->current_role === 'admin') {
             // Jika admin, filter berdasarkan entitas dari session
             $entitasModel = \App\Models\M_Entitas::where('nama', $entitas)->first();
             if ($entitasModel) {
@@ -165,7 +165,7 @@ class PengajuanLembur extends Component
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
 
-        } elseif ($user->role === 'spv') {
+        } elseif ($user->current_role === 'spv') {
             // Jika SPV, hanya bisa melihat karyawan dari divisinya saja
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             // dd($dataKaryawan);

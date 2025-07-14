@@ -36,9 +36,9 @@ class SSOLoginController extends Controller
 
             Auth::login($localUser);
 
-            if ($localUser->role === 'user') {
+            if ($localUser->current_role === 'user') {
                 return redirect()->intended('/clock-in');
-            } elseif (in_array($localUser->role, ['admin', 'hr'])) {
+            } elseif (in_array($localUser->current_role, ['admin', 'hr'])) {
                 return redirect()->intended('/dashboard');
             } else {
                 return redirect()->intended('/');

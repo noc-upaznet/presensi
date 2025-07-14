@@ -17,7 +17,7 @@ class SideNavigation extends Component
         $countLembur = 0;
 
         if ($user) {
-            if ($user->role === 'spv') {
+            if ($user->current_role === 'spv') {
                 $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
 
                 if ($dataKaryawan) {
@@ -41,7 +41,7 @@ class SideNavigation extends Component
                     $countLembur = 0;
                 }
 
-            } elseif ($user->role === 'hr') {
+            } elseif ($user->current_role === 'hr') {
                 // Untuk pengajuan cuti/izin
                 $countPengajuan = M_Pengajuan::where('approve_spv', 1)
                     ->whereNull('approve_hr')

@@ -1,10 +1,61 @@
+@push('styles')
+    <style>
+        @media (max-width: 425px) {
+            /* Tombol Tambah dan Filter agar stack ke bawah */
+            .lembur-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 1rem;
+            }
+
+            .lembur-header .form-select,
+            .lembur-header .form-control,
+            .lembur-header button {
+                width: 100% !important;
+            }
+
+            /* Pagination & search */
+            .lembur-table-controls {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.75rem;
+            }
+
+            /* Table scrollable */
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            /* Perkecil font tabel agar pas di layar kecil */
+            .table th,
+            .table td {
+                font-size: 0.75rem;
+                white-space: nowrap;
+            }
+
+            /* Badge atau tombol di action supaya nggak meluber */
+            .table .btn,
+            .table .badge {
+                font-size: 0.7rem;
+                padding: 0.25rem 0.4rem;
+            }
+
+            /* Modal image full width */
+            #modalImage {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+    
+@endpush
 <div>
     <div class="app-content-header">
         <!--begin::Container-->
         <div class="container-fluid">
           <!--begin::Row-->
           <div class="row">
-            <div class="col-sm-6"><h3 class="mb-0 mt-5" style="color: var(--bs-body-color);">Daftar Pengajuan Lembur</h3></div>
+            <div class="col-sm-6"><h3 class="mb-0" style="color: var(--bs-body-color);">Daftar Pengajuan Lembur</h3></div>
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-end">
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -18,8 +69,8 @@
     </div>
 
     <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            @if (auth()->user()->role == 'user')
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 lembur-header">
+            @if (auth()->user()->current_role == 'user')
                 <button class="btn btn-primary" wire:click="showAdd">
                     <i class="bi bi-plus"></i> Tambah
                 </button>
@@ -34,7 +85,7 @@
                     <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan" wire:model.lazy="filterBulan">
                 </div>
             @endif
-            @if (auth()->user()->role == 'spv' || auth()->user()->role == 'hr' || auth()->user()->role == 'admin')
+            @if (auth()->user()->current_role == 'spv' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'admin')
                 <div class="d-flex gap-2">
                     <select class="form-select" wire:model.lazy="filterPengajuan" style="width: 150px;">
                         <option value="">Pilih Status</option>
@@ -67,7 +118,7 @@
                             <tr>
                                 <th>Tanggal</th>
                                 <th>Diajukan Pada</th>
-                                @if (auth()->user()->role == 'admin' || auth()->user()->role == 'hr' || auth()->user()->role == 'spv')
+                                @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
                                     <th>Nama Karyawan</th>
                                 @endif
                                 <th>Waktu Lembur</th>
@@ -88,7 +139,7 @@
                                     <tr>
                                         <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->created_at }}</td>
-                                        @if (auth()->user()->role == 'admin' || auth()->user()->role == 'hr' || auth()->user()->role == 'spv')
+                                        @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
                                             <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}</td>
                                         @endif
                                         <td style="color: var(--bs-body-color);">{{ $key->waktu_mulai }} - {{ $key->waktu_akhir }}</td>
@@ -124,7 +175,7 @@
                                                 <span class="badge bg-danger">Ditolak</span>
                                             @endif
                                         </td>
-                                        @if (auth()->user()->role == 'user')
+                                        @if (auth()->user()->current_role == 'user')
                                             @if ($key->approve_spv == 0 && $key->approve_hr == 0)
                                                 <td class="text-center" style="color: var(--bs-body-color);">
                                                     <button class="btn btn-sm btn-warning mb-2" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -135,11 +186,11 @@
                                                 </td>
                                             @endif
                                         @endif
-                                        @if (auth()->user()->role != 'user')
+                                        @if (auth()->user()->current_role != 'user')
                                             <td class="text-center" style="color: var(--bs-body-color);">
                                             <!--<button class="btn btn-sm btn-info mb-2" wire:click="showEdit({{ $key->id }})"><i class="fa fa-eye"></i></button>-->
         
-                                                @if (auth()->user()->role == 'spv')
+                                                @if (auth()->user()->current_role == 'spv')
                                                     @if ($key->status == 0)
                                                         @if ($key->approve_spv == null)
                                                             <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">Terima</button>
@@ -147,7 +198,7 @@
                                                         @endif
                                                     @endif
                                                 @endif
-                                                @if (auth()->user()->role == 'hr')
+                                                @if (auth()->user()->current_role == 'hr')
                                                     @if ($key->status == 0)
                                                         @if ($key->approve_hr == null)
                                                             <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">Terima</button>
@@ -155,7 +206,7 @@
                                                         @endif
                                                     @endif
                                                 @endif
-                                                @if (auth()->user()->role == 'admin')
+                                                @if (auth()->user()->current_role == 'admin')
                                                     <button class="btn btn-sm btn-danger mb-2" wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})">
                                                         <i class="fa fa-trash"></i>
                                                     </button>

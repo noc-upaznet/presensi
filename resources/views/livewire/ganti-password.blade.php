@@ -19,6 +19,12 @@
         <div class="container-sm">
             <div class="row justify-content-center">
                 <div class="col-12 col-md-8 col-lg-6">
+                    @if (session('warning'))
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ session('warning') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
                     <div class="card shadow-sm rounded-4 border-0">
                         <form wire:submit.prevent="updatePassword">
                             <div class="card-body p-4">

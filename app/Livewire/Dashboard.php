@@ -22,7 +22,7 @@ class Dashboard extends Component
     
     public function mount()
     {
-        if (Auth::user()?->role !== 'admin') {
+        if (Auth::user()?->current_role !== 'admin') {
             // Bisa redirect atau abort
             return redirect()->route('clock-in');
             // abort(403, 'Access Denied');

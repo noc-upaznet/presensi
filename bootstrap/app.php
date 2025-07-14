@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'tokenauth' => \App\Http\Middleware\TokenAuth::class,
+            'password.expired' => \App\Http\Middleware\CheckPasswordExpired::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

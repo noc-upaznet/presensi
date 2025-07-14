@@ -86,6 +86,11 @@ class CreateSlipGaji extends Component
 
     public function mount($id = null, $month = null, $year = null)
     {
+        if (Auth::user()?->current_role !== 'admin') {
+            // Bisa redirect atau abort
+            return redirect()->route('dashboard');
+            // abort(403, 'Access Denied');
+        }
         if (!Auth::check()) {
             session(['redirect_after_login' => url()->current()]);
             return redirect()->to(route('login'));

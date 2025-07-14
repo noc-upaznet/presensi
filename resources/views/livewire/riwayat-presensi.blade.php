@@ -35,14 +35,14 @@
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
-                                @if (auth()->user()->role != 'user')
+                                @if (auth()->user()->current_role != 'user')
                                     <th>Nama Karyawan</th>
                                 @endif
                                 <th>Clock In</th>
                                 <th>Clock Out</th>
                                 <th>File</th>
                                 <th>Status</th>
-                                @if (auth()->user()->role == 'admin' || auth()->user()->role == 'hr')
+                                @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr')
                                     <th>Action</th>
                                 @endif
                             </tr>
@@ -56,7 +56,7 @@
                                 @foreach($datas as $key)
                                     <tr>
                                         <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
-                                        @if (auth()->user()->role != 'user')
+                                        @if (auth()->user()->current_role != 'user')
                                             <td style="color: var(--bs-body-color);">{{ $key->getUser->nama_karyawan }}</td>
                                         @endif
                                         <td style="color: var(--bs-body-color);">{{ $key->clock_in }}</td>
@@ -76,7 +76,7 @@
                                                 <span class="badge bg-secondary">Unknown</span>
                                             @endif
                                         </td>
-                                        @if (auth()->user()->role == 'admin' || auth()->user()->role == 'hr')
+                                        @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr')
                                             <td>
                                                 <button class="btn btn-warning btn-sm" wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
                                                     <i class="fas fa-edit"></i>

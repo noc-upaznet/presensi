@@ -7,14 +7,12 @@ use Livewire\Component;
 use App\Models\PayrollModel;
 use Livewire\WithPagination;
 use App\Exports\PayrollExport;
-use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\JenisPotonganModel;
-use Illuminate\Support\Facades\DB;
 use App\Models\JenisTunjanganModel;
+use App\Models\M_DataKaryawan;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class Payroll extends Component
 {
@@ -45,6 +43,11 @@ class Payroll extends Component
 
     public function mount()
     {
+        if (Auth::user()?->current_role !== 'admin') {
+            // Bisa redirect atau abort
+            return redirect()->route('dashboard');
+            // abort(403, 'Access Denied');
+        }
         $this->selectedYear = now()->year;
         $this->selectedMonth = now()->subMonth()->format('n');
 
@@ -70,7 +73,7 @@ class Payroll extends Component
         }
 
         // Hitung jumlah karyawan yang belum punya slip gaji di periode tersebut
-        $karyawanQuery = DB::table('data_karyawan')->where('entitas', $selectedEntitas);
+        $karyawanQuery = M_DataKaryawan::where('entitas', $selectedEntitas);
 
         $this->jumlahBelumPunyaSlip = $karyawanQuery
             ->leftJoin('payroll', function ($join) {
@@ -95,49 +98,6 @@ class Payroll extends Component
 
         return Excel::download(new PayrollExport($periode, $periodeLokal), $filename);
     }
-
-    // public function export(): StreamedResponse
-    // {
-    //     $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
-    //     $periode = $this->selectedYear . '-' . $bulanFormatted;
-
-    //     // Ambil data dari tabel payroll sesuai periode
-    //     $data = DB::table('payroll')
-    //         ->join('data_karyawan', 'payroll.karyawan_id', '=', 'data_karyawan.id')
-    //         ->where('payroll.periode', $periode)
-    //         ->select(
-    //             'payroll.no_slip',
-    //             'data_karyawan.nama_karyawan',
-    //             'data_karyawan.nip_karyawan as nip_karyawan',
-    //             'data_karyawan.divisi',
-    //             'payroll.periode',
-    //             'payroll.total_gaji'
-    //         )
-    //         ->get();
-
-    //     $filename = 'slip_gaji_' . $periode . '.csv';
-
-    //     return Response::streamDownload(function () use ($data) {
-    //         $handle = fopen('php://output', 'w');
-
-    //         // Header CSV
-    //         fputcsv($handle, ['No Slip', 'Nama Karyawan', 'NIP', 'Divisi', 'Periode', 'Total Gaji']);
-
-    //         // Data baris
-    //         foreach ($data as $row) {
-    //             fputcsv($handle, [
-    //                 $row->no_slip,
-    //                 $row->nama_karyawan,
-    //                 $row->nip_karyawan,
-    //                 $row->divisi,
-    //                 $row->periode,
-    //                 $row->total_gaji
-    //             ]);
-    //         }
-
-    //         fclose($handle);
-    //     }, $filename);
-    // }
 
     public function downloadSlip($id)
     {

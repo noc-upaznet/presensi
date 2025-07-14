@@ -4,6 +4,7 @@ use App\Livewire\Divisi;
 use App\Livewire\ClockIn;
 use App\Livewire\Entitas;
 use App\Livewire\Payroll;
+use App\Livewire\DataUser;
 use App\Livewire\Dashboard;
 use App\Livewire\RoleUsers;
 use App\Livewire\ListLokasi;
@@ -35,8 +36,9 @@ Route::get('/', function () {
 });
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::group(['middleware' => 'auth'], function () {
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/ganti-password', GantiPassword::class)->middleware('auth')->name('ganti-password');
+Route::group(['middleware' => ['auth', 'password.expired']], function () {
     Route::get('/clock-in', ClockIn::class)->name('clock-in');
     Route::get('/clock-in-selfie', ClockInSelfie::class)->name('clock-in-selfie');
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
@@ -53,6 +55,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/list-lokasi', ListLokasi::class)->name('list-lokasi');
     Route::get('/role-lokasi', RoleLokasi::class)->name('role-lokasi');
     Route::get('/role-users', RoleUsers::class)->name('role-users');
+    Route::get('/data-user', DataUser::class)->name('data-user');
     Route::get('/riwayat-presensi', RiwayatPresensi::class)->name('riwayat-presensi');
     Route::get('/divisi', Divisi::class)->name('divisi');
     Route::get('/entitas', Entitas::class)->name('entitas');
@@ -62,20 +65,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/slip-gaji/download/{id}', [PayrollController::class, 'download'])->name('slip-gaji.download');
     Route::get('/jenis-tunjangan', JenisTunjangan::class)->name('jenis-tunjangan');
     Route::get('/jenis-potongan', JenisPotongan::class)->name('jenis-potongan');
-    Route::get('/ganti-password', GantiPassword::class)->name('ganti-password');
-    // Route::get('/notification-bell', NotificationBell::class)->name('notification-bell');
-    Route::get('/logout', function () {
-        Auth::logout();
-        Session::invalidate();
-        Session::regenerateToken();
+    // Route::get('/logout', function () {
+    //     Auth::logout();
+    //     Session::invalidate();
+    //     Session::regenerateToken();
     
-        return redirect('/login');
-    })->name('logout');
-
-    //store a push subscriber.
-    // Route::post('/push','PushController@store');
-    // Route::post('/subscriptions', [PushController::class, 'store']);
-    // dd(app()->getProvider(WebPushServiceProvider::class));
+    //     return redirect('/login');
+    // })->name('logout');
 });
 
 // Route::get('admin', function () {

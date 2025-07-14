@@ -62,6 +62,13 @@
           <h1 class="mb-0 text-center" style="font-weight: bolder; font-size: 40px;"><b>Sistem Presensi</b></h1>
         </div>
         <div class="card-body login-card-body">
+          @if ($errors->any())
+              <div class="alert alert-danger small">
+                  @foreach ($errors->all() as $error)
+                      <div>{{ $error }}</div>
+                  @endforeach
+              </div>
+          @endif
           <p class="login-box-msg">Silahkan Login</p>
             <form action="{{ route('login') }}" method="POST">
                 @csrf

@@ -34,6 +34,11 @@ class ClockIn extends Component
     
     public function mount()
     {
+        if (Auth::user()?->current_role !== 'user' && Auth::user()?->current_role !== 'hr' && Auth::user()?->current_role !== 'spv') {
+            // Bisa redirect atau abort
+            return redirect()->route('dashboard');
+            // abort(403, 'Access Denied');
+        }
         if (!Auth::check()) {
             session(['redirect_after_login' => url()->current()]);
             return redirect()->to(route('login'));

@@ -66,7 +66,7 @@ class Pengajuan extends Component
             return;
         }
 
-        $userRole = Auth::user()->role;
+        $userRole = Auth::user()->current_role;
 
         // Update approve field berdasarkan role dan status
         if ($userRole === 'spv') {
@@ -157,19 +157,19 @@ class Pengajuan extends Component
         $user = Auth::user();
         $entitas = session('selected_entitas', 'UHO'); // default ke 'UHO'
 
-        if ($user->role === 'user') {
+        if ($user->current_role === 'user') {
             // User biasa hanya melihat datanya sendiri
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
                 $query->where('karyawan_id', $dataKaryawan->id);
             }
 
-        } elseif ($user->role === 'admin') {
+        } elseif ($user->current_role === 'admin') {
             // Admin atau HR melihat semua karyawan dalam entitas
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
 
-        } elseif ($user->role === 'spv') {
+        } elseif ($user->current_role === 'spv') {
             // SPV hanya melihat karyawan yang berada dalam divisinya dan entitas yang sama
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
