@@ -2,42 +2,48 @@
 
 namespace App\Livewire\ModalRole;
 
-use App\Models\M_Roles;
+use App\Models\User;
+use App\Models\UserRole;
 use Livewire\Component;
 
 class ModalRoles extends Component
 {
     public $nama;
+    public $users;
+    public $role;
+    public $user_id;
+    public $listeners = ['refreshTable' => 'refresh'];
+
+    public function mount()
+    {
+        $this->users = User::all();
+    }
     public function store()
     {
-        // Validasi input
         $this->validate([
-            'nama' => 'required|string|max:255',
-            // 'deskripsi' => 'nullable|string|max:500',
+            'user_id' => 'required',
+            'role' => 'required',
         ]);
 
         $data = [
-            'nama' => $this->nama,
-            // 'deskripsi' => $this->deskripsi,
+            'user_id' => $this->user_id,
+            'role' => $this->role,
         ];
         // dd($data);
-        // Simpan data role baru
-        M_Roles::create($data);
+        UserRole::create($data);
 
-        // Reset input
-        $this->reset(['nama']);
+        $this->reset(['user_id', 'role']);
 
-        // Kirim notifikasi sukses
         $this->dispatch('swal', params: [
             'title' => 'Data Saved',
             'icon' => 'success',
             'text' => 'Data has been Saved successfully'
         ]);
 
-        // Refresh data di komponen yang memanggil modal ini
         $this->dispatch('refresh');
         $this->dispatch('modalAddRoles', action: 'hide');
     }
+
     public function render()
     {
         return view('livewire.modal-role.modal-roles');

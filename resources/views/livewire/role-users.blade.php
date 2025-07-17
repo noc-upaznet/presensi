@@ -21,13 +21,6 @@
                             wire:click='setTab("pills-user")' id="pills-user-tab" data-bs-toggle="tab"
                             data-bs-target="#pills-user" data-tab-name="pills-user" type="button" role="tab"
                             aria-controls="pills-user" aria-selected="true">Users</button>
-                        </li>
-
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold @if ($tab == 'pills-roles') active @endif"
-                            wire:click='setTab("pills-roles")' id="pills-roles-tab" data-bs-toggle="tab"
-                            data-bs-target="#pills-roles" data-tab-name="pills-roles" type="button" role="tab"
-                            aria-controls="pills-roles" aria-selected="true">Roles</button>
                         </li> --}}
 
                         <li class="nav-item" role="presentation">
@@ -50,6 +43,13 @@
                             data-bs-target="#pills-entitas" data-tab-name="pills-entitas" type="button" role="tab"
                             aria-controls="pills-entitas" aria-selected="true">Entitas</button>
                         </li>
+
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold @if ($tab == 'pills-roles') active @endif"
+                            wire:click='setTab("pills-roles")' id="pills-roles-tab" data-bs-toggle="tab"
+                            data-bs-target="#pills-roles" data-tab-name="pills-roles" type="button" role="tab"
+                            aria-controls="pills-roles" aria-selected="true">Roles</button>
+                        </li>
                     </ul>
                     <div class="tab-content" id="pills-tabContent">
                         {{-- <div class="tab-pane fade @if ($tab == 'pills-user') active show @endif " id="pills-user"
@@ -57,15 +57,6 @@
 
                             @if ($tab == 'pills-user')
                                 <livewire:users />
-                            @endif
-
-                        </div>
-
-                        <div class="tab-pane fade @if ($tab == 'pills-roles') active show @endif " id="pills-roles"
-                            role="tabpanel" aria-labelledby="pills-roles-tab">
-
-                            @if ($tab == 'pills-roles')
-                                <livewire:roles />
                             @endif
 
                         </div> --}}
@@ -93,6 +84,15 @@
                             @if ($tab == 'pills-entitas')
                                 <livewire:entitas />
                             @endif
+                        </div>
+
+                        <div class="tab-pane fade @if ($tab == 'pills-roles') active show @endif " id="pills-roles"
+                            role="tabpanel" aria-labelledby="pills-roles-tab">
+
+                            @if ($tab == 'pills-roles')
+                                <livewire:roles />
+                            @endif
+
                         </div>
                     </div>
                     

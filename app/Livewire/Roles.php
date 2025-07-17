@@ -2,14 +2,14 @@
 
 namespace App\Livewire;
 
-use App\Models\M_Roles;
+use App\Models\UserRole;
 use Livewire\Component;
 
 class Roles extends Component
 {
     public function render()
     {
-        $roles = M_Roles::orderBy('created_at', 'desc')->latest()->paginate(10);
+        $roles = UserRole::with('user')->orderBy('created_at', 'desc')->latest()->paginate(10);
         return view('livewire.roles', [
             'roles' => $roles,
         ]);
