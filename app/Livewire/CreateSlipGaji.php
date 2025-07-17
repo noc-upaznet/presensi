@@ -185,28 +185,29 @@ class CreateSlipGaji extends Component
 
     public function loadAvailableKaryawanByPeriode()
     {
+        // Ambil entitas dari session, jika tidak ada pakai default 'UHO'
+        $entitas = session('selected_entitas', 'UHO');
+
         // Hitung cut-off akhir (tanggal 25 bulan terpilih)
         $cutoffEnd = Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 25);
         
         // Format periode payroll berdasarkan bulan di tanggal 25 (YYYY-MM)
         $periode = $cutoffEnd->format('Y-m');
 
-        return M_DataKaryawan::whereDoesntHave('payrolls', function ($query) use ($periode) {
-            $query->where('periode', $periode);
-        })->get();
+        return M_DataKaryawan::where('entitas', $entitas)
+            ->whereDoesntHave('payrolls', function ($query) use ($periode) {
+                $query->where('periode', $periode);
+            })
+            ->get();
     }
 
 
     public function updatedUserId($value)
     {
-         // jika perlu
-        // $this->hitungRekapPresensi();
-        // $this->hitungTotalGaji();
-
         if ($this->bulanTahun) {
             $this->loadDataKaryawan($value);
             $this->rekap = $this->hitungRekapPresensi();
-            dd($this->rekap);
+            // dd($this->rekap);
             $this->hitungTotalGaji();
         }
     }
@@ -221,6 +222,8 @@ class CreateSlipGaji extends Component
     public function loadDataKaryawan($dataKaryawanId)
     {
         $karyawan = M_DataKaryawan::find($dataKaryawanId);
+        // dd($karyawan);
+
         if ($karyawan) {
             $this->divisi = $karyawan->divisi;
             $this->jabatan = $karyawan->jabatan;
@@ -325,70 +328,12 @@ class CreateSlipGaji extends Component
         return $this->rekap;
     }
 
-    // public function rekapKehadiran($idKaryawan, $bulan, $tahun)
-    // {
-    //     $karyawan = M_DataKaryawan::with(['getPresensi', 'getJadwal'])->findOrFail($idKaryawan);
-    //     $startDate = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
-    //     $endDate = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth();
-
-    //     $presensiCollection = $karyawan->getPresensi ?? collect();
-    //     $presensi = $presensiCollection->filter(function ($item) use ($startDate, $endDate) {
-    //         return Carbon::parse($item->tanggal)->between($startDate, $endDate);
-    //     });
-
-    //     // $kehadiran = $presensi->count();
-    //     $terlambat = $presensi->where('status', 1)->count();
-
-    //     $jadwal = M_Jadwal::where('karyawan_id', $idKaryawan)
-    //         ->where('bulan_tahun', $this->bulanTahun)
-    //         ->first();
-    //         // dd($jadwal);
-
-    //     // Sekarang $nama_shift berisi nama shift dari kode shift (misal 3) pada hari ke-1
-    //     // dd($jadwalShift);
-        
-    //     $izin = 0;
-    //     $cuti = 0;
-    //     $izinSetengahHari = 0;
-
-    //     if ($jadwal) {
-    //         foreach (range(1, 31) as $i) {
-    //             $kode = $jadwal->{'d' . $i};
-
-    //             if ($kode == 3) {
-    //                 $izin++;
-    //             } elseif ($kode == 2) {
-    //                 $cuti++;
-    //             } elseif ($kode == 8) {
-    //                 $izinSetengahHari++;
-    //             }
-    //         }
-    //     }
-
-    //     // Ambil daftar lembur
-    //     $dataLembur = M_Lembur::where('user_id', $karyawan->user_id)
-    //         ->whereBetween('tanggal', [$startDate, $endDate])
-    //         ->whereNotNull('total_jam')
-    //         ->where('status', 1)
-    //         ->get(['tanggal', 'total_jam']);
-
-
-    //     $totalJamLembur = $dataLembur->sum('total_jam');
-
-    //     return [
-    //         'kehadiran' => 26 - $izin - $cuti - (0.5 * $izinSetengahHari),
-    //         'terlambat' => $terlambat,
-    //         'izin' => $izin,
-    //         'cuti' => $cuti,
-    //         'lembur' => $totalJamLembur,
-    //         'izin setengah hari' => $izinSetengahHari,
-    //     ];
-    // }
-
     public function rekapKehadiran($idKaryawan, $bulan, $tahun)
     {
         // dd(M_DataKaryawan::where('user_id', $this->karyawanId)->exists());
-        $karyawan = M_DataKaryawan::with(['getPresensi', 'getJadwal'])->where('user_id', $this->karyawanId)->firstOrFail();
+        // $karyawan = M_DataKaryawan::with(['getPresensi', 'getJadwal'])->where('user_id', $this->karyawanId)->firstOrFail();
+
+        $karyawan = M_DataKaryawan::find($idKaryawan);
 
         // CUT OFF GAJI: dari 26 bulan sebelumnya s/d 25 bulan ini
         $startDate = Carbon::createFromDate($tahun, $bulan, 26)->subMonthNoOverflow();
