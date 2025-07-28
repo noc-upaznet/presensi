@@ -63,6 +63,14 @@ class CreateSlipGaji extends Component
     public $bpjs_jht_nominal = 0;
     public $no_slip;
 
+    public $bpjs_perusahaan_digunakan = false;
+    public $persentase_bpjs_perusahaan = 4;
+    public $bpjs_perusahaan_nominal = 0;
+
+    public $bpjs_jht_perusahaan_digunakan = false;
+    public $persentase_bpjs_jht_perusahaan = 4.24;
+    public $bpjs_jht_perusahaan_nominal = 0;
+
     public $selectedMonth;
     public $selectedYear;
     public $periode;
@@ -75,6 +83,8 @@ class CreateSlipGaji extends Component
     public $tunjangan_kehadiran = 0;
     public $transport = 0;
     public $uang_makan = 0;
+    public $kebudayaan = 0;
+    public $fee_sharing = 0;
     
     public $fee_sharing_digunakan = false;
     public $fee_sharing_nominal = 0;
@@ -83,6 +93,9 @@ class CreateSlipGaji extends Component
     public $cutoffStart;
     public $cutoffEnd;
     public $entitasId;
+    public $filterCutOff25;
+    public $filterCutOffNormal;
+    public $cutoffType = 'cutoff_normal';
 
     public function mount($id = null, $month = null, $year = null)
     {
@@ -108,15 +121,23 @@ class CreateSlipGaji extends Component
         // $this->bulanTahun = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
 
         // Hitung cut-off: dari tanggal 26 bulan sebelumnya sampai 25 bulan yang dipilih
-        $cutoffEnd = \Carbon\Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 25);
-        $cutoffStart = $cutoffEnd->copy()->subMonthNoOverflow()->setDay(26);
+        $this->filterCutOff25 = [
+            $cutoffEnd = Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 25),
+            $cutoffStart = $cutoffEnd->copy()->subMonthNoOverflow()->setDay(26)
+        ];
 
-        // Simpan sebagai property jika mau dipakai di view atau hitungan lain
-        $this->cutoffStart = $cutoffStart;
-        $this->cutoffEnd = $cutoffEnd;
+        $startNormal = Carbon::createFromDate($year, $month, 1);
+        $endNormal = $startNormal->copy()->endOfMonth();
+        $this->filterCutOffNormal = [
+            'start' => $startNormal,
+            'end' => $endNormal,
+        ];
+       
 
-        // Tetap simpan bulanTahun sebagai penanda periode gaji
-        $this->bulanTahun = $cutoffEnd->format('Y-m');
+        $this->cutoffStart = $this->filterCutOffNormal['start'];
+        $this->cutoffEnd = $this->filterCutOffNormal['end'];
+
+        $this->bulanTahun = $this->cutoffEnd->format('Y-m');
 
         // Set user_id langsung dari $id
         if ($id) {
@@ -127,19 +148,18 @@ class CreateSlipGaji extends Component
                 $this->karyawanId = $dataKaryawan->user_id;
                 // dd($this->karyawanId);
 
-                $this->loadDataKaryawan($dataKaryawanId); // load data karyawan jika ID valid
+                $this->loadDataKaryawan($dataKaryawanId);
                 $this->rekap = $this->hitungRekapPresensi($this->user_id, $this->bulanTahun);
                 // dd($this->rekap);
                 
-                // Hitung nominal lembur dan simpan ke property jika ingin ditampilkan di view
                 $gajiPokok = $this->numericValue($this->gaji_pokok);
                 $tunjanganJabatan = $this->numericValue($this->tunjangan_jabatan);
-                $jamLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
+                $jamLembur = M_Lembur::where('karyawan_id', $dataKaryawanId)
                     ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
                     ->whereNotNull('total_jam')
                     ->where('status', 1)
                     ->sum('total_jam');
-                $jenisLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
+                $jenisLembur = M_Lembur::where('karyawan_id', $dataKaryawanId)
                     ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
                     ->whereNotNull('total_jam')
                     ->where('status', 1)
@@ -173,26 +193,27 @@ class CreateSlipGaji extends Component
         $this->hitungTotalGaji();
     }
 
-    // public function loadAvailableKaryawanByPeriode()
-    // {
-    //     $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
-    //     $periode = $this->selectedYear . '-' . $bulanFormatted;
-
-    //     return M_DataKaryawan::whereDoesntHave('payrolls', function ($query) use ($periode) {
-    //         $query->where('periode', $periode);
-    //     })->get();
-    // }
+    public function setCutoffPeriode()
+    {
+        if ($this->cutoffType === 'cutoff_normal') {
+            $this->cutoffStart = Carbon::create($this->selectedYear, $this->selectedMonth, 1);
+            $this->cutoffEnd = Carbon::create($this->selectedYear, $this->selectedMonth, 1)->endOfMonth();
+        } else { // Default cutoff_25
+            $this->cutoffEnd = Carbon::create($this->selectedYear, $this->selectedMonth, 25);
+            $this->cutoffStart = $this->cutoffEnd->copy()->subMonthNoOverflow()->setDay(26);
+        }
+        // Tetapkan bulanTahun sesuai tanggal akhir
+        $this->bulanTahun = $this->cutoffEnd->format('Y-m');
+    }
 
     public function loadAvailableKaryawanByPeriode()
     {
+        $this->setCutoffPeriode();
         // Ambil entitas dari session, jika tidak ada pakai default 'UHO'
         $entitas = session('selected_entitas', 'UHO');
 
-        // Hitung cut-off akhir (tanggal 25 bulan terpilih)
-        $cutoffEnd = Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 25);
-        
         // Format periode payroll berdasarkan bulan di tanggal 25 (YYYY-MM)
-        $periode = $cutoffEnd->format('Y-m');
+        $periode = $this->bulanTahun;
 
         return M_DataKaryawan::where('entitas', $entitas)
             ->whereDoesntHave('payrolls', function ($query) use ($periode) {
@@ -200,7 +221,6 @@ class CreateSlipGaji extends Component
             })
             ->get();
     }
-
 
     public function updatedUserId($value)
     {
@@ -214,14 +234,14 @@ class CreateSlipGaji extends Component
 
     public function updatedBulanTahun($value)
     {
-        
         $this->hitungRekapPresensi();
         $this->hitungTotalGaji();
     }
 
-    public function loadDataKaryawan($dataKaryawanId)
+    public function loadDataKaryawan($id)
     {
-        $karyawan = M_DataKaryawan::find($dataKaryawanId);
+        // dd($id);
+        $karyawan = M_DataKaryawan::find($id);
         // dd($karyawan);
 
         if ($karyawan) {
@@ -307,7 +327,6 @@ class CreateSlipGaji extends Component
         }
     }
 
-
     public function hitungRekapPresensi()
     {
         if (!$this->user_id || !$this->bulanTahun) {
@@ -315,38 +334,35 @@ class CreateSlipGaji extends Component
             return $this->rekap;
         }
 
-        [$tahun, $bulan] = explode('-', $this->bulanTahun);
+        // Set cutoffStart dan cutoffEnd berdasarkan cutoffType dan bulanTahun
+        $this->setCutoffPeriode();
 
-        $cutoffEnd = Carbon::createFromDate($tahun, $bulan, 25);
-        $cutoffStart = $cutoffEnd->copy()->subMonthNoOverflow()->setDay(26);
+        // Panggil rekapKehadiran dengan tanggal cutoff
+        $this->rekap = $this->rekapKehadiran(
+            $this->user_id,
+            $this->cutoffStart,
+            $this->cutoffEnd
+        );
 
-        $this->cutoffStart = $cutoffStart;
-        $this->cutoffEnd = $cutoffEnd;
-
-        $this->rekap = $this->rekapKehadiran($this->user_id, $bulan, $tahun);
-        // dd($this->rekap);
         return $this->rekap;
     }
 
-    public function rekapKehadiran($idKaryawan, $bulan, $tahun)
+    public function rekapKehadiran($idKaryawan, $cutoffStart, $cutoffEnd)
     {
-        // dd(M_DataKaryawan::where('user_id', $this->karyawanId)->exists());
-        // $karyawan = M_DataKaryawan::with(['getPresensi', 'getJadwal'])->where('user_id', $this->karyawanId)->firstOrFail();
-
         $karyawan = M_DataKaryawan::find($idKaryawan);
 
-        // CUT OFF GAJI: dari 26 bulan sebelumnya s/d 25 bulan ini
-        $startDate = Carbon::createFromDate($tahun, $bulan, 26)->subMonthNoOverflow();
-        $endDate = Carbon::createFromDate($tahun, $bulan, 25);
-
         $presensiCollection = $karyawan->getPresensi ?? collect();
-        $presensi = $presensiCollection->filter(function ($item) use ($startDate, $endDate) {
-            return Carbon::parse($item->tanggal)->between($startDate, $endDate);
+        $presensi = $presensiCollection->filter(function ($item) use ($cutoffStart, $cutoffEnd) {
+            return Carbon::parse($item->tanggal)->between($cutoffStart, $cutoffEnd);
         });
 
         $terlambat = $presensi->where('status', 1)->count();
 
-        $bulanTahun = sprintf('%04d-%02d', $tahun, $bulan);
+        // Ambil bulan dan tahun dari cutoffEnd (bukan dari input manual)
+        $bulan = $cutoffEnd->format('m');
+        $tahun = $cutoffEnd->format('Y');
+        $bulanTahun = $cutoffEnd->format('Y-m');
+
         $jadwal = M_Jadwal::where('karyawan_id', $idKaryawan)
             ->where('bulan_tahun', $bulanTahun)
             ->first();
@@ -354,14 +370,13 @@ class CreateSlipGaji extends Component
         $izin = 0;
         $cuti = 0;
         $izinSetengahHari = 0;
-        // dd($idKaryawan, $bulanTahun);
+
         foreach (range(1, 31) as $i) {
             $kode = $jadwal->{'d' . $i};
-            // buat tanggal lengkap berdasarkan hari ke-i
+
             $tanggal = Carbon::createFromFormat('Y-m-d', "{$tahun}-{$bulan}-" . str_pad($i, 2, '0', STR_PAD_LEFT));
 
-            // skip jika tanggal tidak dalam periode cut-off
-            if (!$tanggal->between($startDate, $endDate)) {
+            if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
                 continue;
             }
 
@@ -373,13 +388,15 @@ class CreateSlipGaji extends Component
                 $izinSetengahHari++;
             }
         }
-        // dd($karyawan->user_id, $startDate, $endDate);
+
         $dataLembur = M_Lembur::where('karyawan_id', $idKaryawan)
-            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
             ->whereNotNull('total_jam')
             ->where('status', 1)
             ->get(['tanggal', 'total_jam']);
+
         $totalJamLembur = $dataLembur->sum('total_jam');
+
         return [
             'kehadiran' => 26 - $izin - $cuti - (0.5 * $izinSetengahHari),
             'terlambat' => $terlambat,
@@ -387,8 +404,8 @@ class CreateSlipGaji extends Component
             'cuti' => $cuti,
             'lembur' => $totalJamLembur,
             'izin setengah hari' => $izinSetengahHari,
-            'cutoff_start' => $startDate->format('Y-m-d'),
-            'cutoff_end' => $endDate->format('Y-m-d'),
+            'cutoff_start' => $cutoffStart->format('Y-m-d'),
+            'cutoff_end' => $cutoffEnd->format('Y-m-d'),
         ];
     }
 
@@ -439,18 +456,57 @@ class CreateSlipGaji extends Component
         $this->hitungTotalGaji();
     }
 
-    public function hitungTotalGaji($id = null)
+    public function updatedBpjsPerusahaanDigunakan()
     {
-        // Tambahan: Uang Transport dan Uang Makan
+        $gajiPokok = $this->gaji_pokok + $this->tunjangan_jabatan;
+        $umk = 2470800;
+
+        if ($this->bpjs_perusahaan_digunakan) {
+            // $gajiPokok = $this->gaji_pokok ?? 0;
+
+            // Hitung 4%
+            if ($gajiPokok > $umk) {
+                $this->bpjs_perusahaan_nominal = round($gajiPokok * 0.04);
+            } else {
+                $this->bpjs_perusahaan_nominal = round($umk * 0.04);
+            }
+        } else {
+            $this->bpjs_perusahaan_nominal = 0;
+        }
+    }
+
+    public function updatedBpjsJhtPerusahaanDigunakan()
+    {
+        $gajiPokok = $this->gaji_pokok + $this->tunjangan_jabatan;
+        $umk = 2470800;
+
+        if ($this->bpjs_jht_perusahaan_digunakan) {
+            // $gajiPokok = $this->gaji_pokok ?? 0;
+
+            // Hitung 4%
+            if ($gajiPokok > $umk) {
+                $this->bpjs_jht_perusahaan_nominal = round($gajiPokok * 0.0424);
+            } else {
+                $this->bpjs_jht_perusahaan_nominal = round($umk * 0.0424);
+            }
+        } else {
+            $this->bpjs_jht_perusahaan_nominal = 0;
+        }
+    }
+
+    public function hitungTotalGaji()
+    {
         $transport = $this->numericValue($this->transport ?? 0);
         $uangMakan = $this->numericValue($this->uang_makan ?? 0);
+        $kebudayaan = $this->numericValue($this->kebudayaan ?? 0);
+        $fee_sharing = $this->numericValue($this->fee_sharing ?? 0);
 
         // Tunjangan kehadiran: 2000/hari jika tidak terlambat, jika ada terlambat maka hangus (0)
         $tunjanganKehadiran = 0;
         if (($this->rekap['terlambat'] ?? 0) == 0) {
             $tunjanganKehadiran = ($this->rekap['kehadiran'] ?? 0) * 2000;
         }
-        // $this->tunjangan_kehadiran = $tunjanganKehadiran;
+        $tunjanganKehadiran = $this->tunjangan_kehadiran;
 
         if ($this->user_id) {
             $this->rekap['kehadiran'] == 0;
@@ -473,7 +529,6 @@ class CreateSlipGaji extends Component
         // Potongan otomatis
         $potonganIzin = 0;
         $potonganTerlambat = 0;
-        $potonganIzin2 = 0;
 
         if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
             $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
@@ -490,8 +545,6 @@ class CreateSlipGaji extends Component
             ->sum('total_jam');
 
         // dd($jamLembur);
-        // Hitung nominal lembur
-        // Default lemburNominal
         $lemburNominal = 0;
 
         $jenisLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
@@ -539,8 +592,10 @@ class CreateSlipGaji extends Component
             + $lemburNominal
             + $this->insentif
             + $this->insentif_spv
-            + $this->tunjangan_kehadiran
-            + ($this->fee_sharing_digunakan ? $this->fee_sharing_nominal : 0)
+            + $tunjanganKehadiran
+            // + ($this->fee_sharing_digunakan ? $this->fee_sharing_nominal : 0)
+            + $kebudayaan
+            + $fee_sharing
             + $transport
             + $uangMakan
             - $totalPotonganManual
@@ -549,7 +604,6 @@ class CreateSlipGaji extends Component
             - $this->bpjs_nominal
             - $this->bpjs_jht_nominal;
     }
-
 
     public function addTunjangan()
     {
@@ -566,19 +620,17 @@ class CreateSlipGaji extends Component
 
             // Isi nominal otomatis jika "Tunjangan Kehadiran"
             if ($namaDipilih === 'Tunjangan Kehadiran') {
+                $tunjangan = JenisTunjanganModel::where('nama_tunjangan', $namaDipilih)->first();
                 $tunjanganKehadiran = 0;
                 if (($this->rekap['terlambat'] ?? 0) == 0) {
-                    $tunjanganKehadiran = ($this->rekap['kehadiran'] ?? 0) * 2000;
+                    $tunjanganKehadiran = ($this->rekap['kehadiran'] ?? 0) * $tunjangan->deskripsi;
                 }
                 $this->tunjangan[$index]['nominal'] = $tunjanganKehadiran;
-            }else if ($namaDipilih === 'Tunjangan Kebudayaan') {
-                $tunjanganKebudayaan = 100000;
-                $this->tunjangan[$index]['nominal'] = $tunjanganKebudayaan;
-            }else {
-                // default: ambil dari DB jika bukan "Tunjangan Kehadiran"
+            } else {
+                // Default ambil dari kolom deskripsi di DB
                 $tunjangan = JenisTunjanganModel::where('nama_tunjangan', $namaDipilih)->first();
-                if ($tunjangan) {
-                    $this->tunjangan[$index]['nominal'] = $tunjangan->nominal;
+                if ($tunjangan && is_numeric($tunjangan->deskripsi)) {
+                    $this->tunjangan[$index]['nominal'] = (int) $tunjangan->deskripsi;
                 }
             }
 
@@ -610,16 +662,22 @@ class CreateSlipGaji extends Component
         if ($property === 'nama') {
             $namaDipilih = $value;
 
-            // Isi nominal otomatis jika "Voucher"
-            if ($namaDipilih === 'Voucher') {
-                $voucher = 100000;
-                $this->potongan[$index]['nominal'] = $voucher;
-            }else {
-                // default: ambil dari DB jika bukan "Tunjangan Kehadiran"
-                $potongan = JenisPotonganModel::where('nama_potongan', $namaDipilih)->first();
-                if ($potongan) {
-                    $this->potongan[$index]['nominal'] = $potongan->nominal;
-                }
+            // if ($namaDipilih === 'Voucher') {
+            //     $voucher = 100000;
+            //     $this->potongan[$index]['nominal'] = $voucher;
+            // }elseif($namaDipilih === 'Potongan Kebudayaan') {
+            //     $potonganKebudayaan = 100000;
+            //     $this->potongan[$index]['nominal'] = $potonganKebudayaan;
+            // }else {
+            //     $potongan = JenisPotonganModel::where('nama_potongan', $namaDipilih)->first();
+            //     if ($potongan) {
+            //         $this->potongan[$index]['nominal'] = $potongan->nominal;
+            //     }
+            // }
+
+            $potongan = JenisPotonganModel::where('nama_potongan', $namaDipilih)->first();
+            if ($potongan) {
+                $this->potongan[$index]['nominal'] = $potongan->deskripsi; // ambil dari kolom deskripsi
             }
 
             // Perbarui daftar terpilih
@@ -685,8 +743,6 @@ class CreateSlipGaji extends Component
         }
     }
 
-
-
     public function toRoman($month)
     {
         $romawi = [1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
@@ -723,12 +779,15 @@ class CreateSlipGaji extends Component
             'bpjs_jht' => $this->bpjs_jht_nominal,
             'uang_makan' => $this->numericValue($this->uang_makan),
             'transport' => $this->numericValue($this->transport),
-            'fee_sharing' => $this->numericValue($this->fee_sharing_nominal),
+            'fee_sharing' => $this->numericValue($this->fee_sharing),
             'insentif' => $this->numericValue($this->insentif),
             'jml_psb' => $this->jml_psb,
             'rekap' => json_encode($this->rekap),
             'total_gaji' => (int) $this->total_gaji,
             'periode' => $this->bulanTahun,
+            'bpjs_perusahaan' => $this->bpjs_perusahaan_nominal,
+            'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
+            'tunjangan_kebudayaan' => $this->numericValue($this->kebudayaan),
         ];
         // dd($data);
 

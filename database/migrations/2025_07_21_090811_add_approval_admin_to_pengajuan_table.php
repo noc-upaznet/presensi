@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('password_expired')->default(false);
+        Schema::table('pengajuan', function (Blueprint $table) {
+            $table->tinyInteger('approve_admin')->after('status')->nullable();
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('pengajuan', function (Blueprint $table) {
             //
         });
     }

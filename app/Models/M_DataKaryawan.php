@@ -48,6 +48,7 @@ class M_DataKaryawan extends Model
         'anggota_bpjs',
         'tgl_aktif_bpjs',
         'penanggung',
+        'poin',
     ];
 
     public function getJadwal()
@@ -78,6 +79,16 @@ class M_DataKaryawan extends Model
     public function payrolls()
     {
         return $this->hasMany(PayrollModel::class, 'karyawan_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function roleLokasi()
+    {
+        return $this->hasOne(RoleLokasiModel::class, 'karyawan_id');
     }
 
     // public function jadwal()

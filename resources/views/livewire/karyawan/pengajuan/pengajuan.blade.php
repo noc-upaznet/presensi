@@ -48,9 +48,8 @@
                 gap: 0.5rem;
                 align-items: stretch !important;
             }
-}
+        }
     </style>
-    
 @endpush
 <div>
     <div class="app-content-header">
@@ -132,6 +131,7 @@
                                 @endif
                                 <th>Pengajuan</th>
                                 <th>Keterangan</th>
+                                <th>File</th>
                                 <th>Approve</th>
                                 <th>Status</th>
                                 <th class="text-center">Action</th>
@@ -152,6 +152,16 @@
                                         @endif
                                         <td style="color: var(--bs-body-color);">{{ $key->getShift->nama_shift }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->keterangan }}</td>
+                                        <td>
+                                            @if($key->file && is_string($key->file) && file_exists(public_path('storage/' . $key->file)))
+                                                <img src="{{ asset('storage/' . $key->file) }}" 
+                                                style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
+                                                data-bs-target="#modalGambar"
+                                                onclick="setModalImage('{{ asset('storage/' . $key->file) }}')">
+                                            @else
+                                                <span style="color: gray;">-</span>
+                                            @endif
+                                        </td>
                                         <td style="color: var(--bs-body-color);">
                                             @if ($key->approve_spv == 1)
                                                 <span class="badge bg-success">SPV</span>
@@ -162,6 +172,11 @@
                                                 <span class="badge bg-success">HRD</span>
                                             @elseif ($key->approve_hr == 2)
                                                 <span class="badge bg-danger">HRD</span>
+                                            @endif
+                                            @if ($key->approve_admin == 1)
+                                                <span class="badge bg-success">ADMIN</span>
+                                            @elseif ($key->approve_admin == 2)
+                                                <span class="badge bg-danger">ADMIN</span>
                                             @endif
                                         </td>
                                         <td style="color: var(--bs-body-color);">
@@ -183,31 +198,50 @@
                                                 </td>
                                             @else
                                                 <td class="text-center" style="color: var(--bs-body-color);">
-                                                    <button class="btn btn-sm btn-warning mb-2" disabled wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                    <button class="btn btn-sm btn-warning mb-2" disabled><i class="fa-solid fa-pen-to-square"></i></button>
                                                 </td>
                                             @endif
                                         @endif
                                         @if (auth()->user()->current_role != 'user')
                                             <td class="text-center" style="color: var(--bs-body-color);">
                                                 {{-- <button class="btn btn-sm btn-info mb-2" wire:click="showDetail('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-eye"></i></button> --}}
-                                                @if (auth()->user()->current_role == 'spv')
-                                                    @if ($key->approve_spv == 0)
-                                                        <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">Terima</button>
-                                                        <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">Tolak</button>
-                                                    @endif
+                                                {{-- Tombol Approve SPV --}}
+                                                @if ($key->canBeApprovedBySpv())
+                                                    <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">
+                                                        <i class="bi bi-check-square"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">
+                                                        <i class="bi bi-x-square"></i>
+                                                    </button>
                                                 @endif
-                                                @if (auth()->user()->current_role == 'hr')
-                                                    @if ($key->approve_hr == 0)
-                                                        @if ($key->status == 0)
-                                                            <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">Terima</button>
-                                                            <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">Tolak</button>
-                                                        @endif
-                                                    @endif
+                                                {{-- Tombol Approve HR --}}
+                                                @if ($key->canBeApprovedByHr())
+                                                    <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">
+                                                        <i class="bi bi-check-square"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">
+                                                        <i class="bi bi-x-square"></i>
+                                                    </button>
                                                 @endif
+
+                                                {{-- Tombol Admin --}}
                                                 @if (auth()->user()->current_role == 'admin')
-                                                    @if ($key->status == 0)
-                                                        <button class="btn btn-sm btn-danger mb-2" wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"><i class="fa fa-trash"></i></button>
-                                                    @endif
+                                                    <div class="table-action-btns">
+                                                        @if ($key->canBeApprovedByAdmin())
+                                                            <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">
+                                                                <i class="bi bi-check-square"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">
+                                                                <i class="bi bi-x-square"></i>
+                                                            </button>
+                                                        @endif
+
+                                                        @if ($key->canBeDeletedByAdmin())
+                                                            <button class="btn btn-sm btn-danger" wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                 @endif
                                             </td>
                                         @endif
@@ -223,6 +257,19 @@
         </div>
     </div>
     <livewire:karyawan.pengajuan.modal-pengajuan />
+    <div class="modal fade" id="modalGambar" tabindex="-1" aria-labelledby="modalGambarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalGambarLabel">Bukti Izin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Bukti" class="img-fluid">
+            </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -234,6 +281,10 @@
         Livewire.on('modalEditPengajuan', (event) => {
             $('#modalEditPengajuan').modal(event.action);
         });
+
+        function setModalImage(src) {
+            document.getElementById('modalImage').src = src;
+        }
 
         Livewire.on('modal-confirm-delete', (event) => {
             $('#modal-confirm-delete').modal(event.action);

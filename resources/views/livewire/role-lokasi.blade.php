@@ -82,11 +82,8 @@
                         </table>
                     </div>
                 </div>
-
-                <div class="card-footer d-flex justify-content-between align-items-center bg-white p-3">
-                    <span style="color: var(--bs-body-color)">Showing {{ $lokasiList->firstItem() }} to {{ $lokasiList->lastItem() }} of {{
-                        $lokasiList->total() }} entries</span>
-                    {{ $lokasiList->links() }}
+                <div class="pt-3">
+                    {{ $lokasiList->links('pagination::bootstrap-5') }}
                 </div>
             </div>
             <!-- End Card Wrapper -->

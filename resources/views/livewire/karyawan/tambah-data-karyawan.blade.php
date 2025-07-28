@@ -358,7 +358,7 @@
                         <h4 style="color: blue; margin-bottom: 20px;">Penggajian</h4>
                         <div class="mb-3">
                             <label for="total-upah" class="form-label">Total Upah <small class="text-danger">*</small></label>
-                            <input class="form-control" type="text" id="total-upah" wire:model.lazy="total_upah">
+                            <input class="form-control" type="text" id="total-upah" wire:model.lazy="form.total_upah">
                             @error('form.total_upah') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
                         <div class="row">

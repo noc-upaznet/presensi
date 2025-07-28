@@ -116,8 +116,8 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ route('role-users') }}" 
-                        class="nav-link {{ request()->routeIs('role-users') ? 'active' : '' }}">
+                    <a href="{{ route('data-masters') }}" 
+                        class="nav-link {{ request()->routeIs('data-masters') ? 'active' : '' }}">
                         <i class="bi bi-person-fill-gear"></i>
                             <p>Data Master</p>
                     </a>
@@ -165,7 +165,7 @@
             </li>
             
 
-            @if (auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
+            @if (auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv' || auth()->user()->current_role == 'admin')
                 <li class="nav-item menu-open">
                     <a href="#" class="nav-link active">
                         <i class="bi bi-clipboard-plus"></i>
@@ -199,6 +199,32 @@
                             </a>
                         </li>
                     </ul>
+                </li>
+            @endif
+
+            @if (auth()->user()->current_role == 'spv')
+                <li class="nav-item">
+                    <a href="{{ route('riwayat-presensi-staff') }}" 
+                        class="nav-link {{ request()->routeIs('riwayat-presensi-staff') ? 'active' : '' }}">
+                        <i class="bi bi-list-task"></i>
+                        <p>Riwayat Presensi Staff</p>
+                    </a>
+                </li>
+            @endif
+            
+            @php
+                $user = auth()->user();
+                $divisi = $user->karyawan->divisi ?? null;
+                // dump($divisi);
+            @endphp
+
+            @if ($user->current_role === 'spv' && in_array($divisi, ['Helpdesk', 'Teknisi']))
+                <li class="nav-item">
+                    <a href="{{ route('jadwal-shift') }}" 
+                    class="nav-link {{ request()->routeIs('jadwal-shift') ? 'active' : '' }}">
+                        <i class="bi bi-calendar-range"></i>
+                        <p>Jadwal Shift</p>
+                    </a>
                 </li>
             @endif
             

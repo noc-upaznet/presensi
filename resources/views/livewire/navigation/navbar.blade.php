@@ -54,28 +54,31 @@
         </li>
       @endif
       @if(Auth::check() && count($roles) > 1)
-          <div class="dropdown ms-3 mt-1">
-              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                  Role: {{ strtoupper($currentRole) }}
-              </button>
-              <ul class="dropdown-menu">
-                  @foreach ($roles as $role)
-                      <li>
-                          <button wire:click="switchRole('{{ $role }}')" class="dropdown-item">
-                              {{ strtoupper($role) }}
-                          </button>
-                      </li>
-                  @endforeach
-              </ul>
-          </div>
+         <li class="nav-item dropdown border border-secondary rounded ms-2">
+          <button class="btn btn-link nav-link py-2 px-2 dropdown-toggle d-flex align-items-center rounded text-secondary" 
+          id="dropdown-entitas"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false">
+          <span id="dropdown-entitas-text">Role: {{ strtoupper($currentRole) }}</span>
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end border border-secondary rounded shadow"
+              aria-labelledby="dropdown-entitas"
+              style="--bs-dropdown-min-width: 10rem; z-index:1055;">
+            @foreach ($roles as $role)
+              <li>
+                <button class="dropdown-item d-flex align-items-center text-secondary"
+                  wire:click="switchRole('{{ $role }}')">
+                  {{ strtoupper($role) }}
+                </button>
+              </li>
+            @endforeach
+          </ul>
+        </li>
       @endif
 
-      @if (session()->has('success'))
-          <div class="alert alert-success alert-sm mt-2">{{ session('success') }}</div>
-      @endif
-      @if (session()->has('error'))
-          <div class="alert alert-danger alert-sm mt-2">{{ session('error') }}</div>
-      @endif
+      
       <li class="nav-item dropdown user-menu">
         <li class="nav-item dropdown user-menu">
             <a href="#" class="nav-link dropdown-toggle text-secondary" data-bs-toggle="dropdown" role="button" aria-expanded="false">  

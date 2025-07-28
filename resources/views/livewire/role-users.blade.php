@@ -3,26 +3,19 @@
         <!--begin::Container-->
         <div class="container-fluid">
             <!--begin::Row-->
-            {{-- <div class="row mt-5 mb-4">
-                <div class="col-sm-6"><h3 class="mb-0" style="color: var(--bs-body-color);">Role Users</h3></div>
+            <div class="row mb-4">
+                <div class="col-sm-6 mt-5"><h3 class="mb-0" style="color: var(--bs-body-color);">Data Master</h3></div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                         <li class="breadcrumb-item"><a href="/dashboard">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Role Users</li>
+                        <li class="breadcrumb-item active" aria-current="page">Data Master</li>
                     </ol>
                 </div>
-            </div> --}}
+            </div>
 
             <div class="app-content" id="tab-role-users">
                 <!--begin::Container-->
                     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist" style="background-color: var(--bs-body-bg);">
-                        {{-- <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold @if ($tab == 'pills-user') active @endif"
-                            wire:click='setTab("pills-user")' id="pills-user-tab" data-bs-toggle="tab"
-                            data-bs-target="#pills-user" data-tab-name="pills-user" type="button" role="tab"
-                            aria-controls="pills-user" aria-selected="true">Users</button>
-                        </li> --}}
-
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold @if ($tab == 'pills-jabatan') active @endif"
                             wire:click='setTab("pills-jabatan")' id="pills-jabatan-tab" data-bs-toggle="tab"
@@ -52,15 +45,6 @@
                         </li>
                     </ul>
                     <div class="tab-content" id="pills-tabContent">
-                        {{-- <div class="tab-pane fade @if ($tab == 'pills-user') active show @endif " id="pills-user"
-                            role="tabpanel" aria-labelledby="pills-user-tab">
-
-                            @if ($tab == 'pills-user')
-                                <livewire:users />
-                            @endif
-
-                        </div> --}}
-
                         <div class="tab-pane fade @if ($tab == 'pills-jabatan') active show @endif " id="pills-jabatan"
                             role="tabpanel" aria-labelledby="pills-jabatan-tab">
 
@@ -95,8 +79,6 @@
 
                         </div>
                     </div>
-                    
-                {{-- </div> --}}
                 <!--end::Row-->
             </div>
         </div>

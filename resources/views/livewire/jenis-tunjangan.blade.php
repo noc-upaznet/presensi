@@ -42,17 +42,15 @@
                             <thead>
                                 <tr>
                                     <th scope="col">Jenis Tunjangan</th>
-                                    <th scope="col">Deskripsi</th>
-                                    <th scope="col">Dibuat Pada</th>
-                                    <th scope="col">Aksi</th>
+                                    <th scope="col">Nominal</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($jenisTunjangan as $item)
                                 <tr>
                                     <td>{{ $item->nama_tunjangan }}</td>
-                                    <td>{{ $item->maksimal_jumlah }}</td>
-                                    <td>{{ $item->created_at->format('d-m-Y H:i') }}</td>
+                                    <td>{{ $item->deskripsi }}</td>
                                     <td>
                                         <button wire:click.prevent="editTunjangan({{ $item->id }})"
                                             class="btn btn-warning btn-sm" data-bs-toggle="modal"
@@ -94,8 +92,8 @@
                         <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
                     <div class="mb-3">
-                        <label for="deskripsi" class="form-label">Deskripsi</label>
-                        <input type="text" class="form-control" id="deskripsi" wire:model="deskripsi">
+                        <label for="deskripsi" class="form-label">Nominal</label>
+                        <input type="number" class="form-control" id="deskripsi" wire:model="deskripsi">
                     </div>
                 </div>
                 <div class="modal-footer">

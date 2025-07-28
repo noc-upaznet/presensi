@@ -45,6 +45,7 @@ class DataKaryawan extends Component
 
     public function DetailDataKaryawan($id)
     {
+        // $id = Crypt::decrypt($id);
         return redirect()->route('karyawan.detail-data-karyawan', ['id' => $id]);
     }
 

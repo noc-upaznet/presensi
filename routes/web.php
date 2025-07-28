@@ -18,6 +18,7 @@ use App\Livewire\RiwayatPresensi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Karyawan\JadwalShift;
+use App\Livewire\RiwayatPresensiStaff;
 use App\Livewire\Karyawan\DataKaryawan;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\AuthController;
@@ -54,7 +55,7 @@ Route::group(['middleware' => ['auth', 'password.expired']], function () {
     Route::get('/pengajuan-lembur', PengajuanLembur::class)->name('pengajuan-lembur');
     Route::get('/list-lokasi', ListLokasi::class)->name('list-lokasi');
     Route::get('/role-lokasi', RoleLokasi::class)->name('role-lokasi');
-    Route::get('/role-users', RoleUsers::class)->name('role-users');
+    Route::get('/data-masters', RoleUsers::class)->name('data-masters');
     Route::get('/data-user', DataUser::class)->name('data-user');
     Route::get('/riwayat-presensi', RiwayatPresensi::class)->name('riwayat-presensi');
     Route::get('/divisi', Divisi::class)->name('divisi');
@@ -65,17 +66,5 @@ Route::group(['middleware' => ['auth', 'password.expired']], function () {
     Route::get('/slip-gaji/download/{id}', [PayrollController::class, 'download'])->name('slip-gaji.download');
     Route::get('/jenis-tunjangan', JenisTunjangan::class)->name('jenis-tunjangan');
     Route::get('/jenis-potongan', JenisPotongan::class)->name('jenis-potongan');
-    // Route::get('/logout', function () {
-    //     Auth::logout();
-    //     Session::invalidate();
-    //     Session::regenerateToken();
-    
-    //     return redirect('/login');
-    // })->name('logout');
+    Route::get('/riwayat-presensi-staff', RiwayatPresensiStaff::class)->name('riwayat-presensi-staff');
 });
-
-// Route::get('admin', function () {
-//     return '<h1>Admin Page</h1><p>Only accessible by users with the admin role.</p>';
-// })->middleware(['auth', 'role:admin']);
-
-// require __DIR__.'/auth.php';

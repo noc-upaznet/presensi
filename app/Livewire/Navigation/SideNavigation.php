@@ -22,35 +22,60 @@ class SideNavigation extends Component
 
                 if ($dataKaryawan) {
                     $karyawanIds = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
-                        ->where('entitas', $dataKaryawan->entitas) // opsional jika perlu filter entitas juga
+                        ->where('entitas', $dataKaryawan->entitas)
                         ->pluck('id');
 
-                    // Untuk pengajuan cuti/izin dari karyawan satu divisi
+                    // Untuk pengajuan cuti/izin dari karyawan satu divisi (kecuali dia sendiri)
                     $countPengajuan = M_Pengajuan::whereNull('approve_spv')
                         ->where('status', 0)
                         ->whereIn('karyawan_id', $karyawanIds)
+                        ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->count();
 
-                    // Untuk pengajuan lembur dari karyawan satu divisi
+                    // Untuk pengajuan lembur dari karyawan satu divisi (kecuali dia sendiri)
                     $countLembur = M_Lembur::whereNull('approve_spv')
                         ->where('status', 0)
                         ->whereIn('karyawan_id', $karyawanIds)
+                        ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->count();
                 } else {
                     $countPengajuan = 0;
                     $countLembur = 0;
                 }
-
             } elseif ($user->current_role === 'hr') {
-                // Untuk pengajuan cuti/izin
-                $countPengajuan = M_Pengajuan::where('approve_spv', 1)
-                    ->whereNull('approve_hr')
+                $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
+
+                if ($dataKaryawan) {
+                    // Pengajuan cuti/izin (hanya yang sudah disetujui SPV, belum disetujui HR, dan bukan milik HR itu sendiri)
+                    $countPengajuan = M_Pengajuan::where(function ($q) {
+                            $q->where('approve_spv', 1)
+                            ->orWhereNull('approve_spv');
+                        })
+                        ->whereNull('approve_hr')
+                        ->where('status', 0)
+                        ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->count();
+
+                    // Pengajuan lembur (sama seperti di atas)
+                    $countLembur = M_Lembur::where(function ($q) {
+                            $q->where('approve_spv', 1)
+                            ->orWhereNull('approve_spv');
+                        })
+                        ->whereNull('approve_hr')
+                        ->where('status', 0)
+                        ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->count();
+                } else {
+                    $countPengajuan = 0;
+                    $countLembur = 0;
+                }
+            } elseif ($user->current_role === 'admin') {
+                $countPengajuan = M_Pengajuan::whereNull('approve_admin')
                     ->where('status', 0)
                     ->count();
 
-                // Untuk pengajuan lembur
-                $countLembur = M_Lembur::where('approve_spv', 1)
-                    ->whereNull('approve_hr')
+                // Pengajuan lembur yang belum disetujui admin
+                $countLembur = M_Lembur::whereNull('approve_admin')
                     ->where('status', 0)
                     ->count();
             }

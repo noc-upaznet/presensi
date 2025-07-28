@@ -197,7 +197,6 @@
         </div>
     </div>
 </div>
-</div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // SweetAlert2 untuk notifikasi
@@ -227,13 +226,12 @@
         });
     });
     window.addEventListener('lokasiTerhapus', event => {
-    Swal.fire({
-        icon: 'success',
-        title: 'Berhasil',
-        text: 'Lokasi berhasil dihapus.',
-        confirmButtonColor: '#3085d6',
-        confirmButtonText: 'OK'
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: 'Lokasi berhasil dihapus.',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+        });
     });
-});
-
 </script>

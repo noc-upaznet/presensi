@@ -108,12 +108,15 @@ class TambahDataKaryawan extends Component
         ]);
         $this->form->validate();
 
-        $user = User::create([
+        $dataUser = [
             'name' => $this->form->nama_karyawan,
             'email' => $this->form->email,
             'password' => bcrypt($this->password),
-        ]);
-        // dd($user);
+            'current_role' => 'user',
+        ];
+        // dd($dataUser);
+
+        $user = User::create($dataUser);
         
         $data = [
             'user_id' => $user->id,
@@ -157,7 +160,7 @@ class TambahDataKaryawan extends Component
             'penanggung' => $this->form->penanggung,
         ];
 
-        // dd($data, $data2);
+        // dd($data);
             
         M_DataKaryawan::create($data);
         

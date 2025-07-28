@@ -1,8 +1,8 @@
 <div>
-    <div class="app-content-header mb-3" style="padding-top: 60px;">
+    <div class="app-content-header mb-3">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-6 mt-5">
                     <h3 class="mb-0" style="color: var(--bs-body-color);">Ganti Password</h3>
                 </div>
                 <div class="col-sm-6">

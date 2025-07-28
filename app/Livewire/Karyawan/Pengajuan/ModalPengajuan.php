@@ -7,13 +7,15 @@ use Livewire\Component;
 use App\Models\M_Jadwal;
 use App\Models\M_Pengajuan;
 use App\Models\M_JadwalShift;
+use Livewire\WithFileUploads;
 use App\Models\M_DataKaryawan;
+use Illuminate\Support\Facades\Auth;
 use App\Livewire\Forms\PengajuanForm;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Auth;
 
 class ModalPengajuan extends Component
 {
+    use WithFileUploads;
     public PengajuanForm $form;
     public $karyawans;
     public $shifts;
@@ -45,7 +47,7 @@ class ModalPengajuan extends Component
         $this->form->pengajuan = $data['shift_id'];
         $this->form->tanggal = $data['tanggal'];
         $this->form->keterangan = $data['keterangan'];
-        $this->file = $data['file'] ? str_replace('storage/', '', $data['file']) : null;
+        $this->file = isset($data['file']) ? str_replace('storage/', '', $data['file']) : null;
     }
     
     public function saveEdit()
@@ -56,15 +58,10 @@ class ModalPengajuan extends Component
             session()->flash('error', 'Data pengajuan tidak ditemukan!');
             return;
         }
-        // $this->form->validate();
-
-        // $this->validate([
-        //     'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5048',
-        // ]);
 
         $path = null;
         if ($this->file) {
-            $path = $this->file->store('file', 'public');
+            $path = $this->file->store('file-pengajuan', 'public');
         }
 
         $data = [
@@ -96,13 +93,19 @@ class ModalPengajuan extends Component
     {
         $this->form->validate();
 
-        $this->validate([
-            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5048',
-        ]);
+        if ($this->file) {
+            // dd($this->file);
+            $this->validate([
+                'file' => 'nullable|mimes:jpg,jpeg,png|max:2048',
+            ], [
+                'file.max' => 'Ukuran file maksimal 2MB.',
+                'file.mimes' => 'Format file harus JPG, JPEG, PNG.',
+            ]);
+        }
 
         $path = null;
         if ($this->file) {
-            $path = $this->file->store('file', 'public');
+            $path = $this->file->store('file-pengajuan', 'public');
         }
         // dd(auth()->id());
         $data = [
@@ -111,9 +114,9 @@ class ModalPengajuan extends Component
             'tanggal' => $this->form->tanggal,
             'keterangan' => $this->form->keterangan,
             'file' => $path ? str_replace('public/', 'storage/', $path) : null,
-            'satatus' => 0, // Status default 0 (pending)
+            'satatus' => 0,
         ];
-        // dd($data);
+        dd($data);
 
         // Simpan data ke database
         M_Pengajuan::create($data);

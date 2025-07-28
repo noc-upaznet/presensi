@@ -10,6 +10,7 @@ use App\Models\M_Presensi;
 use App\Models\M_JadwalShift;
 use App\Models\M_DataKaryawan;
 use App\Models\M_TemplateWeek;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
 class ModalJadwalShift extends Component
@@ -43,10 +44,42 @@ class ModalJadwalShift extends Component
             'tahun' => (int) $carbon->format('Y'),
         ];
     }
+
     public function setBulan($value)
     {
         $this->bulan = $value;
     }
+
+    public function updatedBulanTahun()
+    {
+        $user = Auth::user();
+
+        // Ambil ID karyawan yang sudah punya jadwal di bulan-tahun tersebut
+        $jadwalId = M_Jadwal::where('bulan_tahun', $this->bulan_tahun)
+            ->pluck('karyawan_id')
+            ->toArray();
+            // dd($jadwalId);
+        
+        if ($user->current_role === 'spv') {    
+            $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+            $divisi = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+            $this->karyawans = M_DataKaryawan::where('divisi', $divisi)
+                ->where('entitas', $entitas)
+                ->whereNotIn('id', $jadwalId)
+                ->orderBy('nama_karyawan')
+                ->get();
+        } elseif ($user->current_role === 'admin') {
+            $entitas = session('selected_entitas', 'UHO');
+            $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
+                ->whereNotIn('id', $jadwalId)
+                ->orderBy('nama_karyawan')
+                ->get();
+        }
+
+        $this->selectedKaryawan = null;
+    }
+
 
     public function fillCalendarFromTemplate()
     {
@@ -222,13 +255,34 @@ class ModalJadwalShift extends Component
     public function mount()
     {
         $this->bulan_tahun = now()->format('Y-m');
-        $this->karyawans = M_DataKaryawan::orderBy('nama_karyawan')->get();
-        // dd($this->karyawans);    
-        // $this->users = User::where('role', 'user')->orderBy('name')->get();
+        $user = Auth::user();
+
+        $jadwalId = M_Jadwal::where('bulan_tahun', $this->bulan_tahun)
+            ->pluck('karyawan_id')
+            ->toArray();
+        if ($user->current_role === 'spv') {
+            $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+            $divisi = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+
+            $this->karyawans = M_DataKaryawan::where('divisi', $divisi)
+                ->where('entitas', $entitas)
+                ->whereNotIn('id', $jadwalId) // filter
+                ->orderBy('nama_karyawan')
+                ->get();
+        } elseif ($user->current_role === 'admin') {
+            $entitas = session('selected_entitas', 'UHO');
+
+            $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
+                ->whereNotIn('id', $jadwalId)
+                ->orderBy('nama_karyawan')
+                ->get();
+        }
+
         $this->jadwalShifts = M_JadwalShift::orderBy('nama_shift')->get();
         $this->templateWeeks = M_TemplateWeek::orderBy('nama_template')->get();
-
     }
+
     public function render()
     {
         $bulan = (int) Carbon::parse($this->bulan_tahun)->format('m');

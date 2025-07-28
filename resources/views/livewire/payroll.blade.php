@@ -2,7 +2,7 @@
     <div class="app-content-header">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-6 mt-5">
                     <h3 class="mb-0" style="color: var(--bs-body-color);">Payroll</h3>
                 </div>
                 <div class="col-sm-6">
@@ -24,7 +24,8 @@
                         <div class="inner pe-5">
                             <!-- Tambahkan padding end/right -->
                             <h3>{{ $jumlahBelumPunyaSlip }}</h3>
-                            <p>Slip Gaji Belum Dibuat</p>
+                            <span>Slip Gaji Belum Dibuat</span><br>
+                            <span><b>Entitas {{ $currentEntitas }}</b></span>
                         </div>
                         <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -40,12 +41,80 @@
                     </div>
                     <!--end::Small Box Widget 3-->
                 </div>
+                <div class="col-lg-3 col-6">
+                    <!--begin::Small Box Widget 3-->
+                    <div class="small-box text-bg-warning">
+                        <div class="inner pe-5">
+                            <!-- Tambahkan padding end/right -->
+                            <h3>{{ $jumlahBelumPunyaSlipTitip }}</h3>
+                            <span>Slip Gaji Belum Dibuat</span><br>
+                            <span><b>Entitas Lainnya</b></span>
+                        </div>
+                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path
+                                d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
+                            </path>
+                        </svg>
+                        <a href="#" wire:click="showModalEks"
+                            class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+                            More info <i class="bi bi-arrow-right-circle"></i>
+                        </a>
+                        <livewire:modal-payroll />  
+                    </div>
+                    <!--end::Small Box Widget 3-->
+                </div>
+                <div class="col-lg-3 col-6">
+                    <!--begin::Small Box Widget 3-->
+                    <div class="small-box text-bg-info">
+                        <div class="inner pe-5">
+                            <!-- Tambahkan padding end/right -->
+                            <h3>{{ $JumlahKaryawanInternal }}</h3>
+                            <span>Jumlah Slip Gaji</span><br>
+                            <span><b>Karyawan {{ $currentEntitas }} </b></span>
+                        </div>
+                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path
+                                d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
+                            </path>
+                        </svg>
+                        <span
+                            class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+                            -
+                        </span>
+                        <livewire:modal-payroll />  
+                    </div>
+                    <!--end::Small Box Widget 3-->
+                </div>
+                <div class="col-lg-3 col-6">
+                    <!--begin::Small Box Widget 3-->
+                    <div class="small-box text-bg-info">
+                        <div class="inner pe-5">
+                            <!-- Tambahkan padding end/right -->
+                            <h3>{{ $JumlahKaryawanTitip }}</h3>
+                            <span>Jumlah Slip Gaji</span><br>
+                            <span><b>Karyawan Titip </b></span>
+                        </div>
+                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path
+                                d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
+                            </path>
+                        </svg>
+                        <span
+                            class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+                            -
+                        </span>
+                        <livewire:modal-payroll />  
+                    </div>
+                    <!--end::Small Box Widget 3-->
+                </div>
             </div>
         </div>
     </div>
-
     <div class="container">
-        <div class="card" style="background-color: var(--bs-body-bg);">
+        <div class="card">
             <div class="card-header">
                 @php
                     $month = $selectedMonth ?? now()->subMonth()->format('n');
@@ -60,26 +129,27 @@
             <div class="card-body">
                 <div class="d-flex mb-3 align-items-center">
                     {{-- Dropdown Tahun --}}
-                <select wire:model.lazy="selectedYear" class="form-select me-2" style="width: 100px;">
-                    @for ($i = now()->year; $i >= 2020; $i--)
-                        <option value="{{ $i }}">{{ $i }}</option>
-                    @endfor
-                </select>
+                    <select wire:model.lazy="selectedYear" class="form-select me-2" style="width: 100px;">
+                        @for ($i = now()->year; $i >= 2020; $i--)
+                            <option value="{{ $i }}">{{ $i }}</option>
+                        @endfor
+                    </select>
 
-                {{-- Dropdown Bulan (dengan label lebih informatif untuk cut-off) --}}
-                <select wire:model.lazy="selectedMonth" class="form-select me-2" style="width: 180px;">
-                    <option value="">Pilih Bulan</option>
-                    @foreach (range(1, 12) as $m)
-                        @php
-                            $bulan = \Carbon\Carbon::create()->month($m)->locale('id');
-                            $namaBulan = $bulan->translatedFormat('F');
-                        @endphp
-                        <option value="{{ $m }}">
-                            {{ $namaBulan }} (cut-off 25 {{ $namaBulan }})
-                        </option>
-                    @endforeach
-                </select>
+                    {{-- Dropdown Bulan --}}
+                    <select wire:model.lazy="selectedMonth" class="form-select me-2" style="width: 150px;">
+                        <option value="">Bulan</option>
+                        @foreach (range(1, 12) as $m)
+                            <option value="{{ $m }}">
+                                {{ \Carbon\Carbon::create()->month($m)->locale('id')->translatedFormat('F') }}
+                            </option>
+                        @endforeach
+                    </select>
 
+                    {{-- <select wire:model.lazy="selectedStatus" class="form-select me-2" style="width: 170px;">
+                        <option value="">Status Karyawan</option>
+                        <option value="titip">TITIP</option>
+                        <option value="tetap">TETAP</option>
+                    </select> --}}
 
                     <div class="ms-auto">
                         <button type="button" class="btn btn-sm btn-success" wire:click="export">
@@ -89,23 +159,8 @@
 
                 </div>
 
-                {{-- <h5 class="text-secondary mb-3">
-                    Periode: {{ $selectedMonth ? \Carbon\Carbon::createFromFormat('m', $selectedMonth)->locale('id')->translatedFormat('F') . ' ' . $selectedYear : 'Semua Periode' }}
-                </h5> --}}
-                @php
-                    use Carbon\Carbon;
-
-                    if ($selectedMonth && $selectedYear) {
-                        $cutoffEnd = Carbon::createFromDate($selectedYear, $selectedMonth, 25);
-                        $cutoffStart = $cutoffEnd->copy()->subMonthNoOverflow()->setDay(26);
-                        $periodeText = $cutoffStart->locale('id')->translatedFormat('d F Y') . ' - ' . $cutoffEnd->locale('id')->translatedFormat('d F Y');
-                    } else {
-                        $periodeText = 'Semua Periode';
-                    }
-                @endphp
-
                 <h5 class="text-secondary mb-3">
-                    Periode: {{ $periodeText }}
+                    Periode: {{ $selectedMonth ? \Carbon\Carbon::createFromFormat('m', $selectedMonth)->locale('id')->translatedFormat('F') . ' ' . $selectedYear : 'Semua Periode' }}
                 </h5>
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -121,36 +176,47 @@
                         </label>
                     </div>
                 </div>
-
+                <h5 class="text-secondary mb-3">Data Slip Karyawan {{ $currentEntitas }}</h5>
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                {{-- <th>No</th> --}}
                                 <th>No. Slip</th>
                                 <th>Nama</th>
                                 <th>NIP Karyawan</th>
                                 <th>Departemen</th>
                                 <th>Bulan</th>
                                 <th>Grand Total</th>
+                                <th>Status Titip</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if ($data->isEmpty())
                                 <tr>
-                                    <td colspan="7" class="text-center" style="color: var(--bs-body-color);">Data tidak ditemukan.</td>
+                                    <td colspan="12" class="text-center">Data tidak ditemukan.</td>
                                 </tr>
                             @else
-                                @foreach ($data as $i => $payroll)
+                                @foreach ($data as $payroll)
                                     <tr>
-                                        {{-- <td>{{ $data->firstItem() + $i }}</td> --}}
-                                        <td style="color: var(--bs-body-color);">{{ $payroll->no_slip }}</td>
-                                        <td style="color: var(--bs-body-color);">{{ $payroll->getKaryawan->nama_karyawan }}</td>
-                                        <td style="color: var(--bs-body-color);">{{ $payroll->nip_karyawan }}</td>
-                                        <td style="color: var(--bs-body-color);">{{ $payroll->divisi }}</td>
-                                        <td style="color: var(--bs-body-color);">{{ $payroll->periode }}</td>
-                                        <td style="color: var(--bs-body-color);">Rp. {{ number_format($payroll->total_gaji, 0, ',', '.') }}</td>
+                                        <td>{{ $payroll->no_slip }}</td>
+                                        <td>{{ $payroll->getKaryawan->nama_karyawan }}</td>
+                                        <td>{{ $payroll->nip_karyawan }}</td>
+                                        <td>{{ $payroll->divisi }}</td>
+                                        <td>{{ $payroll->periode }}</td>
+                                        <td>Rp. {{ number_format($payroll->total_gaji, 0, ',', '.') }}</td>
+                                        <td>
+                                            <div class="form-check form-switch d-inline-block">
+                                                <input type="checkbox"
+                                                    class="form-check-input"
+                                                    id="switchTitip{{ $payroll->id }}"
+                                                    wire:change="toggleTitip({{ $payroll->id }})"
+                                                    @if($payroll->titip) checked @endif>
+                                                <label class="form-check-label" for="switchTitip{{ $payroll->id }}">
+                                                    {{ $payroll->titip ? 'Titip' : $currentEntitas }}
+                                                </label>
+                                            </div>
+                                        </td>
                                         <td>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview({{ $payroll->id }})"><i class="fa-solid fa-print"></i>
                                             </button>
@@ -168,11 +234,69 @@
                     </table>
                 </div>
 
+                <h5 class="text-secondary mb-3">Data Slip Karyawan Titip</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No. Slip</th>
+                                <th>Nama</th>
+                                <th>NIP Karyawan</th>
+                                <th>Departemen</th>
+                                <th>Bulan</th>
+                                <th>Grand Total</th>
+                                <th>Status Titip</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if ($data2->isEmpty())
+                                <tr>
+                                    <td colspan="12" class="text-center">Data tidak ditemukan.</td>
+                                </tr>
+                            @else
+                                @foreach ($data2 as $key)
+                                    <tr>
+                                        <td>{{ $key->no_slip }}</td>
+                                        <td>{{ $key->getKaryawan->nama_karyawan }}</td>
+                                        <td>{{ $key->nip_karyawan }}</td>
+                                        <td>{{ $key->divisi }}</td>
+                                        <td>{{ $key->periode }}</td>
+                                        <td>Rp. {{ number_format($key->total_gaji, 0, ',', '.') }}</td>
+                                        <td>
+                                            <div class="form-check form-switch d-inline-block">
+                                                <input type="checkbox"
+                                                    class="form-check-input"
+                                                    id="switchTitip{{ $key->id }}"
+                                                    wire:change="toggleTitip({{ $key->id }})"
+                                                    @if($key->titip) checked @endif>
+                                                <label class="form-check-label" for="switchTitip{{ $key->id }}">
+                                                    {{ $key->titip ? 'Titip' : $currentEntitas }}
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview({{ $key->id }})"><i class="fa-solid fa-print"></i>
+                                            </button>
+                                            <button wire:click="editPayroll({{ $key->id }})"
+                                                class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit"></i>
+                                            </button>
+                                            <button wire:click="confirmHapusPayroll({{ $key->id }})"
+                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <span>
                         Showing {{ $data->firstItem() }} to {{ $data->lastItem() }} of {{ $data->total() }} entries
                     </span>
-                    {{ $data->links() }}
+                    {{ $data->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>
@@ -209,73 +333,109 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="nip" class="form-label fw-semibold">No. Slip</label>
-                        <input type="text" class="form-control" id="nip" wire:model="no_slip"
-                            disabled>
-                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nip" class="form-label fw-semibold">No. Slip</label>
+                            <input type="text" class="form-control" id="nip" wire:model="no_slip"
+                                disabled>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="employee" class="form-label fw-semibold">Karyawan</label>
-                        <input type="text" class="form-control" id="nip" wire:model="nama_karyawan" 
-                            disabled>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="month" class="form-label fw-semibold">Bulan & Tahun</label>
-                        <input type="month" id="month" class="form-control" wire:model="bulan_tahun">
-                    </div>
-                    <div class="mb-3">
-                        <label for="nip" class="form-label fw-semibold">NPK/NIP</label>
-                        <input type="text" class="form-control" id="nip" wire:model="nip_karyawan" 
-                            disabled>
-                    </div>
-                    <div class="mb-3">
-                        <label for="divisi" class="form-label fw-semibold">Divisi</label>
-                        <input type="text" class="form-control" id="divisi" wire:model="divisi" 
-                            disabled>
-                    </div>
-                    <div class="mb-3">
-                        <label for="jabatan" class="form-label fw-semibold">Jabatan</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" disabled wire:model="jabatan">
+                        <div class="col-md-6 mb-3">
+                            <label for="employee" class="form-label fw-semibold">Karyawan</label>
+                            <input type="text" class="form-control" id="nip" wire:model="nama_karyawan" 
+                                disabled>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
-                        <input type="number" id="gaji_pokok" class="form-control" wire:model="gaji_pokok"
-                            disabled>
-                    </div>
-                    <div class="mb-3">
-                        <label for="tunjangan_jabatan" class="form-label fw-semibold">Tunjangan Jabatan</label>
-                        <input type="number" id="tunjangan_jabatan" class="form-control" wire:model="tunjangan_jabatan"
-                            disabled>
-                    </div>
-                    <div class="mb-3">
-                        <label for="lembur_nominal" class="form-label fw-semibold">Lembur</label>
-                        <input type="number" id="lembur_nominal" class="form-control" wire:model="lembur_nominal"
-                            disabled>
-                    </div>
-                    @if ($this->isSalesPosition())
-                        <div class="row">
-                            <div class="mb-3 col-md-6">
-                                <label for="jml_psb" class="form-label fw-semibold">Jml. PSB</label>
-                                <input type="text" id="jml_psb" class="form-control" wire:model.lazy="jml_psb">
-                            </div>
-                            <div class="mb-3 col-md-6">
-                                <label for="insentif" class="form-label fw-semibold">Insentif</label>
-                                <input type="text" id="insentif" class="form-control" disabled wire:model="insentif">
-                            </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="month" class="form-label fw-semibold">Bulan & Tahun</label>
+                            <input type="month" id="month" class="form-control" wire:model="bulan_tahun">
                         </div>
-                    @endif
+                        <div class="col-md-6 mb-3">
+                            <label for="nip" class="form-label fw-semibold">NPK/NIP</label>
+                            <input type="text" class="form-control" id="nip" wire:model="nip_karyawan" 
+                                disabled>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="divisi" class="form-label fw-semibold">Divisi</label>
+                            <input type="text" class="form-control" id="divisi" wire:model="divisi" 
+                                disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
+                            <input type="number" id="gaji_pokok" class="form-control" wire:model="gaji_pokok"
+                                disabled>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tunjangan_jabatan" class="form-label fw-semibold">Tunjangan Jabatan</label>
+                            <input type="number" id="tunjangan_jabatan" class="form-control" wire:model="tunjangan_jabatan"
+                                disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lembur_nominal" class="form-label fw-semibold">Lembur</label>
+                            <input type="number" id="lembur_nominal" class="form-control" wire:model="lembur_nominal"
+                                disabled>
+                        </div>
+                    </div>
+                    
                     <div class="row">
                         <div class="mb-3 col-md-6">
-                            <label for="izin_nominal" class="form-label fw-semibold">Potongan Izin</label>
-                            <input type="text" id="izin_nominal" class="form-control" disabled wire:model="izin_nominal">
+                            <label for="potongan" class="form-label fw-semibold">Tunjangan Kebudayaan</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">Rp</span>
+                                <select name="kebudayaan" class="form-select" wire:model.lazy="kebudayaan">
+                                    <option value="">-- Pilih Nominal --</option>
+                                    <option value="100000">100000</option>
+                                    <option value="200000">200000</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="mb-3 col-md-6">
-                            <label for="terlambat_nominal" class="form-label fw-semibold">Potongan Terlambat</label>
-                            <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
+                            <label for="potongan" class="form-label fw-semibold">Bonus Fee Sharing</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">Rp</span>
+                                <select name="fee_sharing" class="form-select" wire:model.lazy="fee_sharing">
+                                    <option value="">-- Pilih Nominal --</option>
+                                    <option value="100000">100000</option>
+                                    <option value="200000">200000</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="mb-3 col-md-6">
+                            <label for="potongan" class="form-label fw-semibold">Uang Transport</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">Rp</span>
+                                <select name="transport" class="form-select" wire:model.lazy="transport">
+                                    <option value="">-- Pilih Nominal --</option>
+                                    <option value="5000">5.000</option>
+                                    <option value="10000">10.000</option>
+                                    <option value="15000">15.000</option>
+                                    <option value="25000">25.000</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3 col-md-6">
+                            <label for="potongan" class="form-label fw-semibold">Uang Makan</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">Rp</span>
+                                <select name="uang_makan" class="form-select" wire:model.lazy="uang_makan">
+                                    <option value="">-- Pilih Nominal --</option>
+                                    <option value="5000">5.000</option>
+                                    <option value="10000">10.000</option>
+                                    <option value="15000">15.000</option>
+                                    <option value="25000">25.000</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
@@ -304,7 +464,7 @@
                             <button type="button" class="btn btn-success mb-2" wire:click="addTunjangan">+ Tambah Tunjangan</button>
                         </div>
                     </div>
-
+                    
                     <div class="mb-3">
                         <label for="potongan" class="form-label fw-semibold">Potongan</label>
                         @foreach ($potongan as $index => $item)
@@ -330,34 +490,65 @@
                             <button type="button" class="btn btn-success mb-2" wire:click="addPotongan">+ Tambah Potongan</button>
                         </div>
                     </div>
-                    <div class="mb-2">
-                        <label>Bonus Fee Sharing</label>
-                        <input type="number" class="form-control" wire:model.lazy="fee_sharing_nominal">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="izin_nominal" class="form-label fw-semibold">Potongan Izin</label>
+                            <input type="text" id="izin_nominal" class="form-control" disabled wire:model="izin_nominal">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="terlambat_nominal" class="form-label fw-semibold">Potongan Terlambat</label>
+                            <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
+                        </div>
                     </div>
                     <div class="row mt-2 mb-2">
                         <div class="col-md-6">
                             <label>Nominal BPJS Kesehatan (1%)</label>
-                            <input type="number" class="form-control" wire:model.lazy="bpjs_nominal">
+                            <input type="number" class="form-control" readonly wire:model.lazy="bpjs_nominal">
                         </div>
 
                         <div class="col-md-6">
                             <label>Nominal BPJS JHT (2%)</label>
-                            <input type="number" class="form-control" wire:model.lazy="bpjs_jht_nominal">
+                            <input type="number" class="form-control" readonly wire:model.lazy="bpjs_jht_nominal">
                         </div>
                     </div>
-                    
+                    {{-- <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="terlambat" class="form-label fw-semibold">Terlambat</label>
+                            <input type="number" id="terlambat" class="form-control" wire:model="terlambat">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="izin" class="form-label fw-semibold">Izin</label>
+                            <input type="number" id="izin" class="form-control" wire:model="izin">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="cuti" class="form-label fw-semibold">Cuti</label>
+                            <input type="number" id="cuti" class="form-control" wire:model="cuti">
+                        </div>
+                    </div> --}}
+                    {{-- <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="kehadiran" class="form-label fw-semibold">Kehadiran</label>
+                            <input type="number" id="kehadiran" class="form-control" wire:model="kehadiran">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="lembur" class="form-label fw-semibold">Lembur</label>
+                            <input type="number" id="lembur" class="form-control" wire:model="lembur">
+                        </div>
+                    </div> --}}
                     <div class="mb-3">
                         <label for="terlambat" class="form-label fw-semibold">Total gaji</label>
                         <input type="number" id="terlambat" class="form-control" wire:model="total_gaji" readonly>
                     </div>
                     <div class="modal-footer">
                         <button type="button" wire:click="saveEdit" class="btn btn-primary"
-                            wire:loading.attr="disabled">
-                            <div wire:loading class="spinner-border spinner-border-sm" role="status">
+                            wire:loading.attr="disabled" wire:target="saveEdit">
+                            <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <span wire:loading.remove><i class="fa fa-save"></i> Simpan</span>
-                            <span wire:loading>Loading...</span>
+                            <span wire:loading.remove wire:target="saveEdit">
+                                <i class="fa fa-save"></i> Simpan
+                            </span>
+                            <span wire:loading wire:target="saveEdit">Loading...</span>
                         </button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             style="border-radius: 8px;">Tutup</button>
@@ -397,6 +588,10 @@
     <script>
         Livewire.on('modalPayroll', (event) => {
             $('#modalPayroll').modal(event.action);
+        });
+
+        Livewire.on('modalPayrollEks', (event) => {
+            $('#modalPayrollEks').modal(event.action);
         });
 
         Livewire.on('editPayrollModal', (event) => {

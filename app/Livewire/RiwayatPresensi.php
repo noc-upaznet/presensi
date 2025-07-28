@@ -8,9 +8,12 @@ use App\Models\M_Presensi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\M_DataKaryawan;
+use Livewire\WithPagination;
 
 class RiwayatPresensi extends Component
 {
+    use WithPagination;
+
     public $editId;
     public $statusList = [
         0 => 'Tepat Waktu',
@@ -86,14 +89,14 @@ class RiwayatPresensi extends Component
 
     public function render()
     {
-        if (Auth::user()->current_role == 'admin' || Auth::user()->current_role == 'spv' || Auth::user()->current_role == 'hr') {
+        if (Auth::user()->current_role == 'admin' || Auth::user()->current_role == 'hr') {
             $datas = M_Presensi::with('getUser')
                 ->whereMonth('created_at', Carbon::now()->month)
                 ->whereYear('created_at', Carbon::now()->year)
                 ->orderBy('created_at', 'desc')
-                ->get();
+                ->paginate(10);
                 // dd($datas);
-        } elseif (Auth::user()->current_role == 'user') {
+        } elseif (Auth::user()->current_role == 'user' || Auth::user()->current_role == 'spv') {
             $userId = Auth::id();
             $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
             $karyawanId = $karyawan ? $karyawan->id : null;
@@ -102,7 +105,7 @@ class RiwayatPresensi extends Component
                 ->whereMonth('created_at', Carbon::now()->month)
                 ->whereYear('created_at', Carbon::now()->year)
                 ->orderBy('created_at', 'desc')
-                ->get();
+                ->paginate(10);
             // dd($datas);
         }
         // dd($dataPresensi);

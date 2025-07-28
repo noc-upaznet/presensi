@@ -9,6 +9,7 @@ use App\Models\M_DataKaryawan;
 
 class ModalPayroll extends Component
 {
+    public $search = '';
     public function render()
     {
         $bulanIni = Carbon::now()->format('Y-m');
@@ -20,11 +21,23 @@ class ModalPayroll extends Component
 
         $data = M_DataKaryawan::where('entitas', $selectedEntitas)
             ->whereNotIn('id', $existingKaryawanIds)
+            ->when($this->search, function ($query) {
+                $query->where('nama_karyawan', 'like', '%' . $this->search . '%');
+            })
+            ->orderByDesc('id')
+            ->get();
+
+        $dataEks = M_DataKaryawan::where('entitas', '!=', $selectedEntitas)
+            ->whereNotIn('id', $existingKaryawanIds)
+            ->when($this->search, function ($query) {
+                $query->where('nama_karyawan', 'like', '%' . $this->search . '%');
+            })
             ->orderByDesc('id')
             ->get();
 
         return view('livewire.modal-payroll', [
-            'data' => $data
+            'data' => $data,
+            'dataEks' => $dataEks,
         ]);
     }
 }

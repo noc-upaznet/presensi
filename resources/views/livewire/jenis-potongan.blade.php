@@ -42,8 +42,8 @@
                             <thead>
                                 <tr>
                                     <th scope="col">Jenis Potongan</th>
-                                    <th scope="col">Deskripsi</th>
-                                    <th scope="col">Aksi</th>
+                                    <th scope="col">Nominal</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -92,7 +92,7 @@
                         @enderror
                     </div>
                     <div class="mb-3">
-                        <label for="deskripsi" class="form-label">Deskripsi</label>
+                        <label for="deskripsi" class="form-label">Nominal</label>
                         <input type="number" class="form-control" id="deskripsi" wire:model="deskripsi">
                     </div>
                 </div>

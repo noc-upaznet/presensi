@@ -1,0 +1,176 @@
+<?php
+
+namespace App\Exports;
+
+use App\Models\PayrollModel;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+
+class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
+{
+    protected $periode;
+    protected $status;
+
+    protected $uniqueTunjangan = [];
+    protected $uniquePotongan = [];
+
+    public function __construct($periode, $status)
+    {
+        $this->periode = $periode;
+        $this->status = $status;
+    }
+
+    protected $headerRowCount = 1;
+
+    public function array(): array
+    {
+        $query = PayrollModel::join('data_karyawan', 'payroll.karyawan_id', '=', 'data_karyawan.id')
+            ->where('payroll.periode', $this->periode);
+
+        if ($this->status == 'titip') {
+            $query->where('payroll.titip', 1);
+        } else {
+            $query->where(function ($q) {
+                $q->whereNull('payroll.titip')->orWhere('payroll.titip', 0);
+            });
+        }
+
+        $data = $query->select(
+            'payroll.*',
+            'data_karyawan.nama_karyawan',
+            'data_karyawan.nip_karyawan'
+        )->get();
+
+        // Ambil semua nama tunjangan dan potongan
+        foreach ($data as $item) {
+            $tunjanganArray = json_decode($item->tunjangan, true) ?? [];
+            foreach ($tunjanganArray as $t) {
+                $nama = $t['nama'] ?? '';
+                if ($nama && !in_array($nama, $this->uniqueTunjangan)) {
+                    $this->uniqueTunjangan[] = $nama;
+                }
+            }
+
+            $potonganArray = json_decode($item->potongan, true) ?? [];
+            foreach ($potonganArray as $p) {
+                $nama = $p['nama'] ?? '';
+                if ($nama && !in_array($nama, $this->uniquePotongan)) {
+                    $this->uniquePotongan[] = $nama;
+                }
+            }
+        }
+
+        // Header tetap
+        $headerTetap = [
+            'No Slip',
+            'Nama Karyawan',
+            'NIP',
+            'Divisi',
+            'Periode',
+            'Tunjangan Jabatan',
+            'Gaji Pokok',
+            'Lembur',
+            'Tunjangan Kebudayaan',
+            'Transport',
+            'Izin',
+            'Terlambat',
+            'BPJS',
+            'BPJS JHT',
+            'Fee Sharing',
+            'Insentif',
+            'Uang Makan',
+            'Total Gaji',
+        ];
+
+        $headerTunjangan = array_map(fn($t) => "$t", $this->uniqueTunjangan);
+        $headerPotongan = array_map(fn($p) => "$p", $this->uniquePotongan);
+
+        $indexTotalGaji = array_search('Total Gaji', $headerTetap);
+        $headerAwal = array_slice($headerTetap, 0, $indexTotalGaji); // Sebelum Total Gaji
+        $headerAkhir = array_slice($headerTetap, $indexTotalGaji + 1); // Setelah Total Gaji (jika ada)
+
+        $header = array_merge(
+            $headerAwal,
+            $headerTunjangan,
+            $headerPotongan,
+            ['Total Gaji'],
+            $headerAkhir // opsional, kalau memang ada kolom setelah 'Total Gaji'
+        );
+
+        // Hitung jumlah kolom untuk styling
+        $this->headerRowCount = count($header);
+
+        $rows = [];
+
+        foreach ($data as $item) {
+            $tunjanganArray = collect(json_decode($item->tunjangan, true) ?? []);
+            $potonganArray = collect(json_decode($item->potongan, true) ?? []);
+
+            $row = [
+                $item->no_slip,
+                $item->nama_karyawan,
+                $item->nip_karyawan,
+                $item->divisi,
+                $item->periode,
+                $item->tunjangan_jabatan,
+                $item->gaji_pokok,
+                $item->lembur,
+                $item->tunjangan_kebudayaan,
+                $item->transport,
+                $item->izin,
+                $item->terlambat,
+                $item->bpjs,
+                $item->bpjs_jht,
+                $item->fee_sharing,
+                $item->insentif,
+                $item->uang_makan,
+                // $item->total_gaji,
+            ];
+
+            // Tambah nilai tunjangan
+            foreach ($this->uniqueTunjangan as $nama) {
+                $match = $tunjanganArray->firstWhere('nama', $nama);
+                $row[] = $match['nominal'] ?? 0;
+            }
+
+            // Tambah nilai potongan
+            foreach ($this->uniquePotongan as $nama) {
+                $match = $potonganArray->firstWhere('nama', $nama);
+                $row[] = $match['nominal'] ?? 0;
+            }
+
+            $row[] = $item->total_gaji;
+
+            $rows[] = $row;
+        }
+
+        return array_merge([$header], $rows);
+    }
+
+    public function title(): string
+    {
+        return $this->status === 'titip' ? 'Karyawan Titip' : 'Karyawan Tetap';
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        // Bold header
+        $sheet->getStyle('A1:' . $sheet->getHighestColumn() . '1')->getFont()->setBold(true);
+
+        // Border untuk semua sel yang terisi
+        $highestRow = $sheet->getHighestRow();
+        $highestCol = $sheet->getHighestColumn();
+
+        $sheet->getStyle("A1:{$highestCol}{$highestRow}")->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ]
+            ]
+        ]);
+    }
+}

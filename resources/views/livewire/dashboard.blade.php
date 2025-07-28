@@ -1,26 +1,74 @@
 <div class="container-fluid">
+    <div class="app-content-header">
+        <!--begin::Row-->
+        <div class="row">
+            <div class="col-sm-6 mt-5"><h3 class="mb-0" style="color: var(--bs-body-color);">Dashboard</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                </ol>
+            </div>
+        </div>
+        <!--end::Row-->
+    </div>
     {{-- Summary Cards --}}
-    <div class="row g-3 mb-3 mt-5" syle="background-color: var(--bs-body-bg);">
+    <div class="row g-3 mb-3" syle="background-color: var(--bs-body-bg);">
         @php
         $cards = [
-        ['title' => 'TOTAL PEGAWAI', 'value' => $totalPegawai ?? '0', 'icon' => 'fa-users', 'color' => 'warning', 'href' => '<a href="' . route('data-karyawan') . '" class="text-white text-decoration-none fw-medium">
-            More Info <i class="fa-solid fa-circle-chevron-right"></i>
-        </a>'],
-        ['title' => 'TOTAL GAJI KARYAWAN', 'value' => 'Rp.' . number_format($totalGaji) ?? '0', 'icon' => 'fa-money-bill-wave', 'color' => 'info', 'note' => '▲ -5% dari bulan sebelumnya', 'href' => '<a href="' . route('payroll') . '" class="text-white text-decoration-none fw-medium">
-            More Info <i class="fa-solid fa-circle-chevron-right"></i>
-        </a>'],
-        ['title' => 'IZIN/CUTI', 'value' => $izinCuti ?? '0', 'icon' => 'fa-calendar-times', 'color' => 'danger', 'href' => '<a href="' . route('pengajuan') . '" class="text-white text-decoration-none fw-medium">
-            More Info <i class="fa-solid fa-circle-chevron-right"></i>
-        </a>'],
-        ['title' => 'MASUK', 'value' => $totalPresensi ?? '0', 'icon' => 'fa-user-check', 'color' => 'success', 'href' => '<a href="' . route('riwayat-presensi') . '" class="text-white text-decoration-none fw-medium">
-            More Info <i class="fa-solid fa-circle-chevron-right"></i>
-        </a>'],
+            ['title' => 'TOTAL PEGAWAI', 'value' => $totalPegawai ?? '0', 'icon' => 'fa-users', 'color' => 'warning', 'href' => '<a href="' . route('data-karyawan') . '" class="text-white text-decoration-none fw-medium">
+                More Info <i class="fa-solid fa-circle-chevron-right"></i>
+            </a>'],
+            ['title' => 'IZIN/CUTI', 'value' => $izinCuti ?? '0', 'icon' => 'fa-calendar-times', 'color' => 'danger', 'href' => '<a href="' . route('pengajuan') . '" class="text-white text-decoration-none fw-medium">
+                More Info <i class="fa-solid fa-circle-chevron-right"></i>
+            </a>'],
+            ['title' => 'MASUK', 'value' => $totalPresensi ?? '0', 'icon' => 'fa-user-check', 'color' => 'success', 'href' => '<a href="' . route('riwayat-presensi') . '" class="text-white text-decoration-none fw-medium">
+                More Info <i class="fa-solid fa-circle-chevron-right"></i>
+            </a>'],
+            ['title' => 'TOTAL GAJI KARYAWAN', 'value' => 'Rp.' . number_format($totalGaji) ?? '0', 'icon' => 'fa-money-bill-wave', 'color' => 'info', 'note' => '▲ -5% dari bulan sebelumnya', 'href' => '<a href="' . route('payroll') . '" class="text-white text-decoration-none fw-medium">
+                More Info <i class="fa-solid fa-circle-chevron-right"></i>
+            </a>'],
+            ['title' => 'TOTAL GAJI KARYAWAN TITIP', 'value' => 'Rp.' . number_format($totalGajiTitip) ?? '0', 'icon' => 'fa-money-bill-wave', 'color' => 'info', 'note' => '▲ -5% dari bulan sebelumnya', 'href' => '<a href="' . route('payroll') . '" class="text-white text-decoration-none fw-medium">
+                More Info <i class="fa-solid fa-circle-chevron-right"></i>
+            </a>'],
+            ['title' => 'BPJS Kesehatan', 'value' => 'Rp.' . number_format($totalBpjskes) ?? '0', 'icon' => 'fa-hospital-user', 'color' => 'info', 'note' => '+8% dari bulan sebelumnya', 'href' => '<a href="' . route('riwayat-presensi') . '" class="text-white text-decoration-none fw-medium">
+                More Info <i class="fa-solid fa-circle-chevron-right"></i>
+            </a>'],
+            ['title' => 'BPJS Ketenagakerjaan', 'value' => 'Rp.' . number_format($totalBpjsJht) ?? '0', 'icon' => 'fa-briefcase', 'color' => 'primary', 'note' => '+5% dari bulan sebelumnya', 'href' => '<a href="' . route('riwayat-presensi') . '" class="text-white text-decoration-none fw-medium">
+                More Info <i class="fa-solid fa-circle-chevron-right"></i>
+            </a>'],
         ];
         @endphp
 
         @foreach ($cards as $card)
+            <div class="col-md-6 col-xl-3">
+                <div class="card shadow-sm h-100 d-flex flex-column" style="background-color: var(--bs-body-bg);">
+                    <div class="card-body text-center flex-grow-1">
+                        <div class="d-flex justify-content-center mb-2">
+                            <div class="rounded-circle bg-{{ $card['color'] }} d-flex align-items-center justify-content-center"
+                                style="width: 45px; height: 45px;">
+                                <i class="fas {{ $card['icon'] }} text-white"></i>
+                            </div>
+                        </div>
+                        <h6 class="text-muted text-uppercase mb-1">{{ $card['title'] }}</h6>
+                        <h3 class="fw-bold mb-2">{{ $card['value'] }}</h3>
+                        @isset($card['note'])
+                        <p class="text-danger small mb-0">{{ $card['note'] }}</p>
+                        @endisset
+                    </div>
+                    <div class="card-footer bg-info text-white py-2 text-center">
+                        @isset($card['href'])
+                            {!! $card['href'] !!}
+                        @endisset
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+    {{-- <div class="row g-3 mb-3">
+        @foreach ($cards as $card)
         <div class="col-md-6 col-xl-3">
-            <div class="card shadow-sm h-100 d-flex flex-column" style="background-color: var(--bs-body-bg);">
+            <div class="card shadow-sm h-100 d-flex flex-column">
                 <div class="card-body text-center flex-grow-1">
                     <div class="d-flex justify-content-center mb-2">
                         <div class="rounded-circle bg-{{ $card['color'] }} d-flex align-items-center justify-content-center"
@@ -30,19 +78,29 @@
                     </div>
                     <h6 class="text-muted text-uppercase mb-1">{{ $card['title'] }}</h6>
                     <h3 class="fw-bold mb-2">{{ $card['value'] }}</h3>
+
                     @isset($card['note'])
-                    <p class="text-danger small mb-0">{{ $card['note'] }}</p>
+                    @php
+                    $isPositive = \Illuminate\Support\Str::contains($card['note'], '+');
+                    $isNegative = \Illuminate\Support\Str::contains($card['note'], '-');
+                    $noteColor = $isPositive ? 'text-success' : ($isNegative ? 'text-danger' : 'text-muted');
+                    $arrow = $isPositive ? '▲' : ($isNegative ? '▼' : '');
+                    @endphp
+                    <p class="{{ $noteColor }} small mb-0">
+                        <span class="me-1">{{ $arrow }}</span>{{ $card['note'] }}
+                    </p>
                     @endisset
+
                 </div>
                 <div class="card-footer bg-info text-white py-2 text-center">
-                    @isset($card['href'])
-                        {!! $card['href'] !!}
-                    @endisset
+                    <a href="#" class="text-white text-decoration-none fw-medium">
+                        More Info <i class="fa-solid fa-circle-chevron-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
         @endforeach
-    </div>
+    </div> --}}
 
     {{-- Grafik dan Status --}}
     <div class="row">
@@ -142,7 +200,6 @@
         </div>
 
     </div>
-</div>
 </div>
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

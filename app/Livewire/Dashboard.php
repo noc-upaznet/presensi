@@ -99,16 +99,21 @@ class Dashboard extends Component
     {
         $entitas = session('selected_entitas', 'UHO'); // default fallback
         $entitasModel = M_Entitas::where('nama', $entitas)->first();
-        // Ambil ID entitas jika valid
-        if ($entitasModel) {
-            $karyawanIds = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
-            // dd($entitas, $karyawanIds);
-        } else {
-            $karyawanIds = M_DataKaryawan::pluck('id'); // fallback ke semua
-        }
+        $entitasIdSaatIni = $entitasModel?->id;
+
+        $karyawanIds = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
+        $karyawanIdTitip = M_DataKaryawan::where('entitas', '!=', $entitas)->pluck('id');
 
         // Filter berdasarkan ID karyawan dari entitas tersebut
         $totalGaji = PayrollModel::whereIn('karyawan_id', $karyawanIds)->sum('total_gaji');
+        $totalGajiTitip = PayrollModel::whereIn('karyawan_id', $karyawanIdTitip)
+            ->where('entitas_id', $entitasIdSaatIni)
+            ->where('titip', 1)
+            ->sum('total_gaji');
+            // dd($totalGajiTitip);
+        $totalBpjskes = PayrollModel::whereIn('karyawan_id', $karyawanIds)->sum('bpjs_perusahaan');
+        $totalBpjsJht = PayrollModel::whereIn('karyawan_id', $karyawanIds)->sum('bpjs_jht_perusahaan');
+        // dd($totalBpjskes);
         $totalIzinCuti = M_Pengajuan::whereIn('karyawan_id', $karyawanIds)
             ->where('status', 1)
             ->whereDate('tanggal', now()->toDateString())
@@ -127,10 +132,13 @@ class Dashboard extends Component
         return view('livewire.dashboard', [
             'totalPegawai' => $karyawanIds->count(),
             'totalGaji' => $totalGaji,
+            'totalGajiTitip' => $totalGajiTitip,
             'kenaikanGaji' => -5,
             'izinCuti' => $totalIzinCuti,
             'totalPresensi' => $totalPresensi,
             'statusKaryawan' => $statusKaryawan,
+            'totalBpjskes' => $totalBpjskes,
+            'totalBpjsJht' => $totalBpjsJht,
             'pendidikan' => [
                 'SMK' => 45,
                 'D3' => 23,

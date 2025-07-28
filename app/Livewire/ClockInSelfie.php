@@ -222,17 +222,20 @@ class ClockInSelfie extends Component
                 $status = 1;
             }
         }
+
+        $data = [
+            'user_id' => $karyawanId,
+            'tanggal' => $tanggal,
+            'clock_in' => $clockInTime,
+            'clock_out' => "00:00:00",
+            'lokasi' => json_encode([$lokasiIdTerdekat]),
+            'lokasi_lock' => $lock,
+            'file' => $this->photo,
+            'status' => $status,
+        ];
     
         // Simpan presensi
-        M_Presensi::create([
-            'user_id'   => $karyawanId,
-            'tanggal'   => $tanggal,
-            'clock_in'  => $clockInTime,
-            'clock_out' => "00:00:00",
-            'lokasi'    => json_encode([$lokasiIdTerdekat]),
-            'file'      => $this->photo,
-            'status'    => $status,
-        ]);
+        M_Presensi::create($data);
     
         $this->reset(['photo']);
         session()->flash('success', 'Clock-in berhasil.');

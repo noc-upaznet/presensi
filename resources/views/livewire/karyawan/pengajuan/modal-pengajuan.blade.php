@@ -43,8 +43,14 @@
 
                         <div class="mb-3">
                             <label for="file" class="form-label fw-semibold">File</label>
-                            <input type="file" class="form-control" id="file" wire:model="file">
-                            <small class="text-danger">Ukuran maksimal file: 5MB</small>
+                            <input type="file" class="form-control" id="file" wire:model="file" accept=".jpg,.jpeg,.png">
+                            <small class="text-danger">
+                                @if (session()->has('error'))
+                                    {{ session('error') }}
+                                @else
+                                    Ukuran maksimal file: 2MB
+                                @endif
+                            </small>
                         </div>
                     </div>
 
@@ -108,8 +114,20 @@
 
                         <div class="mb-3">
                             <label for="file" class="form-label fw-semibold">File</label>
-                            <input type="file" class="form-control" id="file" wire:model="file">
-                            <small class="text-danger">Ukuran maksimal file: 5MB</small>
+                            <input type="file" class="form-control" id="file" wire:model="file" accept=".jpg,.jpeg,.png">
+                            <small class="text-danger">
+                                @if (session()->has('error'))
+                                    {{ session('error') }}
+                                @else
+                                    Ukuran maksimal file: 2MB
+                                @endif
+                            </small>
+
+                            @if ($file)
+                                <div class="mt-2">
+                                    <img src="{{ asset('storage/' . $file) }}" alt="Preview File" style="max-width: 200px;" class="img-thumbnail">
+                                </div>
+                            @endif
                         </div>
                     </div>
 

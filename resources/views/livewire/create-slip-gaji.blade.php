@@ -131,7 +131,6 @@
                                 <label for="potongan" class="form-label fw-semibold">Uang Transport</label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
-                                    {{-- <input type="text" class="form-control" wire:model.lazy="transport_nominal"> --}}
                                     <select name="transport" class="form-select" wire:model.lazy="transport">
                                         <option value="">-- Pilih Nominal --</option>
                                         <option value="5000">5.000</option>
@@ -155,21 +154,27 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="row">
                             <div class="mb-3 col-md-6">
-                                <label for="izin_nominal" class="form-label fw-semibold">Potongan Izin</label>
+                                <label for="potongan" class="form-label fw-semibold">Tunjangan Kebudayaan</label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" id="izin_nominal" class="form-control" disabled wire:model="izin_nominal">
+                                    <select name="kebudayaan" class="form-select" wire:model.lazy="kebudayaan">
+                                        <option value="">-- Pilih Nominal --</option>
+                                        <option value="100000">100000</option>
+                                        <option value="200000">200000</option>
+                                    </select>
                                 </div>
                             </div>
-
                             <div class="mb-3 col-md-6">
-                                <label for="terlambat_nominal" class="form-label fw-semibold">Potongan Terlambat</label>
+                                <label for="potongan" class="form-label fw-semibold">Bonus Fee Sharing</label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
+                                    <select name="fee_sharing" class="form-select" wire:model.lazy="fee_sharing">
+                                        <option value="">-- Pilih Nominal --</option>
+                                        <option value="100000">100000</option>
+                                        <option value="200000">200000</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -222,17 +227,23 @@
                             <button type="button" class="btn btn-success mb-2" wire:click="addPotongan">+ Tambah Potongan</button>
                         </div>
 
-                        <div class="form-check">
-                            <input type="checkbox" wire:model.lazy="fee_sharing_digunakan" class="form-check-input" id="bonusCheckbox">
-                            <label class="form-check-label" for="bonusCheckbox">Bonus Fee Sharing</label>
-                        </div>
-
-                        @if($fee_sharing_digunakan)
-                            <div class="mt-2 mb-2">
-                                <label>Nominal Bonus Fee Sharing</label>
-                                <input type="text" class="form-control" readonly value="{{ number_format($fee_sharing_nominal, 0, ',', '.') }}">
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="izin_nominal" class="form-label fw-semibold">Potongan Izin</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="izin_nominal" class="form-control" disabled wire:model="izin_nominal">
+                                </div>
                             </div>
-                        @endif
+
+                            <div class="mb-3 col-md-6">
+                                <label for="terlambat_nominal" class="form-label fw-semibold">Potongan Terlambat</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="form-check">
                             <input type="checkbox" wire:model.lazy="bpjs_digunakan" class="form-check-input" id="bpjsCheckbox">
@@ -258,7 +269,7 @@
                         </div>
 
                         @if($bpjs_jht_digunakan)
-                            <div class="row mt-2">
+                            <div class="row mt-2 mb-2">
                                 <div class="col-md-6">
                                     <label>Persentase BPJS JHT (%)</label>
                                     <input type="number" class="form-control" wire:model="persentase_bpjs_jht">
@@ -266,6 +277,42 @@
                                 <div class="col-md-6">
                                     <label>Nominal BPJS JHT</label>
                                     <input type="text" class="form-control" readonly value="{{ number_format($bpjs_jht_nominal, 0, ',', '.') }}">
+                                </div>
+                            </div>
+                        @endif
+                        {{-- BPJS Dibayarkan Perusahaan --}}
+                        <div class="form-check">
+                            <input type="checkbox" wire:model.lazy="bpjs_perusahaan_digunakan" class="form-check-input" id="bpjsPCheckbox">
+                            <label class="form-check-label" for="bpjsPCheckbox">BPJS Kesehatan (Perusahaan)</label>
+                        </div>
+
+                        @if($bpjs_perusahaan_digunakan)
+                            <div class="row mt-2 mb-2">
+                                <div class="col-md-6">
+                                    <label>Persentase BPJS Kesehatan (%)</label>
+                                    <input type="number" class="form-control" wire:model="persentase_bpjs_perusahaan">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Nominal BPJS (Perusahaan)</label>
+                                    <input type="text" class="form-control" readonly value="{{ number_format($bpjs_perusahaan_nominal, 0, ',', '.') }}">
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="form-check">
+                            <input type="checkbox" wire:model.lazy="bpjs_jht_perusahaan_digunakan" class="form-check-input" id="bpjsJhtPCheckbox">
+                            <label class="form-check-label" for="bpjsJhtPCheckbox">BPJS JHT (Perusahaan)</label>
+                        </div>
+
+                        @if($bpjs_jht_perusahaan_digunakan)
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <label>Persentase BPJS JHT (%)</label>
+                                    <input type="number" class="form-control" wire:model="persentase_bpjs_jht_perusahaan">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Nominal BPJS JHT (Perusahaan)</label>
+                                    <input type="text" class="form-control" readonly value="{{ number_format($bpjs_jht_perusahaan_nominal, 0, ',', '.') }}">
                                 </div>
                             </div>
                         @endif
@@ -304,12 +351,14 @@
 
                         <div class="footer text-end">
                             <button type="button" wire:click="store" class="btn btn-primary"
-                                wire:loading.attr="disabled">
-                                <div wire:loading class="spinner-border spinner-border-sm" role="status">
+                                wire:loading.attr="disabled" wire:target="store">
+                                <div wire:loading wire:target="store" class="spinner-border spinner-border-sm" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
-                                <span wire:loading.remove><i class="fa fa-save"></i> Simpan</span>
-                                <span wire:loading>Loading...</span>
+                                <span wire:loading.remove wire:target="store">
+                                    <i class="fa fa-save"></i> Simpan
+                                </span>
+                                <span wire:loading wire:target="store">Loading...</span>
                             </button>
                             <a href="{{ route('payroll') }}" class="btn btn-secondary">Kembali</a>
                         </div>

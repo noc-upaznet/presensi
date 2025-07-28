@@ -58,7 +58,7 @@ class ClockIn extends Component
         $jadwal = M_Jadwal::where('karyawan_id', $karyawanId)
             ->where('bulan_tahun', $bulanTahun)
             ->first();
-
+        // dd($jadwal);
         $shiftId = $jadwal?->{$hari}; // ambil shift id hari ini
 
         $shift = M_JadwalShift::find($shiftId); // tabel shift berisi jam_masuk & jam_keluar
@@ -152,11 +152,18 @@ class ClockIn extends Component
         }
     
         // Ambil role lokasi
-        $roleLokasi = RoleLokasiModel::where('karyawan_id', $karyawanId)
-            ->first();
+        // $roleLokasi = RoleLokasiModel::where('karyawan_id', $karyawanId)
+        //     ->first();
+        $roleLokasis = RoleLokasiModel::where('karyawan_id', $karyawanId)->get();
+        
+        
+        $lokasiIds = $roleLokasis->pluck('lokasi_presensi')
+            ->flatten()
+            ->unique()
+            ->values()
+            ->all();
     
-        $lock = $roleLokasi->lock ?? 1; // default ke 1 (aktifkan radius)
-    
+        $lock = $roleLokasis->first()->lock ?? 1;
         if ($lock == 1) {
             // Ambil lokasi dari data presensi (yang disimpan saat clock-in)
             $lokasiIds = json_decode($presensi->lokasi, true) ?? [];

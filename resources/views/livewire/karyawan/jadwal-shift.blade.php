@@ -4,7 +4,7 @@
         <div class="container-fluid">
           <!--begin::Row-->
           <div class="row">
-            <div class="col-sm-6"><h3 class="mb-0 mt-5" style="color: var(--bs-body-color);">Jadwal Shift Karyawan</h3></div>
+            <div class="col-sm-6 mt-5"><h3 class="mb-0" style="color: var(--bs-body-color);">Jadwal Shift Karyawan</h3></div>
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-end">
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -38,39 +38,32 @@
         </div>
     
         <div class="table-responsive">
-            <table class="table table-striped table-hover mb-0" style="background-color: var(--bs-body-bg);">
+            <table class="table table-striped table-hover" style="background-color: var(--bs-body-bg);">
                 <thead>
                     <tr>
-                        <th>No</th>
                         <th>Bulan</th>
                         <th>Nama Karyawan</th>
                         <th class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if ($jadwals->isEmpty())
-                        <tr>
-                            <td colspan="4" class="text-center" style="color: var(--bs-body-color);">Data tidak ditemukan</td>
+                    @foreach ($jadwals as $key)
+                        <tr wire:key="jadwal-{{ $key->id }}">
+                            <td style="color: var(--bs-body-color);">{{ $key->bulan_tahun }}</td>
+                            <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}</td>
+                            <td class="text-center" style="color: var(--bs-body-color);">
+                                <button class="btn btn-sm btn-info text-white" wire:click="showDetail('{{ Crypt::encrypt($key->id) }}')"><i class="fa fa-eye"></i></button>
+                                <button class="btn btn-sm btn-warning" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn btn-sm btn-danger" wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"><i class="fa fa-trash"></i></button>
+                            </td>
                         </tr>
-                    @else
-                        @foreach ($jadwals as $key)
-                            <tr wire:key="jadwal-{{ $key->id }}">
-                                <td style="color: var(--bs-body-color);">{{ $loop->iteration }}</td>
-                                <td style="color: var(--bs-body-color);">{{ $key->bulan_tahun }}</td>
-                                <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}</td>
-                                <td class="text-center" style="color: var(--bs-body-color);">
-                                    <button class="btn btn-sm btn-info text-white" wire:click="showDetail('{{ Crypt::encrypt($key->id) }}')"><i class="fa fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-warning" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                                    <button class="btn btn-sm btn-danger" wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"><i class="fa fa-trash"></i></button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    @endif
-                    
+                    @endforeach
                 </tbody>
             </table>
         </div>
-        {{ $jadwals->links('pagination::bootstrap-5') }}
+        <div class="mt-3">
+            {{ $jadwals->links('pagination::bootstrap-5') }}
+        </div>
     </div>
 
     <livewire:karyawan.modal-jadwal-shift />
@@ -111,4 +104,3 @@
         });
     </script>
 @endpush
-

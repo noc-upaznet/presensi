@@ -3,8 +3,8 @@
     <!--begin::Container-->
     <div class="container-fluid">
       <!--begin::Row-->
-      <div class="row mt-5">
-        <div class="col-sm-6"><h3 class="mb-0" style="color: var(--bs-body-color);">Data Karyawan</h3></div>
+      <div class="row">
+        <div class="col-sm-6 mt-5"><h3 class="mb-0" style="color: var(--bs-body-color);">Data Karyawan</h3></div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-end">
             <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -81,7 +81,7 @@
                     <td style="color: var(--bs-body-color);"><span class="badge-success">{{ $key->status_karyawan }}</span></td>
                     <td style="color: var(--bs-body-color);">{{ $key->email }}</td>
                     <td class="text-center">
-                      <button type="button" wire:click="DetailDataKaryawan({{ $key->id }})" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></button>
+                      <button type="button" wire:click="DetailDataKaryawan('{{ Crypt::encrypt($key->id) }}')" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></button>
                       <button type="button" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')" class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
                     </td>
                   </tr>

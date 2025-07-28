@@ -9,10 +9,12 @@ use App\Models\M_Lembur;
 use App\Models\M_Pengajuan;
 use Livewire\WithFileUploads;
 use App\Models\M_DataKaryawan;
+use Illuminate\Support\Carbon;
 use App\Events\PengajuanBaruEvent;
 use App\Livewire\Forms\LemburForm;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ModalPengajuanLembur extends Component
 {
@@ -52,9 +54,15 @@ class ModalPengajuanLembur extends Component
     {
         $this->form->validate();
 
-        $this->validate([
-            'file_bukti' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-        ]);
+        if ($this->file_bukti) {
+            // dd($this->file);
+            $this->validate([
+                'file_bukti' => 'nullablx   e|mimes:jpg,jpeg,png|max:2048',
+            ], [
+                'file_bukti.max' => 'Ukuran file maksimal 2MB.',
+                'file_bukti.mimes' => 'Format file harus JPG, JPEG, PNG.',
+            ]);
+        }
 
         $path = null;
         if ($this->file_bukti) {
@@ -98,13 +106,13 @@ class ModalPengajuanLembur extends Component
         // dd($data['id']);
         $this->pengajuanId = $data['id'];
         $this->form->fill($data);
-        $this->form->tanggal = $data['tanggal'] ? \Carbon\Carbon::parse($data['tanggal'])->format('Y-m-d') : null;
-        $this->form->waktu_mulai = $data['waktu_mulai'] ? \Carbon\Carbon::parse($data['waktu_mulai'])->format('H:i') : null;
-        $this->form->waktu_akhir = $data['waktu_akhir'] ? \Carbon\Carbon::parse($data['waktu_akhir'])->format('H:i') : null;
+        $this->form->tanggal = $data['tanggal'];
+        $this->form->waktu_mulai = $data['waktu_mulai'] ? Carbon::parse($data['waktu_mulai'])->format('H:i') : null;
+        $this->form->waktu_akhir = $data['waktu_akhir'] ? Carbon::parse($data['waktu_akhir'])->format('H:i') : null;
         $this->form->total_jam = $data['total_jam'] ? $data['total_jam'] : 0;
         $this->form->jenis = $data['jenis'] ?? 'Lembur';
         $this->form->keterangan = $data['keterangan'] ?? '';
-        $this->file = $data['file_bukti'] ? str_replace('storage/', '', $data['file']) : null;
+        $this->file = isset($data['file_bukti']) ? str_replace('storage/', '', $data['file_bukti']) : null;
     }
 
     public function saveEdit()
@@ -122,8 +130,8 @@ class ModalPengajuanLembur extends Component
         // ]);
 
         $path = null;
-        if ($this->file) {
-            $path = $this->file->store('file', 'public');
+        if ($this->file_bukti) {
+            $path = $this->file_bukti->store('file-lembur', 'public');
         }
 
         $data = [
@@ -151,7 +159,7 @@ class ModalPengajuanLembur extends Component
         ]);
 
         // Tutup modal
-        $this->dispatch('modalEditPengajuan', action: 'hide');
+        $this->dispatch('modalEditPengajuanLembur', action: 'hide');
         $this->dispatch('refresh');
     }
 

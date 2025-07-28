@@ -3,12 +3,15 @@
 namespace App\Livewire\Karyawan;
 
 use Livewire\Component;
+use App\Models\M_Entitas;
+use App\Models\M_Divisi;
+use App\Models\M_Jabatan;
+use Illuminate\Http\Request;
 use Livewire\WithFileUploads;
 use App\Models\M_DataKaryawan;
 use App\Imports\KaryawanImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
 use App\Livewire\Forms\TambahDataKaryawanForm;
 
 class ModalKaryawan extends Component
@@ -19,13 +22,30 @@ class ModalKaryawan extends Component
     public $file;
 
     public $ticketId;
+    public $entitas;
+    public $divisi;
+    public $jabatan;
     protected $listeners = ['edit-ticket' => 'loadTicketData'];
 
+    public function mount()
+    {
+        $this->entitas = M_Entitas::all();
+        $this->divisi = M_Divisi::all();
+        $this->jabatan = M_Jabatan::all();
+    }
+
+    public function UpdatedTotalUpah($value)
+    {
+        $value = (int) str_replace('.', '', $value);
+        $this->form->gaji_pokok = $value * 0.75;
+        $this->form->tunjangan_jabatan = $value * 0.25;
+    }
     public function loadTicketData($data)
     {
         // dd($data);
         $this->ticketId = $data['id'];
         $this->form->fill($data);
+        // dd($data);
         $this->form->alamatKTP = $data['alamat_ktp'] ?? '';
         $this->form->alamatDomisili = $data['alamat_domisili'] ?? '';
         $this->form->nomorKTP = $data['nik'] ?? '';
@@ -64,9 +84,10 @@ class ModalKaryawan extends Component
             'entitas' => $this->form->entitas,
             'divisi' => $this->form->divisi,
             'jabatan' => $this->form->jabatan,
-            // 'posisi' => $this->form->posisi,
+            'level' => $this->form->level,
             'sistem_kerja' => $this->form->sistem_kerja,
             // 'spv' => $this->form->spv,
+            'total_upah' => $this->form->total_upah,
             'gaji_pokok' => $this->form->gaji_pokok,
             'tunjangan_jabatan' => $this->form->tunjangan_jabatan,
             'bonus' => $this->form->bonus,

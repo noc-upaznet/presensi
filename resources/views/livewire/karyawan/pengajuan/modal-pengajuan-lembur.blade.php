@@ -65,9 +65,15 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="file" class="form-label fw-semibold">File Bukti</label>
-                        <input type="file" class="form-control" id="file" wire:model="file_bukti">
-                        @error('file_bukti') <span class="text-danger">{{ $message }}</span> @enderror
+                        <label for="file" class="form-label fw-semibold">File</label>
+                        <input type="file" class="form-control" id="file" wire:model="file_bukti" accept=".jpg,.jpeg,.png">
+                        <small class="text-danger">
+                            @if (session()->has('error'))
+                                {{ session('error') }}
+                            @else
+                                Ukuran maksimal file: 2MB
+                            @endif
+                        </small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -151,9 +157,15 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="file" class="form-label fw-semibold">File Bukti</label>
-                        <input type="file" class="form-control" id="file" wire:model="file_bukti">
-                        @error('file_bukti') <span class="text-danger">{{ $message }}</span> @enderror
+                        <label for="file" class="form-label fw-semibold">File</label>
+                        <input type="file" class="form-control" id="file" wire:model="file">
+                        <small class="text-danger">Ukuran maksimal file: 2MB</small>
+
+                        @if ($file)
+                            <div class="mt-2">
+                                <img src="{{ asset('storage/' . $file) }}" alt="Preview File" style="max-width: 200px;" class="img-thumbnail">
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <div class="modal-footer">
