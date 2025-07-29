@@ -58,6 +58,8 @@
 <!-- Bootstrap Datepicker JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js"></script>
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
 
 <!--end::Head-->
 <!--begin::Body-->
