@@ -32,17 +32,16 @@ use App\Livewire\Karyawan\Shifts\TemplateMingguan;
 use App\Livewire\Karyawan\Pengajuan\PengajuanLembur;
 
 // Route::redirect('/', '/login');
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/ganti-password', GantiPassword::class)->middleware('auth')->name('ganti-password');
 Route::group(['middleware' => ['auth', 'password.expired']], function () {
+    Route::get('/', Dashboard::class)->name('dashboard');
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
     Route::get('/clock-in', ClockIn::class)->name('clock-in');
     Route::get('/clock-in-selfie', ClockInSelfie::class)->name('clock-in-selfie');
-    Route::get('/dashboard', Dashboard::class)->name('dashboard');
     Route::view('/profile', 'profile')->name('profile');
     Route::get('/data-karyawan', DataKaryawan::class)->name('data-karyawan');
     Route::get('/tambah-data-karyawan', TambahDataKaryawan::class)->name('tambah-data-karyawan');
