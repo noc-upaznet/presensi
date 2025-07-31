@@ -15,6 +15,7 @@ use Livewire\WithPagination;
 class JadwalShift extends Component
 {
     use WithPagination;
+    protected $paginationTheme = 'bootstrap';
     public TambahDataKaryawanForm $form;
     
     public $selectedTemplateId;
@@ -186,9 +187,9 @@ class JadwalShift extends Component
                 $q->where('entitas', $entitas);
             });
         }
-
+        $jadwals = $query->paginate(10);
         return view('livewire.karyawan.jadwal-shift', [
-            'jadwals' => $query->paginate(10),
+            'jadwals' => $jadwals,
         ]);
     }
 }

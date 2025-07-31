@@ -191,6 +191,10 @@ class PengajuanLembur extends Component
                 $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)->pluck('id');
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
+        } elseif ($user->current_role === 'hr') {
+            // Jika HR, bisa melihat semua karyawan dari semua entitas
+            $karyawanIdList = M_DataKaryawan::pluck('id');
+            $query->whereIn('karyawan_id', $karyawanIdList);
         }
         // Jika HR atau SPV, tidak difilter entitas → bisa lihat semua data
     

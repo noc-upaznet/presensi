@@ -158,9 +158,9 @@
 
                     <div class="mb-3">
                         <label for="file" class="form-label fw-semibold">File</label>
-                        <input type="file" class="form-control" id="file" wire:model="file">
+                        <input type="file" class="form-control" id="file" wire:model="file_bukti">
                         <small class="text-danger">Ukuran maksimal file: 2MB</small>
-
+                        <div x-data x-on:show-warning.window="alert($event.detail.message)"></div>
                         @if ($file)
                             <div class="mt-2">
                                 <img src="{{ asset('storage/' . $file) }}" alt="Preview File" style="max-width: 200px;" class="img-thumbnail">

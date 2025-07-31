@@ -10,41 +10,25 @@
                 <div class="modal-body" style="color: var(--bs-body-color);">
                     <div class="mb-3">
                         <label for="jabatan" class="form-label">Jabatan</label>
-                        {{-- <select class="form-select"  id="selectJabatan" name="state">
-                            <option value="">-- Pilih Jabatan --</option>
-                            <option value="SPV NOC">SPV NOC</option>
-                            <option value="SPV HR">SPV HR</option>
-                            <option value="SPV Teknisi">SPV Teknisi</option>
-                            <option value="SPV Finance">SPV Finance</option>
-                            <option value="SPV Sales Marketing">SPV Sales Marketing</option>
-                            <option value="SPV Helpdesk">SPV Helpdesk</option>
-                            <option value="Billing">Billing</option>
-                            <option value="Asisten NOC">Asisten NOC</option>
-                            <option value="Staff NOC">Staff NOC</option>
-                            <option value="Admin HR">Admin HR</option>
-                            <option value="Recruitment HR">Recruitment HR</option>
-                            <option value="Teknisi">Teknisi</option>
-                            <option value="Sales Marketing">Sales Marketing</option>
-                            <option value="Digital Marketing">Digital Marketing</option>
-                            <option value="Helpdesk">Helpdesk</option>
-                        </select> --}}
                         <select type="text" class="form-select" id="jabatan" wire:model="nama_jabatan">
                             <option value="">-- Pilih Jabatan --</option>
-                            <option value="SPV NOC">SPV NOC</option>
-                            <option value="SPV HR">SPV HR</option>
-                            <option value="SPV Teknisi">SPV Teknisi</option>
-                            <option value="SPV Finance">SPV Finance</option>
-                            <option value="SPV Sales Marketing">SPV Sales Marketing</option>
-                            <option value="SPV Helpdesk">SPV Helpdesk</option>
+                            <option value="Branch Manager">Branch Manager</option>
+                            <option value="Branch Manager">Branch Manager</option>
+                            <option value="SPV">SPV</option>
+                            <option value="Accounting">Accounting</option>
                             <option value="Billing">Billing</option>
-                            <option value="Asisten NOC">Asisten NOC</option>
-                            <option value="Staff NOC">Staff NOC</option>
-                            <option value="Admin HR">Admin HR</option>
-                            <option value="Recruitment HR">Recruitment HR</option>
-                            <option value="Teknisi">Teknisi</option>
-                            <option value="Sales Marketing">Sales Marketing</option>
-                            <option value="Digital Marketing">Digital Marketing</option>
+                            <option value="Customer Service">Customer Service</option>
+                            <option value="ASL">ASL</option>
+                            <option value="Finance">Finance</option>
                             <option value="Helpdesk">Helpdesk</option>
+                            <option value="Sales Marketing">Sales Marketing</option>
+                            <option value="Asisten SPV Teknisi">Asisten SPV Teknisi</option>
+                            <option value="Teknisi">Teknisi</option>
+                            <option value="Kasir">Kasir</option>
+                            <option value="Support">Support</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Recruitment">Recruitment</option>
+                            <option value="Asisten">Asisten</option>
                         </select>
                     </div>
                     <div class="mb-3">

@@ -116,7 +116,7 @@ class ModalPengajuan extends Component
             'file' => $path ? str_replace('public/', 'storage/', $path) : null,
             'satatus' => 0,
         ];
-        dd($data);
+        // dd($data);
 
         // Simpan data ke database
         M_Pengajuan::create($data);

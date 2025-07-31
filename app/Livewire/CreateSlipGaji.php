@@ -309,8 +309,10 @@ class CreateSlipGaji extends Component
 
                 // gaji pokok = 75% dari upah, tunjangan jabatan = 25% dari upah
                 $this->gaji_pokok = round($upah * 0.75);
-                $this->tunjangan_jabatan = round($upah * 0.25);
+                $this->tunjangan_jabatan = $upah * 0.25; 
                 $this->insentif = $insentif;
+
+                // dd('gaji:'. $this->gaji_pokok, 'tunjangan:'. $this->tunjangan_jabatan, 'insentif:'.$this->insentif);
 
                 $this->hitungTotalGaji();
             } else {
@@ -496,114 +498,107 @@ class CreateSlipGaji extends Component
 
     public function hitungTotalGaji()
     {
-        $transport = $this->numericValue($this->transport ?? 0);
-        $uangMakan = $this->numericValue($this->uang_makan ?? 0);
-        $kebudayaan = $this->numericValue($this->kebudayaan ?? 0);
-        $fee_sharing = $this->numericValue($this->fee_sharing ?? 0);
+        // === 1. Ambil dan normalisasi input ===
+        $gajiPokok         = $this->numericValue($this->gaji_pokok);
+        $tunjanganJabatan  = $this->numericValue($this->tunjangan_jabatan);
+        $transport         = $this->numericValue($this->transport ?? 0);
+        $uangMakan         = $this->numericValue($this->uang_makan ?? 0);
+        $kebudayaan        = $this->numericValue($this->kebudayaan ?? 0);
+        $feeSharing        = $this->numericValue($this->fee_sharing ?? 0);
+        $insentif          = $this->numericValue($this->insentif ?? 0);
+        $insentifSpv       = $this->numericValue($this->insentif_spv ?? 0);
 
-        // Tunjangan kehadiran: 2000/hari jika tidak terlambat, jika ada terlambat maka hangus (0)
+        // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
         if (($this->rekap['terlambat'] ?? 0) == 0) {
-            $tunjanganKehadiran = ($this->rekap['kehadiran'] ?? 0) * 2000;
-        }
-        $tunjanganKehadiran = $this->tunjangan_kehadiran;
-
-        if ($this->user_id) {
-            $this->rekap['kehadiran'] == 0;
+            $tunjanganKehadiran = $this->numericValue($this->tunjangan_kehadiran);
         }
 
-        //gaji pokok jabatan sales 
-        $gajiPokok = $this->numericValue($this->gaji_pokok);
-        $tunjanganJabatan = $this->numericValue($this->tunjangan_jabatan);
-
+        // === 3. Hitung total tunjangan tambahan (manual input) ===
         $totalTunjangan = 0;
         foreach ($this->tunjangan as $item) {
             $totalTunjangan += $this->numericValue($item['nominal']);
         }
 
+        // === 4. Hitung potongan manual ===
         $totalPotonganManual = 0;
         foreach ($this->potongan as $item) {
             $totalPotonganManual += $this->numericValue($item['nominal']);
         }
 
-        // Potongan otomatis
+        // === 5. Potongan otomatis ===
         $potonganIzin = 0;
         $potonganTerlambat = 0;
 
         if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
             $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
-        // dd($perHari);
             $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0);
-            $potonganIzin = $perHari * $totalHariIzin;
-            $potonganTerlambat = $this->rekap['terlambat'] > 0 ? 25000 : 0;
+            $potonganIzin = round($perHari * $totalHariIzin);
+            $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) > 0 ? 25000 : 0;
         }
 
+        // === 6. Hitung lembur ===
         $jamLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
             ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
             ->whereNotNull('total_jam')
             ->where('status', 1)
             ->sum('total_jam');
 
-        // dd($jamLembur);
         $lemburNominal = 0;
+        if ($jamLembur > 0 && ($gajiPokok > 0 || $tunjanganJabatan > 0)) {
+            $jenisLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
+                ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
+                ->whereNotNull('total_jam')
+                ->where('status', 1)
+                ->orderByDesc('tanggal')
+                ->value('jenis');
 
-        $jenisLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
-            ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
-            ->whereNotNull('total_jam')
-            ->where('status', 1)
-            ->orderByDesc('tanggal')
-            ->value('jenis');
-
-        if (($gajiPokok > 0 || $tunjanganJabatan > 0) && $jamLembur > 0) {
-            if ($jenisLembur == 2) {
-            $lemburNominal = (1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur * 2;
-            } else {
-            $lemburNominal = (1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur;
-            }
+            $faktor = ($jenisLembur == 2) ? 2 : 1;
+            $lemburNominal = (1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur * $faktor;
         }
-        // dd($lemburNominal);
 
-        // Hitung BPJS
-        $dasar_bpjs = $gajiPokok + $tunjanganJabatan;
+        // === 7. Hitung BPJS ===
+        $dasarBpjs = $gajiPokok + $tunjanganJabatan;
         $umk = 2470800;
 
-        if ($gajiPokok <= 0 && $tunjanganJabatan <= 0) {
-            $this->bpjs_nominal = 0;
-            $this->bpjs_jht_nominal = 0;
-        } else {
-            $nilai_dasar_bpjs = $dasar_bpjs < $umk ? $umk : $dasar_bpjs;
-
-            $this->bpjs_nominal = $this->bpjs_digunakan
-                ? ($nilai_dasar_bpjs * $this->persentase_bpjs / 100)
-                : 0;
-
-            $this->bpjs_jht_nominal = $this->bpjs_jht_digunakan
-                ? ($nilai_dasar_bpjs * $this->persentase_bpjs_jht / 100)
-                : 0;
+        if ($dasarBpjs < $umk) {
+            $nilaiDasarBpjs = $umk;
+        } elseif($dasarBpjs > $umk) {
+            $nilaiDasarBpjs = $dasarBpjs;
         }
 
-        $this->fee_sharing_nominal = $this->fee_sharing_digunakan
-            ? 100000
+        $bpjsNominal = $this->bpjs_digunakan
+            ? ($nilaiDasarBpjs * $this->persentase_bpjs / 100)
             : 0;
 
-        $this->total_gaji = $gajiPokok
+        $bpjsJhtNominal = $this->bpjs_jht_digunakan
+            ? ($nilaiDasarBpjs * $this->persentase_bpjs_jht / 100)
+            : 0;
+
+        $this->bpjs_nominal = round($bpjsNominal);
+        $this->bpjs_jht_nominal = round($bpjsJhtNominal);
+
+        // === 8. Hitung total gaji akhir ===
+        $this->total_gaji = round(
+            $gajiPokok
             + $tunjanganJabatan
             + $totalTunjangan
             + $lemburNominal
-            + $this->insentif
-            + $this->insentif_spv
+            + $insentif
+            + $insentifSpv
             + $tunjanganKehadiran
-            // + ($this->fee_sharing_digunakan ? $this->fee_sharing_nominal : 0)
             + $kebudayaan
-            + $fee_sharing
+            + $feeSharing
             + $transport
             + $uangMakan
             - $totalPotonganManual
             - $potonganIzin
             - $potonganTerlambat
             - $this->bpjs_nominal
-            - $this->bpjs_jht_nominal;
+            - $this->bpjs_jht_nominal
+        );
     }
+
 
     public function addTunjangan()
     {
@@ -789,7 +784,7 @@ class CreateSlipGaji extends Component
             'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
             'tunjangan_kebudayaan' => $this->numericValue($this->kebudayaan),
         ];
-        // dd($data);
+        dd($data);
 
         PayrollModel::create($data);
 

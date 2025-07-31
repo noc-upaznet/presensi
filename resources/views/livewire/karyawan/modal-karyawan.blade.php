@@ -376,13 +376,15 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" wire:click='saveEdit'
-                    wire:loading.attr="disabled">
-                    <div wire:loading class="spinner-border spinner-border-sm" role="status">
+                <button type="button" wire:click="saveEdit" class="btn btn-primary"
+                    wire:loading.attr="disabled" wire:target="saveEdit">
+                    <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <span wire:loading.remove>Simpan</span>
-                    <span wire:loading>Loading...</span>
+                    <span wire:loading.remove wire:target="saveEdit">
+                        <i class="fa fa-save"></i> Simpan
+                    </span>
+                    <span wire:loading wire:target="saveEdit">Loading...</span>
                 </button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>

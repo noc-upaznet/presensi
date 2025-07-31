@@ -13,21 +13,23 @@ class KaryawanImport implements ToModel, WithHeadingRow
 {
     public function model(array $row)
     {
+        // dd($row);    
         // Cek apakah user dengan email ini sudah ada
-        $user = User::where('email', $row['email'])->first();
-        if (!$user) {
+        $user = User::where('email', $row['email'])->count();
+        if ($user < 1) {
             $user = User::create([
                 'name' => $row['nama_karyawan'],
                 'email' => $row['email'],
-                'password' => Hash::make('12345678'), // default password
-                'role' => 'user',
+                'password' => Hash::make('12345678'),
+                'current_role' => strtolower($row['level']) === 'staff' ? 'user' : strtolower($row['level']),
+                'password_expired' => 1,
             ]);
-            // dd('User created: ' . $user->name);
+            // dd('User created: ' . $user);
         }
 
         // Simpan ke tabel data_karyawan dan hubungkan dengan user
         return new M_DataKaryawan([
-            'user_id' => $user->id, // simpan user_id di sini
+            'user_id' => $user->id,
             'nama_karyawan' => $row['nama_karyawan'],
             'email' => $row['email'],
             'no_hp' => $row['no_hp'],
@@ -49,9 +51,10 @@ class KaryawanImport implements ToModel, WithHeadingRow
             'entitas' => $row['entitas'],
             'divisi' => $row['divisi'],
             'jabatan' => $row['jabatan'],
-            'posisi' => $row['posisi'],
+            'level' => $row['level'],
             'sistem_kerja' => $row['sistem_kerja'],
             'spv' => $row['spv'],
+            'total_upah' => $row['total_upah'],
             'gaji_pokok' => $row['gaji_pokok'],
             'tunjangan_jabatan' => $row['tunjangan_jabatan'],
             'bonus' => $row['bonus'],

@@ -36,11 +36,20 @@ class TemplateMingguan extends Component
         $this->dispatch('modal-edit-template', action: 'show',);
     }
 
+    public function delete($id)
+    {
+        $jadwal = M_TemplateWeek::findOrFail(Crypt::decrypt($id));
+        // dd($jadwal);
+        $jadwal->delete();
+        $this->dispatch('modal-confirm-delete', action: 'hide');
+    }
+
     public function render()
     {
         $datas = M_TemplateWeek::with(
             'getMinggu', 'getSenin', 'getSelasa', 'getRabu', 'getKamis', 'getJumat', 'getSabtu'
         )->latest()->get();
+        // dd($datas);
         return view('livewire.karyawan.shifts.template-mingguan', [
             'datas' => $datas,
         ]);

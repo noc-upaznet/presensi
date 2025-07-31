@@ -461,49 +461,5 @@ class Payroll extends Component
             'data' => $data,
             'data2' => $data2
         ]);
-    }
-
-
-    // public function render()
-    // {
-    //     // Ambil entitas dari session
-    //     $entitasNama = session('selected_entitas', 'UHO');
-    //     $entitas = \App\Models\M_Entitas::where('nama', $entitasNama)->first();
-
-    //     // Query dasar (tanpa filter status dulu)
-    //     $query = PayrollModel::with('getKaryawan');
-
-    //     if ($entitas && $entitasNama !== 'All' && $entitasNama !== 'All Branch') {
-    //         $query->where('entitas_id', $entitas->id);
-    //     }
-
-    //     // Filter periode
-    //     if ($this->selectedMonth && $this->selectedYear) {
-    //         $periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
-    //         $query->where('periode', $periode);
-    //     }
-
-    //     // $data => karyawan TETAP (titip null atau 0)
-    //     $data = (clone $query)
-    //         ->whereHas('getKaryawan', function ($q) {
-    //             $q->whereNull('titip')->orWhere('titip', 0);
-    //         })
-    //         ->orderBy('created_at', 'desc')
-    //         ->paginate($this->perPage);
-
-    //     // $data2 => karyawan TITIP
-    //     $data2 = (clone $query)
-    //         ->whereHas('getKaryawan', function ($q) {
-    //             $q->where('titip', 1);
-    //         })
-    //         ->orderBy('created_at', 'desc')
-    //         ->paginate($this->perPage);
-
-    //     return view('livewire.payroll', [
-    //         'data' => $data,
-    //         'data2' => $data2,
-    //     ]);
-    // }
-
-
+    }    
 }

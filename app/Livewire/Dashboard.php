@@ -106,13 +106,67 @@ class Dashboard extends Component
 
         // Filter berdasarkan ID karyawan dari entitas tersebut
         $totalGaji = PayrollModel::whereIn('karyawan_id', $karyawanIds)->sum('total_gaji');
+        $totalGajiLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->whereMonth('periode', now()->subMonth()->month)
+            ->whereYear('periode', now()->subMonth()->year)
+            ->sum('total_gaji');
+
+        if ($totalGajiLastMonth > 0) {
+            $diff = $totalGaji - $totalGajiLastMonth;
+            $percentChange = round(($diff / $totalGajiLastMonth) * 100, 2);
+            $isUp = $percentChange >= 0;
+            $noteTotalGajiTetap = ($isUp ? '▲ +' : '▼ ') . abs($percentChange) . '% dari bulan sebelumnya';
+        } else {
+            $noteTotalGajiTetap = 'Data bulan lalu tidak tersedia';
+        }
+
         $totalGajiTitip = PayrollModel::whereIn('karyawan_id', $karyawanIdTitip)
             ->where('entitas_id', $entitasIdSaatIni)
             ->where('titip', 1)
             ->sum('total_gaji');
             // dd($totalGajiTitip);
+        $totalGajiTitipLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIdTitip)
+            ->where('entitas_id', $entitasIdSaatIni)
+            ->where('titip', 1)
+            ->whereMonth('periode', now()->subMonth()->month)
+            ->whereYear('periode', now()->subMonth()->year)
+            ->sum('total_gaji');
+        if ($totalGajiTitipLastMonth > 0) {
+            $diffTitip = $totalGajiTitip - $totalGajiTitipLastMonth;
+            $percentChangeTitip = round(($diffTitip / $totalGajiTitipLastMonth) * 100, 2);
+            $isUpTitip = $percentChangeTitip >= 0;
+            $noteTotalGajiTitip = ($isUpTitip ? '▲ +' : '▼ ') . abs($percentChangeTitip) . '% dari bulan sebelumnya';
+        } else {
+            $noteTotalGajiTitip = 'Data bulan lalu tidak tersedia';
+        }
+        
         $totalBpjskes = PayrollModel::whereIn('karyawan_id', $karyawanIds)->sum('bpjs_perusahaan');
+        $totalBpjsKesLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->whereMonth('periode', now()->subMonth()->month)
+            ->whereYear('periode', now()->subMonth()->year)
+            ->sum('bpjs_perusahaan');
+        if ($totalBpjsKesLastMonth > 0) {
+            $diff = $totalBpjskes - $totalBpjsKesLastMonth;
+            $percentChange = round(($diff / $totalBpjsKesLastMonth) * 100, 2);
+            $isUp = $percentChange >= 0;
+            $noteTotalBpjskes = ($isUp ? '▲ +' : '▼ ') . abs($percentChange) . '% dari bulan sebelumnya';
+        } else {
+            $noteTotalBpjskes = 'Data bulan lalu tidak tersedia';
+        }
+
         $totalBpjsJht = PayrollModel::whereIn('karyawan_id', $karyawanIds)->sum('bpjs_jht_perusahaan');
+        $totalBpjsJhtLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->whereMonth('periode', now()->subMonth()->month)
+            ->whereYear('periode', now()->subMonth()->year)
+            ->sum('bpjs_jht_perusahaan');
+        if ($totalBpjsJhtLastMonth > 0) {
+            $diffJht = $totalBpjsJht - $totalBpjsJhtLastMonth;
+            $percentChangeJht = round(($diffJht / $totalBpjsJhtLastMonth) * 100, 2);
+            $isUpJht = $percentChangeJht >= 0;
+            $noteTotalBpjsJht = ($isUpJht ? '▲ +' : '▼ ') . abs($percentChangeJht) . '% dari bulan sebelumnya';
+        } else {
+            $noteTotalBpjsJht = 'Data bulan lalu tidak tersedia';
+        }
         // dd($totalBpjskes);
         $totalIzinCuti = M_Pengajuan::whereIn('karyawan_id', $karyawanIds)
             ->where('status', 1)
@@ -132,13 +186,16 @@ class Dashboard extends Component
         return view('livewire.dashboard', [
             'totalPegawai' => $karyawanIds->count(),
             'totalGaji' => $totalGaji,
+            'noteTotalGajiTetap' => $noteTotalGajiTetap,
             'totalGajiTitip' => $totalGajiTitip,
-            'kenaikanGaji' => -5,
+            'noteTotalGajiTitip' => $noteTotalGajiTitip,
             'izinCuti' => $totalIzinCuti,
             'totalPresensi' => $totalPresensi,
             'statusKaryawan' => $statusKaryawan,
             'totalBpjskes' => $totalBpjskes,
+            'noteTotalBpjskes' => $noteTotalBpjskes,
             'totalBpjsJht' => $totalBpjsJht,
+            'noteTotalBpjsJht' => $noteTotalBpjsJht,
             'pendidikan' => [
                 'SMK' => 45,
                 'D3' => 23,

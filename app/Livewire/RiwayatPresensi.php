@@ -89,13 +89,17 @@ class RiwayatPresensi extends Component
 
     public function render()
     {
+        $entitasNama = session('selected_entitas', 'UHO');
+
         if (Auth::user()->current_role == 'admin' || Auth::user()->current_role == 'hr') {
             $datas = M_Presensi::with('getUser')
                 ->whereMonth('created_at', Carbon::now()->month)
                 ->whereYear('created_at', Carbon::now()->year)
+                ->whereHas('getUser', function ($query) use ($entitasNama) {
+                    $query->where('entitas', $entitasNama);
+                })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
-                // dd($datas);
         } elseif (Auth::user()->current_role == 'user' || Auth::user()->current_role == 'spv') {
             $userId = Auth::id();
             $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
@@ -106,11 +110,11 @@ class RiwayatPresensi extends Component
                 ->whereYear('created_at', Carbon::now()->year)
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
-            // dd($datas);
         }
-        // dd($dataPresensi);
+
         return view('livewire.riwayat-presensi', [
             'datas' => $datas
         ]);
     }
+
 }

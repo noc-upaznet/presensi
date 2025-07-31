@@ -4,8 +4,9 @@ namespace App\Livewire\Karyawan\Shifts;
 
 use Livewire\Component;
 use App\Models\M_JadwalShift;
-use App\Livewire\Forms\TambahTemplateMingguan;
 use App\Models\M_TemplateWeek;
+use Illuminate\Support\Facades\Crypt;
+use App\Livewire\Forms\TambahTemplateMingguan;
 
 class ModalTemplate extends Component
 {
@@ -48,6 +49,19 @@ class ModalTemplate extends Component
         ]);
 
         $this->dispatch('modal-tambah-template', action: 'show');
+        $this->dispatch('refresh');
+    }
+
+    public function delete($id)
+    {
+        // dd($id);
+        M_TemplateWeek::find(Crypt::decrypt($id))->delete();
+        $this->dispatch('swal', params: [
+            'title' => 'Data Deleted',
+            'icon' => 'success',
+            'text' => 'Data has been deleted successfully'
+        ]);
+        $this->dispatch('modal-confirm-delete', action: 'show');
         $this->dispatch('refresh');
     }
 

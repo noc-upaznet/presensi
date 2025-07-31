@@ -13,6 +13,7 @@ use App\Imports\KaryawanImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
 use App\Livewire\Forms\TambahDataKaryawanForm;
+use App\Models\User;
 
 class ModalKaryawan extends Component
 {
@@ -32,10 +33,12 @@ class ModalKaryawan extends Component
         $this->entitas = M_Entitas::all();
         $this->divisi = M_Divisi::all();
         $this->jabatan = M_Jabatan::all();
+        // dd($this->jabatan);
     }
 
-    public function UpdatedTotalUpah($value)
+    public function updatedFormTotalUpah($value)
     {
+        // dd($value);
         $value = (int) str_replace('.', '', $value);
         $this->form->gaji_pokok = $value * 0.75;
         $this->form->tunjangan_jabatan = $value * 0.25;
@@ -54,14 +57,13 @@ class ModalKaryawan extends Component
     }
 
     public function saveEdit() {
-        // $this->form->validate();
-
         $ticket = M_DataKaryawan::find($this->ticketId);
         // dd($ticket);
         if (!$ticket) {
             session()->flash('error', 'Data karyawan tidak ditemukan!');
             return;
         }
+    
         $data = [
             'nama_karyawan' => $this->form->nama_karyawan,
             'email' => $this->form->email,
@@ -104,7 +106,11 @@ class ModalKaryawan extends Component
             'penanggung' => $this->form->penanggung,
         ];
         // dd($data);
-            
+        User::where('id', $ticket->user_id)->update([
+            'name' => $this->form->nama_karyawan,
+            'email' => $this->form->email,
+            'current_role' => strtolower($this->form->level) === 'staff' ? 'user' : strtolower($this->form->level),
+        ]);
         $ticket->update($data);
 
         $this->form->reset();

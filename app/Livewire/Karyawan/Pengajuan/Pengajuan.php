@@ -319,6 +319,10 @@ class Pengajuan extends Component
                     ->pluck('id');
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
+        } elseif ($user->current_role === 'hr') {
+            // HR melihat semua karyawan dari semua entitas
+            $karyawanIdList = M_DataKaryawan::pluck('id');
+            $query->whereIn('karyawan_id', $karyawanIdList);
         }
 
         // Filter Status

@@ -57,7 +57,7 @@ class ModalPengajuanLembur extends Component
         if ($this->file_bukti) {
             // dd($this->file);
             $this->validate([
-                'file_bukti' => 'nullablx   e|mimes:jpg,jpeg,png|max:2048',
+                'file_bukti' => 'nullable|mimes:jpg,jpeg,png|max:2048',
             ], [
                 'file_bukti.max' => 'Ukuran file maksimal 2MB.',
                 'file_bukti.mimes' => 'Format file harus JPG, JPEG, PNG.',
@@ -123,16 +123,27 @@ class ModalPengajuanLembur extends Component
             session()->flash('error', 'Data pengajuan tidak ditemukan!');
             return;
         }
-        // $this->form->validate();
-
-        // $this->validate([
-        //     'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5048',
-        // ]);
+        $this->form->validate();
 
         $path = null;
-        if ($this->file_bukti) {
-            $path = $this->file_bukti->store('file-lembur', 'public');
+        if ($this->file_bukti && $this->file_bukti->isFile()) {
+            try {
+                $fileSize = $this->file_bukti->getSize();
+
+                if ($fileSize > 2 * 1024 * 1024) { // lebih dari 2MB
+                    $this->reset('file_bukti');
+                    $this->dispatch('show-warning', message: 'Ukuran file tidak boleh lebih dari 2MB.');
+                    // lanjutkan simpan TANPA file
+                } else {
+                    $path = $this->file_bukti->store('file-lembur', 'public');
+                }
+            } catch (\Exception $e) {
+                $this->reset('file_bukti');
+                $this->dispatch('show-warning', message: 'File gagal disimpan. Mungkin ukurannya terlalu besar.');
+                // lanjutkan simpan TANPA file
+            }
         }
+
 
         $data = [
             // 'karyawan_id' => M_DataKaryawan::where('user_id', Auth::id())->value('id'),

@@ -36,7 +36,7 @@
                             </select> entries per page</label>
                     </div>
                     <div>
-                        <input type="search" class="form-control form-control-sm" placeholder="Search...">
+                        <input type="search" wire:model.live="search" class="form-control form-control-sm" placeholder="Search...">
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -51,33 +51,39 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($lokasiList as $roleLokasi)
-                                <tr>
-                                    <td style="color: var(--bs-body-color);">{{ $roleLokasi->getKaryawan->nama_karyawan }}</td>
-                                    <td>
-                                        <span
-                                            class="badge bg-{{ $roleLokasi->lock ? 'primary' : 'secondary' }} text-white">
-                                            {{ $roleLokasi->lock ? 'Ya' : 'Tidak' }}
-                                        </span>
-                                    </td>
-                                    <td style="color: var(--bs-body-color);">
-                                        {{-- {{ $roleLokasi->lokasi_presensi }} --}}
-                                        @foreach ($roleLokasi->lokasis as $lokasi)
-                                            <span class="badge bg-info text-dark me-1">{{ $lokasi->nama_lokasi }}</span>
-                                        @endforeach
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-warning btn-sm" wire:click="showEdit('{{ Crypt::encrypt($roleLokasi->id) }}')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button wire:click.prevent="confirmHapusLokasi({{ $roleLokasi->id }})"
-                                            class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#hapusLokasiModal">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                @endforeach
+                                @if ($lokasiList->isEmpty())
+                                    <tr>
+                                        <td colspan="4" class="text-center" style="color: var(--bs-body-color);">Data tidak ditemukan</td>
+                                    </tr>
+                                @else
+                                    @foreach($lokasiList as $roleLokasi)
+                                        <tr>
+                                            <td style="color: var(--bs-body-color);">{{ $roleLokasi->getKaryawan->nama_karyawan }}</td>
+                                            <td>
+                                                <span
+                                                    class="badge bg-{{ $roleLokasi->lock ? 'primary' : 'secondary' }} text-white">
+                                                    {{ $roleLokasi->lock ? 'Ya' : 'Tidak' }}
+                                                </span>
+                                            </td>
+                                            <td style="color: var(--bs-body-color);">
+                                                {{-- {{ $roleLokasi->lokasi_presensi }} --}}
+                                                @foreach ($roleLokasi->lokasis as $lokasi)
+                                                    <span class="badge bg-info text-dark me-1">{{ $lokasi->nama_lokasi }}</span>
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-warning btn-sm" wire:click="showEdit('{{ Crypt::encrypt($roleLokasi->id) }}')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button wire:click.prevent="confirmHapusLokasi({{ $roleLokasi->id }})"
+                                                    class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#hapusLokasiModal">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
                             </tbody>
                         </table>
                     </div>

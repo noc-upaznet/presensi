@@ -5,14 +5,17 @@ namespace App\Livewire;
 use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\M_Presensi;
+use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Auth;
-use Livewire\WithPagination;
+use Illuminate\Support\Facades\Crypt;
 
 class RiwayatPresensiStaff extends Component
 {
-    // public $approve;
     use WithPagination;
+    public $editId;
+    public $status;
+
     public function approve($id)
     {
         $presensi = M_Presensi::findOrFail($id);
@@ -24,6 +27,49 @@ class RiwayatPresensiStaff extends Component
             'icon' => 'success',
             'text' => 'Presensi has been approved successfully'
         ]);
+    }
+
+    public $statusList = [
+        0 => 'Tepat Waktu',
+        1 => 'Terlambat',
+        2 => 'Dispensasi',
+    ];
+
+    public function showModal($id)
+    {
+        $decryptedId = Crypt::decrypt($id);
+        $this->editId = $decryptedId;
+
+        $data = M_Presensi::find($decryptedId);
+        // dd($data);
+        if (!$data) {
+            session()->flash('error', 'Data tiket tidak ditemukan!');
+            return;
+        }
+
+        $this->status = $data->status;
+        $this->dispatch('editModal', action: 'show');
+    }
+
+    public function updateStatus()
+    {
+        // Cari data berdasarkan ID yang sudah didekripsi sebelumnya
+        $data = M_Presensi::find($this->editId);
+
+        if (!$data) {
+            session()->flash('error', 'Data presensi tidak ditemukan!');
+            return;
+        }
+
+        // Update field status dengan nilai dari form
+        $data->status = $this->status;
+        $data->save();
+
+        // Reset form jika perlu
+        $this->reset(['editId', 'status']);
+
+        // Tutup modal
+        $this->dispatch('editModal', action: 'hide');
     }
 
     public function reject($id)
@@ -44,15 +90,20 @@ class RiwayatPresensiStaff extends Component
 
         // Ambil data karyawan dari user yang login
         $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
+        // dd($karyawan);
 
         $divisi = $karyawan->divisi;
-        $karyawanId = $karyawan->id; // id dari tabel data_karyawan
+        // dd($divisi);
+        $karyawanId = $karyawan->id;
+
+        $entitasNama = session('selected_entitas', 'UHO');
 
         $datas = M_Presensi::with('getUser')
-            ->where('lokasi_lock', 0)
-            ->where('user_id', '!=', $karyawanId) // user_id pada presensi = karyawan_id
-            ->whereHas('getUser', function ($query) use ($divisi) {
-                $query->where('divisi', $divisi);
+            // ->where('lokasi_lock', 0)
+            ->where('user_id', '!=', $karyawanId)
+            ->whereHas('getUser', function ($query) use ($divisi, $entitasNama) {
+                $query->where('divisi', $divisi)
+                    ->where('entitas', $entitasNama);
             })
             ->whereMonth('created_at', Carbon::now()->month)
             ->whereYear('created_at', Carbon::now()->year)
@@ -63,6 +114,7 @@ class RiwayatPresensiStaff extends Component
             'datas' => $datas
         ]);
     }
+
 
 
 }

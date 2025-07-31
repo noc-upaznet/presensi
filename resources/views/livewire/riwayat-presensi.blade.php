@@ -42,9 +42,9 @@
                                 <th>Clock Out</th>
                                 <th>File</th>
                                 <th>Status</th>
-                                @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr')
+                                {{-- @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
                                     <th>Action</th>
-                                @endif
+                                @endif --}}
                             </tr>
                         </thead>
                         <tbody>
@@ -76,7 +76,7 @@
                                                 <span class="badge bg-secondary">Unknown</span>
                                             @endif
                                         </td>
-                                        @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr')
+                                        {{-- @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
                                             <td>
                                                 <button class="btn btn-warning btn-sm" wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
                                                     <i class="fas fa-edit"></i>
@@ -90,7 +90,7 @@
                                                 </button>
         
                                             </td>
-                                        @endif
+                                        @endif --}}
                                     </tr>
                                 @endforeach
                             @endif
@@ -105,7 +105,7 @@
     </div>
 
     <!-- Modal Edit -->
-    <div wire:ignore.self class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    {{-- <div wire:ignore.self class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -130,7 +130,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div class="modal fade" id="modal-confirm-delete" tabindex="-1" wire:ignore.self data-bs-backdrop="static"
         data-bs-keyboard="false" aria-hidden="true">

@@ -62,7 +62,7 @@
             </table>
         </div>
         <div class="mt-3">
-            {{ $jadwals->links('pagination::bootstrap-5') }}
+            {{ $jadwals->links() }}
         </div>
     </div>
 

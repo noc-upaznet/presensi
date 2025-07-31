@@ -250,7 +250,7 @@
                             @endif
                         </tbody>
                     </table>
-                {{ $pengajuans->links() }}
+                {{-- {{ $pengajuans->links() }} --}}
                 </div>
                 {{ $pengajuans->links('pagination::bootstrap-5') }}
             </div>

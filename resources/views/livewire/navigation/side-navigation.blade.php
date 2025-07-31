@@ -215,15 +215,30 @@
             @php
                 $user = auth()->user();
                 $divisi = $user->karyawan->divisi ?? null;
-                // dump($divisi);
+                // dump($user);
             @endphp
 
-            @if ($user->current_role === 'spv' && in_array($divisi, ['Helpdesk', 'Teknisi']))
+            @if ($user->current_role === 'spv' && in_array($divisi, ['Pelayanan', 'Teknisi']))
                 <li class="nav-item">
                     <a href="{{ route('jadwal-shift') }}" 
                     class="nav-link {{ request()->routeIs('jadwal-shift') ? 'active' : '' }}">
                         <i class="bi bi-calendar-range"></i>
                         <p>Jadwal Shift</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('template-mingguan') }}" 
+                    class="nav-link {{ request()->routeIs('template-mingguan') ? 'active' : '' }}">
+                    <i class="bi bi-calendar2-plus"></i>
+                        <p>Template Mingguan</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('pembagian-shift') }}" 
+                    class="nav-link {{ request()->routeIs('pembagian-shift') ? 'active' : '' }}">
+                    <i class="bi bi-calendar2-plus"></i>
+                        <p>Pembagian Shift</p>
                     </a>
                 </li>
             @endif

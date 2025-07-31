@@ -69,7 +69,7 @@
                         </td>
                         <td>
                             <button class="btn btn-warning btn-sm" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
+                            <button class="btn btn-sm btn-danger" wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"><i class="fa fa-trash"></i></button>
                         </td>
                     </tr>
                 @endforeach
@@ -90,10 +90,14 @@
       $('#modal-edit-template').modal(event.action);
   });
 
+  Livewire.on('modal-confirm-delete', (event) => {
+      $('#modal-confirm-delete').modal(event.action);
+      $('#btn-confirm-delete').attr('wire:click', 'delete("' + event.id + '")');
+      $('#modal-confirm-delete').modal('hide');
+  });
+
   Livewire.on('refresh', () => {
       Livewire.dispatch('refreshTable');
   });
 </script>
 @endpush
-
-

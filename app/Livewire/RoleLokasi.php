@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\User;
 use App\Models\Lokasi;
 use Livewire\Component;
+use App\Models\M_Entitas;
 use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
 use App\Models\RoleLokasiModel;
@@ -137,7 +138,14 @@ class RoleLokasi extends Component
     {
         // Load lokasi saat komponen pertama kali di-mount
         // $this->users = User::where('role', '!=', 'admin')->orderBy('name')->get();
-        $this->karyawans = M_DataKaryawan::orderBy('nama_karyawan')->get();
+        $entitasNama = session('selected_entitas', 'UHO');
+
+        $this->karyawans = M_DataKaryawan::where('entitas', $entitasNama)
+            ->whereNotIn('id', function ($query) {
+                $query->select('karyawan_id')->from('role_lokasi');
+            })
+            ->orderBy('nama_karyawan')
+            ->get();
         $this->lokasis = Lokasi::orderBy('nama_lokasi')->get();
         $this->lokasi_list = RoleLokasiModel::all();
 
@@ -146,8 +154,21 @@ class RoleLokasi extends Component
 
     public function render()
     {
-        // $lokasiList = RoleLokasiModel::where('nama_karyawan', 'like', '%' . $this->search . '%')->paginate(10);
-        $lokasiList = RoleLokasiModel::with(['getKaryawan'])->latest()->paginate(10);
+        // $lokasiList = RoleLokasiModel::withwhere('nama_karyawan', 'like', '%' . $this->search . '%')->paginate(10);
+        $entitasNama = session('selected_entitas', 'UHO');
+
+        $lokasiList = RoleLokasiModel::with('getKaryawan')
+            ->whereHas('getKaryawan', function ($query) use ($entitasNama) {
+                $query->where('entitas', $entitasNama);
+            })
+            ->when($this->search, function ($query) {
+                $query->whereHas('getKaryawan', function ($q) {
+                    $q->where('nama_karyawan', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->latest()
+            ->paginate(10);
+        // dd($lokasiList);
         return view('livewire.role-lokasi', [
             'lokasiList' => $lokasiList,
         ]);
