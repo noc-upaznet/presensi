@@ -96,25 +96,13 @@ class ClockInSelfie extends Component
         $image = base64_decode($base64Image);
 
         // Buat nama file unik
-        $filename = 'selfie_' . now()->timestamp . '.png';
+        $filename = 'selfie_' . Str::uuid() . '.png';
 
         // Simpan ke public disk
         Storage::disk('public')->put('selfies/' . $filename, $image);
 
         // Simpan path ke properti
         $this->photo = 'selfies/' . $filename;
-    }
-
-    public function removePhoto()
-    {
-        if ($this->photo && Storage::disk('public')->exists($this->photo)) {
-        Storage::disk('public')->delete($this->photo);
-        }
-
-        $this->photo = null;
-
-        // Hapus session supaya foto sebelumnya gak muncul lagi
-        session()->forget($this->photo);
     }
 
     public function clockIn()
@@ -216,7 +204,7 @@ class ClockInSelfie extends Component
     
         $status = 0;
         if ($shift && $shift->jam_masuk) {
-            $jamMasukShift = Carbon::parse($shift->jam_masuk);
+            $jamMasukShift = Carbon::parse($shift->jam_masuk)->addSeconds(60);
             $jamSekarang = Carbon::parse($clockInTime);
             if ($jamSekarang->gt($jamMasukShift)) {
                 $status = 1;
@@ -240,6 +228,18 @@ class ClockInSelfie extends Component
         $this->reset(['photo']);
         session()->flash('success', 'Clock-in berhasil.');
         return redirect()->route('clock-in');
+    }
+
+    public function removePhoto()
+    {
+        if ($this->photo && Storage::disk('public')->exists($this->photo)) {
+        Storage::disk('public')->delete($this->photo);
+        }
+
+        $this->photo = null;
+
+        // Hapus session supaya foto sebelumnya gak muncul lagi
+        session()->forget($this->photo);
     }
 
 

@@ -125,7 +125,7 @@
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
-                                <th>Diajukan Pada</th>
+                                {{-- <th>Diajukan Pada</th> --}}
                                 @if (auth()->user()->current_role != 'user')
                                     <th>Nama</th>
                                 @endif
@@ -146,7 +146,7 @@
                                 @foreach ($pengajuans as $key)
                                     <tr>
                                         <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
-                                        <td style="color: var(--bs-body-color);">{{ $key->created_at }}</td>
+                                        {{-- <td style="color: var(--bs-body-color);">{{ $key->created_at }}</td> --}}
                                         @if (auth()->user()->current_role != 'user')
                                             <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}</td>
                                         @endif

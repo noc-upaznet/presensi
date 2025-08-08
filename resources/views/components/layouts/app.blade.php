@@ -343,7 +343,7 @@
       // sparkline3.render();
     </script>
     <!--end::Script-->
-    <script src="https://kit.fontawesome.com/800cfdc68e.js" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     {{-- alpine.js --}}

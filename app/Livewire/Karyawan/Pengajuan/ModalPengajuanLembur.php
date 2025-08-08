@@ -76,7 +76,7 @@ class ModalPengajuanLembur extends Component
             'keterangan' => $this->form->keterangan,
             'waktu_mulai' => $this->form->waktu_mulai,
             'waktu_akhir' => $this->form->waktu_akhir,
-            'total_jam' => $this->form->total_jam,
+            'total_jam' => round($this->form->total_jam, 2),
             'file_bukti' => $path ? str_replace('public/', 'storage/', $path) : null,
             'satatus' => 0,
         ];
@@ -152,7 +152,7 @@ class ModalPengajuanLembur extends Component
             'keterangan' => $this->form->keterangan,
             'waktu_mulai' => $this->form->waktu_mulai,
             'waktu_akhir' => $this->form->waktu_akhir,
-            'total_jam' => $this->form->total_jam,
+            'total_jam' => round($this->form->total_jam, 2),
             'file_bukti' => $path ? str_replace('public/', 'storage/', $path) : null,
         ];
         // dd($data);

@@ -33,7 +33,7 @@ class GantiPassword extends Component
 
         // Update password + password_expired
         $user->update([
-            'password' => Hash::make($this->new_password),
+            'password' => bcrypt($this->new_password),
             'password_expired' => false, // ✅ update kolom expired jadi false
         ]);
 

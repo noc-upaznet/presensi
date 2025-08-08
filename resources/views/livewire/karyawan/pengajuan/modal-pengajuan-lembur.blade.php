@@ -32,28 +32,41 @@
                                 <label for="waktu_mulai" class="form-label">Jam Mulai <small class="text-danger">*</small></label>
                                 <select class="form-control" wire:model.lazy="form.waktu_mulai">
                                     <option value="">Pilih Jam</option>
-                                    @for ($i = 1; $i <= 24; $i++)
-                                        <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}:00">
-                                            {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}:00
-                                        </option>
+                                    @for ($i = 0; $i < 48; $i++)
+                                        @php
+                                            $hour = floor($i / 2);
+                                            $minute = $i % 2 == 0 ? '00' : '30';
+                                            $value = str_pad($hour, 2, '0', STR_PAD_LEFT) . ':' . $minute;
+
+                                            // Label: jika 00:00 ditampilkan sebagai 24:00
+                                            $label = ($value === '00:00') ? '24:00' : $value;
+                                        @endphp
+                                        <option value="{{ $value }}">{{ $label }}</option>
                                     @endfor
                                 </select>
                                 @error('form.waktu_mulai') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
+
                             <div class="col">
                                 <label for="waktu_akhir" class="form-label">Jam Selesai <small class="text-danger">*</small></label>
                                 <select class="form-control" wire:model.lazy="form.waktu_akhir">
                                     <option value="">Pilih Jam</option>
-                                    @for ($i = 1; $i <= 24; $i++)
-                                        <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}:00">
-                                            {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}:00
-                                        </option>
+                                    @for ($i = 0; $i < 48; $i++)
+                                        @php
+                                            $hour = floor($i / 2);
+                                            $minute = $i % 2 == 0 ? '00' : '30';
+                                            $value = str_pad($hour, 2, '0', STR_PAD_LEFT) . ':' . $minute;
+
+                                            $label = ($value === '00:00') ? '24:00' : $value;
+                                        @endphp
+                                        <option value="{{ $value }}">{{ $label }}</option>
                                     @endfor
                                 </select>
                                 @error('form.waktu_akhir') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
                     </div>
+
                     <div class="mb-3">
                         <label for="total_jam" class="form-label fw-semibold">Jumlah Jam Lembur</label>
                         <input type="text" id="total_jam" class="form-control" wire:model="form.total_jam" readonly>
@@ -124,11 +137,14 @@
                                 <label for="waktu_mulai" class="form-label">Jam Mulai <small class="text-danger">*</small></label>
                                 <select class="form-control" wire:model.lazy="form.waktu_mulai">
                                     <option value="">Pilih Jam</option>
-                                    @for ($i = 1; $i <= 24; $i++)
-                                        <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}:00">
-                                            {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}:00
-                                        </option>
-                                    @endfor
+                                    @php
+                                        $start = \Carbon\Carbon::createFromTime(0, 0);
+                                        $end = \Carbon\Carbon::createFromTime(23, 30);
+                                    @endphp
+                                    @while ($start <= $end)
+                                        <option value="{{ $start->format('H:i') }}">{{ $start->format('H:i') }}</option>
+                                        @php $start->addMinutes(30); @endphp
+                                    @endwhile
                                 </select>
                                 @error('form.waktu_mulai') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
@@ -136,16 +152,20 @@
                                 <label for="waktu_akhir" class="form-label">Jam Selesai <small class="text-danger">*</small></label>
                                 <select class="form-control" wire:model.lazy="form.waktu_akhir">
                                     <option value="">Pilih Jam</option>
-                                    @for ($i = 1; $i <= 24; $i++)
-                                        <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}:00">
-                                            {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}:00
-                                        </option>
-                                    @endfor
+                                    @php
+                                        $start = \Carbon\Carbon::createFromTime(0, 0);
+                                        $end = \Carbon\Carbon::createFromTime(23, 30);
+                                    @endphp
+                                    @while ($start <= $end)
+                                        <option value="{{ $start->format('H:i') }}">{{ $start->format('H:i') }}</option>
+                                        @php $start->addMinutes(30); @endphp
+                                    @endwhile
                                 </select>
                                 @error('form.waktu_akhir') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
                     </div>
+
                     <div class="mb-3">
                         <label for="total_jam" class="form-label fw-semibold">Jumlah Jam Lembur</label>
                         <input type="text" id="total_jam" class="form-control" wire:model="form.total_jam" readonly>

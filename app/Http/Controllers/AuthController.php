@@ -14,23 +14,18 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // Validasi form
         $request->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
 
-        // Ambil inputan login
         $credentials = $request->only('email', 'password');
 
-        // Coba login
         if (Auth::attempt($credentials)) {
-            // Amankan session dari fixation
             $request->session()->regenerate();
 
             $user = Auth::user();
 
-            // Jika password masih default (expired)
             if ($user->password_expired) {
                 session()->flash('warning', 'Password Anda masih default, silakan ganti password terlebih dahulu.');
                 return redirect()->route('ganti-password');

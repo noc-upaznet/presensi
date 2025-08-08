@@ -96,10 +96,11 @@ class RiwayatPresensiStaff extends Component
         // dd($divisi);
         $karyawanId = $karyawan->id;
 
-        $entitasNama = session('selected_entitas', 'UHO');
+        $entitasNama = $karyawan->entitas;
+        // dd($entitasNama);
 
         $datas = M_Presensi::with('getUser')
-            // ->where('lokasi_lock', 0)
+            ->where('lokasi_lock', 0)
             ->where('user_id', '!=', $karyawanId)
             ->whereHas('getUser', function ($query) use ($divisi, $entitasNama) {
                 $query->where('divisi', $divisi)

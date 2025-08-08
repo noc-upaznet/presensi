@@ -7,6 +7,7 @@ use App\Models\Lokasi;
 use Livewire\Component;
 use App\Models\M_Jadwal;
 use App\Models\M_Presensi;
+use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use App\Models\M_JadwalShift;
 use App\Models\M_DataKaryawan;
@@ -92,7 +93,7 @@ class ClockIn extends Component
         $base64Image = preg_replace('#^data:image/\w+;base64,#i', '', $photo);
         $image = base64_decode($base64Image);
 
-        $filename = 'selfie_' . now()->timestamp . '.png';
+        $filename = 'selfie_' . Str::uuid() . '.png';
         Storage::disk('public')->put('selfies/' . $filename, $image);
 
         $this->photo = 'selfies/' . $filename;

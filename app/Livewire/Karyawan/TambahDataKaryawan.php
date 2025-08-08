@@ -95,8 +95,9 @@ class TambahDataKaryawan extends Component
         $this->step--;
     }
 
-    public function UpdatedTotalUpah($value)
+    public function updatedFormTotalUpah($value)
     {
+        // dd($value);
         $value = (int) str_replace('.', '', $value); // buang titik pemisah ribuan
         $this->form->gaji_pokok = $value * 0.75;
         $this->form->tunjangan_jabatan = $value * 0.25;
