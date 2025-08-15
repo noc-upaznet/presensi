@@ -237,7 +237,7 @@
                                                         @endif
 
                                                         @if ($key->canBeDeletedByAdmin())
-                                                            <button class="btn btn-sm btn-danger" wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
+                                                            <button class="btn btn-sm btn-danger mb-2" wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
                                                                 <i class="bi bi-trash"></i>
                                                             </button>
                                                         @endif
@@ -252,7 +252,7 @@
                     </table>
                 {{-- {{ $pengajuans->links() }} --}}
                 </div>
-                {{ $pengajuans->links('pagination::bootstrap-5') }}
+                {{ $pengajuans->links()}}
             </div>
         </div>
     </div>

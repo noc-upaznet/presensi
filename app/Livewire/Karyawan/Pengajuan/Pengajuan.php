@@ -17,6 +17,8 @@ class Pengajuan extends Component
 {
     public PengajuanForm $form;
     use WithPagination;
+    protected $paginationTheme = 'bootstrap';
+    
     protected $listeners = ['refreshTable' => 'refresh'];
 
     public $filterPengajuan = '';
@@ -227,7 +229,7 @@ class Pengajuan extends Component
 
         // Jika pengaju adalah HR
         elseif ($userRole === 'admin') {
-            if ($pengajuRole !== 'hr') {
+            if (!in_array($pengajuRole, ['hr', 'admin'])) {
                 $this->dispatch('swal', params: [
                     'title' => 'Tidak Diizinkan',
                     'icon' => 'error',
@@ -311,12 +313,19 @@ class Pengajuan extends Component
             $query->whereIn('karyawan_id', $karyawanIdList);
 
         } elseif ($user->current_role === 'spv') {
-            // SPV hanya melihat karyawan yang berada dalam divisinya dan entitas yang sama
+            // SPV hanya melihat karyawan yang berada dalam divisinya
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
-                $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
-                    ->where('entitas', $dataKaryawan->entitas) // pastikan tetap dalam entitas yang sama
+                if (strtolower($dataKaryawan->divisi) === 'noc') {
+                    // Divisi NOC tidak pakai entitas
+                    $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
                     ->pluck('id');
+                } else {
+                    // Divisi lain tetap filter divisi dan entitas
+                    $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
+                    ->where('entitas', $dataKaryawan->entitas)
+                    ->pluck('id');
+                }
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
         } elseif ($user->current_role === 'hr') {
@@ -337,7 +346,7 @@ class Pengajuan extends Component
             $query->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
         }
 
-        // Search + Pagination
+        // Search
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('id', 'like', '%' . $this->search . '%')

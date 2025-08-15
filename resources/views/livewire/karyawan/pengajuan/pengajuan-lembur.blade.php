@@ -121,6 +121,7 @@
                                 @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
                                     <th>Nama Karyawan</th>
                                 @endif
+                                <th>Jenis Lembur</th>
                                 <th>Waktu Lembur</th>
                                 <th>Keterangan</th>
                                 <th>File</th>
@@ -142,6 +143,13 @@
                                         @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
                                             <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}</td>
                                         @endif
+                                        <td style="color: var(--bs-body-color);">
+                                            @if ($key->jenis == 1)
+                                                Hari Biasa
+                                            @elseif ($key->jenis == 2)
+                                                Hari Libur
+                                            @endif
+                                        </td>
                                         <td style="color: var(--bs-body-color);">{{ $key->waktu_mulai }} - {{ $key->waktu_akhir }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->keterangan }}</td>
                                         <td style="color: var(--bs-body-color);">
@@ -264,7 +272,7 @@
                     </table>
                 </div>
             </div>
-            {{ $pengajuanLembur->links('pagination::bootstrap-5') }}
+            {{ $pengajuanLembur->links() }}
         </div>
         <livewire:karyawan.pengajuan.modal-pengajuan-lembur />
     </div>

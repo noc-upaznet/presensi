@@ -3,12 +3,12 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-6">
-                    <h3 class="mb-0" style="color: var(--bs-body-color);">Create Slip Gaji</h3>
+                    <h3 class="mb-0" style="color: var(--bs-body-color);">Edit Slip Gaji</h3>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Create Slip Gaji</li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit Slip Gaji</li>
                     </ol>
                 </div>
             </div>
@@ -36,7 +36,7 @@
                                 Periode: 
                                 {{ $cutoffStart->translatedFormat('d M Y') }} - {{ $cutoffEnd->translatedFormat('d M Y') }}
                             </label>
-                            <input type="month" id="month" class="form-control @error('bulanTahun') is-invalid @enderror" wire:model="bulanTahun">
+                            <input type="month" id="month" readonly class="form-control @error('bulanTahun') is-invalid @enderror" wire:model="bulanTahun">
                             @error('bulanTahun') 
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -44,12 +44,7 @@
 
                         <div class="mb-3">
                             <label for="employee" class="form-label fw-semibold">Karyawan</label>
-                            <select id="employee" class="form-select" wire:model.lazy="user_id">
-                                <option value="">Pilih Karyawan</option>
-                                @foreach($karyawan as $item)
-                                    <option value="{{ $item->id }}">{{ $item->nama_karyawan }}</option>
-                                @endforeach
-                            </select>
+                            <input id="employee" class="form-control" wire:model.lazy="user_id" readonly>
                             @error('user_id')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -63,12 +58,6 @@
                             <label for="departemen" class="form-label fw-semibold">Departemen</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" disabled wire:model="divisi">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="jabatan" class="form-label fw-semibold">Jabatan</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" disabled wire:model="jabatan">
                             </div>
                         </div>
                         @if ($this->isSalesPosition())
@@ -128,7 +117,7 @@
                                 <div class="input-group mb-2">
                                     <input type="number" name="inovation_reward" class="form-control" wire:model.lazy="inovation_reward" placeholder="Nominal">
                                     <span class="input-group-text">X</span>
-                                    <input type="number" class="form-control" wire:model.lazy="inovation_reward_jumlah" placeholder="Jumlah">
+                                    <input type="number" class="form-control" wire:model.lazy="kehadiran" placeholder="Jumlah">
                                 </div>
 
                                 {{-- Menampilkan total hasil perkalian --}}
@@ -241,10 +230,10 @@
 
                         <div class="row">
                             <div class="mb-3 col-md-6">
-                                <label for="izin_nominal" class="form-label fw-semibold">Potongan Izin</label>
+                                <label for="izin" class="form-label fw-semibold">Potongan Izin</label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" id="izin_nominal" class="form-control" disabled wire:model="izin_nominal">
+                                    <input type="text" id="izin" class="form-control" disabled wire:model="izin_nominal">
                                 </div>
                             </div>
 
@@ -256,7 +245,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div class="form-check">
                             <input type="checkbox" wire:model.lazy="bpjs_digunakan" class="form-check-input" id="bpjsCheckbox">
                             <label class="form-check-label" for="bpjsCheckbox">BPJS Kesehatan</label>
@@ -332,24 +321,24 @@
                         <div class="row mt-3">
                             <div class="col-md-2 mb-3">
                                 <label for="kehadiran" class="form-label fw-semibold">Kehadiran (Hari)</label>
-                                <input type="text" class="form-control" value="{{ $rekap['kehadiran'] }}" readonly>
+                                <input type="text" class="form-control" wire:model="kehadiran" readonly>
                             </div>
                             <div class="col-md-2 mb-3">
                                 <label for="terlambat" class="form-label fw-semibold">Terlambat (Hari)</label>
-                                <input type="text" class="form-control" value="{{ $rekap['terlambat'] }}" readonly>
+                                <input type="text" class="form-control" wire:model="terlambat" readonly>
                             </div>
                             <div class="col-md-2 mb-3">
                                 <label for="izin" class="form-label fw-semibold">Izin (Hari)</label>
-                                <input type="text" class="form-control" value="{{ ($rekap['izin'] ?? 0) + 0.5 * ($rekap['izin setengah hari'] ?? 0) }}" readonly>
+                                <input type="text" class="form-control" wire:model="izin" readonly>
                             </div>
                             <div class="col-md-2 mb-3">
                                 <label for="cuti" class="form-label fw-semibold">Cuti (Hari)</label>
-                                <input type="text" class="form-control" value="{{ $rekap['cuti'] }}" readonly>
+                                <input type="text" class="form-control" wire:model="cuti" readonly>
                             </div>
                             
                             <div class="col-md-2 mb-3">
                                 <label for="lembur" class="form-label fw-semibold">Lembur (Jam)</label>
-                                <input type="text" class="form-control" value="{{ $rekap['lembur'] }}" wire:model="lembur" readonly>
+                                <input type="text" class="form-control" wire:model="lembur_jam" readonly>
                             </div>
                         </div>
                         <div class="row">
@@ -362,15 +351,15 @@
                         </div>
 
                         <div class="footer text-end">
-                            <button type="button" wire:click="store" class="btn btn-primary"
-                                wire:loading.attr="disabled" wire:target="store">
-                                <div wire:loading wire:target="store" class="spinner-border spinner-border-sm" role="status">
+                            <button type="button" wire:click="saveEdit" class="btn btn-primary"
+                                wire:loading.attr="disabled" wire:target="saveEdit">
+                                <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
-                                <span wire:loading.remove wire:target="store">
+                                <span wire:loading.remove wire:target="saveEdit">
                                     <i class="fa fa-save"></i> Simpan
                                 </span>
-                                <span wire:loading wire:target="store">Loading...</span>
+                                <span wire:loading wire:target="saveEdit">Loading...</span>
                             </button>
                             <a href="{{ route('payroll') }}" class="btn btn-secondary">Kembali</a>
                         </div>

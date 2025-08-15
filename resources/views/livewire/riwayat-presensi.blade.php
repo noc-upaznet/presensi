@@ -18,6 +18,18 @@
     <div class="container">
         <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
             <div class="mb-4">
+                <div class="d-flex justify-content gap-2 flex-wrap mb-4">
+                    <select class="form-select" wire:model.lazy="filterkaryawan" style="width: 150px;">
+                        <option value="">Pilih Karyawan</option>
+                        @foreach ($karyawanList as $karyawan)
+                            <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
+                        @endforeach
+                    </select>
+
+                    <input type="month" class="form-control" style="width: 150px;" placeholder="Bulan" wire:model.lazy="filterBulan">
+
+                    <input type="date" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Tanggal" wire:model.lazy="filterTanggal">
+                </div>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
                         <label>Show <select class="form-select form-select-sm d-inline-block w-auto">
@@ -42,9 +54,9 @@
                                 <th>Clock Out</th>
                                 <th>File</th>
                                 <th>Status</th>
-                                {{-- @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
+                                @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
                                     <th>Action</th>
-                                @endif --}}
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -76,21 +88,21 @@
                                                 <span class="badge bg-secondary">Unknown</span>
                                             @endif
                                         </td>
-                                        {{-- @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
+                                        @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
                                             <td>
                                                 <button class="btn btn-warning btn-sm" wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
         
                                                 <!-- Tombol Buka Modal -->
-                                                <button wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"
+                                                {{-- <button wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"
                                                     class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                     data-bs-target="#hapusPresensiModal">
                                                     <i class="fas fa-trash"></i>
-                                                </button>
+                                                </button> --}}
         
                                             </td>
-                                        @endif --}}
+                                        @endif
                                     </tr>
                                 @endforeach
                             @endif
@@ -98,14 +110,14 @@
                     </table>
                 </div>
                 <div class="mt-3">
-                    {{ $datas->links('pagination::bootstrap-5') }}
+                    {{ $datas->links() }}
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Modal Edit -->
-    {{-- <div wire:ignore.self class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -130,7 +142,7 @@
                 </div>
             </div>
         </div>
-    </div> --}}
+    </div>
 
     <div class="modal fade" id="modal-confirm-delete" tabindex="-1" wire:ignore.self data-bs-backdrop="static"
         data-bs-keyboard="false" aria-hidden="true">

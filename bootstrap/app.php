@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Http\RedirectResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,10 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'tokenauth' => \App\Http\Middleware\TokenAuth::class,
+            // 'tokenauth' => \App\Http\Middleware\TokenAuth::class,
             'password.expired' => \App\Http\Middleware\CheckPasswordExpired::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->renderable(function (TokenMismatchException $e, $request): RedirectResponse {
+            return redirect()->route('login')
+                ->with('error', 'Sesi Anda telah habis. Silakan login kembali.');
+        });
     })->create();

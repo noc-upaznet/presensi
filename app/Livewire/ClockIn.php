@@ -36,9 +36,7 @@ class ClockIn extends Component
     public function mount()
     {
         if (Auth::user()?->current_role !== 'user' && Auth::user()?->current_role !== 'hr' && Auth::user()?->current_role !== 'spv') {
-            // Bisa redirect atau abort
             return redirect()->route('dashboard');
-            // abort(403, 'Access Denied');
         }
         if (!Auth::check()) {
             session(['redirect_after_login' => url()->current()]);
@@ -49,37 +47,38 @@ class ClockIn extends Component
 
         $userId = Auth::user()->id;
         $karyawanId = M_DataKaryawan::where('user_id', $userId)->value('id');
-        // dd($karyawanId);
 
         $tanggal = Carbon::now();
-        $hari = 'd' . $tanggal->day; // contoh: d24
+        $hari = 'd' . $tanggal->day;
         $bulanTahun = $tanggal->format('Y-m');
 
-        // ambil jadwal user
         $jadwal = M_Jadwal::where('karyawan_id', $karyawanId)
             ->where('bulan_tahun', $bulanTahun)
             ->first();
-        // dd($jadwal);
-        $shiftId = $jadwal?->{$hari}; // ambil shift id hari ini
 
-        $shift = M_JadwalShift::find($shiftId); // tabel shift berisi jam_masuk & jam_keluar
-        // dd($shift);
+        $shiftId = $jadwal?->{$hari};
+        $shift = M_JadwalShift::find($shiftId);
+
         $this->jamMasuk = $shift?->jam_masuk ?? '00:00';
         $this->jamKeluar = $shift?->jam_pulang ?? '00:00';
 
-        $user = Auth::user();
-        $today = now()->toDateString();
+        if ($this->jamMasuk === '00:00:00' && $this->jamKeluar === '00:00:00') {
+            session()->flash('error', 'Jadwal tidak ada, tidak bisa melakukan Clock-in.');
+            $this->hasClockedIn = true; // disable tombol clock-in di view
+            return;
+        }
 
+        $today = now()->toDateString();
         $presensi = M_Presensi::where('user_id', $karyawanId)
             ->where('tanggal', $today)
             ->first();
-        // dd($presensi);
 
         if ($presensi) {
             $this->hasClockedIn = $presensi->clock_in !== '00:00:00';
             $this->hasClockedOut = $presensi->clock_out !== '00:00:00';
         }
     }
+
 
     public function showCamera()
     {

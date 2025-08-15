@@ -145,12 +145,6 @@
                         @endforeach
                     </select>
 
-                    {{-- <select wire:model.lazy="selectedStatus" class="form-select me-2" style="width: 170px;">
-                        <option value="">Status Karyawan</option>
-                        <option value="titip">TITIP</option>
-                        <option value="tetap">TETAP</option>
-                    </select> --}}
-
                     <div class="ms-auto">
                         <button type="button" class="btn btn-sm btn-success" wire:click="export">
                             <i class="fas fa-file-export"></i> Export
@@ -189,6 +183,7 @@
                                 <th>Grand Total</th>
                                 <th>Status Titip</th>
                                 <th>Action</th>
+                                <th>Published</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -220,12 +215,23 @@
                                         <td>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview({{ $payroll->id }})"><i class="fa-solid fa-print"></i>
                                             </button>
-                                            <button wire:click="editPayroll({{ $payroll->id }})"
-                                                class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit"></i>
-                                            </button>
+                                            <a href="{{ route('edit-payroll', encrypt($payroll->id)) }}" 
+                                            class="btn btn-warning btn-sm" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="top" 
+                                            title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
                                             <button wire:click="confirmHapusPayroll({{ $payroll->id }})"
                                                 class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
                                             </button>
+                                        </td>
+                                        <td>
+                                            @if ($payroll->published == 0)
+                                                <button wire:click="publishPayroll({{ $payroll->id }})" class="btn btn-primary btn-sm">Publish</button>
+                                            @elseif ($payroll->published == 1)
+                                                <span class="badge bg-success">Published</span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -247,6 +253,7 @@
                                 <th>Grand Total</th>
                                 <th>Status Titip</th>
                                 <th>Action</th>
+                                <th>Published</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -284,6 +291,13 @@
                                             <button wire:click="confirmHapusPayroll({{ $key->id }})"
                                                 class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
                                             </button>
+                                        </td>
+                                        <td>
+                                            @if ($payroll->published == 0)
+                                                <button wire:click="publishPayroll({{ $payroll->id }})" class="btn btn-primary btn-sm">Publish</button>
+                                            @elseif ($payroll->published == 1)
+                                                <span class="badge bg-success">Published</span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -325,7 +339,7 @@
     <!-- Modal Edit Payroll-->
     <div wire:ignore.self class="modal fade" id="editPayrollModal" tabindex="-1" aria-labelledby="editPayrollModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
@@ -384,6 +398,17 @@
                                 disabled>
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="mb-3 col-md-6">
+                            <label for="inovation_reward" class="form-label fw-semibold">Uang Transport</label>
+                            <input type="number" name="transport" class="form-control" wire:model.lazy="transport" placeholder="Nominal">
+                        </div>
+                        <div class="mb-3 col-md-6">
+                            <label for="potongan" class="form-label fw-semibold">Uang Makan</label>
+                            <input type="number" name="uang_makan" class="form-control" wire:model.lazy="uang_makan" placeholder="Nominal">
+                        </div>
+                    </div>
                     
                     <div class="row">
                         <div class="mb-3 col-md-6">
@@ -410,7 +435,7 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    {{-- <div class="row">
                         <div class="mb-3 col-md-6">
                             <label for="potongan" class="form-label fw-semibold">Uang Transport</label>
                             <div class="input-group mb-2">
@@ -437,7 +462,7 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     
                     <div class="mb-3">
                         <label for="potongan" class="form-label fw-semibold">Tunjangan</label>
@@ -500,7 +525,7 @@
                             <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
                         </div>
                     </div>
-                    <div class="row mt-2 mb-2">
+                    {{-- <div class="row mt-2 mb-2">
                         <div class="col-md-6">
                             <label>Nominal BPJS Kesehatan (1%)</label>
                             <input type="number" class="form-control" readonly wire:model.lazy="bpjs_nominal">
@@ -510,7 +535,7 @@
                             <label>Nominal BPJS JHT (2%)</label>
                             <input type="number" class="form-control" readonly wire:model.lazy="bpjs_jht_nominal">
                         </div>
-                    </div>
+                    </div> --}}
                     {{-- <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="terlambat" class="form-label fw-semibold">Terlambat</label>
@@ -611,46 +636,6 @@
             iframe.src = `/slip-gaji/html/${id}`;
             document.getElementById('downloadSlipLink').href = `/slip-gaji/download/${id}`;
         }
-
-        // window.addEventListener('dataPayrollAdded', event => {
-        //     Swal.fire({
-        //         icon: 'success',
-        //         title: 'Berhasil',
-        //         text: 'Data payroll berhasil ditambahkan.',
-        //         confirmButtonText: 'OK',
-        //         confirmButtonColor: '#3085d6',
-        //     });
-        // });
-
-        // window.addEventListener('dataPayrollImported', event => {
-        //     Swal.fire({
-        //         icon: 'success',
-        //         title: 'Berhasil',
-        //         text: 'Data payroll berhasil diimpor.',
-        //         confirmButtonText: 'OK',
-        //         confirmButtonColor: '#3085d6',
-        //     });
-        // });
-
-        // window.addEventListener('dataPayrollExported', event => {
-        //     Swal.fire({
-        //         icon: 'success',
-        //         title: 'Berhasil',
-        //         text: 'Data payroll berhasil diekspor.',
-        //         confirmButtonText: 'OK',
-        //         confirmButtonColor: '#3085d6',
-        //     });
-        // });
-
-        // window.addEventListener('dataPayrollUpdated', event => {
-        //     Swal.fire({
-        //         icon: 'success',
-        //         title: 'Berhasil',
-        //         text: 'Data payroll berhasil diperbarui.',
-        //         confirmButtonText: 'OK',
-        //         confirmButtonColor: '#3085d6',
-        //     });
-        // });
 
         window.addEventListener('dataPayrollDeleted', event => {
             Swal.fire({

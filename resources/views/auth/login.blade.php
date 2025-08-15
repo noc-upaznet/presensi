@@ -71,27 +71,35 @@
           @endif
           <p class="login-box-msg">Silahkan Login</p>
             <form action="{{ route('login') }}" method="POST">
-                @csrf
-                <div class="input-group mb-3">
-                    <input type="email" name="email" class="form-control" placeholder="Email">
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="bi bi-envelope-fill"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-group mb-3">
-                    <input type="password" name="password" class="form-control" placeholder="Password">
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="bi bi-lock-fill"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="social-auth-links text-center mb-3 d-grid gap-2">
-                    <button type="submit" class="btn btn-primary" width="100%" style="text-align: center">Login</button>
-                </div>
+              @csrf
+              <div class="input-group mb-3">
+                  <input type="email" name="email" class="form-control" placeholder="Email" value="{{ request()->cookie('login_email') }}">
+                  <div class="input-group-append">
+                      <div class="input-group-text">
+                          <span class="bi bi-envelope-fill"></span>
+                      </div>
+                  </div>
+              </div>
+              <div class="input-group mb-3">
+                  <input type="password" name="password" class="form-control" placeholder="Password" value="{{ request()->cookie('login_password') }}">
+                  <div class="input-group-append">
+                      <div class="input-group-text">
+                          <span class="bi bi-lock-fill"></span>
+                      </div>
+                  </div>
+              </div>
+
+              <label>
+                  <input type="checkbox" name="remember_form"
+                        {{ request()->cookie('login_email') ? 'checked' : '' }}>
+                  Ingat Email & Password
+              </label>
+
+              <div class="social-auth-links text-center mb-3 d-grid gap-2">
+                  <button type="submit" class="btn btn-primary" style="text-align: center">Login</button>
+              </div>
             </form>
+
           
         </div>
         <!-- /.login-card-body -->

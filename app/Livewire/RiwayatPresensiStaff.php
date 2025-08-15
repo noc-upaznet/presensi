@@ -13,8 +13,6 @@ use Illuminate\Support\Facades\Crypt;
 class RiwayatPresensiStaff extends Component
 {
     use WithPagination;
-    public $editId;
-    public $status;
 
     public function approve($id)
     {
@@ -27,49 +25,6 @@ class RiwayatPresensiStaff extends Component
             'icon' => 'success',
             'text' => 'Presensi has been approved successfully'
         ]);
-    }
-
-    public $statusList = [
-        0 => 'Tepat Waktu',
-        1 => 'Terlambat',
-        2 => 'Dispensasi',
-    ];
-
-    public function showModal($id)
-    {
-        $decryptedId = Crypt::decrypt($id);
-        $this->editId = $decryptedId;
-
-        $data = M_Presensi::find($decryptedId);
-        // dd($data);
-        if (!$data) {
-            session()->flash('error', 'Data tiket tidak ditemukan!');
-            return;
-        }
-
-        $this->status = $data->status;
-        $this->dispatch('editModal', action: 'show');
-    }
-
-    public function updateStatus()
-    {
-        // Cari data berdasarkan ID yang sudah didekripsi sebelumnya
-        $data = M_Presensi::find($this->editId);
-
-        if (!$data) {
-            session()->flash('error', 'Data presensi tidak ditemukan!');
-            return;
-        }
-
-        // Update field status dengan nilai dari form
-        $data->status = $this->status;
-        $data->save();
-
-        // Reset form jika perlu
-        $this->reset(['editId', 'status']);
-
-        // Tutup modal
-        $this->dispatch('editModal', action: 'hide');
     }
 
     public function reject($id)
@@ -100,7 +55,7 @@ class RiwayatPresensiStaff extends Component
         // dd($entitasNama);
 
         $datas = M_Presensi::with('getUser')
-            ->where('lokasi_lock', 0)
+            // ->where('lokasi_lock', 0)
             ->where('user_id', '!=', $karyawanId)
             ->whereHas('getUser', function ($query) use ($divisi, $entitasNama) {
                 $query->where('divisi', $divisi)

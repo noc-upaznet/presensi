@@ -56,7 +56,7 @@ class Payroll extends Component
             // abort(403, 'Access Denied');
         }
         $this->selectedYear = now()->year;
-        $this->selectedMonth = now()->subMonth()->format('n');
+        $this->selectedMonth = now()->format('n');
 
         // Format periode (YYYY-MM) dari bulan yang dipilih
         $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
@@ -278,49 +278,55 @@ class Payroll extends Component
         return in_array(strtolower($this->jabatan), ['sales', 'sm', 'sales marketing']);
     }
 
+    // public function editPayroll($id)
+    // {
+    //     $payroll = PayrollModel::with('getKaryawan')->find($id);
+    //     // dd($payroll);
+    //     if ($payroll) {
+    //         $this->payroll_id = $payroll->id; // tambahkan ini untuk menyimpan ID (jika ingin update nanti)
+    //         $this->no_slip = $payroll->no_slip;
+    //         $this->karyawan_id = $payroll->karyawan_id;
+    //         $this->nama_karyawan = $payroll->getKaryawan->nama_karyawan;
+    //         $this->bulan_tahun = $payroll->periode;
+    //         $this->nip_karyawan = $payroll->nip_karyawan;
+    //         $this->divisi = $payroll->divisi;
+    //         $this->jabatan = $payroll->getKaryawan->jabatan;
+    //         $this->jml_psb = $payroll->jml_psb;
+    //         $this->insentif = $payroll->insentif;
+    //         $this->gaji_pokok = $payroll->gaji_pokok;
+    //         $this->tunjangan_jabatan = $payroll->tunjangan_jabatan;
+    //         $this->kebudayaan = $payroll->tunjangan_kebudayaan;
+    //         $this->lembur_nominal = $payroll->lembur;
+    //         $this->transport = $payroll->transport;
+    //         $this->uang_makan = $payroll->uang_makan;
+    //         $this->fee_sharing = $payroll->fee_sharing;
+    //         $this->izin_nominal = $payroll->izin;
+    //         $this->terlambat_nominal = $payroll->terlambat;
+    //         $this->tunjangan = json_decode($payroll->tunjangan, true) ?? [];
+    //         $this->potongan = json_decode($payroll->potongan, true) ?? [];
+    //         $this->bpjs_nominal = $payroll->bpjs ?? 0;
+    //         $this->bpjs_jht_nominal = $payroll->bpjs_jht ?? 0;
+
+    //         // Hitung balik persentase jika gaji pokok ada
+    //         // if ($this->gaji_pokok > 0) {
+    //         //     $this->persentase_bpjs = round(($this->bpjs_nominal / $this->gaji_pokok) * 100, 2);
+    //         //     $this->persentase_bpjs_jht = round(($this->bpjs_jht_nominal / $this->gaji_pokok) * 100, 2);
+    //         // }
+    //         $this->terlambat = $payroll->terlambat ?? 0;
+    //         $this->izin = $payroll->izin ?? 0;
+    //         $this->cuti = $payroll->cuti ?? 0;
+    //         $this->kehadiran = $payroll->kehadiran ?? 0;
+    //         $this->lembur = $payroll->lembur ?? 0;
+    //         $this->total_gaji = $payroll->total_gaji;
+
+
+    //         $this->dispatch('editPayrollModal', action: 'show'); // trigger untuk buka modal (optional)
+    //     }
+    // }
+
     public function editPayroll($id)
     {
-        $payroll = PayrollModel::with('getKaryawan')->find($id);
-        // dd($payroll);
-        if ($payroll) {
-            $this->payroll_id = $payroll->id; // tambahkan ini untuk menyimpan ID (jika ingin update nanti)
-            $this->no_slip = $payroll->no_slip;
-            $this->karyawan_id = $payroll->karyawan_id;
-            $this->nama_karyawan = $payroll->getKaryawan->nama_karyawan;
-            $this->bulan_tahun = $payroll->periode;
-            $this->nip_karyawan = $payroll->nip_karyawan;
-            $this->divisi = $payroll->divisi;
-            $this->jabatan = $payroll->getKaryawan->jabatan;
-            $this->jml_psb = $payroll->jml_psb;
-            $this->insentif = $payroll->insentif;
-            $this->gaji_pokok = $payroll->gaji_pokok;
-            $this->tunjangan_jabatan = $payroll->tunjangan_jabatan;
-            $this->kebudayaan = $payroll->tunjangan_kebudayaan;
-            $this->lembur_nominal = $payroll->lembur;
-            $this->transport = $payroll->transport;
-            $this->fee_sharing = $payroll->fee_sharing;
-            $this->izin_nominal = $payroll->izin;
-            $this->terlambat_nominal = $payroll->terlambat;
-            $this->tunjangan = json_decode($payroll->tunjangan, true) ?? [];
-            $this->potongan = json_decode($payroll->potongan, true) ?? [];
-            $this->bpjs_nominal = $payroll->bpjs ?? 0;
-            $this->bpjs_jht_nominal = $payroll->bpjs_jht ?? 0;
-
-            // Hitung balik persentase jika gaji pokok ada
-            // if ($this->gaji_pokok > 0) {
-            //     $this->persentase_bpjs = round(($this->bpjs_nominal / $this->gaji_pokok) * 100, 2);
-            //     $this->persentase_bpjs_jht = round(($this->bpjs_jht_nominal / $this->gaji_pokok) * 100, 2);
-            // }
-            $this->terlambat = $payroll->terlambat ?? 0;
-            $this->izin = $payroll->izin ?? 0;
-            $this->cuti = $payroll->cuti ?? 0;
-            $this->kehadiran = $payroll->kehadiran ?? 0;
-            $this->lembur = $payroll->lembur ?? 0;
-            $this->total_gaji = $payroll->total_gaji;
-
-
-            $this->dispatch('editPayrollModal', action: 'show'); // trigger untuk buka modal (optional)
-        }
+        return redirect()->route('edit-payroll', $id);
     }
 
     public function saveEdit()
@@ -411,6 +417,19 @@ class Payroll extends Component
 
     //     return Excel::download(new PayrollExport($this->startDate, $this->endDate), 'payroll.xlsx');
     // }
+
+    public function publishPayroll($id)
+    {
+        $payroll = PayrollModel::findOrFail($id);
+        $payroll->published = 1; // Set published ke 1
+        $payroll->save();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Payroll Published',
+            'icon' => 'success',
+            'text' => 'Payroll has been published successfully'
+        ]);
+    }
 
     public function showModal()
     {

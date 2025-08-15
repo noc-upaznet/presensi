@@ -10,9 +10,13 @@ use App\Models\M_Lembur;
 use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Livewire\WithPagination;
 
 class PengajuanLembur extends Component
 {
+    use WithPagination;
+    protected $paginationTheme = 'bootstrap';
+
     public LemburForm $form;
     protected $listeners = ['refreshTable' => 'refresh'];
     public $filterPengajuan = '';
@@ -184,11 +188,20 @@ class PengajuanLembur extends Component
             }
 
         } elseif ($user->current_role === 'spv') {
-            // Jika SPV, hanya bisa melihat karyawan dari divisinya saja
+            // Jika SPV, hanya bisa melihat karyawan dari entitas dan divisi yang sama
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
-            // dd($dataKaryawan);
             if ($dataKaryawan && $dataKaryawan->divisi) {
-                $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)->pluck('id');
+                if (strtolower($dataKaryawan->divisi) === 'noc') {
+                    $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
+                    ->pluck('id');
+                } else if ($dataKaryawan->entitas) {
+                    // Untuk divisi lain, filter entitas dan divisi
+                    $karyawanIdList = M_DataKaryawan::where('entitas', $dataKaryawan->entitas)
+                    ->where('divisi', $dataKaryawan->divisi)
+                    ->pluck('id');
+                } else {
+                    $karyawanIdList = collect();
+                }
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
         } elseif ($user->current_role === 'hr') {

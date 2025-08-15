@@ -4,6 +4,8 @@ namespace App\Livewire\Navigation;
 
 use Livewire\Component;
 use App\Models\M_Lembur;
+use App\Models\M_Entitas;
+use App\Models\M_Presensi;
 use App\Models\M_Pengajuan;
 use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +17,7 @@ class SideNavigation extends Component
         $user = Auth::user();
         $countPengajuan = 0;
         $countLembur = 0;
+        $countPresensiStaff = 0;
 
         if ($user) {
             if ($user->current_role === 'spv') {
@@ -38,9 +41,16 @@ class SideNavigation extends Component
                         ->whereIn('karyawan_id', $karyawanIds)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->count();
+
+                    $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
+                        ->where('approve', 0)
+                        ->where('user_id', '!=', $dataKaryawan->id)
+                        ->count();
+                        // dd($countPresensiStaff);
                 } else {
                     $countPengajuan = 0;
                     $countLembur = 0;
+                    $countPresensiStaff = 0;
                 }
             } elseif ($user->current_role === 'hr') {
                 $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
@@ -70,13 +80,28 @@ class SideNavigation extends Component
                     $countLembur = 0;
                 }
             } elseif ($user->current_role === 'admin') {
-                $countPengajuan = M_Pengajuan::whereNull('approve_admin')
+                $entitas = session('selected_entitas', 'UHO'); // default fallback
+                $entitasModel = M_Entitas::where('nama', $entitas)->first();
+                $entitasIdSaatIni = $entitasModel?->nama;
+
+                 $countPengajuan = M_Pengajuan::whereNull('approve_admin')
                     ->where('status', 0)
+                    ->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)
+                    ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
+                        $q->where('entitas', $entitasIdSaatIni);
+                    })
                     ->count();
+                // dd($entitasIdSaatIni);
 
                 // Pengajuan lembur yang belum disetujui admin
                 $countLembur = M_Lembur::whereNull('approve_admin')
                     ->where('status', 0)
+                    ->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)
+                    ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
+                        $q->where('entitas', $entitasIdSaatIni);
+                    })
                     ->count();
             }
         }
@@ -85,6 +110,7 @@ class SideNavigation extends Component
         return view('livewire.navigation.side-navigation', [
             'pengajuanMenungguCount' => $countPengajuan,
             'lemburMenungguCount' => $countLembur,
+            'PresensiMenungguCount' => $countPresensiStaff,
         ]);
     }
 }

@@ -24,12 +24,14 @@ use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\AuthController;
 use App\Livewire\Karyawan\PembagianShift;
 use App\Http\Controllers\PayrollController;
+use App\Livewire\EditPayroll;
 use App\Livewire\Karyawan\DetailDataKaryawan;
 use App\Livewire\Karyawan\TambahDataKaryawan;
 use App\Livewire\Karyawan\Pengajuan\Pengajuan;
 use App\Livewire\Karyawan\TambahPembagianShift;
 use App\Livewire\Karyawan\Shifts\TemplateMingguan;
 use App\Livewire\Karyawan\Pengajuan\PengajuanLembur;
+use App\Livewire\SlipGaji;
 
 // Route::redirect('/', '/login');
 
@@ -60,10 +62,12 @@ Route::group(['middleware' => ['auth', 'password.expired']], function () {
     Route::get('/divisi', Divisi::class)->name('divisi');
     Route::get('/entitas', Entitas::class)->name('entitas');
     Route::get('/payroll', Payroll::class)->name('payroll');
+    Route::get('/edit-payroll/{id}', EditPayroll::class)->name('edit-payroll');
     Route::get('/create-slip-gaji/{id?}', CreateSlipGaji::class)->name('create-slip-gaji');
     Route::get('/slip-gaji/html/{id}', [PayrollController::class, 'html'])->name('slip.html');
     Route::get('/slip-gaji/download/{id}', [PayrollController::class, 'download'])->name('slip-gaji.download');
     Route::get('/jenis-tunjangan', JenisTunjangan::class)->name('jenis-tunjangan');
     Route::get('/jenis-potongan', JenisPotongan::class)->name('jenis-potongan');
     Route::get('/riwayat-presensi-staff', RiwayatPresensiStaff::class)->name('riwayat-presensi-staff');
+    Route::get('/slip-gaji', SlipGaji::class)->name('slip-gaji');
 });

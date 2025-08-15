@@ -48,8 +48,6 @@
         }
     </style>
 
-
-
     <div class="content-wrapper p-4">
         <div class="d-flex justify-content-between align-items-center mb-3" style="color: var(--bs-body-color);">
             <h3>Dashboard</h3>
@@ -80,7 +78,11 @@
                     <div class="fw-semibold mb-2">Normal</div>
                     <div class="fw-bold fs-5 mb-3">{{ \Carbon\Carbon::parse($jamMasuk)->format('H:i') }} - {{ \Carbon\Carbon::parse($jamKeluar)->format('H:i') }}</div>
                     <div class="d-flex justify-content-center flex-wrap">
-                        @if (!$hasClockedIn)
+                        @if ($jamMasuk === '00:00:00' && $jamKeluar === '00:00:00')
+                            <span class="badge bg-danger text-light me-2 px-2" style="font-size: 20px;">
+                                Jadwal tidak ada
+                            </span>
+                        @elseif (!$hasClockedIn)
                             <button class="btn btn-success px-4 me-2" wire:click="showCamera">
                                 <i class="fas fa-arrow-right-to-bracket me-2"></i> Clock In
                             </button>
@@ -89,7 +91,9 @@
                                 <i class="fas fa-arrow-right-from-bracket me-2"></i> Clock Out
                             </button>
                         @else
-                            <span class="badge bg-primary text-light me-2 px-2" style="font-size: 20px;">Presensi selesai</span>
+                            <span class="badge bg-primary text-light me-2 px-2" style="font-size: 20px;">
+                                Presensi selesai
+                            </span>
                         @endif
                     </div>
                 </div>

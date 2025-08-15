@@ -29,6 +29,7 @@ class PayrollModel extends Model
         'uang_makan',
         'transport',
         'fee_sharing',
+        'inov_reward',
         'insentif',
         'jml_psb',
         'rekap',

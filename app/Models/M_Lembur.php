@@ -61,7 +61,7 @@ class M_Lembur extends Model
     {
         return Auth::user()->current_role === 'admin'
             && $this->status == 0
-            && in_array($this->pengajuRole(), ['hr']);
+            && in_array($this->pengajuRole(), ['hr', 'admin']);
     }
 
     public function canBeDeletedByAdmin()

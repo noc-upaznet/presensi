@@ -14,33 +14,32 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
-
         $credentials = $request->only('email', 'password');
+        $rememberForm = $request->filled('remember_form');
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
+            // Simpan ke cookie kalau user minta
+            if ($rememberForm) {
+                cookie()->queue(cookie('login_email', $request->email, 43200));
+                cookie()->queue(cookie('login_password', $request->password, 43200));
+            } else {
+                cookie()->queue(cookie('login_email', '', -1));
+                cookie()->queue(cookie('login_password', '', -1));
+            }
             $user = Auth::user();
-
+            // Jika password masih default (expired)
             if ($user->password_expired) {
                 session()->flash('warning', 'Password Anda masih default, silakan ganti password terlebih dahulu.');
                 return redirect()->route('ganti-password');
             }
 
-            // Login sukses, arahkan ke dashboard atau intended URL
-            return redirect()->intended('/dashboard');
+            return redirect()->intended('dashboard');
         }
 
-        // Login gagal
-        return back()
-            ->withErrors(['email' => 'Email atau password salah.'])
-            ->onlyInput('email');
+        return back()->withErrors([
+            'email' => 'Email atau password salah.',
+        ]);
     }
-
 
     public function logout(Request $request)
     {

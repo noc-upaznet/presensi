@@ -13,6 +13,7 @@ use Livewire\WithPagination;
 class RiwayatPresensi extends Component
 {
     use WithPagination;
+    protected $paginationTheme = 'bootstrap';
 
     public $editId;
     public $statusList = [
@@ -21,10 +22,18 @@ class RiwayatPresensi extends Component
         2 => 'Dispensasi',
     ];
     public $status;
+    public $filterTanggal;
+    public $filterBulan;
+    public $filterkaryawan;
+    public $karyawanList;
 
     public function mount()
     {
         // $this->statusList = M_Presensi::select('status')->distinct()->pluck('status')->toArray();
+        $entitasNama = session('selected_entitas', 'UHO');
+        $this->karyawanList = M_DataKaryawan::where('entitas', $entitasNama)
+            ->select('id', 'nama_karyawan')
+            ->get();
     }
 
     public function showModal($id)
@@ -93,10 +102,32 @@ class RiwayatPresensi extends Component
 
         if (Auth::user()->current_role == 'admin' || Auth::user()->current_role == 'hr') {
             $datas = M_Presensi::with('getUser')
-                ->whereMonth('created_at', Carbon::now()->month)
-                ->whereYear('created_at', Carbon::now()->year)
+                ->when($this->filterTanggal, function ($query) {
+                    $query->whereDate('created_at', $this->filterTanggal);
+                }, function ($query) {
+                    if ($this->filterBulan) {
+                        [$year, $month] = explode('-', $this->filterBulan);
+                        $query->whereYear('created_at', $year)
+                            ->whereMonth('created_at', $month);
+                    } else {
+                        $query->whereDate('created_at', now()->toDateString());
+                    }
+                })
+                ->when($this->filterkaryawan, function ($query) {
+                    $query->where('user_id', $this->filterkaryawan);
+                })
                 ->whereHas('getUser', function ($query) use ($entitasNama) {
                     $query->where('entitas', $entitasNama);
+                })
+                ->where(function ($q) {
+                    $q->where(function ($q2) {
+                        $q2->where('lokasi_lock', 0)
+                        ->where('approve', 1);
+                    })
+                    ->orWhere(function ($q2) {
+                        $q2->where('lokasi_lock', 1)
+                        ->where('approve', 0);
+                    });
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
@@ -108,6 +139,16 @@ class RiwayatPresensi extends Component
             $datas = M_Presensi::where('user_id', $karyawanId)
                 ->whereMonth('created_at', Carbon::now()->month)
                 ->whereYear('created_at', Carbon::now()->year)
+                ->where(function ($q) {
+                    $q->where(function ($q2) {
+                        $q2->where('lokasi_lock', 0)
+                        ->where('approve', 1);
+                    })
+                    ->orWhere(function ($q2) {
+                        $q2->where('lokasi_lock', 1)
+                        ->where('approve', 0);
+                    });
+                })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
         }
