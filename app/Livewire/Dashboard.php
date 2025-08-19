@@ -176,15 +176,23 @@ class Dashboard extends Component
         $totalPresensi = M_Presensi::whereIn('user_id', $karyawanIds)
             ->whereDate('tanggal', now()->toDateString())
             ->where(function ($q) {
-                    $q->where(function ($q2) {
-                        $q2->where('lokasi_lock', 0)
-                        ->where('approve', 1);
+                $q->whereHas('getKaryawan', function ($sub) {
+                    $sub->whereNotIn('level', ['SPV', 'Manajer']);
+                })
+                ->where(function ($q2) {
+                    $q2->where(function ($q3) {
+                        $q3->where('lokasi_lock', 0)
+                            ->where('approve', 1);
                     })
-                    ->orWhere(function ($q2) {
-                        $q2->where('lokasi_lock', 1)
-                        ->where('approve', 0);
+                    ->orWhere(function ($q3) {
+                        $q3->where('lokasi_lock', 1)
+                            ->where('approve', 0);
                     });
                 })
+                ->orWhereHas('getKaryawan', function ($sub) {
+                    $sub->whereIn('level', ['SPV', 'Manajer']);
+                });
+            })
             ->count();
 
         $statusKaryawan = M_DataKaryawan::whereIn('id', $karyawanIds)

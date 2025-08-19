@@ -29,6 +29,7 @@ class RiwayatPresensi extends Component
 
     public function mount()
     {
+        $this->filterBulan = Carbon::now()->format('Y-m');
         // $this->statusList = M_Presensi::select('status')->distinct()->pluck('status')->toArray();
         $entitasNama = session('selected_entitas', 'UHO');
         $this->karyawanList = M_DataKaryawan::where('entitas', $entitasNama)
@@ -120,33 +121,60 @@ class RiwayatPresensi extends Component
                     $query->where('entitas', $entitasNama);
                 })
                 ->where(function ($q) {
-                    $q->where(function ($q2) {
-                        $q2->where('lokasi_lock', 0)
-                        ->where('approve', 1);
+                    $q->whereHas('getKaryawan', function ($sub) {
+                        $sub->whereNotIn('level', ['SPV', 'Manajer']);
                     })
-                    ->orWhere(function ($q2) {
-                        $q2->where('lokasi_lock', 1)
-                        ->where('approve', 0);
+                    ->where(function ($q2) {
+                        $q2->where(function ($q3) {
+                            $q3->where('lokasi_lock', 0)
+                                ->where('approve', 1);
+                        })
+                        ->orWhere(function ($q3) {
+                            $q3->where('lokasi_lock', 1)
+                                ->where('approve', 0);
+                        });
+                    })
+                    ->orWhereHas('getKaryawan', function ($sub) {
+                        $sub->whereIn('level', ['SPV', 'Manajer']);
                     });
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
+                // dd($datas);
         } elseif (Auth::user()->current_role == 'user' || Auth::user()->current_role == 'spv') {
             $userId = Auth::id();
             $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
             $karyawanId = $karyawan ? $karyawan->id : null;
 
             $datas = M_Presensi::where('user_id', $karyawanId)
-                ->whereMonth('created_at', Carbon::now()->month)
-                ->whereYear('created_at', Carbon::now()->year)
+                ->when($this->filterTanggal, function ($query) {
+                    $query->whereDate('created_at', $this->filterTanggal);
+                }, function ($query) {
+                    if ($this->filterBulan) {
+                        [$year, $month] = explode('-', $this->filterBulan);
+                        $query->whereYear('created_at', $year)
+                            ->whereMonth('created_at', $month);
+                    } else {
+                        $query->whereMonth('created_at', Carbon::now()->month)
+                            ->whereYear('created_at', Carbon::now()->year);
+                    }
+                })
                 ->where(function ($q) {
-                    $q->where(function ($q2) {
-                        $q2->where('lokasi_lock', 0)
-                        ->where('approve', 1);
+                    $q->whereHas('getKaryawan', function ($sub) {
+                        $sub->whereNotIn('level', ['SPV', 'Manajer']);
                     })
-                    ->orWhere(function ($q2) {
-                        $q2->where('lokasi_lock', 1)
-                        ->where('approve', 0);
+                    ->where(function ($q2) {
+                        $q2->where(function ($q3) {
+                            $q3->where('lokasi_lock', 0)
+                                ->where('approve', 1);
+                        })
+                        ->orWhere(function ($q3) {
+                            $q3->where('lokasi_lock', 1)
+                                ->where('approve', 0);
+                        });
+                    })
+                    ->orWhereHas('getKaryawan', function ($sub) {
+                        $sub->whereIn('level', ['SPV', 'Manajer']);
                     });
                 })
                 ->orderBy('created_at', 'desc')

@@ -112,46 +112,30 @@
                                     <input type="text" id="lembur_nominal" class="form-control" disabled wire:model="lembur_nominal">
                                 </div>
                             </div>
-                            <div class="mb-3 col-md-6">
-                                <label for="inovation_reward" class="form-label fw-semibold">Inovation Reward</label>
-                                <div class="input-group mb-2">
-                                    <input type="number" name="inovation_reward" class="form-control" wire:model.lazy="inovation_reward" placeholder="Nominal">
-                                    <span class="input-group-text">X</span>
-                                    <input type="number" class="form-control" wire:model.lazy="kehadiran" placeholder="Jumlah">
-                                </div>
 
-                                {{-- Menampilkan total hasil perkalian --}}
-                                <div class="fw-bold">
-                                    Total: {{ number_format($inovation_reward_total, 0, ',', '.') }}
+                            <div class="mb-3 col-md-6">
+                                <label for="inovation-reward" class="form-label fw-semibold">Inovation Reward</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="inovation-reward" class="form-control" wire:model="inovation_reward_total">
                                 </div>
                             </div>
+                            
                         </div>
                         
                         <div class="row">
                             <div class="mb-3 col-md-6">
-                                <label for="inovation_reward" class="form-label fw-semibold">Uang Transport</label>
+                                <label for="uang-transport" class="form-label fw-semibold">Uang Transport</label>
                                 <div class="input-group mb-2">
-                                    <input type="number" name="transport" class="form-control" wire:model.lazy="transport" placeholder="Nominal">
-                                    <span class="input-group-text">X</span>
-                                    <input type="number" class="form-control" wire:model.lazy="transport_jumlah" placeholder="Jumlah">
-                                </div>
-
-                                {{-- Menampilkan total hasil perkalian --}}
-                                <div class="fw-bold">
-                                    Total: {{ number_format($transport_total, 0, ',', '.') }}
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="uang-transport" class="form-control" wire:model="transport_total">
                                 </div>
                             </div>
                             <div class="mb-3 col-md-6">
-                                <label for="potongan" class="form-label fw-semibold">Uang Makan</label>
+                                <label for="uang-makan" class="form-label fw-semibold">Uang Makan</label>
                                 <div class="input-group mb-2">
-                                    <input type="number" name="uang_makan" class="form-control" wire:model.lazy="uang_makan" placeholder="Nominal">
-                                    <span class="input-group-text">X</span>
-                                    <input type="number" class="form-control" wire:model.lazy="uang_makan_jumlah" placeholder="Jumlah">
-                                </div>
-
-                                {{-- Menampilkan total hasil perkalian --}}
-                                <div class="fw-bold">
-                                    Total: {{ number_format($uang_makan_total, 0, ',', '.') }}
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="uang-makan" class="form-control" wire:model="uang_makan_total">
                                 </div>
                             </div>
                         </div>

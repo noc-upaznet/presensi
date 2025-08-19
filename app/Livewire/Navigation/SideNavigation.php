@@ -22,6 +22,9 @@ class SideNavigation extends Component
         if ($user) {
             if ($user->current_role === 'spv') {
                 $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
+                $entitas = $dataKaryawan->entitas; // default fallback
+                $entitasModel = M_Entitas::where('nama', $entitas)->first();
+                $entitasIdSaatIni = $entitasModel?->nama;
 
                 if ($dataKaryawan) {
                     $karyawanIds = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
@@ -33,6 +36,9 @@ class SideNavigation extends Component
                         ->where('status', 0)
                         ->whereIn('karyawan_id', $karyawanIds)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
+                            $q->where('entitas', $entitasIdSaatIni);
+                        })
                         ->count();
 
                     // Untuk pengajuan lembur dari karyawan satu divisi (kecuali dia sendiri)
@@ -40,11 +46,17 @@ class SideNavigation extends Component
                         ->where('status', 0)
                         ->whereIn('karyawan_id', $karyawanIds)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
+                            $q->where('entitas', $entitasIdSaatIni);
+                        })
                         ->count();
 
                     $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
                         ->where('approve', 0)
                         ->where('user_id', '!=', $dataKaryawan->id)
+                        ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
+                            $q->where('entitas', $entitasIdSaatIni);
+                        })
                         ->count();
                         // dd($countPresensiStaff);
                 } else {

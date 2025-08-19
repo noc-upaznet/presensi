@@ -200,14 +200,6 @@
                         </li>
                     </ul>
                 </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('slip-gaji') }}" 
-                    class="nav-link {{ request()->routeIs('slip-gaji') ? 'active' : '' }}">
-                    <i class="bi bi-box-arrow-left"></i>
-                        <p>Slip Gaji</p>
-                    </a>
-                </li>
             @endif
 
             @if (auth()->user()->current_role == 'spv')
@@ -219,6 +211,14 @@
                         @if ($PresensiMenungguCount > 0)
                             <span class="badge bg-danger ms-2">{{ $PresensiMenungguCount }}</span>
                         @endif
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('slip-gaji') }}" 
+                    class="nav-link {{ request()->routeIs('slip-gaji') ? 'active' : '' }}">
+                    <i class="bi bi-box-arrow-left"></i>
+                        <p>Slip Gaji</p>
                     </a>
                 </li>
             @endif

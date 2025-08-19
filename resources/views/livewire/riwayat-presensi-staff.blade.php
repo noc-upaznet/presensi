@@ -18,6 +18,18 @@
     <div class="container">
         <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
             <div class="mb-4">
+                <div class="d-flex justify-content gap-2 flex-wrap mb-4">
+                    <select class="form-select" wire:model.lazy="filterkaryawan" style="width: 150px;">
+                        <option value="">Pilih Karyawan</option>
+                        @foreach ($karyawanList as $karyawan)
+                            <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
+                        @endforeach
+                    </select>
+
+                    <input type="month" class="form-control" style="width: 150px;" placeholder="Bulan" wire:model.lazy="filterBulan">
+
+                    <input type="date" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Tanggal" wire:model.lazy="filterTanggal">
+                </div>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
                         <label>Show <select class="form-select form-select-sm d-inline-block w-auto">
