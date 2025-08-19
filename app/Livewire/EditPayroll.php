@@ -185,9 +185,10 @@ class EditPayroll extends Component
         $this->gaji_pokok = $payroll->gaji_pokok;
         $this->tunjangan_jabatan = $payroll->tunjangan_jabatan;
         $this->lembur = $payroll->lembur;
-        $this->inovation_reward = $payroll->inov_reward;
-        $this->transport = $payroll->transport;
-        $this->uang_makan = $payroll->uang_makan;
+        $this->kehadiran = $rekap['kehadiran'] ?? 0;
+        $this->inovation_reward_total = $payroll->inov_reward;
+        $this->transport_total = $payroll->transport;
+        $this->uang_makan_total = $payroll->uang_makan;
         $this->kebudayaan = $payroll->tunjangan_kebudayaan;
         $this->fee_sharing = $payroll->fee_sharing;
 
@@ -401,7 +402,7 @@ class EditPayroll extends Component
         $gaji = $this->numericValue($this->gaji_pokok);
         $tunjangan = $this->numericValue($this->tunjangan_jabatan);
         
-        $this->hitungInovationReward();
+        // $this->hitungInovationReward();
 
         if (in_array($propertyName, ['transport', 'transport_jumlah'])) {
             $this->transport_total = (float)$this->transport * (float)$this->transport_jumlah;
@@ -646,6 +647,8 @@ class EditPayroll extends Component
             'gaji_pokok' => $this->gaji_pokok,
             'tunjangan_jabatan' => $this->tunjangan_jabatan,
             'lembur' => $this->lembur_nominal,
+            'uang_makan' => $this->uang_makan_total,
+            'transport' => $this->transport_total,
             'inov_reward' => $this->inovation_reward_total,
             'insentif' => $this->insentif,
             'izin' => $this->izin_nominal,
@@ -658,7 +661,7 @@ class EditPayroll extends Component
             'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
             'total_gaji' => $this->total_gaji,
         ];
-        // dd($data);
+        dd($data);
         $payroll->update($data);
 
         $this->dispatch('swal', params: [
