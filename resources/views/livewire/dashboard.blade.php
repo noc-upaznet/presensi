@@ -2,11 +2,13 @@
     <div class="app-content-header">
         <!--begin::Row-->
         <div class="row">
-            <div class="col-sm-6 mt-5"><h3 class="mb-0" style="color: var(--bs-body-color);">Dashboard12</h3></div>
+            <div class="col-sm-6">
+                <h3 class="mb-0" style="color: var(--bs-body-color);">Dashboard12</h3>
+            </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
                 </ol>
             </div>
         </div>
@@ -70,13 +72,59 @@
         @php
             use Illuminate\Support\Str;
             $cards = [
-                ['title' => 'TOTAL PEGAWAI', 'value' => $totalPegawai ?? '0', 'icon' => 'fa-users', 'color' => 'warning', 'href' => route('data-karyawan')],
-                ['title' => 'IZIN/CUTI', 'value' => $izinCuti ?? '0', 'icon' => 'fa-calendar-times', 'color' => 'danger', 'href' => route('pengajuan')],
-                ['title' => 'MASUK', 'value' => $totalPresensi ?? '0', 'icon' => 'fa-user-check', 'color' => 'success', 'href' => route('riwayat-presensi')],
-                ['title' => 'TOTAL GAJI KARYAWAN', 'value' => 'Rp.' . number_format($totalGaji) ?? '0', 'icon' => 'fa-money-bill-wave', 'color' => 'info', 'note' => $noteTotalGajiTetap, 'href' => route('payroll')],
-                ['title' => 'TOTAL GAJI KARYAWAN TITIP', 'value' => 'Rp.' . number_format($totalGajiTitip) ?? '0', 'icon' => 'fa-money-bill-wave', 'color' => 'info', 'note' => $noteTotalGajiTitip, 'href' => route('payroll')],
-                ['title' => 'BPJS Kesehatan', 'value' => 'Rp.' . number_format($totalBpjskes) ?? '0', 'icon' => 'fa-hospital-user', 'color' => 'info', 'note' => $noteTotalBpjskes, 'href' => route('riwayat-presensi')],
-                ['title' => 'BPJS Ketenagakerjaan', 'value' => 'Rp.' . number_format($totalBpjsJht) ?? '0', 'icon' => 'fa-briefcase', 'color' => 'primary', 'note' => $noteTotalBpjsJht, 'href' => route('riwayat-presensi')],
+                [
+                    'title' => 'TOTAL PEGAWAI',
+                    'value' => $totalPegawai ?? '0',
+                    'icon' => 'fa-users',
+                    'color' => 'warning',
+                    'href' => route('data-karyawan'),
+                ],
+                [
+                    'title' => 'IZIN/CUTI',
+                    'value' => $izinCuti ?? '0',
+                    'icon' => 'fa-calendar-times',
+                    'color' => 'danger',
+                    'href' => route('pengajuan'),
+                ],
+                [
+                    'title' => 'MASUK',
+                    'value' => $totalPresensi ?? '0',
+                    'icon' => 'fa-user-check',
+                    'color' => 'success',
+                    'href' => route('riwayat-presensi'),
+                ],
+                [
+                    'title' => 'TOTAL GAJI KARYAWAN',
+                    'value' => 'Rp.' . number_format($totalGaji) ?? '0',
+                    'icon' => 'fa-money-bill-wave',
+                    'color' => 'info',
+                    'note' => $noteTotalGajiTetap,
+                    'href' => route('payroll'),
+                ],
+                [
+                    'title' => 'TOTAL GAJI KARYAWAN TITIP',
+                    'value' => 'Rp.' . number_format($totalGajiTitip) ?? '0',
+                    'icon' => 'fa-money-bill-wave',
+                    'color' => 'info',
+                    'note' => $noteTotalGajiTitip,
+                    'href' => route('payroll'),
+                ],
+                [
+                    'title' => 'BPJS Kesehatan',
+                    'value' => 'Rp.' . number_format($totalBpjskes) ?? '0',
+                    'icon' => 'fa-hospital-user',
+                    'color' => 'info',
+                    'note' => $noteTotalBpjskes,
+                    'href' => route('riwayat-presensi'),
+                ],
+                [
+                    'title' => 'BPJS Ketenagakerjaan',
+                    'value' => 'Rp.' . number_format($totalBpjsJht) ?? '0',
+                    'icon' => 'fa-briefcase',
+                    'color' => 'primary',
+                    'note' => $noteTotalBpjsJht,
+                    'href' => route('riwayat-presensi'),
+                ],
             ];
 
             $textColorMap = [
@@ -96,20 +144,25 @@
 
                     {{-- Bagian Atas (Putih) --}}
                     <div class="bg-white position-relative p-3 pb-5" style="min-height: 120px;">
-                        <h6 class="fw-bold mb-1 text-{{ $card['color'] }}" style="font-size: 1.2rem;">{{ $card['value'] }}
+                        <h6 class="fw-bold mb-1 text-{{ $card['color'] }}" style="font-size: 1.2rem;">
+                            {{ $card['value'] }}
                         </h6>
                         <p class="mb-1 text-uppercase small text-dark">{{ $card['title'] }}</p>
 
                         @isset($card['note'])
-                        @php
-                            $isPositive = Str::contains($card['note'], '+');
-                            $isNegative = Str::contains($card['note'], '-');
-                            $noteColor = $isPositive ? 'text-success' : ($isNegative ? 'text-danger' : 'text-muted');
-                            $arrow = $isPositive ? '▲' : ($isNegative ? '▼' : '');
-                        @endphp
-                        <p class="{{ $noteColor }} mb-0 small">
-                            <span class="me-1">{{ $arrow }}</span>{{ $card['note'] }}
-                        </p>
+                            @php
+                                $isPositive = Str::contains($card['note'], '+');
+                                $isNegative = Str::contains($card['note'], '-');
+                                $noteColor = $isPositive
+                                    ? 'text-success'
+                                    : ($isNegative
+                                        ? 'text-danger'
+                                        : 'text-muted');
+                                $arrow = $isPositive ? '▲' : ($isNegative ? '▼' : '');
+                            @endphp
+                            <p class="{{ $noteColor }} mb-0 small">
+                                <span class="me-1">{{ $arrow }}</span>{{ $card['note'] }}
+                            </p>
                         @endisset
 
                         <div class="icon position-absolute top-0 end-0 pe-3 pt-2 text-{{ $card['color'] }}"
@@ -146,7 +199,8 @@
                     <div class="card-body" style="height: 255px;">
                         @foreach ($shiftKategori as $kategori => $shifts)
                             <div class="mb-3">
-                                <div class="fw-bold mb-2" style="color: var(--bs-body-color);">{{ $kategori }}</div>
+                                <div class="fw-bold mb-2" style="color: var(--bs-body-color);">{{ $kategori }}
+                                </div>
                                 @foreach ($shifts as $shift)
                                     <div class="d-flex justify-content-between mb-1">
                                         <div>{{ $shift['label'] }}</div>
@@ -174,14 +228,17 @@
                         </div>
                         @php
                             $totalStatus = array_sum($statusKaryawan ?? []);
-                            $persen = function($jumlah) use ($totalStatus) {
+                            $persen = function ($jumlah) use ($totalStatus) {
                                 return $totalStatus > 0 ? round(($jumlah / $totalStatus) * 100) : 0;
                             };
                         @endphp
                         <div class="progress mb-2" style="height: 14px;">
-                            <div class="progress-bar bg-primary" style="width: {{ $persen($statusKaryawan['OJT'] ?? 0) }}%"></div>
-                            <div class="progress-bar bg-warning" style="width: {{ $persen($statusKaryawan['PKWT Kontrak'] ?? 0) }}%"></div>
-                            <div class="progress-bar bg-danger" style="width: {{ $persen($statusKaryawan['Probation'] ?? 0) }}%"></div>
+                            <div class="progress-bar bg-primary"
+                                style="width: {{ $persen($statusKaryawan['OJT'] ?? 0) }}%"></div>
+                            <div class="progress-bar bg-warning"
+                                style="width: {{ $persen($statusKaryawan['PKWT Kontrak'] ?? 0) }}%"></div>
+                            <div class="progress-bar bg-danger"
+                                style="width: {{ $persen($statusKaryawan['Probation'] ?? 0) }}%"></div>
                         </div>
                         <ul class="list-unstyled small mb-2">
                             <li class="d-flex align-items-center">
@@ -190,11 +247,13 @@
                             </li>
                             <li class="d-flex align-items-center">
                                 <i class="fas fa-square text-warning me-2"></i>
-                                PKWT Kontrak ({{ $statusKaryawan['PKWT Kontrak'] ?? 0 }} - {{ $persen($statusKaryawan['PKWT Kontrak'] ?? 0) }}%)
+                                PKWT Kontrak ({{ $statusKaryawan['PKWT Kontrak'] ?? 0 }} -
+                                {{ $persen($statusKaryawan['PKWT Kontrak'] ?? 0) }}%)
                             </li>
                             <li class="d-flex align-items-center">
                                 <i class="fas fa-square text-danger me-2"></i>
-                                Probation ({{ $statusKaryawan['Probation'] ?? 0 }} - {{ $persen($statusKaryawan['Probation'] ?? 0) }}%)
+                                Probation ({{ $statusKaryawan['Probation'] ?? 0 }} -
+                                {{ $persen($statusKaryawan['Probation'] ?? 0) }}%)
                             </li>
                         </ul>
                     </div>
@@ -207,45 +266,46 @@
             </div>
         </div>
 
-        
+
     </div>
 </div>
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const presensiCtx = document.getElementById('grafikPresensi').getContext('2d');
-    new Chart(presensiCtx, {
-        type: 'bar',
-        data: {
-            labels: @json($labels),
-            datasets: [
-                {
-                    label: 'Tepat Waktu',
-                    backgroundColor: '#9966ff',
-                    data: @json($tepatWaktu)
-                },
-                {
-                    label: 'Terlambat',
-                    backgroundColor: '#ff6384',
-                    data: @json($terlambat)
-                },
-                {
-                    label: 'Tidak Absen',
-                    backgroundColor: '#36a2eb',
-                    data: @json($tidakAbsen)
-                },
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'top' }
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const presensiCtx = document.getElementById('grafikPresensi').getContext('2d');
+        new Chart(presensiCtx, {
+            type: 'bar',
+            data: {
+                labels: @json($labels),
+                datasets: [{
+                        label: 'Tepat Waktu',
+                        backgroundColor: '#9966ff',
+                        data: @json($tepatWaktu)
+                    },
+                    {
+                        label: 'Terlambat',
+                        backgroundColor: '#ff6384',
+                        data: @json($terlambat)
+                    },
+                    {
+                        label: 'Tidak Absen',
+                        backgroundColor: '#36a2eb',
+                        data: @json($tidakAbsen)
+                    },
+                ]
             },
-            layout: {
-                padding: 10
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                layout: {
+                    padding: 10
+                }
             }
-        }
-    });
-</script>
+        });
+    </script>
 @endpush
