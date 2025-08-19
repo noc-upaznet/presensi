@@ -21,5 +21,4 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             cd /www/wwwroot/presensi.sandbox.upaz.net.id
-            git reset --hard
-            git pull origin main
+            ls
