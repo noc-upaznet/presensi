@@ -217,7 +217,7 @@
                 <li class="nav-item">
                     <a href="{{ route('slip-gaji') }}" 
                     class="nav-link {{ request()->routeIs('slip-gaji') ? 'active' : '' }}">
-                    <i class="bi bi-box-arrow-left"></i>
+                    <i class="bi bi-wallet"></i>
                         <p>Slip Gaji</p>
                     </a>
                 </li>
@@ -293,7 +293,7 @@
                 <li class="nav-item">
                     <a href="{{ route('slip-gaji') }}" 
                     class="nav-link {{ request()->routeIs('slip-gaji') ? 'active' : '' }}">
-                    <i class="bi bi-box-arrow-left"></i>
+                    <i class="bi bi-wallet"></i>
                         <p>Slip Gaji</p>
                     </a>
                 </li>
