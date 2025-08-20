@@ -162,13 +162,15 @@ class EditPayroll extends Component
 
         $this->jenis_tunjangan = JenisTunjanganModel::all();
         $this->jenis_potongan = JenisPotonganModel::all();
-
         $this->loadData($id);
+        $this->hitungTotalGaji();
+
     }
 
     public function loadData($id)
     {
-        $payroll = PayrollModel::findOrFail($id); // pastikan $id dikirim ke method
+
+        $payroll = PayrollModel::findOrFail($id);
         $this->karyawan = M_DataKaryawan::findOrFail($payroll->karyawan_id);
 
         // Data umum
@@ -230,7 +232,7 @@ class EditPayroll extends Component
         $this->inovation_reward_jumlah = (int) $this->kehadiran;
 
         // Total gaji
-        $this->total_gaji = $payroll->total_gaji;
+        // $this->total_gaji = $payroll->total_gaji;
     }
 
     public function isSalesPosition()
@@ -379,22 +381,22 @@ class EditPayroll extends Component
         return is_numeric($value) ? (int) $value : (int) str_replace(['.', ','], '', $value);
     }
 
-    public function hitungInovationReward()
-    {
-        if (!isset($this->kehadiran)) {
-            $this->kehadiran = M_Presensi::where('user_id', $this->user_id)
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count();
-        }
+    // public function hitungInovationReward()
+    // {
+    //     if (!isset($this->kehadiran)) {
+    //         $this->kehadiran = M_Presensi::where('user_id', $this->user_id)
+    //             ->whereMonth('created_at', now()->month)
+    //             ->whereYear('created_at', now()->year)
+    //             ->count();
+    //     }
 
-        // Set jumlah inovation reward sesuai kehadiran
-        $this->inovation_reward_jumlah = (int) $this->kehadiran;
+    //     // Set jumlah inovation reward sesuai kehadiran
+    //     $this->inovation_reward_jumlah = (int) $this->kehadiran;
 
-        // Hitung total
-        $this->inovation_reward_total = 
-            (float) $this->inovation_reward * (float) $this->inovation_reward_jumlah;
-    }
+    //     // Hitung total
+    //     $this->inovation_reward_total = 
+    //         (float) $this->inovation_reward * (float) $this->inovation_reward_jumlah;
+    // }
 
     public function updated($propertyName, $id = null)
     {
@@ -467,17 +469,6 @@ class EditPayroll extends Component
         foreach ($this->potongan as $item) {
             $totalPotonganManual += $this->numericValue($item['nominal']);
         }
-
-        // === 5. Potongan otomatis ===
-        // $potonganIzin = 0;
-        // $potonganTerlambat = 0;
-
-        // if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
-        //     $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
-        //     $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0);
-        //     $potonganIzin = round($perHari * $totalHariIzin);
-        //     $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) > 0 ? 25000 : 0;
-        // }
 
         // === 6. Hitung lembur ===
         $jamLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
@@ -650,6 +641,7 @@ class EditPayroll extends Component
             'uang_makan' => $this->uang_makan_total,
             'transport' => $this->transport_total,
             'inov_reward' => $this->inovation_reward_total,
+            'fee_sharing' => $this->fee_sharing,
             'insentif' => $this->insentif,
             'izin' => $this->izin_nominal,
             'terlambat' => $this->terlambat_nominal,
@@ -661,7 +653,7 @@ class EditPayroll extends Component
             'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
             'total_gaji' => $this->total_gaji,
         ];
-        dd($data);
+        // dd($data);
         $payroll->update($data);
 
         $this->dispatch('swal', params: [

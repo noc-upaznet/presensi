@@ -117,7 +117,7 @@
                                 <label for="inovation-reward" class="form-label fw-semibold">Inovation Reward</label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" id="inovation-reward" class="form-control" wire:model="inovation_reward_total">
+                                    <input type="text" id="inovation-reward" class="form-control" wire:model.lazy="inovation_reward_total">
                                 </div>
                             </div>
                             
@@ -128,14 +128,14 @@
                                 <label for="uang-transport" class="form-label fw-semibold">Uang Transport</label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" id="uang-transport" class="form-control" wire:model="transport_total">
+                                    <input type="text" id="uang-transport" class="form-control" wire:model.lazy="transport_total">
                                 </div>
                             </div>
                             <div class="mb-3 col-md-6">
                                 <label for="uang-makan" class="form-label fw-semibold">Uang Makan</label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" id="uang-makan" class="form-control" wire:model="uang_makan_total">
+                                    <input type="text" id="uang-makan" class="form-control" wire:model.lazy="uang_makan_total">
                                 </div>
                             </div>
                         </div>

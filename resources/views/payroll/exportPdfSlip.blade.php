@@ -246,7 +246,15 @@
                 </tr>
             </thead>
             @php
-                $totalPendapatan = $data->gaji_pokok + $data->tunjangan_jabatan + $data->lembur;
+                $totalPendapatan = $data->gaji_pokok 
+                    + $data->tunjangan_jabatan 
+                    + $data->tunjangan_kebudayaan
+                    + $data->lembur
+                    + $data->uang_makan
+                    + $data->transport
+                    + $data->fee_sharing
+                    + $data->insentif
+                    + $data->inov_reward;
             @endphp
 
             <tbody>
@@ -259,10 +267,9 @@
                     <td class="text-right">Rp. {{ number_format($data->tunjangan_jabatan) }}</td>
                 </tr>
                 <tr>
-                    <td>Upah Lembur</td>
-                    <td class="text-right">Rp. {{ number_format($data->lembur) }}</td>
+                    <td>Tunjangan Kebudayaan</td>
+                    <td class="text-right">Rp. {{ number_format($data->tunjangan_kebudayaan) }}</td>
                 </tr>
-
                 @foreach ($tunjangan as $item)
                     @if (!empty($item['nama']) && $item['nominal'] >= 0)
                         @php
@@ -274,6 +281,33 @@
                         </tr>
                     @endif
                 @endforeach
+                <tr>
+                    <td>Upah Lembur</td>
+                    <td class="text-right">Rp. {{ number_format($data->lembur) }}</td>
+                </tr>
+                <tr>
+                    <td>Uang Makan</td>
+                    <td class="text-right">Rp. {{ number_format($data->uang_makan) }}</td>
+                </tr>
+                <tr>
+                    <td>Transport</td>
+                    <td class="text-right">Rp. {{ number_format($data->transport) }}</td>
+                </tr>
+                <tr>
+                    <td>Inovation Reward</td>
+                    <td class="text-right">Rp. {{ number_format($data->inov_reward) }}</td>
+                </tr>
+                <tr>
+                    <td>Fee Sharing</td>
+                    <td class="text-right">Rp. {{ number_format($data->fee_sharing) }}</td>
+                </tr>
+
+                @if ($data->divisi == 'Sales Marketing')
+                    <tr>
+                        <td>Insentif</td>
+                        <td class="text-right">Rp. {{ number_format($data->insentif) }}</td>
+                    </tr>
+                @endif
 
                 <tr style="border-bottom: 1px solid blue;">
                     <th>Total Pendapatan</th>

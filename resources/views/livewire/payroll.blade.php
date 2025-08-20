@@ -213,7 +213,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview({{ $payroll->id }})"><i class="fa-solid fa-print"></i>
+                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($payroll->id) }}')"><i class="fa-solid fa-print"></i>
                                             </button>
                                             <a href="{{ route('edit-payroll', encrypt($payroll->id)) }}" 
                                             class="btn btn-warning btn-sm" 
@@ -283,7 +283,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview({{ $key->id }})"><i class="fa-solid fa-print"></i>
+                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-print"></i>
                                             </button>
                                             <button wire:click="editPayroll({{ $key->id }})"
                                                 class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit"></i>
@@ -293,9 +293,9 @@
                                             </button>
                                         </td>
                                         <td>
-                                            @if ($payroll->published == 0)
-                                                <button wire:click="publishPayroll({{ $payroll->id }})" class="btn btn-primary btn-sm">Publish</button>
-                                            @elseif ($payroll->published == 1)
+                                            @if ($key->published == 0)
+                                                <button wire:click="publishPayroll({{ $key->id }})" class="btn btn-primary btn-sm">Publish</button>
+                                            @elseif ($key->published == 1)
                                                 <span class="badge bg-success">Published</span>
                                             @endif
                                         </td>
@@ -310,7 +310,7 @@
                     <span>
                         Showing {{ $data->firstItem() }} to {{ $data->lastItem() }} of {{ $data->total() }} entries
                     </span>
-                    {{ $data->links('pagination::bootstrap-5') }}
+                    {{ $data->links() }}
                 </div>
             </div>
         </div>
@@ -632,6 +632,7 @@
         });
 
         function loadSlipPreview(id) {
+            console.log(id);
             const iframe = document.getElementById('slipPreviewIframe');
             iframe.src = `/slip-gaji/html/${id}`;
             document.getElementById('downloadSlipLink').href = `/slip-gaji/download/${id}`;

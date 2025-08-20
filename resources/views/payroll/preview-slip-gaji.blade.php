@@ -242,10 +242,11 @@
                     + $data->tunjangan_jabatan 
                     + $data->tunjangan_kebudayaan
                     + $data->lembur
-                    + $data->uanga_makan
+                    + $data->uang_makan
                     + $data->transport
                     + $data->fee_sharing
-                    + $data->insentif;
+                    + $data->insentif
+                    + $data->inov_reward;
             @endphp
 
             <tbody>
@@ -278,11 +279,15 @@
                 </tr>
                 <tr>
                     <td>Uang Makan</td>
-                    <td class="text-right">Rp. {{ number_format($data->uanga_makan) }}</td>
+                    <td class="text-right">Rp. {{ number_format($data->uang_makan) }}</td>
                 </tr>
                 <tr>
                     <td>Transport</td>
                     <td class="text-right">Rp. {{ number_format($data->transport) }}</td>
+                </tr>
+                <tr>
+                    <td>Inovation Reward</td>
+                    <td class="text-right">Rp. {{ number_format($data->inov_reward) }}</td>
                 </tr>
                 <tr>
                     <td>Fee Sharing</td>

@@ -59,7 +59,7 @@
                                         <td>{{ $payroll->periode }}</td>
                                         <td>Rp. {{ number_format($payroll->total_gaji, 0, ',', '.') }}</td>
                                         <td>
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview({{ $payroll->id }})"><i class="fa-solid fa-print"></i>
+                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($payroll->id) }}')"><i class="fa-solid fa-print"></i>
                                             </button>
                                         </td>
                                     </tr>
