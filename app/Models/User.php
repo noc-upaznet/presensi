@@ -55,6 +55,11 @@ class User extends Authenticatable
         // atau: return $this->belongsTo(DataKaryawan::class, 'karyawan_id');
     }
 
+    public function entitas()
+    {
+        return $this->belongsTo(M_Entitas::class);
+    }
+
     public function getPresensi()
     {
         return $this->hasMany(M_Presensi::class);

@@ -202,7 +202,7 @@
                 </li>
             @endif
 
-            @if (auth()->user()->current_role == 'spv')
+            @if (auth()->user()->current_role == 'spv' || auth()->user()->current_role == 'hr')
                 <li class="nav-item">
                     <a href="{{ route('riwayat-presensi-staff') }}" 
                         class="nav-link {{ request()->routeIs('riwayat-presensi-staff') ? 'active' : '' }}">
