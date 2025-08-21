@@ -73,24 +73,34 @@ class RiwayatPresensiStaff extends Component
         if ($presensi) {
             $role = Auth::user()->current_role;
 
-            // update sesuai role
+            // cari level karyawan yang presensi
+            $karyawan = M_DataKaryawan::where('id', $presensi->user_id)->first();
+
             if ($role === 'spv') {
                 $presensi->approve_late_spv = 1;
             } elseif ($role === 'hr') {
                 $presensi->approve_late_hr = 1;
             }
 
-            // jika keduanya sudah approve dan status = 1, update status jadi 2
-            if ($presensi->status == 1 
-                && $presensi->approve_late_spv == 1 
-                && $presensi->approve_late_hr == 1) {
-                $presensi->status = 2;
+            // === logika status ===
+            if ($presensi->status == 1) {
+                if ($karyawan && $karyawan->level === 'SPV') {
+                    // kalau karyawan adalah SPV -> hanya butuh approve HR
+                    if ($presensi->approve_late_hr == 1) {
+                        $presensi->status = 2;
+                    }
+                } else {
+                    // kalau bukan SPV -> butuh approve SPV + HR
+                    if ($presensi->approve_late_spv == 1 && $presensi->approve_late_hr == 1) {
+                        $presensi->status = 2;
+                    }
+                }
             }
 
             $presensi->save();
 
             $this->dispatch('swal', params: [
-                'title' => 'Presensi Approved ✅',
+                'title' => 'Presensi Approved',
                 'icon'  => 'success',
                 'text'  => 'Approval berhasil disimpan'
             ]);
