@@ -292,8 +292,6 @@ class Pengajuan extends Component
         $this->dispatch('refresh');
     }
 
-
-
     public function render()
     {
         $query = M_Pengajuan::with(['getKaryawan', 'getShift']);

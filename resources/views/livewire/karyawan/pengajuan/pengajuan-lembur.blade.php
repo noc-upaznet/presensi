@@ -226,12 +226,20 @@
                                             <td class="text-center" style="color: var(--bs-body-color);">
                                                 {{-- <button class="btn btn-sm btn-info mb-2" wire:click="showDetail('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-eye"></i></button> --}}
                                                 {{-- Tombol Approve SPV --}}
-                                                @if ($key->canBeApprovedBySpv())
-                                                    <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">
-                                                        <i class="bi bi-check-square"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">
-                                                        <i class="bi bi-x-square"></i>
+                                                @if (auth()->user()->current_role == 'spv')
+                                                    @if ($key->canBeApprovedBySpv())
+                                                        <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">
+                                                            <i class="bi bi-check-square"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">
+                                                            <i class="bi bi-x-square"></i>
+                                                        </button>
+                                                    @endif
+                                                @endif
+
+                                                @if ($key->canBeDeletedBySPV())
+                                                    <button class="btn btn-sm btn-danger mb-2" wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
+                                                        <i class="bi bi-trash"></i>
                                                     </button>
                                                 @endif
                                                 {{-- Tombol Approve HR --}}

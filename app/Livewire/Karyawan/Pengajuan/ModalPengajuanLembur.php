@@ -180,21 +180,6 @@ class ModalPengajuanLembur extends Component
         // dd($pengajuan);
         if (!$pengajuan) return;
 
-        // if ($pengajuan->status === 1) {
-        //     $tanggal = \Carbon\Carbon::parse($pengajuan->tanggal);
-        //     $hari = 'd' . $tanggal->day;
-        //     $bulanTahun = $tanggal->format('Y-m');
-
-        //     $jadwal = M_Jadwal::where('id_karyawan', $pengajuan->karyawan_id)
-        //         ->where('bulan_tahun', $bulanTahun)
-        //         ->first();
-
-        //     if ($jadwal) {
-        //         $jadwal->$hari = $pengajuan->jadwal_sebelumnya;
-        //         $jadwal->save();
-        //     }
-        // }
-
         $pengajuan->delete();
 
         $this->dispatch('swal', params: [

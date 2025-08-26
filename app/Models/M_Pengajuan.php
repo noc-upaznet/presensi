@@ -64,7 +64,11 @@ class M_Pengajuan extends Model
 
     public function canBeDeletedByAdmin()
     {
-        return Auth::user()->current_role === 'admin'
-            && $this->status == 0;
+        return Auth::user()->current_role === 'admin';
+    }
+
+    public function canBeDeletedBySPV()
+    {
+        return Auth::user()->current_role === 'spv';
     }
 }

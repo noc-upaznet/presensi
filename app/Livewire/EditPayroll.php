@@ -130,6 +130,17 @@ class EditPayroll extends Component
         $this->selectedYear = now()->year;
         $this->selectedMonth = now()->format('n');
 
+        // 🔥 Tangkap periode dari session
+        $this->periode = session('periode', $this->payroll->periode);
+
+        // Misal $this->periode formatnya "2025-08" (Y-m)
+        $this->bulanTahun = $this->periode;
+
+        $date = \Carbon\Carbon::createFromFormat('Y-m', $this->periode);
+
+        $this->cutoffStart = $date->copy()->startOfMonth();
+        $this->cutoffEnd   = $date->copy()->endOfMonth();
+
         // Normal periode
         $startNormal = Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 1);
         if ($this->selectedYear == now()->year && $this->selectedMonth == now()->month) {
@@ -156,9 +167,9 @@ class EditPayroll extends Component
         ];
 
         // Default set cutoff normal
-        $this->cutoffStart = $this->filterCutOffNormal['start'];
-        $this->cutoffEnd = $this->filterCutOffNormal['end'];
-        $this->bulanTahun = $this->cutoffEnd->format('Y-m');
+        // $this->cutoffStart = $this->filterCutOffNormal['start'];
+        // $this->cutoffEnd = $this->filterCutOffNormal['end'];
+        // $this->bulanTahun = $this->cutoffEnd->format('Y-m');
 
         $this->jenis_tunjangan = JenisTunjanganModel::all();
         $this->jenis_potongan = JenisPotonganModel::all();
@@ -169,7 +180,6 @@ class EditPayroll extends Component
 
     public function loadData($id)
     {
-
         $payroll = PayrollModel::findOrFail($id);
         $this->karyawan = M_DataKaryawan::findOrFail($payroll->karyawan_id);
 
@@ -653,7 +663,7 @@ class EditPayroll extends Component
             'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
             'total_gaji' => $this->total_gaji,
         ];
-        // dd($data);
+        dd($data);
         $payroll->update($data);
 
         $this->dispatch('swal', params: [

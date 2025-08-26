@@ -256,13 +256,23 @@ class CreateSlipGaji extends Component
 
     public function updatedBulanTahun($value)
     {
-        $this->hitungRekapPresensi();
+        // dd('oke');
+        [$year, $month] = explode('-', $value);
+        $this->selectedYear = (int) $year;
+        $this->selectedMonth = (int) $month;
+
+        $this->setCutoffPeriode();
+        $this->rekap = $this->hitungRekapPresensi();
         $this->hitungTotalGaji();
+
+        $this->no_slip = $this->generateNoSlip();
+        // dd($this->no_slip);
+        $this->karyawan = $this->loadAvailableKaryawanByPeriode();
     }
+
 
     public function loadDataKaryawan($id)
     {
-        // dd($id);
         $karyawan = M_DataKaryawan::find($id);
         // dd($karyawan);
 
@@ -353,23 +363,38 @@ class CreateSlipGaji extends Component
 
     public function hitungRekapPresensi()
     {
+        $default = [
+            'kehadiran' => 0,
+            'terlambat' => 0,
+            'izin' => 0,
+            'cuti' => 0,
+            'lembur' => 0,
+            'izin setengah hari' => 0,
+            'cutoff_start' => null,
+            'cutoff_end' => null,
+        ];
+
         if (!$this->user_id || !$this->bulanTahun) {
-            $this->rekap = [];
+            $this->rekap = $default;
             return $this->rekap;
         }
 
-        // Set cutoffStart dan cutoffEnd berdasarkan cutoffType dan bulanTahun
+        // Set cutoffStart dan cutoffEnd
         $this->setCutoffPeriode();
 
-        // Panggil rekapKehadiran dengan tanggal cutoff
-        $this->rekap = $this->rekapKehadiran(
+        // Ambil data dari rekapKehadiran
+        $data = $this->rekapKehadiran(
             $this->user_id,
             $this->cutoffStart,
             $this->cutoffEnd
         );
-        // dd($this->rekap);
+
+        // Gabungkan default + data supaya semua key tetap ada
+        $this->rekap = array_merge($default, $data);
+
         return $this->rekap;
     }
+
 
     public function rekapKehadiran($id, $cutoffStart, $cutoffEnd)
     {
@@ -753,7 +778,7 @@ class CreateSlipGaji extends Component
     public function generateNoSlip()
     {
         // Ambil entitas dari session
-        $entitasNama = session('selected_entitas', 'UHO'); // default UHO jika tidak dipilih
+        $entitasNama = session('selected_entitas', 'UHO');
 
         // Cari entitas dari tabel
         $entitasModel = M_Entitas::where('nama', $entitasNama)->first();

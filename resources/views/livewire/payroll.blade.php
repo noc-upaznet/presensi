@@ -130,7 +130,7 @@
                 <div class="d-flex mb-3 align-items-center">
                     {{-- Dropdown Tahun --}}
                     <select wire:model.lazy="selectedYear" class="form-select me-2" style="width: 100px;">
-                        @for ($i = now()->year; $i >= 2020; $i--)
+                        @for ($i = now()->year; $i >= 2023; $i--)
                             <option value="{{ $i }}">{{ $i }}</option>
                         @endfor
                     </select>
@@ -215,13 +215,14 @@
                                         <td>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($payroll->id) }}')"><i class="fa-solid fa-print"></i>
                                             </button>
-                                            <a href="{{ route('edit-payroll', encrypt($payroll->id)) }}" 
-                                            class="btn btn-warning btn-sm" 
-                                            data-bs-toggle="tooltip" 
-                                            data-bs-placement="top" 
-                                            title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
+                                            <button 
+                                                wire:click="editPayroll('{{ encrypt($payroll->id) }}')" 
+                                                class="btn btn-warning btn-sm" 
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                            </button>
                                             <button wire:click="confirmHapusPayroll({{ $payroll->id }})"
                                                 class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
                                             </button>

@@ -36,7 +36,7 @@
                                 Periode: 
                                 {{ $cutoffStart->translatedFormat('d M Y') }} - {{ $cutoffEnd->translatedFormat('d M Y') }}
                             </label>
-                            <input type="month" id="month" class="form-control @error('bulanTahun') is-invalid @enderror" wire:model="bulanTahun">
+                            <input type="month" id="month" class="form-control @error('bulanTahun') is-invalid @enderror" wire:model.lazy="bulanTahun">
                             @error('bulanTahun') 
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -349,7 +349,7 @@
                             
                             <div class="col-md-2 mb-3">
                                 <label for="lembur" class="form-label fw-semibold">Lembur (Jam)</label>
-                                <input type="text" class="form-control" value="{{ $rekap['lembur'] }}" wire:model="lembur" readonly>
+                                <input type="text" class="form-control" value="{{ $rekap['lembur'] }}" readonly>
                             </div>
                         </div>
                         <div class="row">

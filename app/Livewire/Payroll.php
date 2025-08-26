@@ -157,7 +157,11 @@ class Payroll extends Component
 
     public function editPayroll($id)
     {
-        return redirect()->route('edit-payroll', $id);
+        $this->periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        // dd($this->periode);
+        return redirect()
+            ->route('edit-payroll', $id)
+            ->with(['periode' => $this->periode]);
     }
 
     public function saveEdit()
