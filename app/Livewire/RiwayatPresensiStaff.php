@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Crypt;
 class RiwayatPresensiStaff extends Component
 {
     use WithPagination;
+    protected $paginationTheme = 'bootstrap';
+
     public $karyawanList;
     public $filterTanggal;
     public $filterBulan;

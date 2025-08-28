@@ -21,6 +21,9 @@ class PengajuanLembur extends Component
     protected $listeners = ['refreshTable' => 'refresh'];
     public $filterPengajuan = '';
     public $filterBulan = '';
+    public $filterKaryawan = '';
+    public $karyawanList;
+    public $selectedKaryawan = '';
     public $status = [];
     public $search;
 
@@ -33,6 +36,11 @@ class PengajuanLembur extends Component
         // Ambil semua status unik dari database
         $this->status = M_Lembur::select('status')->distinct()->get();
         $this->filterBulan = now()->format('Y-m');
+
+        $entitas = session('selected_entitas', 'UHO');
+        $this->karyawanList = M_DataKaryawan::where('entitas', $entitas)
+            ->orderBy('nama_karyawan')
+            ->get();
     }
     public function showAdd()
     {
@@ -209,8 +217,13 @@ class PengajuanLembur extends Component
             $karyawanIdList = M_DataKaryawan::pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
         }
-        // Jika HR atau SPV, tidak difilter entitas → bisa lihat semua data
     
+        if (!empty($this->selectedKaryawan)) {
+            $query->whereHas('getKaryawan', function ($q) {
+                $q->where('nama_karyawan', 'like', '%' . $this->selectedKaryawan . '%');
+            });
+        }
+
         // Filter status pengajuan
         if (in_array($this->filterPengajuan, ['0', '1', '2'], true)) {
             $query->where('status', (int) $this->filterPengajuan);

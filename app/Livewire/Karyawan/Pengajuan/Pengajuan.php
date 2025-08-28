@@ -23,6 +23,9 @@ class Pengajuan extends Component
 
     public $filterPengajuan = '';
     public $filterBulan = '';
+    public $filterKaryawan = '';
+    public $karyawanList;
+    public $selectedKaryawan = '';
     public $status = [];
     public $search;
     public $tanggal;
@@ -37,6 +40,10 @@ class Pengajuan extends Component
         // Ambil semua status unik dari database
         $this->status = M_Pengajuan::select('status')->distinct()->get();
         $this->filterBulan = now()->format('Y-m');
+        $entitas = session('selected_entitas', 'UHO');
+        $this->karyawanList = M_DataKaryawan::where('entitas', $entitas)
+            ->orderBy('nama_karyawan')
+            ->get();
     }
 
     public function showAdd()
@@ -330,6 +337,12 @@ class Pengajuan extends Component
             // HR melihat semua karyawan dari semua entitas
             $karyawanIdList = M_DataKaryawan::pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
+        }
+
+        if (!empty($this->selectedKaryawan)) {
+            $query->whereHas('getKaryawan', function ($q) {
+                $q->where('nama_karyawan', 'like', '%' . $this->selectedKaryawan . '%');
+            });
         }
 
         // Filter Status

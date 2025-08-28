@@ -85,6 +85,33 @@ class Payroll extends Component
 
         // Hitung jumlah karyawan yang belum punya slip gaji di periode tersebut
         // $karyawanQuery = M_DataKaryawan::where('entitas', $selectedEntitas);
+        $this->hitungSlip();
+    }
+
+    public function updatedSelectedMonth()
+    {
+        $this->hitungSlip();
+    }
+
+    public function updatedSelectedYear()
+    {
+        $this->hitungSlip();
+    }
+
+    private function hitungSlip()
+    {
+        // Format periode (YYYY-MM) dari bulan yang dipilih
+        $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        $this->periode = $this->selectedYear . '-' . $bulanFormatted;
+
+        // Hitung tanggal cutoff
+        $cutoffEnd = \Carbon\Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 25);
+        $cutoffStart = $cutoffEnd->copy()->subMonthNoOverflow()->setDay(26);
+
+        $this->cutoffStart = $cutoffStart->format('Y-m-d');
+        $this->cutoffEnd = $cutoffEnd->format('Y-m-d');
+
+        $selectedEntitas = $this->currentEntitas;
 
         $this->jumlahBelumPunyaSlip = M_DataKaryawan::query()
             ->where('entitas', $selectedEntitas)
@@ -105,6 +132,7 @@ class Payroll extends Component
             ->count();
 
         $selectedEntitasId = M_Entitas::where('nama', $selectedEntitas)->value('id');
+
         $this->JumlahKaryawanTitip = PayrollModel::with('getKaryawan')
             ->where('titip', 1)
             ->where('periode', $this->periode)
@@ -119,8 +147,6 @@ class Payroll extends Component
             ->where('periode', $this->periode)
             ->where('payroll.entitas_id', $selectedEntitasId)
             ->count();
-
-            // dd($this->JumlahKaryawanInternal);
     }
 
     public function toggleTitip($karyawan_id)

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Crypt;
 class RoleLokasi extends Component
 {
     use WithPagination;
+    protected $paginationTheme = 'bootstrap';
 
     public $search = '';
 

@@ -21,7 +21,7 @@
                 @php
                     $currentRole = auth()->user()->current_role;
                 @endphp
-                <div class="d-flex justify-content gap-2 flex-wrap mb-4">
+                <div class="d-flex justify-content-end gap-2 flex-wrap mb-4">
                     @if ($currentRole == 'admin')
                         <select class="form-select" wire:model.lazy="filterkaryawan" style="width: 150px;">
                             <option value="">Pilih Karyawan</option>

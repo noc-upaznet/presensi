@@ -69,7 +69,7 @@
     </div>
 
     <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 lembur-header">
+        <div class="d-flex justify-content-end align-items-center mb-3 flex-wrap gap-2 lembur-header">
             @if (auth()->user()->current_role == 'spv' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'user')
                 <button class="btn btn-primary" wire:click="showAdd">
                     <i class="bi bi-plus"></i> Tambah
@@ -87,6 +87,12 @@
             @endif
             @if (auth()->user()->current_role == 'admin')
                 <div class="d-flex gap-2">
+                    <select class="form-select" wire:model.lazy="selectedKaryawan" style="width: 200px;">
+                        <option value="">Pilih Karyawan</option>
+                        @foreach($karyawanList as $karyawan)
+                            <option value="{{ $karyawan->nama_karyawan }}">{{ $karyawan->nama_karyawan }}</option>
+                        @endforeach
+                    </select>
                     <select class="form-select" wire:model.lazy="filterPengajuan" style="width: 150px;">
                         <option value="">Pilih Status</option>
                         <option value="0">Menunggu</option>

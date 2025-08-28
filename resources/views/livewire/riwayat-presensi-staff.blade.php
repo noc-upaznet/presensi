@@ -18,7 +18,7 @@
     <div class="container">
         <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
             <div class="mb-4">
-                <div class="d-flex justify-content gap-2 flex-wrap mb-4">
+                <div class="d-flex justify-content-end gap-2 flex-wrap mb-4">
                     <select class="form-select" wire:model.lazy="filterkaryawan" style="width: 150px;">
                         <option value="">Pilih Karyawan</option>
                         @foreach ($karyawanList as $karyawan)
@@ -153,7 +153,7 @@
                     </table>
                 </div>
                 <div class="mt-3">
-                    {{ $datas->links('pagination::bootstrap-5') }}
+                    {{ $datas->links() }}
                 </div>
             </div>
         </div>

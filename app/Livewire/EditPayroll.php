@@ -544,7 +544,6 @@ class EditPayroll extends Component
         // dd($this->total_gaji);
     }
 
-
     public function addTunjangan()
     {
         $this->tunjangan[] = ['nama' => '', 'nominal' => 0];
@@ -650,6 +649,7 @@ class EditPayroll extends Component
             'lembur' => $this->lembur_nominal,
             'uang_makan' => $this->uang_makan_total,
             'transport' => $this->transport_total,
+            'tunjangan_kebudayaan' => $this->kebudayaan,
             'inov_reward' => $this->inovation_reward_total,
             'fee_sharing' => $this->fee_sharing,
             'insentif' => $this->insentif,
@@ -663,7 +663,7 @@ class EditPayroll extends Component
             'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
             'total_gaji' => $this->total_gaji,
         ];
-        dd($data);
+        // dd($data);
         $payroll->update($data);
 
         $this->dispatch('swal', params: [
