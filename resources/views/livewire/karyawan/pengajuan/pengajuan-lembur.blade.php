@@ -286,7 +286,9 @@
                     </table>
                 </div>
             </div>
-            {{ $pengajuanLembur->links() }}
+            <div class="mt-3">
+                {{ $pengajuanLembur->links() }}
+            </div>
         </div>
         <livewire:karyawan.pengajuan.modal-pengajuan-lembur />
     </div>

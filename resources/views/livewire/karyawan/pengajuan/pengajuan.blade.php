@@ -262,9 +262,10 @@
                             @endif
                         </tbody>
                     </table>
-                {{-- {{ $pengajuans->links() }} --}}
                 </div>
-                {{ $pengajuans->links()}}
+                <div class="mt-3">
+                    {{ $pengajuans->links() }}
+                </div>
             </div>
         </div>
     </div>
