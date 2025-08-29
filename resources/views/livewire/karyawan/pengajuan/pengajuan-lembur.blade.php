@@ -69,7 +69,7 @@
     </div>
 
     <div class="container mt-4">
-        <div class="d-flex justify-content-end align-items-center mb-3 flex-wrap gap-2 lembur-header">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 lembur-header">
             @if (auth()->user()->current_role == 'spv' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'user')
                 <button class="btn btn-primary" wire:click="showAdd">
                     <i class="bi bi-plus"></i> Tambah

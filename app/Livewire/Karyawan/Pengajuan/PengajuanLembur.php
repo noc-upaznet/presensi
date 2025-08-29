@@ -72,6 +72,7 @@ class PengajuanLembur extends Component
 
         $userRole = Auth::user()->current_role;
         $pengajuRole = optional(optional($pengajuan->getKaryawan)->user)->current_role;
+        $entitasUser = optional($pengajuan->getKaryawan)->entitas;
         // dd($pengajuRole);
 
         // SPV approval
@@ -102,36 +103,46 @@ class PengajuanLembur extends Component
                     ]);
                 }
             } else {
-            // Jika pengaju bukan SPV, maka perlu approve_spv
-                if ($pengajuan->approve_spv == 1) {
+                if ($entitasUser === 'MC'){
                     if ($status == 1) {
                         $pengajuan->approve_hr = 1;
                         $pengajuan->status = 1;
                     } elseif ($status == 2) {
                         $pengajuan->approve_hr = 2;
                         $pengajuan->status = 2;
-
-                        $this->dispatch('swal', params: [
-                            'title' => 'Pengajuan Rejected',
-                            'icon' => 'error',
-                            'text' => 'Berhasil Menolak Pengajuan ini.'
-                        ]);
                     }
-                } elseif ($pengajuan->approve_spv == 2) {
-                    $pengajuan->status = 2;
-                    $this->dispatch('swal', params: [
-                        'title' => 'Gagal Menyimpan',
-                        'icon' => 'error',
-                        'text' => 'SPV sudah menolak pengajuan ini.'
-                    ]);
-                    return;
                 } else {
-                    $this->dispatch('swal', params: [
-                        'title' => 'Gagal Menyimpan',
-                        'icon' => 'error',
-                        'text' => 'Pengajuan belum disetujui oleh SPV.'
-                    ]);
-                    return;
+                    // Jika pengaju bukan SPV, maka perlu approve_spv
+                    if ($pengajuan->approve_spv == 1) {
+                        if ($status == 1) {
+                            $pengajuan->approve_hr = 1;
+                            $pengajuan->status = 1;
+                        } elseif ($status == 2) {
+                            $pengajuan->approve_hr = 2;
+                            $pengajuan->status = 2;
+
+                            $this->dispatch('swal', params: [
+                                'title' => 'Pengajuan Rejected',
+                                'icon' => 'error',
+                                'text' => 'Berhasil Menolak Pengajuan ini.'
+                            ]);
+                        }
+                    } elseif ($pengajuan->approve_spv == 2) {
+                        $pengajuan->status = 2;
+                        $this->dispatch('swal', params: [
+                            'title' => 'Gagal Menyimpan',
+                            'icon' => 'error',
+                            'text' => 'SPV sudah menolak pengajuan ini.'
+                        ]);
+                        return;
+                    } else {
+                        $this->dispatch('swal', params: [
+                            'title' => 'Gagal Menyimpan',
+                            'icon' => 'error',
+                            'text' => 'Pengajuan belum disetujui oleh SPV.'
+                        ]);
+                        return;
+                    }
                 }
             }
         }
