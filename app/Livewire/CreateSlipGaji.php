@@ -91,7 +91,7 @@ class CreateSlipGaji extends Component
     public $transport_jumlah;
     public $transport_total = 0;
 
-    public $uang_makan;
+    public $uang_makan = 15000;
     public $uang_makan_jumlah;
     public $uang_makan_total = 0;
 
@@ -301,7 +301,6 @@ class CreateSlipGaji extends Component
         $this->karyawan = $this->loadAvailableKaryawanByPeriode();
     }
 
-
     public function loadDataKaryawan($id)
     {
         $karyawan = M_DataKaryawan::find($id);
@@ -431,7 +430,6 @@ class CreateSlipGaji extends Component
 
         return $this->rekap;
     }
-
 
     public function rekapKehadiran($id, $cutoffStart, $cutoffEnd)
     {
@@ -878,7 +876,7 @@ class CreateSlipGaji extends Component
             'gaji_pokok' => $this->numericValue($this->gaji_pokok),
             'tunjangan_jabatan' => $this->numericValue($this->tunjangan_jabatan),
             'lembur' => $this->numericValue($this->lembur_nominal),
-            'jenis_lembur' => $this->numericValue($this->lemburLibur_nominal),
+            'lembur_libur' => $this->numericValue($this->lemburLibur_nominal),
             'izin' => $this->numericValue($this->izin_nominal),
             'terlambat' => $this->numericValue($this->terlambat_nominal),
             'tunjangan' => json_encode($this->tunjangan),

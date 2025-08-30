@@ -238,10 +238,11 @@
                 </tr>
             </thead>
             @php
+                $lembur = $data->lembur + $data->lembur_libur;
                 $totalPendapatan = $data->gaji_pokok 
                     + $data->tunjangan_jabatan 
                     + $data->tunjangan_kebudayaan
-                    + $data->lembur
+                    + $lembur
                     + $data->uang_makan
                     + $data->transport
                     + $data->fee_sharing
@@ -275,7 +276,7 @@
                 @endforeach
                 <tr>
                     <td>Upah Lembur</td>
-                    <td class="text-right">Rp. {{ number_format($data->lembur) }}</td>
+                    <td class="text-right">Rp. {{ number_format($lembur) }}</td>
                 </tr>
                 <tr>
                     <td>Uang Makan</td>

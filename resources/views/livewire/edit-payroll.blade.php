@@ -103,26 +103,64 @@
                                 <span class="input-group-text">Rp</span>
                                 <input type="text" id="tunjangan_jabatan" class="form-control" disabled wire:model="tunjangan_jabatan">
                             </div>
+                        </div><div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="lembur" class="form-label fw-semibold">
+                                    Lembur Hari Biasa
+                                </label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="lembur" class="form-control" disabled wire:model="lembur">
+                                </div>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="lemburLibur_nominal" class="form-label fw-semibold">
+                                    Lembur Hari Libur
+                                </label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="lemburLibur_nominal" class="form-control" disabled wire:model="lemburLibur_nominal">
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
-                            <div class="mb-3 col-md-6">
-                                <label for="lembur_nominal" class="form-label fw-semibold">Lembur</label>
-                                <div class="input-group mb-2">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="text" id="lembur_nominal" class="form-control" disabled wire:model="lembur_nominal">
-                                </div>
+                            <div class="mb-3 col-6">
+                                <label class="form-label fw-semibold">Daftar Lembur Hari Biasa</label>
+                                <ul class="list-group">
+                                    @foreach($listLemburBiasa as $l)
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($l['tanggal'])->format('d-m-Y') }}<br>
+                                                <strong>Waktu:</strong> {{ $l['waktu_mulai'] }} - {{ $l['waktu_akhir'] }}
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill">{{ $l['jam'] }} jam</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
                             </div>
 
-                            <div class="mb-3 col-md-6">
-                                <label for="inovation-reward" class="form-label fw-semibold">Inovation Reward</label>
-                                <div class="input-group mb-2">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="text" id="inovation-reward" class="form-control" wire:model.lazy="inovation_reward_total">
-                                </div>
+                            <div class="mb-3 col-6">
+                                <label class="form-label fw-semibold">Daftar Lembur Hari Libur</label>
+                                <ul class="list-group">
+                                    @foreach($listLemburLibur as $l)
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($l['tanggal'])->format('d-m-Y') }}<br>
+                                                <strong>Waktu:</strong> {{ $l['waktu_mulai'] }} - {{ $l['waktu_akhir'] }}
+                                            </div>
+                                            <span class="badge bg-success rounded-pill">{{ $l['jam'] }} jam</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
                             </div>
-                            
                         </div>
-                        
+                        <div class="mb-3 col-md-12">
+                            <label for="inovation-reward" class="form-label fw-semibold">Inovation Reward</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" id="inovation-reward" class="form-control" wire:model.lazy="inovation_reward_total">
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="mb-3 col-md-6">
                                 <label for="uang-transport" class="form-label fw-semibold">Uang Transport</label>

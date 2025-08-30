@@ -72,7 +72,7 @@ class EditPayroll extends Component
     public $selectedYear;
     public $periode;
     public $karyawanId;
-    public $lembur_nominal = 0;
+    public $lembur_libur_nominal = 0;
     public $izin_nominal = 0;
     public $terlambat_nominal = 0;
     public $jml_psb = 0;
@@ -117,6 +117,10 @@ class EditPayroll extends Component
     public $karyawan_id;
     public $id;
     public $bulan_tahun;
+    public $listLemburBiasa = [];
+    public $listLemburLibur = [];
+    public $libur_lembur = 0;
+
 
     public function mount($id)
     {
@@ -461,6 +465,8 @@ class EditPayroll extends Component
         $feeSharing        = $this->numericValue($this->fee_sharing ?? 0);
         $insentif          = $this->numericValue($this->insentif ?? 0);
         $insentifSpv       = $this->numericValue($this->insentif_spv ?? 0);
+        $lemburLiburNominal= $this->numericValue($this->libur_lembur ?? 0);
+        $lemburNominal     = $this->numericValue($this->lembur ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -481,23 +487,40 @@ class EditPayroll extends Component
         }
 
         // === 6. Hitung lembur ===
-        $jamLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
-            ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
+        $lembur = M_Lembur::where('karyawan_id', $this->karyawanId)
+            ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
             ->whereNotNull('total_jam')
             ->where('status', 1)
-            ->sum('total_jam');
+            ->orderBy('tanggal')
+            ->get();
 
-        $lemburNominal = 0;
-        if ($jamLembur > 0 && ($gajiPokok > 0 || $tunjanganJabatan > 0)) {
-            $jenisLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
-                ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
-                ->whereNotNull('total_jam')
-                ->where('status', 1)
-                ->orderByDesc('tanggal')
-                ->value('jenis');
+        // Reset
+        $this->lembur = 0;
+        $this->libur_lembur = 0;
+        $this->listLemburBiasa = [];
+        $this->listLemburLibur = [];
 
-            $faktor = ($jenisLembur == 2) ? 2 : 1;
-            $lemburNominal = (1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur * $faktor;
+        foreach ($lembur as $l) {
+            $jamLembur = $l->total_jam;
+            $jenisLembur = $l->jenis; // 1 = biasa, 2 = libur
+
+            if ($jenisLembur == 2) {
+                $this->libur_lembur += round((1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur * 2);
+                $this->listLemburLibur[] = [
+                    'tanggal'     => $l->tanggal,
+                    'waktu_mulai' => $l->waktu_mulai,
+                    'waktu_akhir' => $l->waktu_akhir,
+                    'jam'         => $jamLembur,
+                ];
+            } else {
+                $this->lembur += round((1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur);
+                $this->listLemburBiasa[] = [
+                    'tanggal'     => $l->tanggal,
+                    'waktu_mulai' => $l->waktu_mulai,
+                    'waktu_akhir' => $l->waktu_akhir,
+                    'jam'         => $jamLembur,
+                ];
+            }
         }
 
         // === 7. Hitung BPJS ===
@@ -527,6 +550,7 @@ class EditPayroll extends Component
             + $tunjanganJabatan
             + $totalTunjangan
             + $lemburNominal
+            + $lemburLiburNominal
             + $insentif
             + $insentifSpv
             + $tunjanganKehadiran
@@ -646,7 +670,8 @@ class EditPayroll extends Component
             'divisi' => $this->divisi,
             'gaji_pokok' => $this->gaji_pokok,
             'tunjangan_jabatan' => $this->tunjangan_jabatan,
-            'lembur' => $this->lembur_nominal,
+            'lembur' => $this->lembur,
+            'lembur_libur' => $this->libur_lembur,
             'uang_makan' => $this->uang_makan_total,
             'transport' => $this->transport_total,
             'tunjangan_kebudayaan' => $this->kebudayaan,
@@ -663,7 +688,7 @@ class EditPayroll extends Component
             'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
             'total_gaji' => $this->total_gaji,
         ];
-        // dd($data);
+        dd($data);
         $payroll->update($data);
 
         $this->dispatch('swal', params: [

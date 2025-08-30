@@ -184,7 +184,14 @@
                             <div class="mb-3 col-md-6">
                                 <label for="inovation_reward" class="form-label fw-semibold">Uang Transport</label>
                                 <div class="input-group mb-2">
-                                    <input type="number" name="transport" class="form-control" wire:model.lazy="transport" placeholder="Nominal">
+                                    {{-- <input type="number" name="transport" class="form-control" wire:model.lazy="transport" placeholder="Nominal"> --}}
+                                    <select name="transport" id="transport" class="form-select" wire:model.lazy="transport">
+                                        <option value="">Nominal</option>
+                                        <option value="5000">5.000</option>
+                                        <option value="10000">10.000</option>
+                                        <option value="15000">15.000</option>
+                                        <option value="25000">25.000</option>
+                                    </select>
                                     <span class="input-group-text">X</span>
                                     <input type="number" class="form-control" wire:model.lazy="transport_jumlah" placeholder="Jumlah">
                                 </div>
