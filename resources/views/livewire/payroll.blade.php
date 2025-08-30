@@ -183,8 +183,9 @@
                                 <th>Bulan</th>
                                 <th>Grand Total</th>
                                 <th>Status Titip</th>
-                                <th>Action</th>
                                 <th>Published</th>
+                                <th>Accepted</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -214,6 +215,20 @@
                                             </div>
                                         </td>
                                         <td>
+                                            @if ($payroll->published == 0)
+                                                <button wire:click="publishPayroll({{ $payroll->id }})" class="btn btn-primary btn-sm">Publish</button>
+                                            @elseif ($payroll->published == 1)
+                                                <span class="badge bg-success">Published</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($payroll->accepted == 1)
+                                                <span class="badge bg-success">Accepted</span>
+                                            @else
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            @endif
+                                        </td>
+                                        <td>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($payroll->id) }}')"><i class="fa-solid fa-print"></i>
                                             </button>
                                             <button 
@@ -227,13 +242,6 @@
                                             <button wire:click="confirmHapusPayroll({{ $payroll->id }})"
                                                 class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
                                             </button>
-                                        </td>
-                                        <td>
-                                            @if ($payroll->published == 0)
-                                                <button wire:click="publishPayroll({{ $payroll->id }})" class="btn btn-primary btn-sm">Publish</button>
-                                            @elseif ($payroll->published == 1)
-                                                <span class="badge bg-success">Published</span>
-                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
