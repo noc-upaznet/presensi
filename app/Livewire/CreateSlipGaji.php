@@ -43,6 +43,7 @@ class CreateSlipGaji extends Component
     public $potongan_terpilih = [];
 
     public $bulanTahun = '';
+    public $id;
     public $rekap = [
         'terlambat' => 0,
         'izin' => 0,
@@ -121,6 +122,7 @@ class CreateSlipGaji extends Component
         $this->jenis_tunjangan = JenisTunjanganModel::all();
         $this->jenis_potongan = JenisPotonganModel::all();
 
+        $this->id = $id;
         $this->selectedMonth = $month ?? now()->format('n'); // default ke bulan ini
         $this->selectedYear = $year ?? now()->year;
         $this->karyawan = $this->loadAvailableKaryawanByPeriode();
@@ -153,7 +155,12 @@ class CreateSlipGaji extends Component
         // Default set cutoff normal
         $this->cutoffStart = $this->filterCutOffNormal['start'];
         $this->cutoffEnd = $this->filterCutOffNormal['end'];
-        $this->bulanTahun = $this->cutoffEnd->format('Y-m');
+
+
+        $this->selectedMonth = request()->route('month') ?? now()->month;
+        $this->selectedYear  = request()->route('year') ?? now()->year;
+
+        $this->bulanTahun = sprintf('%04d-%02d', $this->selectedYear, $this->selectedMonth);
 
         // Jika ada ID karyawan → proses gaji
         if ($id) {
@@ -231,15 +238,18 @@ class CreateSlipGaji extends Component
     public function loadAvailableKaryawanByPeriode()
     {
         $this->setCutoffPeriode();
-        // Ambil entitas dari session, jika tidak ada pakai default 'UHO'
-        $entitas = session('selected_entitas', 'UHO');
-
-        // Format periode payroll berdasarkan bulan di tanggal 25 (YYYY-MM)
         $periode = $this->bulanTahun;
 
-        return M_DataKaryawan::where('entitas', $entitas)
-            ->whereDoesntHave('payrolls', function ($query) use ($periode) {
+        $selectedEntitas = session('selected_entitas', 'UHO'); // array atau string entitas
+
+        return M_DataKaryawan::whereDoesntHave('payrolls', function ($query) use ($periode) {
                 $query->where('periode', $periode);
+            })
+            ->where(function ($query) use ($selectedEntitas) {
+                // Tampilkan karyawan yang entitasnya sesuai selectedEntitas
+                $query->where('entitas', $selectedEntitas)
+                    // Atau karyawan yang entitasnya bukan selectedEntitas
+                    ->orWhereNotIn('entitas', (array) $selectedEntitas);
             })
             ->get();
     }
@@ -291,6 +301,11 @@ class CreateSlipGaji extends Component
         }
     }
 
+    public function isCollectorPosition()
+    {
+        return in_array(strtolower($this->divisi), ['collector', 'col', 'cl']);
+    }
+
     public function isSalesPosition()
     {
         return in_array(strtolower($this->jabatan), ['sales', 'sm', 'sales marketing']);
@@ -302,7 +317,7 @@ class CreateSlipGaji extends Component
 
     public function updatedJmlPsb()
     {
-        if ($this->isSalesPosition()) {
+        if ($this->isSalesPosition() || $this->isCollectorPosition()) {
             $insentifMapping = [
                 1 => [1000000, 50000],
                 2 => [1000000, 100000],

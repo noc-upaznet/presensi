@@ -89,7 +89,9 @@
               </tbody>
             </table>
           </div>
-          {{ $datas->links('pagination::bootstrap-5') }}
+          <div class="mt-3">
+            {{ $datas->links() }}
+          </div>
         </div>
       </div>
   </div>

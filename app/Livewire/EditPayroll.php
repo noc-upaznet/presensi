@@ -247,11 +247,11 @@ class EditPayroll extends Component
 
     public function isSalesPosition()
     {
-        return in_array(strtolower($this->jabatan), ['sales', 'sm', 'sales marketing']);
+        return in_array(strtolower($this->divisi), ['sales', 'sm', 'sales marketing']);
     }
     public function isSalesPositionSpv()
     {
-        return in_array(strtolower($this->jabatan), ['spv sales marketing', 'spv sales']);
+        return in_array(strtolower($this->divisi), ['spv sales marketing', 'spv sales']);
     }
 
     public function updatedBpjsDigunakan()

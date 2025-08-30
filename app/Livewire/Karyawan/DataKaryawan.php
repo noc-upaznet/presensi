@@ -12,6 +12,8 @@ use App\Livewire\Forms\TambahDataKaryawanForm;
 class DataKaryawan extends Component
 {
     use WithPagination;
+    protected $paginationTheme = 'bootstrap';
+
     public $search;
     public int $perPage = 10;
     public TambahDataKaryawanForm $form;

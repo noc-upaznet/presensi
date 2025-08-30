@@ -57,8 +57,8 @@ class Payroll extends Component
             return redirect()->route('dashboard');
             // abort(403, 'Access Denied');
         }
-        $this->selectedYear = now()->year;
-        $this->selectedMonth = now()->format('n');
+        $this->selectedMonth = request()->query('month', now()->month);
+        $this->selectedYear  = request()->query('year', now()->year);
 
         // Format periode (YYYY-MM) dari bulan yang dipilih
         $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
@@ -86,6 +86,14 @@ class Payroll extends Component
         // Hitung jumlah karyawan yang belum punya slip gaji di periode tersebut
         // $karyawanQuery = M_DataKaryawan::where('entitas', $selectedEntitas);
         $this->hitungSlip();
+    }
+
+    public function createSlipGaji($month, $year)
+    {
+        return redirect()->route('create-slip-gaji-tambah', [
+            'month' => $month,
+            'year'  => $year,
+        ]);
     }
 
     public function updatedSelectedMonth()
@@ -267,12 +275,16 @@ class Payroll extends Component
 
     public function showModal()
     {
-        $this->dispatch('modalPayroll', action: 'show');
+        $this->periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        // dd($this->periode);
+        $this->dispatch('modalPayroll', action: 'show', periode: $this->periode);
     }
 
     public function showModalEks()
     {
-        $this->dispatch('modalPayrollEks', action: 'show');
+        $this->periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        // dd($this->periode);
+        $this->dispatch('modalPayrollEks', action: 'show', periode: $this->periode);
     }
 
     public function render()

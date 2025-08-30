@@ -120,10 +120,11 @@
                     $month = $selectedMonth ?? now()->subMonth()->format('n');
                     $year = $selectedYear ?? now()->year;
                 @endphp
-                <a href="{{ route('create-slip-gaji', ['month' => $month, 'year' => $year]) }}" class="btn btn-sm btn-primary">
-                    <i class="fa-solid fa-plus"></i>
-                    Tambah
-                </a>
+
+                <button wire:click="createSlipGaji({{ $month }}, {{ $year }})" 
+                        class="btn btn-sm btn-primary">
+                    <i class="fa-solid fa-plus"></i> Tambah
+                </button>
             </div>
 
             <div class="card-body">

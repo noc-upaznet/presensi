@@ -36,7 +36,8 @@
                                 Periode: 
                                 {{ $cutoffStart->translatedFormat('d M Y') }} - {{ $cutoffEnd->translatedFormat('d M Y') }}
                             </label>
-                            <input type="month" id="month" class="form-control @error('bulanTahun') is-invalid @enderror" wire:model.lazy="bulanTahun">
+                            <input type="month" id="month" class="form-control @error('bulanTahun') is-invalid @enderror" 
+                                wire:model.lazy="bulanTahun">
                             @error('bulanTahun') 
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -71,7 +72,7 @@
                                 <input type="text" class="form-control" disabled wire:model="jabatan">
                             </div>
                         </div>
-                        @if ($this->isSalesPosition())
+                        @if ($this->isSalesPosition() || $this->isCollectorPosition())
                             <div class="row">
                                 <div class="mb-3 col-md-6">
                                     <label for="jumlah-psb" class="form-label fw-semibold">Jumlah PSB</label>

@@ -34,9 +34,10 @@
                                             <td>{{ $item->nama_karyawan }}</td>
                                             <td>{{ $item->nip_karyawan }}</td>
                                             <td>
-                                                <a href="{{ route('create-slip-gaji', ['id' => encrypt($item->id)]) }}" class="btn btn-sm btn-primary">
+                                                <button wire:click="redirectToSlip('{{ encrypt($item->id) }}', '{{ $periode }}')" 
+                                                        class="btn btn-sm btn-primary">
                                                     <i class="fa-solid fa-money-bill"></i> Slip Gaji
-                                                </a>
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -86,9 +87,10 @@
                                             <td>{{ $item->nama_karyawan }}</td>
                                             <td>{{ $item->nip_karyawan }}</td>
                                             <td>
-                                                <a href="{{ route('create-slip-gaji', ['id' => encrypt($item->id)]) }}" class="btn btn-sm btn-primary">
+                                                <button wire:click="redirectToSlip('{{ encrypt($item->id) }}', '{{ $periode }}')" 
+                                                        class="btn btn-sm btn-primary">
                                                     <i class="fa-solid fa-money-bill"></i> Slip Gaji
-                                                </a>
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach
