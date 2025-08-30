@@ -26,6 +26,13 @@
                         @endforeach
                     </select>
 
+                    <select class="form-select" wire:model.lazy="filterStatus" style="width: 150px;">
+                        <option value="">Pilih Status</option>
+                        <option value="0">Tepat Waktu</option>
+                        <option value="1">Terlambat</option>
+                        <option value="2">Dispensasi</option>
+                    </select>
+
                     <input type="month" class="form-control" style="width: 150px;" placeholder="Bulan" wire:model.lazy="filterBulan">
 
                     <input type="date" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Tanggal" wire:model.lazy="filterTanggal">
@@ -126,6 +133,13 @@
                                                     @elseif($key->approve_late_spv == 1)
                                                         <span class="badge bg-success">SPV APPROVED</span>
                                                     @endif
+                                                    @if($key->approve_late_hr == NULL)
+                                                        <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    @elseif($key->approve_late_hr == 1)
+                                                        <span class="badge bg-success">HR APPROVED</span>
+                                                    @endif
                                                 @elseif($key->status == "2")
                                                     <span class="badge bg-primary">Dispensasi Approved</span>
                                                 @endif
@@ -134,6 +148,13 @@
                                         @if ($currentRole == 'hr')
                                             <td>
                                                 @if ($key->status == "1")
+                                                    @if($key->approve_late_spv == NULL)
+                                                        <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    @elseif($key->approve_late_spv == 1)
+                                                        <span class="badge bg-success">SPV APPROVED</span>
+                                                    @endif
                                                     @if($key->approve_late_hr == NULL)
                                                         <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
                                                             <i class="fas fa-check"></i>

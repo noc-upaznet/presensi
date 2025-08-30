@@ -24,7 +24,7 @@
 
     <!--begin::End Navbar links-->
     <ul class="navbar-nav ms-auto">
-      @if (auth()->user()->current_role == 'admin')
+      @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr')
         <li class="nav-item dropdown border border-secondary rounded ms-2">
           <button class="btn btn-link nav-link py-2 px-2 dropdown-toggle d-flex align-items-center rounded text-secondary" 
           id="dropdown-entitas"
