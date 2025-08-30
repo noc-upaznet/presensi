@@ -240,7 +240,7 @@ class CreateSlipGaji extends Component
         $this->setCutoffPeriode();
         $periode = $this->bulanTahun;
 
-        $selectedEntitas = session('selected_entitas', 'UHO'); // array atau string entitas
+        $selectedEntitas = session('selected_entitas', 'UHO');
 
         return M_DataKaryawan::whereDoesntHave('payrolls', function ($query) use ($periode) {
                 $query->where('periode', $periode);
@@ -378,7 +378,7 @@ class CreateSlipGaji extends Component
 
     public function hitungRekapPresensi()
     {
-        $default = [
+        $rekap = [
             'kehadiran' => 0,
             'terlambat' => 0,
             'izin' => 0,
@@ -390,7 +390,7 @@ class CreateSlipGaji extends Component
         ];
 
         if (!$this->user_id || !$this->bulanTahun) {
-            $this->rekap = $default;
+            $this->rekap = $rekap;
             return $this->rekap;
         }
 
@@ -405,7 +405,8 @@ class CreateSlipGaji extends Component
         );
 
         // Gabungkan default + data supaya semua key tetap ada
-        $this->rekap = array_merge($default, $data);
+        $this->rekap = array_merge($rekap, $data);
+        // dd($this->rekap);
 
         return $this->rekap;
     }
@@ -422,7 +423,16 @@ class CreateSlipGaji extends Component
             return Carbon::parse($item->tanggal)->between($cutoffStart, $cutoffEnd);
         });
         // dd($presensi);
-        $terlambat = $presensi->where('status', 1)->where('user_id', $id)->count();
+        $terlambat = M_Presensi::where('user_id', $id)
+            ->where('status', 1)
+            ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
+            ->where(function($query) {
+                $query->where('lokasi_lock', 0)->where('approve', 1)
+                    ->orWhere(function($q) {
+                        $q->where('lokasi_lock', 1)->where('approve', 0);
+                    });
+            })
+            ->count();
         // dd($terlambat);
         // Ambil bulan dan tahun dari cutoffEnd (bukan dari input manual)
         $bulan = $cutoffEnd->format('m');
@@ -690,6 +700,7 @@ class CreateSlipGaji extends Component
             - $this->bpjs_nominal
             - $this->bpjs_jht_nominal
         );
+        // dd($this->total_gaji);
     }
 
 

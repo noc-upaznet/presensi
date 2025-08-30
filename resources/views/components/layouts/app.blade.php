@@ -637,7 +637,15 @@
     <!-- Bootstrap Datepicker -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
-
+    <script>
+        document.addEventListener('livewire:load', function () {
+            Livewire.onError((status, response) => {
+                if (status === 401) {
+                    window.location.href = "{{ route('login') }}";
+                }
+            });
+        });
+    </script>
     {{-- <script>
       $(document).ready(function() {
           $('.js-example-basic-multiple').select2();
