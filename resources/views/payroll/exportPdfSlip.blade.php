@@ -177,7 +177,7 @@
                     <div class="company-info">
                         <h2>PT DIMENSI JARINGAN BERSINAR</h2>
                         <p>Tulungagung, Jawa Timur, Indonesia</p>
-                        <p><a href="https://www.upaznet.com" style="color: blue;">www.upaznet.com</a></p>
+                        {{-- <p><a href="https://www.upaznet.com" style="color: blue;">www.upaznet.com</a></p> --}}
                         <p class="slip-number">Slip Number&nbsp;&nbsp;&nbsp;: {{ $data->no_slip }}</p>
                     </div>
                 </td>
