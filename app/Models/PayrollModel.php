@@ -17,6 +17,7 @@ class PayrollModel extends Model
         'gaji_pokok',
         'tunjangan_jabatan',
         'lembur',
+        'jenis_lembur',
         'tunjangan_kebudayaan',
         'izin',
         'terlambat',

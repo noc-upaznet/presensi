@@ -118,27 +118,68 @@
                         </div>
                         <div class="row">
                             <div class="mb-3 col-md-6">
-                                <label for="lembur_nominal" class="form-label fw-semibold">Lembur</label>
+                                <label for="lembur_nominal" class="form-label fw-semibold">
+                                    Lembur Hari Biasa
+                                </label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" id="lembur_nominal" class="form-control" disabled wire:model="lembur_nominal">
                                 </div>
                             </div>
                             <div class="mb-3 col-md-6">
-                                <label for="inovation_reward" class="form-label fw-semibold">Inovation Reward</label>
+                                <label for="lemburLibur_nominal" class="form-label fw-semibold">
+                                    Lembur Hari Libur
+                                </label>
                                 <div class="input-group mb-2">
-                                    <input type="number" name="inovation_reward" class="form-control" wire:model.lazy="inovation_reward" placeholder="Nominal">
-                                    <span class="input-group-text">X</span>
-                                    <input type="number" class="form-control" wire:model.lazy="inovation_reward_jumlah" placeholder="Jumlah">
-                                </div>
-
-                                {{-- Menampilkan total hasil perkalian --}}
-                                <div class="fw-bold">
-                                    Total: {{ number_format($inovation_reward_total, 0, ',', '.') }}
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="lemburLibur_nominal" class="form-control" disabled wire:model="lemburLibur_nominal">
                                 </div>
                             </div>
                         </div>
-                        
+                        <div class="row">
+                            <div class="mb-3 col-6">
+                                <label class="form-label fw-semibold">Daftar Lembur Hari Biasa</label>
+                                <ul class="list-group">
+                                    @foreach($listLemburBiasa as $l)
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($l['tanggal'])->format('d-m-Y') }}<br>
+                                                <strong>Waktu:</strong> {{ $l['waktu_mulai'] }} - {{ $l['waktu_akhir'] }}
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill">{{ $l['jam'] }} jam</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+
+                            <div class="mb-3 col-6">
+                                <label class="form-label fw-semibold">Daftar Lembur Hari Libur</label>
+                                <ul class="list-group">
+                                    @foreach($listLemburLibur as $l)
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($l['tanggal'])->format('d-m-Y') }}<br>
+                                                <strong>Waktu:</strong> {{ $l['waktu_mulai'] }} - {{ $l['waktu_akhir'] }}
+                                            </div>
+                                            <span class="badge bg-success rounded-pill">{{ $l['jam'] }} jam</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mb-3 col-md-12">
+                            <label for="inovation_reward" class="form-label fw-semibold">Inovation Reward</label>
+                            <div class="input-group mb-2">
+                                <input type="number" name="inovation_reward" class="form-control" wire:model.lazy="inovation_reward" placeholder="Nominal">
+                                <span class="input-group-text">X</span>
+                                <input type="number" class="form-control" wire:model.lazy="inovation_reward_jumlah" placeholder="Jumlah">
+                            </div>
+
+                            {{-- Menampilkan total hasil perkalian --}}
+                            <div class="fw-bold">
+                                Total: {{ number_format($inovation_reward_total, 0, ',', '.') }}
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="mb-3 col-md-6">
                                 <label for="inovation_reward" class="form-label fw-semibold">Uang Transport</label>
@@ -199,17 +240,19 @@
                                     <select name="tunjangan[]" class="form-select" wire:model.lazy="tunjangan.{{ $index }}.nama">
                                         <option value="">-- Pilih Tunjangan --</option>
                                         @if(!empty($jenis_tunjangan) && $jenis_tunjangan->count())
-                                            @foreach($jenis_tunjangan as $tunjangan)
-                                                @if (!in_array($tunjangan->id, $tunjangan_terpilih ?? []))
-                                                    <option value="{{ $tunjangan->nama_tunjangan }}">{{ $tunjangan->nama_tunjangan }}</option>
+                                            @foreach($jenis_tunjangan as $t)
+                                                @if (!in_array($t->id, $tunjangan_terpilih ?? []))
+                                                    <option value="{{ $t->nama_tunjangan }}">{{ $t->nama_tunjangan }}</option>
                                                 @endif
                                             @endforeach
                                         @else
                                             <option value="">Data tidak tersedia</option>
                                         @endif
                                     </select>
+
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" class="form-control" wire:model.lazy="tunjangan.{{ $index }}.nominal">
+
                                     <button type="button" class="btn btn-danger" wire:click="removeTunjangan({{ $index }})">Hapus</button>
                                 </div>
                             @endforeach

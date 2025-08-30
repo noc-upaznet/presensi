@@ -77,6 +77,7 @@ class CreateSlipGaji extends Component
     public $periode;
     public $karyawanId;
     public $lembur_nominal = 0;
+    public $lemburLibur_nominal = 0;
     public $izin_nominal = 0;
     public $terlambat_nominal = 0;
     public $jml_psb = 0;
@@ -108,6 +109,8 @@ class CreateSlipGaji extends Component
     public $filterCutOff25;
     public $filterCutOffNormal;
     public $cutoffType = 'cutoff_normal';
+    public $listLemburBiasa = [];
+    public $listLemburLibur = [];
 
     public function mount($id = null, $month = null, $year = null)
     {
@@ -175,25 +178,43 @@ class CreateSlipGaji extends Component
                 
                 $gajiPokok = $this->numericValue($this->gaji_pokok);
                 $tunjanganJabatan = $this->numericValue($this->tunjangan_jabatan);
-                $jamLembur = M_Lembur::where('karyawan_id', $dataKaryawanId)
+                    // Hitung lembur
+                $lembur = M_Lembur::where('karyawan_id', $dataKaryawanId)
                     ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
                     ->whereNotNull('total_jam')
                     ->where('status', 1)
-                    ->sum('total_jam');
-                $jenisLembur = M_Lembur::where('karyawan_id', $dataKaryawanId)
-                    ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
-                    ->whereNotNull('total_jam')
-                    ->where('status', 1)
-                    ->orderByDesc('tanggal')
-                    ->value('jenis');
+                    ->orderBy('tanggal')
+                    ->get();
+
+                // Reset
                 $this->lembur_nominal = 0;
-                if (($gajiPokok > 0 || $tunjanganJabatan > 0) && $jamLembur > 0) {
+                $this->lemburLibur_nominal = 0;
+                $this->listLemburBiasa = [];
+                $this->listLemburLibur = [];
+
+                foreach ($lembur as $l) {
+                    $jamLembur = $l->total_jam;
+                    $jenisLembur = $l->jenis; // 1 = biasa, 2 = libur
+
                     if ($jenisLembur == 2) {
-                        $this->lembur_nominal = round((1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur * 2);
+                        $this->lemburLibur_nominal += round((1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur * 2);
+                        $this->listLemburLibur[] = [
+                            'tanggal' => $l->tanggal,
+                            'waktu_mulai' => $l->waktu_mulai,
+                            'waktu_akhir' => $l->waktu_akhir,
+                            'jam' => $jamLembur,
+                        ];
                     } else {
-                        $this->lembur_nominal = round((1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur);
+                        $this->lembur_nominal += round((1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur);
+                        $this->listLemburBiasa[] = [
+                            'tanggal' => $l->tanggal,
+                            'waktu_mulai' => $l->waktu_mulai,
+                            'waktu_akhir' => $l->waktu_akhir,
+                            'jam' => $jamLembur,
+                        ];
                     }
                 }
+
                 $this->inovation_reward_jumlah = (int) $this->rekap['kehadiran'];
                 $this->izin_nominal = 0;
                 if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
@@ -609,6 +630,8 @@ class CreateSlipGaji extends Component
         $feeSharing        = $this->numericValue($this->fee_sharing ?? 0);
         $insentif          = $this->numericValue($this->insentif ?? 0);
         $insentifSpv       = $this->numericValue($this->insentif_spv ?? 0);
+        $lemburNominal     = $this->numericValue($this->lembur_nominal ?? 0);
+        $lemburLiburNominal= $this->numericValue($this->lemburLibur_nominal ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -640,26 +663,6 @@ class CreateSlipGaji extends Component
             // dd($potonganTerlambat);
         }
 
-        // === 6. Hitung lembur ===
-        $jamLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
-            ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
-            ->whereNotNull('total_jam')
-            ->where('status', 1)
-            ->sum('total_jam');
-
-        $lemburNominal = 0;
-        if ($jamLembur > 0 && ($gajiPokok > 0 || $tunjanganJabatan > 0)) {
-            $jenisLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
-                ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
-                ->whereNotNull('total_jam')
-                ->where('status', 1)
-                ->orderByDesc('tanggal')
-                ->value('jenis');
-
-            $faktor = ($jenisLembur == 2) ? 2 : 1;
-            $lemburNominal = (1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur * $faktor;
-        }
-
         // === 7. Hitung BPJS ===
         $dasarBpjs = $gajiPokok + $tunjanganJabatan;
         $umk = 2470800;
@@ -687,6 +690,7 @@ class CreateSlipGaji extends Component
             + $tunjanganJabatan
             + $totalTunjangan
             + $lemburNominal
+            + $lemburLiburNominal
             + $insentif
             + $insentifSpv
             + $tunjanganKehadiran
@@ -718,14 +722,20 @@ class CreateSlipGaji extends Component
         if ($property === 'nama') {
             $namaDipilih = $value;
 
-            // Isi nominal otomatis jika "Tunjangan Kehadiran"
             if ($namaDipilih === 'Tunjangan Kehadiran') {
+                // Isi nominal otomatis Tunjangan Kehadiran
                 $tunjangan = JenisTunjanganModel::where('nama_tunjangan', $namaDipilih)->first();
                 $tunjanganKehadiran = 0;
                 if (($this->rekap['terlambat'] ?? 0) == 0) {
                     $tunjanganKehadiran = ($this->rekap['kehadiran'] ?? 0) * $tunjangan->deskripsi;
                 }
                 $this->tunjangan[$index]['nominal'] = $tunjanganKehadiran;
+
+            } elseif ($namaDipilih === 'Achievement') {
+                // Ambil bonus dari data_karyawan
+                $bonus = M_DataKaryawan::where('id', $this->user_id)->value('bonus') ?? 0;
+                $this->tunjangan[$index]['nominal'] = $this->numericValue($bonus);
+
             } else {
                 // Default ambil dari kolom deskripsi di DB
                 $tunjangan = JenisTunjanganModel::where('nama_tunjangan', $namaDipilih)->first();
@@ -868,6 +878,7 @@ class CreateSlipGaji extends Component
             'gaji_pokok' => $this->numericValue($this->gaji_pokok),
             'tunjangan_jabatan' => $this->numericValue($this->tunjangan_jabatan),
             'lembur' => $this->numericValue($this->lembur_nominal),
+            'jenis_lembur' => $this->numericValue($this->lemburLibur_nominal),
             'izin' => $this->numericValue($this->izin_nominal),
             'terlambat' => $this->numericValue($this->terlambat_nominal),
             'tunjangan' => json_encode($this->tunjangan),
