@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             // 'tokenauth' => \App\Http\Middleware\TokenAuth::class,
             'password.expired' => \App\Http\Middleware\CheckPasswordExpired::class,
-            'session.expired' => \App\Http\Middleware\expiredSession::class,
+            // 'session.expired' => \App\Http\Middleware\expiredSession::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

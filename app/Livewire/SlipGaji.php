@@ -13,6 +13,27 @@ class SlipGaji extends Component
     {
         return Redirect::route('slip-gaji.download', ['id' => $id]);
     }
+
+    public function acceptPayroll($id)
+    {
+        $payroll = PayrollModel::find($id);
+        if ($payroll) {
+            $payroll->accepted = 1; // Set accepted to true (1)
+            $payroll->save();
+            $this->dispatch('swal', params: [
+                'title' => 'Slip Accepted',
+                'icon' => 'success',
+                'text' => 'Data has been updated successfully'
+            ]);
+        } else {
+            $this->dispatch('swal', params: [
+                'title' => 'Error',
+                'icon' => 'error',
+                'text' => 'Payroll record not found'
+            ]);
+        }
+    }
+
     public function render()
     {
         $data = PayrollModel::with('getKaryawan')

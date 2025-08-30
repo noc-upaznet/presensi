@@ -41,6 +41,7 @@
                                 <th>Departemen</th>
                                 <th>Bulan</th>
                                 <th>Grand Total</th>
+                                <th>Accepted</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -59,8 +60,19 @@
                                         <td>{{ $payroll->periode }}</td>
                                         <td>Rp. {{ number_format($payroll->total_gaji, 0, ',', '.') }}</td>
                                         <td>
+                                            @if ($payroll->accepted == 1)
+                                                <span class="badge bg-success">Accepted</span>
+                                            @else
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            @endif
+                                        </td>
+                                        <td>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($payroll->id) }}')"><i class="fa-solid fa-print"></i>
                                             </button>
+                                            @if ($payroll->accepted == 0)
+                                                <button class="btn btn-success btn-sm" wire:click="acceptPayroll('{{ $payroll->id }}')"><i class="fa-solid fa-check"></i>
+                                                </button>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -100,5 +112,9 @@
             iframe.src = `/slip-gaji/html/${id}`;
             document.getElementById('downloadSlipLink').href = `/slip-gaji/download/${id}`;
         }
+
+        Livewire.on('swal', (e) => {
+            Swal.fire(e.params);
+        });
     </script>
 @endpush

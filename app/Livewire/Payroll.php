@@ -273,11 +273,11 @@ class Payroll extends Component
         ]);
     }
 
-    public function showModal()
+    public function showModal($id = null)
     {
         $this->periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
         // dd($this->periode);
-        $this->dispatch('modalPayroll', action: 'show', periode: $this->periode);
+        $this->dispatch('modalPayroll', action: 'show', periode: $this->periode, id: encrypt($id));
     }
 
     public function showModalEks()

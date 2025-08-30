@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
+use App\Models\M_Jadwal;
 use Illuminate\Support\Facades\Crypt;
 use App\Livewire\Forms\TambahDataKaryawanForm;
 
@@ -17,6 +18,7 @@ class DataKaryawan extends Component
     public $search;
     public int $perPage = 10;
     public TambahDataKaryawanForm $form;
+    public $deleteKaryawan;
 
     protected $listeners = [
         'entitasUpdated' => '$refresh',
@@ -58,6 +60,36 @@ class DataKaryawan extends Component
     public function entitasUpdated()
     {
         $this->resetPage();
+    }
+
+    public function confirmHapusKaryawan($id)
+    {
+        // dd($id);
+        $this->deleteKaryawan = decrypt($id);
+        // dd($this->deleteKaryawan);
+        $this->dispatch('hapusKaryawanModal', action: 'show');
+    }
+
+    public function delete()
+    {
+        // dd($this->deleteKaryawan);
+        if ($this->deleteKaryawan) {
+        // Hapus jadwal terkait
+        M_Jadwal::where('karyawan_id', $this->deleteKaryawan)->delete();
+
+        // Baru hapus data karyawan
+        M_DataKaryawan::find($this->deleteKaryawan)?->delete();
+
+        $this->dispatch(
+            'swal', params: [
+            'title' => 'Data Deleted',
+            'icon' => 'success',
+            'text' => 'Data has been deleted successfully',
+            'showConfirmButton' => false,
+            'timer' => 1500
+        ]);
+        $this->deleteKaryawan = null;
+    }
     }
 
     public function render()

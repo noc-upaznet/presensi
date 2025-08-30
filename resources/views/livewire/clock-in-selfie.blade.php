@@ -1,3 +1,6 @@
+@assets
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+@endassets
 <div>
     <style>
         #video {
@@ -111,6 +114,8 @@
 
         </div>
     </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <script>
         let videoStream = null;
 

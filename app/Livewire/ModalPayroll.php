@@ -12,12 +12,21 @@ class ModalPayroll extends Component
 {
     public $search = '';
     public $periode;
+    public $karyawan_id;
 
     #[On('modalPayroll')]
-    public function handleModal($action, $periode)
+    public function handleModal($action, $periode, $karyawanId = null)
     {
         if ($action === 'show') {
             $this->periode = $periode;
+
+            if ($karyawanId) {
+                // Simpan karyawan ID di property Livewire
+                $this->karyawan_id = decrypt($karyawanId); // jika dikirim terenkripsi
+
+                // Load data karyawan langsung
+                $this->loadDataKaryawan($this->karyawan_id);
+            }
         }
     }
 

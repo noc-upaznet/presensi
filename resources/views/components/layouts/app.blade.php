@@ -61,7 +61,6 @@
     /> --}}
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 
@@ -159,199 +158,13 @@
         cardHeader.style.cursor = 'move';
       });
     </script>
-    {{-- <!-- apexcharts -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
-      integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
-      crossorigin="anonymous"
-    ></script>
-    <!-- ChartJS -->
-    <script>
-      // NOTICE!! DO NOT USE ANY OF THIS JAVASCRIPT
-      // IT'S ALL JUST JUNK FOR DEMO
-      // ++++++++++++++++++++++++++++++++++++++++++
 
-      const sales_chart_options = {
-        series: [
-          {
-            name: 'Digital Goods',
-            data: [28, 48, 40, 19, 86, 27, 90],
-          },
-          {
-            name: 'Electronics',
-            data: [65, 59, 80, 81, 56, 55, 40],
-          },
-        ],
-        chart: {
-          height: 300,
-          type: 'area',
-          toolbar: {
-            show: false,
-          },
-        },
-        legend: {
-          show: false,
-        },
-        colors: ['#0d6efd', '#20c997'],
-        dataLabels: {
-          enabled: false,
-        },
-        stroke: {
-          curve: 'smooth',
-        },
-        xaxis: {
-          type: 'datetime',
-          categories: [
-            '2023-01-01',
-            '2023-02-01',
-            '2023-03-01',
-            '2023-04-01',
-            '2023-05-01',
-            '2023-06-01',
-            '2023-07-01',
-          ],
-        },
-        tooltip: {
-          x: {
-            format: 'MMMM yyyy',
-          },
-        },
-      };
-
-      const sales_chart = new ApexCharts(
-        document.querySelector('#revenue-chart'),
-        sales_chart_options,
-      );
-      sales_chart.render();
-    </script> --}}
-    <!-- jsvectormap -->
-    {{-- <script
-      src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"
-      integrity="sha256-/t1nN2956BT869E6H4V1dnt0X5pAQHPytli+1nTZm2Y="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"
-      integrity="sha256-XPpPaZlU8S/HWf7FZLAncLg2SAkP8ScUTII89x9D3lY="
-      crossorigin="anonymous"
-    ></script> --}}
-    <!-- jsvectormap -->
-    <script>
-      const visitorsData = {
-        US: 398, // USA
-        SA: 400, // Saudi Arabia
-        CA: 1000, // Canada
-        DE: 500, // Germany
-        FR: 760, // France
-        CN: 300, // China
-        AU: 700, // Australia
-        BR: 600, // Brazil
-        IN: 800, // India
-        GB: 320, // Great Britain
-        RU: 3000, // Russia
-      };
-
-      // World map by jsVectorMap
-      // const map = new jsVectorMap({
-      //   selector: '#world-map',
-      //   map: 'world',
-      // });
-
-      // Sparkline charts
-      const option_sparkline1 = {
-        series: [
-          {
-            data: [1000, 1200, 920, 927, 931, 1027, 819, 930, 1021],
-          },
-        ],
-        chart: {
-          type: 'area',
-          height: 50,
-          sparkline: {
-            enabled: true,
-          },
-        },
-        stroke: {
-          curve: 'straight',
-        },
-        fill: {
-          opacity: 0.3,
-        },
-        yaxis: {
-          min: 0,
-        },
-        colors: ['#DCE6EC'],
-      };
-
-      // const sparkline1 = new ApexCharts(document.querySelector('#sparkline-1'), option_sparkline1);
-      // sparkline1.render();
-
-      // const option_sparkline2 = {
-      //   series: [
-      //     {
-      //       data: [515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921],
-      //     },
-      //   ],
-      //   chart: {
-      //     type: 'area',
-      //     height: 50,
-      //     sparkline: {
-      //       enabled: true,
-      //     },
-      //   },
-      //   stroke: {
-      //     curve: 'straight',
-      //   },
-      //   fill: {
-      //     opacity: 0.3,
-      //   },
-      //   yaxis: {
-      //     min: 0,
-      //   },
-      //   colors: ['#DCE6EC'],
-      // };
-
-      // const sparkline2 = new ApexCharts(document.querySelector('#sparkline-2'), option_sparkline2);
-      // sparkline2.render();
-
-      // const option_sparkline3 = {
-      //   series: [
-      //     {
-      //       data: [15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21],
-      //     },
-      //   ],
-      //   chart: {
-      //     type: 'area',
-      //     height: 50,
-      //     sparkline: {
-      //       enabled: true,
-      //     },
-      //   },
-      //   stroke: {
-      //     curve: 'straight',
-      //   },
-      //   fill: {
-      //     opacity: 0.3,
-      //   },
-      //   yaxis: {
-      //     min: 0,
-      //   },
-      //   colors: ['#DCE6EC'],
-      // };
-
-      // const sparkline3 = new ApexCharts(document.querySelector('#sparkline-3'), option_sparkline3);
-      // sparkline3.render();
-    </script>
     <!--end::Script-->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    {{-- alpine.js --}}
-    {{-- <script src="//unpkg.com/alpinejs" defer></script> --}}
     
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -584,52 +397,6 @@
       })();
     </script>
 
-    {{-- <script>
-      const vapidPublicKey = "{{ config('webpush.vapid.public_key') }}";
-
-      async function subscribeUser() {
-          // Pastikan browser mendukung Service Worker
-          if (!('serviceWorker' in navigator)) {
-              console.error("Service Worker tidak didukung di browser ini.");
-              return;
-          }
-
-          try {
-              const registration = await navigator.serviceWorker.register('/sw.js');
-              console.log(registration);
-              
-              const subscription = await registration.pushManager.subscribe({
-                  userVisibleOnly: true,
-                  applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-              });
-
-              // await fetch('/api/subscriptions', {
-              //     method: 'POST',
-              //     headers: {
-              //         'Content-Type': 'application/json',
-              //         // Jika tidak pakai Sanctum, bisa kosongkan Authorization
-              //         // 'Authorization': 'Bearer {{ auth()->check() ? auth()->user()->createToken("webpush")->plainTextToken : "" }}'
-              //     },
-              //     body: JSON.stringify(subscription)
-              // });
-
-              alert('Berhasil subscribe notifikasi!');
-          } catch (e) {
-              console.error("Gagal subscribe:", e);
-          }
-      }
-
-      function urlBase64ToUint8Array(base64String) {
-          const padding = '='.repeat((4 - base64String.length % 4) % 4);
-          const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-          const rawData = window.atob(base64);
-          return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
-      }
-
-      // Panggil saat halaman siap
-      window.addEventListener('load', subscribeUser);
-    </script> --}}
-
     {{-- @auth
       <script src="{{ asset('js/enable-push.js') }}" defer></script>
     @endauth --}}
@@ -646,11 +413,6 @@
             });
         });
     </script>
-    {{-- <script>
-      $(document).ready(function() {
-          $('.js-example-basic-multiple').select2();
-      });
-    </script> --}}
   </body>
   <!--end::Body-->
 </html>

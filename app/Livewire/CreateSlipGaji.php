@@ -203,7 +203,7 @@ class CreateSlipGaji extends Component
                 }
                 $this->terlambat_nominal = 0;
                 if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
-                    $this->terlambat_nominal = ($this->rekap['terlambat'] ?? 0) > 0 ? 25000 : 0;
+                    $this->terlambat_nominal = ($this->rekap['terlambat'] ?? 0) * 25000;
                 }
             } catch (DecryptException $e) {
                 abort(403, 'ID tidak valid');
@@ -636,7 +636,8 @@ class CreateSlipGaji extends Component
             $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
             $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0);
             $potonganIzin = round($perHari * $totalHariIzin);
-            $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) > 0 ? 25000 : 0;
+            $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 25000;
+            // dd($potonganTerlambat);
         }
 
         // === 6. Hitung lembur ===
@@ -751,7 +752,6 @@ class CreateSlipGaji extends Component
     public function addPotongan()
     {
         $this->potongan[] = ['nama' => '', 'nominal' => 0];
-
     }
 
     public function updatedPotongan($value, $key)
@@ -803,10 +803,8 @@ class CreateSlipGaji extends Component
 
     public function generateNoSlip()
     {
-        // Ambil entitas dari session
         $entitasNama = session('selected_entitas', 'UHO');
 
-        // Cari entitas dari tabel
         $entitasModel = M_Entitas::where('nama', $entitasNama)->first();
         $entitasId = $entitasModel?->id;
 
@@ -830,7 +828,7 @@ class CreateSlipGaji extends Component
         // Format slip berdasarkan nama entitas
         switch (strtoupper($entitasKode)) {
             case 'UHO':
-                return "DJB/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+                return "UHO/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
             case 'UNR':
                 return "UNR/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
             case 'UNB':
