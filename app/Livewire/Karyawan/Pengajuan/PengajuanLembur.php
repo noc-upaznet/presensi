@@ -149,7 +149,8 @@ class PengajuanLembur extends Component
 
         // Jika pengaju adalah HR
         elseif ($userRole === 'admin') {
-            if ($pengajuRole !== 'hr') {
+            if ($pengajuRole !== 'hr' && $pengajuRole !== 'admin') {
+                // dd($pengajuRole);
                 $this->dispatch('swal', params: [
                     'title' => 'Tidak Diizinkan',
                     'icon' => 'error',
