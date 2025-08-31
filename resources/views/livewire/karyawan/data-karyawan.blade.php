@@ -103,11 +103,11 @@
             <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #dc3545; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-danger" id="hapusKaryawanModalLabel">Hapus Data Payroll</h5>
+                    <h5 class="modal-title fw-bold text-danger" id="hapusKaryawanModalLabel">Hapus Data Karyawan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Apakah Anda yakin ingin menghapus data payroll ini?</p>
+                    <p>Apakah Anda yakin ingin menghapus data karyawan ini?</p>
                     <p class="text-danger">Data yang dihapus tidak dapat dikembalikan.</p>
                 </div>
                 <div class="modal-footer">
