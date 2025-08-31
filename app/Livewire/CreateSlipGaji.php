@@ -8,15 +8,12 @@ use App\Models\M_Lembur;
 use App\Models\M_Entitas;
 use App\Models\M_Presensi;
 use App\Models\PayrollModel;
-use App\Models\M_JadwalShift;
 use App\Models\M_DataKaryawan;
 use Illuminate\Support\Carbon;
 use App\Models\JenisPotonganModel;
-use Illuminate\Support\Facades\DB;
 use App\Models\JenisTunjanganModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use App\Livewire\Karyawan\JadwalShift;
 use Illuminate\Contracts\Encryption\DecryptException;
 
 class CreateSlipGaji extends Component
@@ -892,7 +889,9 @@ class CreateSlipGaji extends Component
             'bpjs' => $this->bpjs_nominal,
             'bpjs_jht' => $this->bpjs_jht_nominal,
             'uang_makan' => $this->numericValue($this->uang_makan_total),
+            'jml_uang_makan' => $this->numericValue($this->uang_makan_jumlah),
             'transport' => $this->numericValue($this->transport_total),
+            'jml_transport' => $this->numericValue($this->transport_jumlah),
             'fee_sharing' => $this->numericValue($this->fee_sharing),
             'inov_reward' => $this->numericValue($this->inovation_reward),
             'insentif' => $this->numericValue($this->insentif),
@@ -904,7 +903,7 @@ class CreateSlipGaji extends Component
             'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
             'tunjangan_kebudayaan' => $this->numericValue($this->kebudayaan),
         ];
-        // dd($data);
+        dd($data);
 
         PayrollModel::create($data);
 

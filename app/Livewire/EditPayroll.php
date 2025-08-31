@@ -171,7 +171,7 @@ class EditPayroll extends Component
         $this->jenis_potongan = JenisPotonganModel::all();
         $this->loadData($id);
         // dd($id);
-        // $this->hitungRekap($id);
+        $this->hitungUangMakanTransport();
         $this->hitungTotalGaji();
 
     }
@@ -200,6 +200,8 @@ class EditPayroll extends Component
         // $this->inovation_reward = $payroll->inov_reward;
         $this->transport = $payroll->transport;
         $this->uang_makan = 15000;
+        $this->uang_makan_jumlah = $payroll->jml_uang_makan;
+        $this->transport_jumlah = $payroll->jml_transport;
         $this->kebudayaan = $payroll->tunjangan_kebudayaan;
         $this->fee_sharing = $payroll->fee_sharing;
 
@@ -350,6 +352,17 @@ class EditPayroll extends Component
             'cuti'      => $this->cuti,
             'lembur'    => round($this->lembur_jam),
         ];
+    }
+
+    public function hitungUangMakanTransport()
+    {
+        if ($this->uang_makan > 0 && $this->uang_makan_jumlah > 0) {
+            $this->uang_makan_total = (float)$this->uang_makan * (float)$this->uang_makan_jumlah;
+        }
+
+        if ($this->transport > 0 && $this->transport_jumlah > 0) {
+            $this->transport_total = (float)$this->transport * (float)$this->transport_jumlah;
+        }
     }
 
     public function isSalesPosition()
@@ -771,7 +784,9 @@ class EditPayroll extends Component
             'lembur' => $this->lembur,
             'lembur_libur' => $this->lembur_libur,
             'uang_makan' => $this->uang_makan_total,
+            'jml_uang_makan' => $this->uang_makan_jumlah,
             'transport' => $this->transport_total,
+            'jml_transport' => $this->transport_jumlah,
             'tunjangan_kebudayaan' => $this->kebudayaan,
             'inov_reward' => $this->inovation_reward,
             'fee_sharing' => $this->fee_sharing,
