@@ -4,11 +4,14 @@ namespace App\Livewire\Karyawan;
 
 use Carbon\Carbon;
 use Livewire\Component;
+use App\Models\M_Jadwal;
 use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
-use App\Models\M_Jadwal;
 use Illuminate\Support\Facades\Crypt;
 use App\Livewire\Forms\TambahDataKaryawanForm;
+use App\Models\M_Lembur;
+use App\Models\M_Pengajuan;
+use App\Models\PayrollModel;
 
 class DataKaryawan extends Component
 {
@@ -76,6 +79,12 @@ class DataKaryawan extends Component
         if ($this->deleteKaryawan) {
         // Hapus jadwal terkait
         M_Jadwal::where('karyawan_id', $this->deleteKaryawan)->delete();
+
+        M_Pengajuan::where('karyawan_id', $this->deleteKaryawan)->delete();
+
+        PayrollModel::where('karyawan_id', $this->deleteKaryawan)->delete();
+
+        M_Lembur::where('karyawan_id', $this->deleteKaryawan)->delete();
 
         // Baru hapus data karyawan
         M_DataKaryawan::find($this->deleteKaryawan)?->delete();
