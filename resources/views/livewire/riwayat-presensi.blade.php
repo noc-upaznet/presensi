@@ -22,12 +22,18 @@
                     $currentRole = auth()->user()->current_role;
                 @endphp
                 <div class="d-flex justify-content-end gap-2 flex-wrap mb-4">
-                    @if ($currentRole == 'admin')
+                    @if ($currentRole == 'admin' || $currentRole == 'hr' || $currentRole == 'spv')
                         <select class="form-select" wire:model.lazy="filterkaryawan" style="width: 150px;">
                             <option value="">Pilih Karyawan</option>
                             @foreach ($karyawanList as $karyawan)
                                 <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
                             @endforeach
+                        </select>
+                        <select class="form-select" wire:model.lazy="filterStatus" style="width: 150px;">
+                            <option value="">Pilih Status</option>
+                            <option value="0">Tepat Waktu</option>
+                            <option value="1">Terlambat</option>
+                            <option value="2">Dispensasi</option>
                         </select>
                     @endif
 

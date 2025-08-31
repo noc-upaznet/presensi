@@ -25,6 +25,7 @@ class RiwayatPresensi extends Component
     public $filterTanggal;
     public $filterBulan;
     public $filterkaryawan;
+    public $filterStatus;
     public $karyawanList;
 
     public function mount()
@@ -120,6 +121,16 @@ class RiwayatPresensi extends Component
                 ->whereHas('getUser', function ($query) use ($entitasNama) {
                     $query->where('entitas', $entitasNama);
                 })
+                ->when($this->filterStatus !== null, function ($query) {
+                    // Filter berdasarkan status presensi
+                    if ($this->filterStatus == 0) {
+                        $query->where('status', 0); // Tepat Waktu
+                    } elseif ($this->filterStatus == 1) {
+                        $query->where('status', 1); // Terlambat
+                    } elseif ($this->filterStatus == 2) {
+                        $query->where('status', 2); // Dispensasi
+                    }
+                })
                 ->where(function ($q) {
                     $q->whereHas('getKaryawan', function ($sub) {
                         $sub->whereNotIn('level', ['SPV', 'Manajer']);
@@ -140,7 +151,6 @@ class RiwayatPresensi extends Component
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
-                // dd($datas);
         } elseif (Auth::user()->current_role == 'user' || Auth::user()->current_role == 'spv') {
             $userId = Auth::id();
             $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
