@@ -903,7 +903,7 @@ class CreateSlipGaji extends Component
             'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
             'tunjangan_kebudayaan' => $this->numericValue($this->kebudayaan),
         ];
-        dd($data);
+        // dd($data);
 
         PayrollModel::create($data);
 
