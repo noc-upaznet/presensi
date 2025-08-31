@@ -174,11 +174,6 @@
                                 <span class="input-group-text">X</span>
                                 <input type="number" class="form-control" wire:model.lazy="inovation_reward_jumlah" placeholder="Jumlah">
                             </div>
-
-                            {{-- Menampilkan total hasil perkalian --}}
-                            <div class="fw-bold">
-                                Total: {{ number_format($inovation_reward_total, 0, ',', '.') }}
-                            </div>
                         </div>
                         <div class="row">
                             <div class="mb-3 col-md-6">

@@ -198,39 +198,39 @@ class Payroll extends Component
             ->with(['periode' => $this->periode]);
     }
 
-    public function saveEdit()
-    {
-        $payroll = PayrollModel::findOrFail($this->payroll_id);
+    // public function saveEdit()
+    // {
+    //     $payroll = PayrollModel::findOrFail($this->payroll_id);
 
-        $data = [
-            'no_slip' => $this->no_slip,
-            'karyawan_id' => $this->karyawan_id,
-            'periode' => $this->bulan_tahun,
-            'nip_karyawan' => $this->nip_karyawan,
-            'divisi' => $this->divisi,
-            'gaji_pokok' => $this->gaji_pokok,
-            'tunjangan_jabatan' => $this->tunjangan_jabatan,
-            'lembur' => $this->lembur_nominal,
-            'insentif' => $this->insentif,
-            'izin' => $this->izin_nominal,
-            'terlambat' => $this->terlambat_nominal,
-            'tunjangan' => json_encode($this->tunjangan),
-            'potongan' => json_encode($this->potongan),
-            'bpjs' => $this->bpjs_nominal,
-            'bpjs_jht' => $this->bpjs_jht_nominal,
-            'total_gaji' => $this->total_gaji,
-        ];
-        // dd($data);
-        $payroll->update($data);
+    //     $data = [
+    //         'no_slip' => $this->no_slip,
+    //         'karyawan_id' => $this->karyawan_id,
+    //         'periode' => $this->bulan_tahun,
+    //         'nip_karyawan' => $this->nip_karyawan,
+    //         'divisi' => $this->divisi,
+    //         'gaji_pokok' => $this->gaji_pokok,
+    //         'tunjangan_jabatan' => $this->tunjangan_jabatan,
+    //         'lembur' => $this->lembur_nominal,
+    //         'insentif' => $this->insentif,
+    //         'izin' => $this->izin_nominal,
+    //         'terlambat' => $this->terlambat_nominal,
+    //         'tunjangan' => json_encode($this->tunjangan),
+    //         'potongan' => json_encode($this->potongan),
+    //         'bpjs' => $this->bpjs_nominal,
+    //         'bpjs_jht' => $this->bpjs_jht_nominal,
+    //         'total_gaji' => $this->total_gaji,
+    //     ];
+    //     // dd($data);
+    //     $payroll->update($data);
 
-        $this->dispatch('swal', params: [
-            'title' => 'Data Updated',
-            'icon' => 'success',
-            'text' => 'Data has been updated successfully'
-        ]);
+    //     $this->dispatch('swal', params: [
+    //         'title' => 'Data Updated',
+    //         'icon' => 'success',
+    //         'text' => 'Data has been updated successfully'
+    //     ]);
 
-        $this->dispatch('editPayrollModal', action: 'hide');
-    }
+    //     $this->dispatch('editPayrollModal', action: 'hide');
+    // }
 
     public function confirmHapusPayroll($id)
     {
@@ -292,7 +292,6 @@ class Payroll extends Component
         $entitasNama = session('selected_entitas', 'UHO');
         $entitasAktif = M_Entitas::where('nama', $entitasNama)->first();
         $entitasIdAktif = $entitasAktif?->id;
-        // dd($entitasAktif);
 
         // Filter periode
         $periode = null;
@@ -302,13 +301,19 @@ class Payroll extends Component
 
         $dataQuery = PayrollModel::with('getKaryawan')
             ->where('entitas_id', $entitasIdAktif)
-            ->where('titip', 0);
-        
+            ->where('titip', 0)
+            ->when($this->selectedStatus !== null && $this->selectedStatus !== '', function ($q) {
+                $q->where('accepted', $this->selectedStatus);
+            });
+
         $data2Query = PayrollModel::with('getKaryawan')
             ->where('entitas_id', $entitasIdAktif)
             ->where('titip', 1)
             ->whereHas('getKaryawan', function ($q) use ($entitasNama) {
                 $q->where('entitas_id', '!=', $entitasNama);
+            })
+            ->when($this->selectedStatus !== null && $this->selectedStatus !== '', function ($q) {
+                $q->where('accepted', $this->selectedStatus);
             });
 
         // Apply filter periode jika ada
@@ -319,12 +324,11 @@ class Payroll extends Component
 
         $data = $dataQuery->orderBy('created_at', 'desc')->paginate($this->perPage);
         $data2 = $data2Query->orderBy('created_at', 'desc')->paginate($this->perPage);
-        // dd($data2);
-
 
         return view('livewire.payroll', [
             'data' => $data,
             'data2' => $data2
         ]);
-    }    
+    }
+  
 }

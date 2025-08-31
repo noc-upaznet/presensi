@@ -114,12 +114,12 @@
                                 </div>
                             </div>
                             <div class="mb-3 col-md-6">
-                                <label for="lemburLibur_nominal" class="form-label fw-semibold">
+                                <label for="lembur_libur" class="form-label fw-semibold">
                                     Lembur Hari Libur
                                 </label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" id="lemburLibur_nominal" class="form-control" disabled wire:model="lemburLibur_nominal">
+                                    <input type="text" id="lembur_libur" class="form-control" disabled wire:model="lembur_libur">
                                 </div>
                             </div>
                         </div>
@@ -133,7 +133,7 @@
                                                 <strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($l['tanggal'])->format('d-m-Y') }}<br>
                                                 <strong>Waktu:</strong> {{ $l['waktu_mulai'] }} - {{ $l['waktu_akhir'] }}
                                             </div>
-                                            <span class="badge bg-primary rounded-pill">{{ $l['jam'] }} jam</span>
+                                            <span class="badge bg-primary rounded-pill">{{ round($l['jam']) }} jam</span>
                                         </li>
                                     @endforeach
                                 </ul>
@@ -148,32 +148,53 @@
                                                 <strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($l['tanggal'])->format('d-m-Y') }}<br>
                                                 <strong>Waktu:</strong> {{ $l['waktu_mulai'] }} - {{ $l['waktu_akhir'] }}
                                             </div>
-                                            <span class="badge bg-success rounded-pill">{{ $l['jam'] }} jam</span>
+                                            <span class="badge bg-success rounded-pill">{{ round($l['jam']) }} jam</span>
                                         </li>
                                     @endforeach
                                 </ul>
                             </div>
                         </div>
                         <div class="mb-3 col-md-12">
-                            <label for="inovation-reward" class="form-label fw-semibold">Inovation Reward</label>
+                            <label for="inovation_reward" class="form-label fw-semibold">Inovation Reward</label>
                             <div class="input-group mb-2">
                                 <span class="input-group-text">Rp</span>
-                                <input type="text" id="inovation-reward" class="form-control" wire:model.lazy="inovation_reward_total">
+                                <input type="number" name="inovation_reward" class="form-control" wire:model.lazy="inovation_reward" placeholder="Nominal">
+                                <span class="input-group-text">Kehadiran</span>
+                                <input type="number" class="form-control" wire:model.lazy="inovation_reward_jumlah" placeholder="Jumlah">
+                                <span class="input-group-text">Hari</span>
                             </div>
                         </div>
                         <div class="row">
                             <div class="mb-3 col-md-6">
-                                <label for="uang-transport" class="form-label fw-semibold">Uang Transport</label>
+                                <label for="inovation_reward" class="form-label fw-semibold">Uang Transport</label>
                                 <div class="input-group mb-2">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="text" id="uang-transport" class="form-control" wire:model.lazy="transport_total">
+                                    <select name="transport" id="transport" class="form-select" wire:model.lazy="transport">
+                                        <option value="">Nominal</option>
+                                        <option value="5000">5.000</option>
+                                        <option value="10000">10.000</option>
+                                        <option value="15000">15.000</option>
+                                        <option value="25000">25.000</option>
+                                    </select>
+                                    <span class="input-group-text">X</span>
+                                    <input type="number" class="form-control" wire:model.lazy="transport_jumlah" placeholder="Jumlah">
+                                </div>
+
+                                {{-- Menampilkan total hasil perkalian --}}
+                                <div class="fw-bold">
+                                    Total: {{ number_format($transport_total, 0, ',', '.') }}
                                 </div>
                             </div>
                             <div class="mb-3 col-md-6">
-                                <label for="uang-makan" class="form-label fw-semibold">Uang Makan</label>
+                                <label for="potongan" class="form-label fw-semibold">Uang Makan</label>
                                 <div class="input-group mb-2">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="text" id="uang-makan" class="form-control" wire:model.lazy="uang_makan_total">
+                                    <input type="number" name="uang_makan" class="form-control" wire:model.lazy="uang_makan" placeholder="Nominal">
+                                    <span class="input-group-text">X</span>
+                                    <input type="number" class="form-control" wire:model.lazy="uang_makan_jumlah" placeholder="Jumlah">
+                                </div>
+
+                                {{-- Menampilkan total hasil perkalian --}}
+                                <div class="fw-bold">
+                                    Total: {{ number_format($uang_makan_total, 0, ',', '.') }}
                                 </div>
                             </div>
                         </div>

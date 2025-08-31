@@ -146,6 +146,12 @@
                         @endforeach
                     </select>
 
+                    <select wire:model.lazy="selectedStatus" class="form-select me-2" style="width: 150px;">
+                        <option value="">Status</option>
+                        <option value="0">Pending</option>
+                        <option value="1">Accepted</option>
+                    </select>
+
                     <div class="ms-auto">
                         <button type="button" class="btn btn-sm btn-success" wire:click="export">
                             <i class="fas fa-file-export"></i> Export
@@ -262,8 +268,9 @@
                                 <th>Bulan</th>
                                 <th>Grand Total</th>
                                 <th>Status Titip</th>
-                                <th>Action</th>
                                 <th>Published</th>
+                                <th>Accepted</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -293,21 +300,33 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-print"></i>
-                                            </button>
-                                            <button wire:click="editPayroll({{ $key->id }})"
-                                                class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit"></i>
-                                            </button>
-                                            <button wire:click="confirmHapusPayroll({{ $key->id }})"
-                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                        <td>
                                             @if ($key->published == 0)
                                                 <button wire:click="publishPayroll({{ $key->id }})" class="btn btn-primary btn-sm">Publish</button>
                                             @elseif ($key->published == 1)
                                                 <span class="badge bg-success">Published</span>
                                             @endif
+                                        </td>
+                                        <td>
+                                            @if ($key->accepted == 1)
+                                                <span class="badge bg-success">Accepted</span>
+                                            @else
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-print"></i>
+                                            </button>
+                                            <button 
+                                                wire:click="editPayroll('{{ encrypt($key->id) }}')" 
+                                                class="btn btn-warning btn-sm" 
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button wire:click="confirmHapusPayroll({{ $key->id }})"
+                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 @endforeach

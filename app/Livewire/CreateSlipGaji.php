@@ -160,10 +160,10 @@ class CreateSlipGaji extends Component
         $this->cutoffEnd = $this->filterCutOffNormal['end'];
 
 
-        $this->selectedMonth = request()->route('month') ?? now()->month;
-        $this->selectedYear  = request()->route('year') ?? now()->year;
+        // $this->selectedMonth = request()->route('month') ?? now()->month;
+        // $this->selectedYear  = request()->route('year') ?? now()->year;
 
-        $this->bulanTahun = sprintf('%04d-%02d', $this->selectedYear, $this->selectedMonth);
+        // $this->bulanTahun = sprintf('%04d-%02d', $this->selectedYear, $this->selectedMonth);
 
         // Jika ada ID karyawan → proses gaji
         if ($id) {
@@ -231,6 +231,7 @@ class CreateSlipGaji extends Component
             }
         }
 
+        $this->hitungInovationReward();
         $this->no_slip = $this->generateNoSlip();
         $this->hitungTotalGaji();
     }
@@ -511,20 +512,27 @@ class CreateSlipGaji extends Component
 
     public function hitungInovationReward()
     {
+        // Ambil data inov_reward dari data_karyawan
+        $inovRewardDasar = M_DataKaryawan::where('user_id', $this->karyawanId)
+            ->value('inov_reward') ?? 0;
+        // dd($inovRewardDasar);
         // Pastikan jumlah kehadiran terisi
         if (!isset($this->rekap['kehadiran'])) {
-            $this->rekap['kehadiran'] = M_Presensi::where('user_id', $this->user_id)
+            $this->rekap['kehadiran'] = M_Presensi::where('user_id', $this->karyawanId)
                 ->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->count();
         }
 
+        // Hitung nilai per hari
+        $inovRewardPerHari = $inovRewardDasar / 26;
         // Set jumlah inovation reward sesuai kehadiran
         $this->inovation_reward_jumlah = (int) $this->rekap['kehadiran'];
 
         // Hitung total
-        $this->inovation_reward_total = 
-            (float) $this->inovation_reward * (float) $this->inovation_reward_jumlah;
+        $this->inovation_reward = 
+            round((float) $inovRewardPerHari * (float) $this->inovation_reward_jumlah);
+            // dd($this->inovation_reward);
     }
 
     public function updated($propertyName, $id = null)
@@ -623,7 +631,7 @@ class CreateSlipGaji extends Component
         $tunjanganJabatan  = $this->numericValue($this->tunjangan_jabatan);
         $transport         = $this->numericValue($this->transport_total ?? 0);
         $uangMakan         = $this->numericValue($this->uang_makan_total ?? 0);
-        $inovationReward   = $this->numericValue($this->inovation_reward_total ?? 0);
+        $inovationReward   = $this->numericValue($this->inovation_reward ?? 0);
         $kebudayaan        = $this->numericValue($this->kebudayaan ?? 0);
         $feeSharing        = $this->numericValue($this->fee_sharing ?? 0);
         $insentif          = $this->numericValue($this->insentif ?? 0);
@@ -886,7 +894,7 @@ class CreateSlipGaji extends Component
             'uang_makan' => $this->numericValue($this->uang_makan_total),
             'transport' => $this->numericValue($this->transport_total),
             'fee_sharing' => $this->numericValue($this->fee_sharing),
-            'inov_reward' => $this->numericValue($this->inovation_reward_total),
+            'inov_reward' => $this->numericValue($this->inovation_reward),
             'insentif' => $this->numericValue($this->insentif),
             'jml_psb' => $this->jml_psb,
             'rekap' => json_encode($this->rekap),
