@@ -165,17 +165,18 @@
                 </h5>
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div>
-                        <label>
-                            Show
-                            <select wire:model="perPage" class="form-select form-select-sm d-inline-block w-auto mx-1">
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="25">25</option>
-                            </select>
-                            entries per page
-                        </label>
-                    </div>
+                    <label>
+                        Show
+                        <select wire:model="perPage" class="form-select form-select-sm d-inline-block w-auto mx-1">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                        </select>
+                        entries per page
+                    </label>
+                    <button class="btn btn-sm btn-primary" wire:click="publishAll">
+                        <i class="fas fa-square-check"></i> Publish All
+                    </button>
                 </div>
                 <h5 class="text-secondary mb-3">Data Slip Karyawan {{ $currentEntitas }}</h5>
                 <div class="table-responsive">

@@ -260,6 +260,48 @@ class Payroll extends Component
         }
     }
 
+    public function publishAll()
+    {
+        $entitasNama = session('selected_entitas', 'UHO');
+        $entitasAktif = M_Entitas::where('nama', $entitasNama)->first();
+        $entitasIdAktif = $entitasAktif?->id;
+
+        // Filter periode
+        $periode = null;
+        if ($this->selectedMonth && $this->selectedYear) {
+            $periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        }
+
+        // Payroll utama (titip = 0)
+        $dataQuery = PayrollModel::with('getKaryawan')
+            ->where('entitas_id', $entitasIdAktif)
+            ->where('titip', 0)
+            ->when($this->selectedStatus !== null && $this->selectedStatus !== '', function ($q) {
+                $q->where('accepted', $this->selectedStatus);
+            });
+
+        // Payroll titip (titip = 1)
+        $data2Query = PayrollModel::with('getKaryawan')
+            ->where('entitas_id', $entitasIdAktif)
+            ->where('titip', 1)
+            ->whereHas('getKaryawan', function ($q) use ($entitasIdAktif) {
+                $q->where('entitas_id', '!=', $entitasIdAktif);
+            })
+            ->when($this->selectedStatus !== null && $this->selectedStatus !== '', function ($q) {
+                $q->where('accepted', $this->selectedStatus);
+            });
+
+        // Apply filter periode jika ada
+        if ($periode) {
+            $dataQuery->where('periode', $periode);
+            $data2Query->where('periode', $periode);
+        }
+
+        // Update sekaligus tanpa looping
+        $dataQuery->where('published', 0)->update(['published' => 1]);
+        $data2Query->where('published', 0)->update(['published' => 1]);
+    }
+
     public function publishPayroll($id)
     {
         $payroll = PayrollModel::findOrFail($id);
