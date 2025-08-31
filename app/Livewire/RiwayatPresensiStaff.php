@@ -25,22 +25,40 @@ class RiwayatPresensiStaff extends Component
     public function mount()
     {
         $this->filterBulan = Carbon::now()->format('Y-m');
-        $userId = Auth::id();
+        $user = Auth::user();
+        $userId = $user->id;
+        $currentRole = $user->current_role;
+
         $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
-        $entitasNama = $karyawan->entitas;
-        // dd($entitasNama);
+        $entitasNama = $karyawan->entitas ?? null;
+
+        // ambil dari session kalau ada
+        $entitasNama = session('selected_entitas', $entitasNama ?? 'UHO');
 
         $divisi = $karyawan ? $karyawan->divisi : null;
-        // dd($divisi);
-        if ($divisi === 'NOC') {
+
+        if ($currentRole === 'hr') {
+            // HR bisa pilih entitas via session
+            $selectedEntitas = session('selected_entitas', 'all');
+
+            if ($selectedEntitas === 'all') {
+                $this->karyawanList = M_DataKaryawan::select('id', 'nama_karyawan')->get();
+            } else {
+                $this->karyawanList = M_DataKaryawan::where('entitas', $selectedEntitas)
+                    ->select('id', 'nama_karyawan')
+                    ->get();
+            }
+        }
+        elseif ($divisi === 'NOC') {
             $this->karyawanList = M_DataKaryawan::where('divisi', 'NOC')
-            ->select('id', 'nama_karyawan')
-            ->get();
-        } else {
+                ->select('id', 'nama_karyawan')
+                ->get();
+        }
+        else {
             $this->karyawanList = M_DataKaryawan::where('entitas', $entitasNama)
-            ->where('divisi', $divisi)
-            ->select('id', 'nama_karyawan')
-            ->get();
+                ->where('divisi', $divisi)
+                ->select('id', 'nama_karyawan')
+                ->get();
         }
     }
     public function approve($id)
@@ -160,7 +178,7 @@ class RiwayatPresensiStaff extends Component
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
-        }elseif($currentRole === 'hr'){
+        }elseif ($currentRole === 'hr') {
             $entitasNama = session('selected_entitas', 'UHO');
 
             $datas = M_Presensi::with('getUser')
@@ -179,10 +197,20 @@ class RiwayatPresensiStaff extends Component
                 ->when($this->filterkaryawan, function ($query) {
                     $query->where('user_id', $this->filterkaryawan);
                 })
+                ->when($this->filterStatus !== null, function ($query) {
+                    // Filter berdasarkan status presensi
+                    if ($this->filterStatus == 0) {
+                        $query->where('status', 0); // Tepat Waktu
+                    } elseif ($this->filterStatus == 1) {
+                        $query->where('status', 1); // Terlambat
+                    } elseif ($this->filterStatus == 2) {
+                        $query->where('status', 2); // Dispensasi
+                    }
+                })
                 ->where('user_id', '!=', $karyawanId)
                 ->whereHas('getUser', function ($q) use ($entitasNama) {
                     $q->where('divisi', 'Teknisi')
-                    ->where('entitas', $entitasNama); // filter berdasarkan entitas session
+                    ->where('entitas', $entitasNama); // filter entitas dari session
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);

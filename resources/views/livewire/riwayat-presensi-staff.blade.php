@@ -133,11 +133,7 @@
                                                     @elseif($key->approve_late_spv == 1)
                                                         <span class="badge bg-success">SPV APPROVED</span>
                                                     @endif
-                                                    @if($key->approve_late_hr == NULL)
-                                                        <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                    @elseif($key->approve_late_hr == 1)
+                                                    @if($key->approve_late_hr == 1)
                                                         <span class="badge bg-success">HR APPROVED</span>
                                                     @endif
                                                 @elseif($key->status == "2")
@@ -148,11 +144,7 @@
                                         @if ($currentRole == 'hr')
                                             <td>
                                                 @if ($key->status == "1")
-                                                    @if($key->approve_late_spv == NULL)
-                                                        <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                    @elseif($key->approve_late_spv == 1)
+                                                    @if($key->approve_late_spv == 1)
                                                         <span class="badge bg-success">SPV APPROVED</span>
                                                     @endif
                                                     @if($key->approve_late_hr == NULL)
