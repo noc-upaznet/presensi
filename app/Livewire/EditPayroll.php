@@ -293,17 +293,17 @@ class EditPayroll extends Component
 
     public function hitungRekap($userId)
     {
-        $bulan = now()->format('Y-m'); // contoh: 2025-08
+        $bulan = now()->format('Y-m'); 
         $tahun = now()->year;
 
-        // --- TERLAMBAT (status = 1 di tabel presensi) ---
+        // --- TERLAMBAT ---
         $terlambat = M_Presensi::where('user_id', $userId)
             ->where('status', 1)
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
 
-        // --- AMBIL DATA JADWAL (1 row per karyawan per bulan) ---
+        // --- AMBIL DATA JADWAL ---
         $jadwal = M_Jadwal::where('karyawan_id', $userId)
             ->where('bulan_tahun', $bulan)
             ->first();
@@ -313,7 +313,6 @@ class EditPayroll extends Component
         $izinSetengahHari = 0;
 
         if ($jadwal) {
-            // Loop semua hari dalam sebulan
             for ($i = 1; $i <= 31; $i++) {
                 $kolom = 'd'.$i;
                 $val = $jadwal->$kolom ?? null;
@@ -328,15 +327,17 @@ class EditPayroll extends Component
             }
         }
 
-        // --- LEMBUR JAM (status=1) ---
+        // --- LEMBUR JAM ---
         $lemburJam = M_Lembur::where('karyawan_id', $userId)
             ->where('status', 1)
             ->whereMonth('tanggal', now()->month)
             ->whereYear('tanggal', now()->year)
-            ->sum('total_jam'); // pastikan ada kolom `jam`
+            ->sum('total_jam');
 
-        // Set hasil ke variabel Livewire
-        $this->kehadiran   = $this->rekap['kehadiran'] ?? 0;
+        // ✅ Hitung kehadiran (fix 26 hari kerja)
+        $this->kehadiran = 26 - ($izin + $cuti + (0.5 * $izinSetengahHari));
+        if ($this->kehadiran < 0) $this->kehadiran = 0; // jangan minus
+
         $this->terlambat   = $terlambat ?? 0;
         $this->izin        = ($izin ?? 0) + (0.5 * ($izinSetengahHari ?? 0));
         $this->cuti        = $cuti ?? 0;
@@ -349,7 +350,6 @@ class EditPayroll extends Component
             'cuti'      => $this->cuti,
             'lembur'    => round($this->lembur_jam),
         ];
-        // dd($this->rekap);
     }
 
     public function isSalesPosition()
