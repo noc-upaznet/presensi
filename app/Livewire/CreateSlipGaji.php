@@ -21,6 +21,7 @@ class CreateSlipGaji extends Component
     public $karyawan;
     public $divisi;
     public $jabatan;
+    public $level;
     public $gaji_pokok = 0;
     public $user_id;
     public $nip_karyawan;
@@ -307,12 +308,14 @@ class CreateSlipGaji extends Component
         if ($karyawan) {
             $this->divisi = $karyawan->divisi;
             $this->jabatan = $karyawan->jabatan;
+            $this->level = $karyawan->level;
             $this->gaji_pokok = $karyawan->gaji_pokok;
             $this->nip_karyawan = $karyawan->nip_karyawan;
             $this->tunjangan_jabatan = $karyawan->tunjangan_jabatan;
         } else {
             $this->divisi = '';
             $this->jabatan = '';
+            $this->level = '';
             $this->gaji_pokok = '';
             $this->nip_karyawan = '';
             $this->tunjangan_jabatan = '';
@@ -326,11 +329,18 @@ class CreateSlipGaji extends Component
 
     public function isSalesPosition()
     {
-        return in_array(strtolower($this->jabatan), ['sales', 'sm', 'sales marketing']);
+        if ($this->karyawan) {
+            return $this->level === 'Staff'
+                && $this->jabatan === 'Sales Marketing';
+        }
     }
     public function isSalesPositionSpv()
     {
-        return in_array(strtolower($this->jabatan), ['spv sales marketing', 'spv sales']);
+        // dd($this->karyawan);
+        if ($this->karyawan) {
+            return $this->level === 'SPV'
+                && $this->jabatan === 'Sales Marketing';
+        }
     }
 
     public function updatedJmlPsb()

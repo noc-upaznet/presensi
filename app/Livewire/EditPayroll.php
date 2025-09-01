@@ -176,6 +176,69 @@ class EditPayroll extends Component
 
     }
 
+    public function hitungRekap($userId)
+    {
+        if (!$this->cutoffStart || !$this->cutoffEnd) {
+            $this->rekap = [];
+            return $this->rekap;
+        }
+
+        // --- TERLAMBAT ---
+        $terlambat = M_Presensi::where('user_id', $userId)
+            ->where('status', 1)
+            ->whereBetween('created_at', [$this->cutoffStart, $this->cutoffEnd])
+            ->count();
+
+        // --- AMBIL DATA JADWAL ---
+        $jadwal = M_Jadwal::where('karyawan_id', $userId)
+            ->where('bulan_tahun', $this->bulanTahun) // bulanTahun sudah di-set di mount
+            ->first();
+
+        $izin = 0;
+        $cuti = 0;
+        $izinSetengahHari = 0;
+
+        if ($jadwal) {
+            for ($i = 1; $i <= 31; $i++) {
+                $kolom = 'd'.$i;
+                $val = $jadwal->$kolom ?? null;
+
+                if ($val == 3) {
+                    $izin++;
+                } elseif ($val == 2) {
+                    $cuti++;
+                } elseif ($val == 8) {
+                    $izinSetengahHari++;
+                }
+            }
+        }
+
+        // --- LEMBUR JAM ---
+        $lemburJam = M_Lembur::where('karyawan_id', $userId)
+            ->where('status', 1)
+            ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
+            ->sum('total_jam');
+
+        // ✅ Hitung kehadiran (fix 26 hari kerja)
+        $this->kehadiran = 26 - ($izin + $cuti + (0.5 * $izinSetengahHari));
+        if ($this->kehadiran < 0) $this->kehadiran = 0; // jangan minus
+
+        $this->terlambat   = $terlambat ?? 0;
+        $this->izin        = ($izin ?? 0) + (0.5 * ($izinSetengahHari ?? 0));
+        $this->cuti        = $cuti ?? 0;
+        $this->lembur_jam  = $lemburJam ?? 0;
+
+        $this->rekap = [
+            'kehadiran' => $this->kehadiran,
+            'terlambat' => $this->terlambat,
+            'izin'      => $this->izin,
+            'cuti'      => $this->cuti,
+            'lembur'    => round($this->lembur_jam),
+        ];
+
+        return $this->rekap;
+    }
+
     public function loadData($id)
     {
         $payroll = PayrollModel::findOrFail($id);
@@ -291,67 +354,6 @@ class EditPayroll extends Component
         $this->terlambat_nominal = $potonganTerlambat; // misal 20rb per terlambat
 
         $this->hitungTotalGaji();
-    }
-
-    public function hitungRekap($userId)
-    {
-        $bulan = now()->format('Y-m'); 
-        $tahun = now()->year;
-
-        // --- TERLAMBAT ---
-        $terlambat = M_Presensi::where('user_id', $userId)
-            ->where('status', 1)
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->count();
-
-        // --- AMBIL DATA JADWAL ---
-        $jadwal = M_Jadwal::where('karyawan_id', $userId)
-            ->where('bulan_tahun', $bulan)
-            ->first();
-
-        $izin = 0;
-        $cuti = 0;
-        $izinSetengahHari = 0;
-
-        if ($jadwal) {
-            for ($i = 1; $i <= 31; $i++) {
-                $kolom = 'd'.$i;
-                $val = $jadwal->$kolom ?? null;
-
-                if ($val == 3) {
-                    $izin++;
-                } elseif ($val == 2) {
-                    $cuti++;
-                } elseif ($val == 8) {
-                    $izinSetengahHari++;
-                }
-            }
-        }
-
-        // --- LEMBUR JAM ---
-        $lemburJam = M_Lembur::where('karyawan_id', $userId)
-            ->where('status', 1)
-            ->whereMonth('tanggal', now()->month)
-            ->whereYear('tanggal', now()->year)
-            ->sum('total_jam');
-
-        // ✅ Hitung kehadiran (fix 26 hari kerja)
-        $this->kehadiran = 26 - ($izin + $cuti + (0.5 * $izinSetengahHari));
-        if ($this->kehadiran < 0) $this->kehadiran = 0; // jangan minus
-
-        $this->terlambat   = $terlambat ?? 0;
-        $this->izin        = ($izin ?? 0) + (0.5 * ($izinSetengahHari ?? 0));
-        $this->cuti        = $cuti ?? 0;
-        $this->lembur_jam  = $lemburJam ?? 0;
-
-        $this->rekap = [
-            'kehadiran' => $this->kehadiran,
-            'terlambat' => $this->terlambat,
-            'izin'      => $this->izin,
-            'cuti'      => $this->cuti,
-            'lembur'    => round($this->lembur_jam),
-        ];
     }
 
     public function hitungUangMakanTransport()

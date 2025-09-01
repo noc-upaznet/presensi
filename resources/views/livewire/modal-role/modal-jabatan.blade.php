@@ -12,7 +12,8 @@
                         <label for="jabatan" class="form-label">Jabatan</label>
                         <select type="text" class="form-select" id="jabatan" wire:model="nama_jabatan">
                             <option value="">-- Pilih Jabatan --</option>
-                            <option value="Branch Manager">Branch Manager</option>
+                            <option value="Komisaris">Komisaris</option>
+                            <option value="Direktur">Direktur</option>
                             <option value="Branch Manager">Branch Manager</option>
                             <option value="SPV">SPV</option>
                             <option value="Accounting">Accounting</option>
@@ -75,10 +76,24 @@
                         <label for="jabatan" class="form-label">Jabatan</label>
                         <select type="text" class="form-select" id="jabatan" wire:model="nama_jabatan">
                             <option value="">-- Pilih Jabatan --</option>
-                            <option value="">SPV NOC</option>
-                            <option value="">SPV HR</option>
-                            <option value="">SPV Teknisi</option>
-                            <option value="">SPV Finance</option>
+                            <option value="Komisaris">Komisaris</option>
+                            <option value="Direktur">Direktur</option>
+                            <option value="Branch Manager">Branch Manager</option>
+                            <option value="SPV">SPV</option>
+                            <option value="Accounting">Accounting</option>
+                            <option value="Billing">Billing</option>
+                            <option value="Customer Service">Customer Service</option>
+                            <option value="ASL">ASL</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Helpdesk">Helpdesk</option>
+                            <option value="Sales Marketing">Sales Marketing</option>
+                            <option value="Asisten SPV Teknisi">Asisten SPV Teknisi</option>
+                            <option value="Teknisi">Teknisi</option>
+                            <option value="Kasir">Kasir</option>
+                            <option value="Support">Support</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Recruitment">Recruitment</option>
+                            <option value="Asisten">Asisten</option>
                         </select>
                     </div>
                     <div class="mb-3">

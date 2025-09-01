@@ -319,6 +319,9 @@
                                 <label for="level" class="form-label">Level <small class="text-danger">*</small></label>
                                 <select class="form-select" id="level" wire:model="form.level">
                                     <option selected disabled value="">-- Pilih Level --</option>
+                                    <option value="Komisaris">Komisaris</option>
+                                    <option value="Direktur">Direktur</option>
+                                    <option value="Branch Manager">Branch Manager</option>
                                     <option value="Manager">Manager</option>
                                     <option value="SPV">SPV</option>
                                     <option value="Staff">Staff</option>
