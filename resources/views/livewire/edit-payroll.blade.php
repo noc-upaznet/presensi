@@ -133,7 +133,7 @@
                                                 <strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($l['tanggal'])->format('d-m-Y') }}<br>
                                                 <strong>Waktu:</strong> {{ $l['waktu_mulai'] }} - {{ $l['waktu_akhir'] }}
                                             </div>
-                                            <span class="badge bg-primary rounded-pill">{{ round($l['jam']) }} jam</span>
+                                            <span class="badge bg-primary rounded-pill">{{ $l['jam'] }} jam</span>
                                         </li>
                                     @endforeach
                                 </ul>
@@ -148,7 +148,7 @@
                                                 <strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($l['tanggal'])->format('d-m-Y') }}<br>
                                                 <strong>Waktu:</strong> {{ $l['waktu_mulai'] }} - {{ $l['waktu_akhir'] }}
                                             </div>
-                                            <span class="badge bg-success rounded-pill">{{ round($l['jam']) }} jam</span>
+                                            <span class="badge bg-success rounded-pill">{{ $l['jam'] }} jam</span>
                                         </li>
                                     @endforeach
                                 </ul>
