@@ -22,6 +22,7 @@ class CreateSlipGaji extends Component
     public $divisi;
     public $jabatan;
     public $level;
+    public $entitas;
     public $gaji_pokok = 0;
     public $user_id;
     public $nip_karyawan;
@@ -100,7 +101,9 @@ class CreateSlipGaji extends Component
     public $fee_sharing_digunakan = false;
     public $fee_sharing_nominal = 0;
     public $jml_psb_spv = 0;
+    public $jml_psb_spv_ugr = 0;
     public $insentif_spv = 0;
+    public $insentif_spv_ugr = 0;
     public $cutoffStart;
     public $cutoffEnd;
     public $entitasId;
@@ -312,6 +315,7 @@ class CreateSlipGaji extends Component
             $this->gaji_pokok = $karyawan->gaji_pokok;
             $this->nip_karyawan = $karyawan->nip_karyawan;
             $this->tunjangan_jabatan = $karyawan->tunjangan_jabatan;
+            $this->entitas = $karyawan->entitas;
         } else {
             $this->divisi = '';
             $this->jabatan = '';
@@ -319,6 +323,7 @@ class CreateSlipGaji extends Component
             $this->gaji_pokok = '';
             $this->nip_karyawan = '';
             $this->tunjangan_jabatan = '';
+            $this->entitas = '';
         }
     }
 
@@ -339,7 +344,8 @@ class CreateSlipGaji extends Component
         // dd($this->karyawan);
         if ($this->karyawan) {
             return $this->level === 'SPV'
-                && $this->jabatan === 'Sales Marketing';
+                && $this->jabatan === 'Sales Marketing'
+                && $this->entitas === 'UNR';
         }
     }
 
@@ -349,7 +355,8 @@ class CreateSlipGaji extends Component
         if ($this->karyawan) {
             return $this->level === 'SPV'
                 && $this->jabatan === 'Sales Marketing'
-                && $this->karyawan->entitas === 'UGR';
+                && $this->entitas === 'UGR';
+                // dd($this->entitas);
         }
     }
 
@@ -410,6 +417,14 @@ class CreateSlipGaji extends Component
     {
         if ($this->isSalesPositionSpv()) {
             $this->insentif_spv = 10000 * ((int) ($this->jml_psb_spv ?? 0));
+            $this->hitungTotalGaji();
+        }
+    }
+
+    public function updatedJmlPsbSpvUGR()
+    {
+        if ($this->isSalesPositionSpvUGR()) {
+            $this->insentif_spv_ugr = 50000 * ((int) ($this->jml_psb_spv_ugr ?? 0));
             $this->hitungTotalGaji();
         }
     }
@@ -653,6 +668,7 @@ class CreateSlipGaji extends Component
         $feeSharing        = $this->numericValue($this->fee_sharing ?? 0);
         $insentif          = $this->numericValue($this->insentif ?? 0);
         $insentifSpv       = $this->numericValue($this->insentif_spv ?? 0);
+        $insentifSpvUgr    = $this->numericValue($this->insentif_spv_ugr ?? 0);
         $lemburNominal     = $this->numericValue($this->lembur_nominal ?? 0);
         $lemburLiburNominal= $this->numericValue($this->lemburLibur_nominal ?? 0);
 
@@ -716,6 +732,7 @@ class CreateSlipGaji extends Component
             + $lemburLiburNominal
             + $insentif
             + $insentifSpv
+            + $insentifSpvUgr
             + $tunjanganKehadiran
             + $kebudayaan
             + $feeSharing

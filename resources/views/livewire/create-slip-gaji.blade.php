@@ -102,6 +102,21 @@
                                 </div>
                             </div>
                         @endif
+                        @if ($this->isSalesPositionSpvUGR())
+                            <div class="row">
+                                <div class="mb-3 col-md-6">
+                                    <label for="jumlah-psb-spv-ugr" class="form-label fw-semibold">Jumlah PSB</label>
+                                    <input type="number" wire:model.lazy="jml_psb_spv_ugr" class="form-control" id="jumlah-psb-spv-ugr" placeholder="Masukkan Jml. PSB sales">
+                                </div>
+                                <div class="mb-3 col-md-6">
+                                    <label for="insentif-spv-ugr" class="form-label fw-semibold">Insentif</label>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="text" id="insentif-spv-ugr" class="form-control" disabled wire:model="insentif_spv_ugr">
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                         <div class="mb-3">
                             <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
                             <div class="input-group mb-2">
