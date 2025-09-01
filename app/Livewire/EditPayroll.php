@@ -805,7 +805,7 @@ class EditPayroll extends Component
             'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
             'total_gaji' => $this->total_gaji,
         ];
-        dd($data);
+        // dd($data);
         $payroll->update($data);
 
         $this->dispatch('swal', params: [
