@@ -87,9 +87,6 @@
                                 </div>
                             </div>
                         @endif
-                        @php
-                            
-                        @endphp
                         @if ($this->isSalesPositionSpv())
                             <div class="row">
                                 <div class="mb-3 col-md-6">

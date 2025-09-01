@@ -343,6 +343,16 @@ class CreateSlipGaji extends Component
         }
     }
 
+    public function isSalesPositionSpvUGR()
+    {
+        // dd($this->karyawan);
+        if ($this->karyawan) {
+            return $this->level === 'SPV'
+                && $this->jabatan === 'Sales Marketing'
+                && $this->karyawan->entitas === 'UGR';
+        }
+    }
+
     public function updatedJmlPsb()
     {
         if ($this->isSalesPosition() || $this->isCollectorPosition()) {
@@ -841,12 +851,23 @@ class CreateSlipGaji extends Component
         $bulanRomawi = $this->toRoman($bulanAngka); // "VI"
 
         // Hitung jumlah slip yang sudah dicetak untuk periode tersebut (per entitas)
-        $count = PayrollModel::where('periode', $periode)
+        $lastSlip = PayrollModel::where('periode', $periode)
             ->when($entitasModel, function ($query) use ($entitasModel) {
                 return $query->where('entitas_id', $entitasModel->id);
-            })->count() + 1;
+            })
+            ->orderByDesc('id')
+            ->first();
 
-        $nomorUrut = str_pad($count, 3, '0', STR_PAD_LEFT);
+        if ($lastSlip) {
+            // Ambil angka terakhir dari nomor slip
+            preg_match('/(\d+)$/', $lastSlip->no_slip, $matches);
+            $lastNumber = isset($matches[1]) ? (int)$matches[1] : 0;
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        $nomorUrut = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
         // Format slip berdasarkan nama entitas
         switch (strtoupper($entitasKode)) {
