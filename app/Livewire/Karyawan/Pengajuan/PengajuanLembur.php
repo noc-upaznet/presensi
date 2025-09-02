@@ -225,8 +225,8 @@ class PengajuanLembur extends Component
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
         } elseif ($user->current_role === 'hr') {
-            // Jika HR, bisa melihat semua karyawan dari semua entitas
-            $karyawanIdList = M_DataKaryawan::pluck('id');
+            // HR bisa lihat semua karyawan, tapi tetap bisa difilter berdasarkan entitas
+            $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
         }
     
