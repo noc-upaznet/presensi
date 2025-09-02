@@ -17,6 +17,7 @@ class expiredSession
 
     public function handle(Request $request, Closure $next)
     {
+        dd('masuk middleware session');
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Session Anda telah habis. Silakan login kembali.');
         }

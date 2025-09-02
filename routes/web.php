@@ -39,7 +39,7 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/ganti-password', GantiPassword::class)->middleware('auth')->name('ganti-password');
-Route::group(['middleware' => ['auth', 'password.expired']], function () {
+Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], function () {
     Route::get('/', Dashboard::class)->name('dashboard');
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
     Route::get('/clock-in', ClockIn::class)->name('clock-in');
