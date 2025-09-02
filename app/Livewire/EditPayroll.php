@@ -21,6 +21,7 @@ class EditPayroll extends Component
     public $karyawan;
     public $divisi;
     public $jabatan;
+    public $level;
     public $gaji_pokok = 0;
     public $user_id;
     public $nip_karyawan;
@@ -90,6 +91,7 @@ class EditPayroll extends Component
     public $fee_sharing_nominal = 0;
     public $jml_psb_spv = 0;
     public $insentif_spv = 0;
+    public $insentif_spv_ugr = 0;
     public $cutoffStart;
     public $cutoffEnd;
     public $entitasId;
@@ -261,6 +263,8 @@ class EditPayroll extends Component
         $this->lembur_libur = $payroll->lembur_libur;
         $this->kehadiran = $rekap['kehadiran'] ?? 0;
         // $this->inovation_reward = $payroll->inov_reward;
+        $this->jml_psb = $payroll->jml_psb;
+        $this->insentif = $payroll->insentif;
         $this->transport = $payroll->transport;
         $this->uang_makan = 15000;
         $this->uang_makan_jumlah = $payroll->jml_uang_makan;
@@ -371,9 +375,95 @@ class EditPayroll extends Component
     {
         return in_array(strtolower($this->divisi), ['sales', 'sm', 'sales marketing']);
     }
+
     public function isSalesPositionSpv()
     {
-        return in_array(strtolower($this->divisi), ['spv sales marketing', 'spv sales']);
+        // dd($this->karyawan);
+        if ($this->karyawan) {
+            return $this->level === 'SPV'
+                && $this->jabatan === 'Sales Marketing'
+                && $this->entitas === 'UNR';
+        }
+    }
+
+    public function isSalesPositionSpvUGR()
+    {
+        // dd($this->karyawan);
+        if ($this->karyawan) {
+            return $this->level === 'SPV'
+                && $this->jabatan === 'Sales Marketing'
+                && $this->entitas === 'UGR';
+                // dd($this->entitas);
+        }
+    }
+
+    public function updatedJmlPsb()
+    {
+        if ($this->isSalesPosition() || $this->isCollectorPosition()) {
+            $insentifMapping = [
+                1 => [1000000, 50000],
+                2 => [1000000, 100000],
+                3 => [1000000, 150000],
+                4 => [1000000, 200000],
+                5 => [1000000, 250000],
+                6 => [1160000, 300000],
+                7 => [1160000, 350000],
+                8 => [1160000, 400000],
+                9 => [1160000, 450000],
+                10 => [1160000, 500000],
+                11 => [1508000, 825000],
+                12 => [1508000, 900000],
+                13 => [1508000, 975000],
+                14 => [1508000, 1050000],
+                15 => [1508000, 1125000],
+                16 => [1508000, 1200000],
+                17 => [1508000, 1275000],
+                18 => [1508000, 1350000],
+                19 => [1508000, 1425000],
+                20 => [2320000, 1700000],
+                21 => [2320000, 1785000],
+                22 => [2320000, 1870000],
+                23 => [2320000, 1955000],
+                24 => [2320000, 2040000],
+                25 => [2320000, 2125000],
+                26 => [2320000, 2210000],
+                27 => [2320000, 2295000],
+                28 => [2320000, 2380000],
+                29 => [2320000, 2465000],
+                30 => [2320000, 2550000],
+            ];
+
+            if (isset($insentifMapping[$this->jml_psb])) {
+                [$upah, $insentif] = $insentifMapping[$this->jml_psb];
+
+                // gaji pokok = 75% dari upah, tunjangan jabatan = 25% dari upah
+                $this->gaji_pokok = round($upah * 0.75);
+                $this->tunjangan_jabatan = $upah * 0.25; 
+                $this->insentif = $insentif;
+
+                // dd('gaji:'. $this->gaji_pokok, 'tunjangan:'. $this->tunjangan_jabatan, 'insentif:'.$this->insentif);
+
+                $this->hitungTotalGaji();
+            } else {
+                $this->insentif = 0;
+            }
+        }
+    }
+
+    public function updatedJmlPsbSpv()
+    {
+        if ($this->isSalesPositionSpv()) {
+            $this->insentif_spv = 10000 * ((int) ($this->jml_psb_spv ?? 0));
+            $this->hitungTotalGaji();
+        }
+    }
+
+    public function updatedJmlPsbSpvUGR()
+    {
+        if ($this->isSalesPositionSpvUGR()) {
+            $this->insentif_spv_ugr = 50000 * ((int) ($this->jml_psb_spv_ugr ?? 0));
+            $this->hitungTotalGaji();
+        }
     }
 
     public function updatedBpjsDigunakan()
