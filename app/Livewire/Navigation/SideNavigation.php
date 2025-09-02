@@ -25,6 +25,7 @@ class SideNavigation extends Component
                 $entitas = $dataKaryawan->entitas; // default fallback
                 $entitasModel = M_Entitas::where('nama', $entitas)->first();
                 $entitasIdSaatIni = $entitasModel?->nama;
+                $divisi = $dataKaryawan->divisi;
 
                 if ($dataKaryawan) {
                     $karyawanIds = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
@@ -50,14 +51,24 @@ class SideNavigation extends Component
                             $q->where('entitas', $entitasIdSaatIni);
                         })
                         ->count();
-
-                    $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
-                        ->where('approve', 0)
-                        ->where('user_id', '!=', $dataKaryawan->id)
-                        ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
-                            $q->where('entitas', $entitasIdSaatIni);
-                        })
-                        ->count();
+                    if ($divisi == 'NOC'){
+                        $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
+                            ->where('approve', 0)
+                            ->where('user_id', '!=', $dataKaryawan->id)
+                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
+                                $q->where('divisi', $divisi);
+                            })
+                            ->count();
+                    } else {
+                        $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
+                            ->where('approve', 0)
+                            ->where('user_id', '!=', $dataKaryawan->id)
+                            ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni, $divisi) {
+                                $q->where('entitas', $entitasIdSaatIni)
+                                ->where('divisi', $divisi);
+                            })
+                            ->count();
+                    }
                         // dd($countPresensiStaff);
                 } else {
                     $countPengajuan = 0;
@@ -66,26 +77,29 @@ class SideNavigation extends Component
                 }
             } elseif ($user->current_role === 'hr') {
                 $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
+                $entitas = session('selected_entitas', 'UHO'); // default fallback
+                $entitasModel = M_Entitas::where('nama', $entitas)->first();
+                $entitasIdSaatIni = $entitasModel?->nama;
 
                 if ($dataKaryawan) {
                     // Pengajuan cuti/izin (hanya yang sudah disetujui SPV, belum disetujui HR, dan bukan milik HR itu sendiri)
-                    $countPengajuan = M_Pengajuan::where(function ($q) {
-                            $q->where('approve_spv', 1)
-                            ->orWhereNull('approve_spv');
-                        })
+                    $countPengajuan = M_Pengajuan::where('approve_spv', 1)
                         ->whereNull('approve_hr')
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
+                            $q->where('entitas', $entitasIdSaatIni);
+                        })
                         ->count();
 
                     // Pengajuan lembur (sama seperti di atas)
-                    $countLembur = M_Lembur::where(function ($q) {
-                            $q->where('approve_spv', 1)
-                            ->orWhereNull('approve_spv');
-                        })
+                    $countLembur = M_Lembur::where('approve_spv', 1)
                         ->whereNull('approve_hr')
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
+                            $q->where('entitas', $entitasIdSaatIni);
+                        })
                         ->count();
                 } else {
                     $countPengajuan = 0;

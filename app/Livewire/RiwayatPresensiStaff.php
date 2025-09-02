@@ -145,7 +145,41 @@ class RiwayatPresensiStaff extends Component
         // dd($entitasNama);
         if($currentRole === 'spv')
         {
-            $datas = M_Presensi::with('getUser')
+            if ($divisi === 'NOC') {
+                $datas = M_Presensi::with('getUser')
+                    ->when($this->filterTanggal, function ($query) {
+                        $query->whereDate('created_at', $this->filterTanggal);
+                    }, function ($query) {
+                        if ($this->filterBulan) {
+                            [$year, $month] = explode('-', $this->filterBulan);
+                            $query->whereYear('created_at', $year)
+                                ->whereMonth('created_at', $month);
+                        } else {
+                            $query->whereMonth('created_at', Carbon::now()->month)
+                                ->whereYear('created_at', Carbon::now()->year);
+                        }
+                    })
+                    ->when($this->filterkaryawan, function ($query) {
+                        $query->where('user_id', $this->filterkaryawan);
+                    })
+                    ->when($this->filterStatus !== null, function ($query) {
+                        // Filter berdasarkan status presensi
+                        if ($this->filterStatus == 0) {
+                            $query->where('status', 0); // Tepat Waktu
+                        } elseif ($this->filterStatus == 1) {
+                            $query->where('status', 1); // Terlambat
+                        } elseif ($this->filterStatus == 2) {
+                            $query->where('status', 2); // Dispensasi
+                        }
+                    })
+                    ->where('user_id', '!=', $karyawanId)
+                    ->whereHas('getUser', function ($query) use ($divisi) {
+                        $query->where('divisi', $divisi);
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(10);
+            } else {
+                $datas = M_Presensi::with('getUser')
                 ->when($this->filterTanggal, function ($query) {
                     $query->whereDate('created_at', $this->filterTanggal);
                 }, function ($query) {
@@ -178,6 +212,7 @@ class RiwayatPresensiStaff extends Component
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
+            }
         }elseif ($currentRole === 'hr') {
             $entitasNama = session('selected_entitas', 'UHO');
 
