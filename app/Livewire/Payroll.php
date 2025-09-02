@@ -166,6 +166,11 @@ class Payroll extends Component
 
     public function export()
     {
+        $entitasNama = session('selected_entitas', 'UHO');
+        $entitasAktif = M_Entitas::where('nama', $entitasNama)->first();
+        $entitasIdAktif = $entitasAktif?->id;
+        // dd($entitasIdAktif);
+
         $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
         $periode = $this->selectedYear . '-' . $bulanFormatted;
 
@@ -173,8 +178,9 @@ class Payroll extends Component
         ->locale('id')
         ->translatedFormat('F Y');
         $filename = 'slip_gaji_' . $periodeLokal . '.xlsx';
+        // dd($periode, $periodeLokal, $entitasIdAktif);
 
-        return Excel::download(new PayrollExport($periode, $periodeLokal), $filename);
+        return Excel::download(new PayrollExport($periode, $entitasIdAktif), $filename);
     }
 
     public function downloadSlip($id)

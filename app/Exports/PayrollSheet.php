@@ -13,14 +13,22 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
 {
     protected $periode;
     protected $status;
+    protected $entitas;
 
     protected $uniqueTunjangan = [];
     protected $uniquePotongan = [];
 
-    public function __construct($periode, $status)
+    public function __construct($periode, $status, $entitas)
     {
+        // dd($periode, $status, $entitas);
+
         $this->periode = $periode;
         $this->status = $status;
+        $this->entitas = $entitas;
+        // dd([
+        //     'entitas' => $this->entitas,
+        //     'periode' => $this->periode,
+        // ]);
     }
 
     protected $headerRowCount = 1;
@@ -28,7 +36,8 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
     public function array(): array
     {
         $query = PayrollModel::join('data_karyawan', 'payroll.karyawan_id', '=', 'data_karyawan.id')
-            ->where('payroll.periode', $this->periode);
+            ->where('payroll.periode', $this->periode)
+            ->where('payroll.entitas_id', $this->entitas);
 
         if ($this->status == 'titip') {
             $query->where('payroll.titip', 1);
@@ -41,8 +50,9 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
         $data = $query->select(
             'payroll.*',
             'data_karyawan.nama_karyawan',
-            'data_karyawan.nip_karyawan'
+            'data_karyawan.nip_karyawan',
         )->get();
+        // dd($data);
 
         // Ambil semua nama tunjangan dan potongan
         foreach ($data as $item) {
