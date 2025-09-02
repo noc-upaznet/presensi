@@ -67,10 +67,10 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($payroll->id) }}')"><i class="fa-solid fa-print"></i>
+                                            <button class="btn btn-info btn-sm mt-1" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($payroll->id) }}')"><i class="fa-solid fa-print"></i>
                                             </button>
                                             @if ($payroll->accepted == 0)
-                                                <button class="btn btn-success btn-sm" wire:click="acceptPayroll('{{ $payroll->id }}')"><i class="fa-solid fa-check"></i>
+                                                <button class="btn btn-success btn-sm mt-1" wire:click="acceptPayroll('{{ $payroll->id }}')"><i class="fa-solid fa-check"></i>
                                                 </button>
                                             @endif
                                         </td>
