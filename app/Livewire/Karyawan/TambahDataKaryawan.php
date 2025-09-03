@@ -109,18 +109,18 @@ class TambahDataKaryawan extends Component
         ]);
         $this->form->validate();
 
-        // $dataUser = [
-        //     'name' => $this->form->nama_karyawan,
-        //     'email' => $this->form->email,
-        //     'password' => bcrypt($this->password),
-        //     'current_role' => 'user',
-        // ];
+        $dataUser = [
+            'name' => $this->form->nama_karyawan,
+            'email' => $this->form->email,
+            'password' => bcrypt($this->password),
+            'current_role' => 'user',
+        ];
         // dd($dataUser);
 
-        // $user = User::create($dataUser);
+        $user = User::create($dataUser);
         
         $data = [
-            // 'user_id' => $user->id,
+            'user_id' => $user->id,
             'nama_karyawan' => $this->form->nama_karyawan,
             'email' => $this->form->email,
             'no_hp' => $this->form->no_hp,

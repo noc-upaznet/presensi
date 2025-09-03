@@ -112,8 +112,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
 
         // Hitung jumlah kolom untuk styling
         $this->headerRowCount = count($header);
-        $totals = array_fill(0, count($header), 0);
-
+        $totals = []; // kosong dulu
         $rows = [];
 
         foreach ($data as $item) {
@@ -128,16 +127,16 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
                 $item->periode,
                 $item->tunjangan_jabatan,
                 $item->gaji_pokok,
-                ($item->lembur + $item->lembur_libur),
-                $item->tunjangan_kebudayaan,
-                $item->transport,
-                $item->izin,
-                $item->terlambat,
-                $item->bpjs,
-                $item->bpjs_jht,
-                $item->fee_sharing,
-                $item->insentif,
-                $item->uang_makan,
+                ($item->lembur + $item->lembur_libur) ?? 0,
+                $item->tunjangan_kebudayaan ?? 0,
+                $item->transport ?? 0,
+                $item->izin ?? 0,
+                $item->terlambat ?? 0,
+                $item->bpjs ?? 0,
+                $item->bpjs_jht ?? 0,
+                $item->fee_sharing ?? 0,
+                $item->insentif ?? 0,
+                $item->uang_makan ?? 0,
             ];
 
             // Tambah nilai tunjangan
@@ -154,20 +153,31 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
 
             $row[] = $item->total_gaji;
 
+            // Hitung total per kolom, kecuali kolom identitas
+            $skipIndex = [0, 1, 2, 3, 4]; // No Slip, Nama, NIP, Divisi, Periode
+            foreach ($row as $i => $value) {
+                if (!in_array($i, $skipIndex) && is_numeric($value)) {
+                    $totals[$i] = ($totals[$i] ?? 0) + $value;
+                }
+            }
+
             $rows[] = $row;
         }
 
+        // Buat footer
         $footer = [];
-        foreach ($header as $i => $col) {
-            if (is_numeric($totals[$i]) && $totals[$i] > 0) {
-                $footer[$i] = $totals[$i];
-            } else {
-                $footer[$i] = ($i === 0 ? 'TOTAL' : ''); // kolom pertama tulis TOTAL
-            }
-        }
-        $rows[] = $footer;
 
-        
+        if (count($rows) > 0) {
+            foreach ($rows[0] as $i => $value) {
+                if (isset($totals[$i]) && $totals[$i] > 0) {
+                    $footer[$i] = $totals[$i];
+                } else {
+                    $footer[$i] = ($i === 0 ? 'TOTAL' : '');
+                }
+            }
+
+            $rows[] = $footer;
+        }
 
         return array_merge([$header], $rows);
     }
