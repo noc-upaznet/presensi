@@ -40,7 +40,8 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
     {
         $query = PayrollModel::join('data_karyawan', 'payroll.karyawan_id', '=', 'data_karyawan.id')
             ->where('payroll.periode', $this->periode)
-            ->where('payroll.entitas_id', $this->entitas);
+            ->where('payroll.entitas_id', $this->entitas)
+            ->orderBy('data_karyawan.nip_karyawan', 'asc');
 
         if ($this->status == 'titip') {
             $query->where('payroll.titip', 1);
