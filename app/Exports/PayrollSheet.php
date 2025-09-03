@@ -87,8 +87,10 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             'Transport',
             'Izin',
             'Terlambat',
-            'BPJS',
-            'BPJS JHT',
+            'BPJS Kesehatan KA',
+            'BPJS JHT KA',
+            'BPJS Kesehatan PT',
+            'BPJS JHT PT',
             'Fee Sharing',
             'Insentif',
             'Uang Makan',
@@ -134,6 +136,8 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
                 $item->terlambat ?? 0,
                 $item->bpjs ?? 0,
                 $item->bpjs_jht ?? 0,
+                $item->bpjs_perusahaan ?? 0,
+                $item->bpjs_jht_perusahaan ?? 0,
                 $item->fee_sharing ?? 0,
                 $item->insentif ?? 0,
                 $item->uang_makan ?? 0,
@@ -151,10 +155,21 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
                 $row[] = $match['nominal'] ?? 0;
             }
 
-            $row[] = $item->total_gaji;
+            // Ambil nilai izin (potongan)
+            $izin = $item->izin ?? 0;
 
-            // Hitung total per kolom, kecuali kolom identitas
-            $skipIndex = [0, 1, 2, 3, 4]; // No Slip, Nama, NIP, Divisi, Periode
+            // Jumlahkan semua nilai numeric dari row (kecuali identitas di depan)
+            $pendapatan = array_sum(array_filter($row, fn($v, $i) =>
+                !in_array($i, [0, 1, 2, 3, 4, 10]) && is_numeric($v) // skip identitas & kolom izin (index ke-10)
+            , ARRAY_FILTER_USE_BOTH));
+
+            // Total gaji = pendapatan - izin
+            $totalGaji = $pendapatan - $izin;
+
+            $row[] = $totalGaji;
+
+            // Hitung total per kolom
+            $skipIndex = [0, 1, 2, 3, 4]; // kolom identitas tidak dijumlah
             foreach ($row as $i => $value) {
                 if (!in_array($i, $skipIndex) && is_numeric($value)) {
                     $totals[$i] = ($totals[$i] ?? 0) + $value;
