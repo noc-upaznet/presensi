@@ -154,14 +154,14 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 $match = $tunjanganArray->firstWhere('nama', $nama);
                 $row[] = $match['nominal'] ?? 0;
             }
-            $row[] = $item->kasbon;
-
 
             // Tambah nilai potongan
             foreach ($this->uniquePotongan as $nama) {
                 $match = $potonganArray->firstWhere('nama', $nama);
                 $row[] = $match['nominal'] ?? 0;
             }
+
+            $row[] = $item->kasbon ?? 0;
 
             $indexVoucher = array_search('Voucher', $header);
             $indexPPH21   = array_search('PPH21', $header);
