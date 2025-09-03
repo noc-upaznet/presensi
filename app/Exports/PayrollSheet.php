@@ -87,7 +87,6 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             'Transport',
             'Inovation Reward',
             'Izin',
-            'Kasbon',
             'Terlambat',
             'BPJS Kesehatan KA',
             'BPJS JHT KA',
@@ -96,6 +95,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             'Fee Sharing',
             'Insentif',
             'Uang Makan',
+            'Kasbon',
             'Total Gaji',
         ];
 
@@ -159,19 +159,22 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
                 $row[] = $match['nominal'] ?? 0;
             }
 
+            $indexVoucher = array_search('Voucher', $header);
+            $indexPPH21   = array_search('PPH21', $header);
+
             $voucher = $potonganArray->firstWhere('nama', 'Voucher')['nominal'] ?? 0;
             $pph21 = $potonganArray->firstWhere('nama', 'PPH21')['nominal'] ?? 0;
             $izin = $item->izin ?? 0;
             // dd($izin);
             // Jumlahkan semua nilai numeric dari row (kecuali identitas di depan)
             $pendapatan = array_sum(array_filter($row, fn($v, $i) =>
-                !in_array($i, [0, 1, 2, 3, 4, 11, 12, 14, 15, 16, 17]) && is_numeric($v) // skip
+                !in_array($i, [0, 1, 2, 3, 4, 11, 12, 14, 15, 16, 17, $indexVoucher, $indexPPH21]) && is_numeric($v) // skip
             , ARRAY_FILTER_USE_BOTH));
 
             // Total gaji = pendapatan - izin
             $totalGaji = $pendapatan - $voucher - $izin - $pph21;
             // dd($totalGaji);
-
+            $row[] = $item->kasbon;
             $row[] = $totalGaji;
 
             // Hitung total per kolom
@@ -223,23 +226,39 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i + 1);
 
             $color = null;
+            $fullCol = false; // default hanya header
+
             if ($header === 'Izin') {
                 $color = 'FFFF0000'; // merah
-            } elseif (in_array($header, ['Terlambat', 'BPJS Kesehatan KA', 'BPJS JHT KA', 'Voucher'])) {
+            } elseif (in_array($header, ['Terlambat', 'BPJS Kesehatan KA', 'BPJS JHT KA', 'Voucher', 'PPH21'])) {
                 $color = 'FF0070C0'; // biru
             } elseif (in_array($header, ['BPJS Kesehatan PT', 'BPJS JHT PT'])) {
                 $color = 'FFFFFF00'; // kuning
-            } elseif ($header !== 'Total Gaji') {
+            } elseif ($header === 'Total Gaji') {
+                $color = 'FFFFFF00'; // kuning
+                $fullCol = true; // warnai full kolom
+            } else {
                 $color = 'FF00B050'; // hijau
             }
 
             if ($color) {
+                // warnai header
                 $sheet->getStyle("{$colLetter}1")->applyFromArray([
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'color' => ['argb' => $color],
                     ],
                 ]);
+
+                // kalau full col (misalnya Total Gaji) -> warnai semua baris
+                if ($fullCol) {
+                    $sheet->getStyle("{$colLetter}1:{$colLetter}{$highestRow}")->applyFromArray([
+                        'fill' => [
+                            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                            'color' => ['argb' => $color],
+                        ],
+                    ]);
+                }
             }
         }
 
