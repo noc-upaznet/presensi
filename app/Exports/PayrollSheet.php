@@ -112,6 +112,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
 
         // Hitung jumlah kolom untuk styling
         $this->headerRowCount = count($header);
+        $totals = array_fill(0, count($header), 0);
 
         $rows = [];
 
@@ -156,6 +157,18 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             $rows[] = $row;
         }
 
+        $footer = [];
+        foreach ($header as $i => $col) {
+            if (is_numeric($totals[$i]) && $totals[$i] > 0) {
+                $footer[$i] = $totals[$i];
+            } else {
+                $footer[$i] = ($i === 0 ? 'TOTAL' : ''); // kolom pertama tulis TOTAL
+            }
+        }
+        $rows[] = $footer;
+
+        
+
         return array_merge([$header], $rows);
     }
 
@@ -172,7 +185,18 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
         // Border untuk semua sel yang terisi
         $highestRow = $sheet->getHighestRow();
         $highestCol = $sheet->getHighestColumn();
+        $sheet->getStyle('A1:' . $highestCol . '1')->getFont()->setBold(true);
 
+        // Bold & background untuk footer total
+        $sheet->getStyle("A{$highestRow}:{$highestCol}{$highestRow}")->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'color' => ['argb' => 'FFEFEFEF'],
+            ],
+        ]);
+
+        // Border semua
         $sheet->getStyle("A1:{$highestCol}{$highestRow}")->applyFromArray([
             'borders' => [
                 'allBorders' => [
