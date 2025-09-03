@@ -157,14 +157,16 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
 
             // Ambil nilai izin (potongan)
             $izin = $item->izin ?? 0;
+            $bpjs_perusahaan = $item->bpjs_perusahaan ?? 0;
+            $bpjs_jht_perusahaan = $item->bpjs_jht_perusahaan ?? 0;
             // dd($izin);
             // Jumlahkan semua nilai numeric dari row (kecuali identitas di depan)
             $pendapatan = array_sum(array_filter($row, fn($v, $i) =>
-                !in_array($i, [0, 1, 2, 3, 4, 10]) && is_numeric($v) // skip identitas & kolom izin (index ke-10)
+                !in_array($i, [0, 1, 2, 3, 4, 10, 15, 16]) && is_numeric($v) // skip identitas & kolom izin (index ke-10)
             , ARRAY_FILTER_USE_BOTH));
 
             // Total gaji = pendapatan - izin
-            $totalGaji = $pendapatan - $izin;
+            $totalGaji = $pendapatan - $izin - $bpjs_perusahaan - $bpjs_jht_perusahaan;
             // dd($totalGaji);
 
             $row[] = $totalGaji;
