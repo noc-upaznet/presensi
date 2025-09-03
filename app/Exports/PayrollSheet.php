@@ -162,7 +162,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             // dd($izin);
             // Jumlahkan semua nilai numeric dari row (kecuali identitas di depan)
             $pendapatan = array_sum(array_filter($row, fn($v, $i) =>
-                !in_array($i, [0, 1, 2, 3, 4, 10, 13, 14, 15, 16, 20]) && is_numeric($v) // skip
+                !in_array($i, [0, 1, 2, 3, 4, 10, 12, 13, 14, 15, 19]) && is_numeric($v) // skip
             , ARRAY_FILTER_USE_BOTH));
 
             // Total gaji = pendapatan - izin
