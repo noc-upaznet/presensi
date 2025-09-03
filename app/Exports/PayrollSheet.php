@@ -139,7 +139,6 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 $item->transport ?? 0,
                 $item->inov_reward ?? 0,
                 $item->izin ?? 0,
-                // $item->kasbon ?? 0,
                 $item->terlambat ?? 0,
                 $item->bpjs ?? 0,
                 $item->bpjs_jht ?? 0,
@@ -155,6 +154,8 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 $match = $tunjanganArray->firstWhere('nama', $nama);
                 $row[] = $match['nominal'] ?? 0;
             }
+            $row[] = $item->kasbon;
+
 
             // Tambah nilai potongan
             foreach ($this->uniquePotongan as $nama) {
@@ -177,8 +178,6 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             // Total gaji = pendapatan - izin
             $totalGaji = $pendapatan - $voucher - $izin - $pph21;
             // dd($totalGaji);
-            $row[] = $item->kasbon;
-
             $row[] = $totalGaji;
 
             // Hitung total per kolom
