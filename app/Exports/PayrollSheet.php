@@ -98,13 +98,13 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             'Fee Sharing',
             'Insentif',
             'Uang Makan',
-            'Kasbon',
             'Total Gaji',
         ];
 
         $headerTunjangan = array_map(fn($t) => "$t", $this->uniqueTunjangan);
         $headerPotongan = array_map(fn($p) => "$p", $this->uniquePotongan);
 
+        $indexKasbon = array_search('Kasbon', $headerTetap);
         $indexTotalGaji = array_search('Total Gaji', $headerTetap);
         $headerAwal = array_slice($headerTetap, 0, $indexTotalGaji); // Sebelum Total Gaji
         $headerAkhir = array_slice($headerTetap, $indexTotalGaji + 1); // Setelah Total Gaji (jika ada)
@@ -113,6 +113,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $headerAwal,
             $headerTunjangan,
             $headerPotongan,
+            ['Kasbon'],
             ['Total Gaji'],
             $headerAkhir // opsional, kalau memang ada kolom setelah 'Total Gaji'
         );
@@ -147,7 +148,6 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 $item->fee_sharing ?? 0,
                 $item->insentif ?? 0,
                 $item->uang_makan ?? 0,
-                $item->kasbon ?? 0,
             ];
 
             // Tambah nilai tunjangan
@@ -161,6 +161,8 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 $match = $potonganArray->firstWhere('nama', $nama);
                 $row[] = $match['nominal'] ?? 0;
             }
+
+            $row[] = $item->kasbon ?? 0;
 
             $indexVoucher = array_search('Voucher', $header);
             $indexPPH21   = array_search('PPH21', $header);
