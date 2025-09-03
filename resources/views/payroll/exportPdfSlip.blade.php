@@ -294,10 +294,12 @@
                     <td>Transport</td>
                     <td class="text-right">Rp. {{ number_format($data->transport) }}</td>
                 </tr>
-                <tr>
-                    <td>Inovation Reward</td>
-                    <td class="text-right">Rp. {{ number_format($data->inov_reward) }}</td>
-                </tr>
+                @if ($data->inov_reward > 0)
+                    <tr>
+                        <td>Inovation Reward</td>
+                        <td class="text-right">Rp. {{ number_format($data->inov_reward) }}</td>
+                    </tr>
+                @endif
                 <tr>
                     <td>Fee Sharing</td>
                     <td class="text-right">Rp. {{ number_format($data->fee_sharing) }}</td>

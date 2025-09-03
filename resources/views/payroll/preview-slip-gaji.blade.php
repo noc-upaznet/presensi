@@ -286,10 +286,12 @@
                     <td>Transport</td>
                     <td class="text-right">Rp. {{ number_format($data->transport) }}</td>
                 </tr>
-                <tr>
-                    <td>Inovation Reward</td>
-                    <td class="text-right">Rp. {{ number_format($data->inov_reward) }}</td>
-                </tr>
+                @if ($data->inov_reward > 0)
+                    <tr>
+                        <td>Inovation Reward</td>
+                        <td class="text-right">Rp. {{ number_format($data->inov_reward) }}</td>
+                    </tr>
+                @endif
                 <tr>
                     <td>Fee Sharing</td>
                     <td class="text-right">Rp. {{ number_format($data->fee_sharing) }}</td>
@@ -316,13 +318,17 @@
                 </tr>
             </thead>
             @php
-                $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat;
+                $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon;
             @endphp
 
             <tbody>
                 <tr>
                     <td>Potongan Izin</td>
                     <td class="text-right">Rp. {{ number_format($data->izin) }}</td>
+                </tr>
+                <tr>
+                    <td>Potongan Kasbon</td>
+                    <td class="text-right">Rp. {{ number_format($data->kasbon) }}</td>
                 </tr>
                 <tr>
                     <td>Potongan Terlambat</td>

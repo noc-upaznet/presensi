@@ -78,6 +78,8 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
         }
 
         // Header tetap
+        $showInovReward = collect($data)->contains(fn($item) => ($item->inov_reward ?? 0) > 0);
+
         $headerTetap = [
             'No Slip',
             'Nama Karyawan',
@@ -89,7 +91,13 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             'Lembur',
             'Tunjangan Kebudayaan',
             'Transport',
-            'Inovation Reward',
+        ];
+
+        if ($showInovReward) {
+            $headerTetap[] = 'Inovation Reward';
+        }
+
+        $headerTetap = array_merge($headerTetap, [
             'Izin',
             'Terlambat',
             'BPJS Kesehatan KA',
@@ -100,8 +108,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             'Insentif',
             'Uang Makan',
             'Total Gaji',
-        ];
-
+        ]);
         $headerTunjangan = array_map(fn($t) => "$t", $this->uniqueTunjangan);
         $headerPotongan = array_map(fn($p) => "$p", $this->uniquePotongan);
 
@@ -139,7 +146,13 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 ($item->lembur + $item->lembur_libur) ?? 0,
                 $item->tunjangan_kebudayaan ?? 0,
                 $item->transport ?? 0,
-                $item->inov_reward ?? 0,
+            ];
+
+            if ($showInovReward) {
+                $row[] = $item->inov_reward ?? 0;
+            }
+
+            $row = array_merge($row, [
                 $item->izin ?? 0,
                 $item->terlambat ?? 0,
                 $item->bpjs ?? 0,
@@ -149,7 +162,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 $item->fee_sharing ?? 0,
                 $item->insentif ?? 0,
                 $item->uang_makan ?? 0,
-            ];
+            ]);
 
             // Tambah nilai tunjangan
             foreach ($this->uniqueTunjangan as $nama) {
@@ -165,6 +178,17 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
 
             $row[] = $item->kasbon ?? 0;
 
+            $indexNoSlip   = array_search('No Slip', $header);
+            $indexNama     = array_search('Nama Karyawan', $header);
+            $indexNip      = array_search('NIP', $header);
+            $indexDivisi   = array_search('Divisi', $header);
+            $indexPeriode  = array_search('Periode', $header);
+            $indexIzin     = array_search('Izin', $header);
+            $indexTerlambat= array_search('Terlambat', $header);
+            $indexBPJSKA   = array_search('BPJS Kesehatan KA', $header);
+            $indexBPJSJHT  = array_search('BPJS JHT KA', $header);
+            $indexBPJSPT   = array_search('BPJS Kesehatan PT', $header);
+            $indexBPJSJHTPT= array_search('BPJS JHT PT', $header);
             $indexVoucher = array_search('Voucher', $header);
             $indexPPH21   = array_search('PPH21', $header);
 
@@ -172,19 +196,17 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $pph21 = $potonganArray->firstWhere('nama', 'PPH21')['nominal'] ?? 0;
             $izin = $item->izin ?? 0;
             // dd($izin);
-            // Jumlahkan semua nilai numeric dari row (kecuali identitas di depan)
             $pendapatan = array_sum(array_filter($row, fn($v, $i) =>
-                !in_array($i, [0, 1, 2, 3, 4, 11, 12, 14, 15, 16, 17, $indexVoucher, $indexPPH21]) && is_numeric($v) // skip
+                !in_array($i, [$indexNoSlip, $indexNama, $indexNip, $indexDivisi, $indexPeriode, $indexIzin, $indexTerlambat, $indexBPJSKA, $indexBPJSJHT, $indexBPJSPT, $indexBPJSJHTPT, $indexVoucher, $indexPPH21]) && is_numeric($v) // skip
             , ARRAY_FILTER_USE_BOTH));
 
-            // Total gaji = pendapatan - izin
             $totalGaji = $pendapatan - $voucher - $izin - $pph21;
             // dd($totalGaji);
             $row[] = $totalGaji;
-            // $row[] = $item->kasbon ?? 0;
+            // dd($izin);
 
             // Hitung total per kolom
-            $skipIndex = [0, 1, 2, 3, 4]; // kolom identitas tidak dijumlah
+            $skipIndex = [0, 1, 2, 3, 4];
             foreach ($row as $i => $value) {
                 if (!in_array($i, $skipIndex) && is_numeric($value)) {
                     $totals[$i] = ($totals[$i] ?? 0) + $value;

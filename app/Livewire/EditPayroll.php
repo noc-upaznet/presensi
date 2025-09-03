@@ -136,7 +136,6 @@ class EditPayroll extends Component
         $this->bulanTahun = $this->periode;
 
         $date = \Carbon\Carbon::createFromFormat('Y-m', $this->periode);
-
         $this->cutoffStart = $date->copy()->startOfMonth();
         $this->cutoffEnd   = $date->copy()->endOfMonth();
 
@@ -189,8 +188,19 @@ class EditPayroll extends Component
         // --- TERLAMBAT ---
         $terlambat = M_Presensi::where('user_id', $userId)
             ->where('status', 1)
-            ->whereBetween('created_at', [$this->cutoffStart, $this->cutoffEnd])
+            ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
+            ->where(function ($q) {
+                $q->where(function ($q1) {
+                    $q1->where('lokasi_lock', 0)
+                    ->where('approve', 1);
+                })->orWhere(function ($q2) {
+                    $q2->where('lokasi_lock', 1)
+                    ->where('approve', 0);
+                });
+            })
             ->count();
+
+            // dd($terlambat);
 
         // --- AMBIL DATA JADWAL ---
         $jadwal = M_Jadwal::where('karyawan_id', $userId)
@@ -516,90 +526,6 @@ class EditPayroll extends Component
         }
     }
 
-    public function hitungRekapPresensi()
-    {
-        if (!$this->user_id || !$this->bulanTahun) {
-            $this->rekap = [];
-            return $this->rekap;
-        }
-
-        // Set cutoffStart dan cutoffEnd berdasarkan cutoffType dan bulanTahun
-        $this->setCutoffPeriode();
-
-        // Panggil rekapKehadiran dengan tanggal cutoff
-        $this->rekap = $this->rekapKehadiran(
-            $this->user_id,
-            $this->cutoffStart,
-            $this->cutoffEnd
-        );
-        // dd($this->rekap);
-        return $this->rekap;
-    }
-
-    public function rekapKehadiran($id, $cutoffStart, $cutoffEnd)
-    {
-        // dd($id);
-        $karyawan = M_DataKaryawan::find($id);
-        // dd($karyawan);
-
-        $presensiCollection = $karyawan->getPresensi ?? collect();
-        $presensi = $presensiCollection->filter(function ($item) use ($cutoffStart, $cutoffEnd) {
-            return Carbon::parse($item->tanggal)->between($cutoffStart, $cutoffEnd);
-        });
-        // dd($presensi);
-        $terlambat = $presensi->where('status', 1)->where('user_id', $id)->count();
-        // dd($terlambat);
-        // Ambil bulan dan tahun dari cutoffEnd (bukan dari input manual)
-        $bulan = $cutoffEnd->format('m');
-        $tahun = $cutoffEnd->format('Y');
-        $bulanTahun = $cutoffEnd->format('Y-m');
-
-        $jadwal = M_Jadwal::where('karyawan_id', $id)
-            ->where('bulan_tahun', $bulanTahun)
-            ->first();
-
-        $izin = 0;
-        $cuti = 0;
-        $izinSetengahHari = 0;
-
-        foreach (range(1, 31) as $i) {
-            $kode = $jadwal->{'d' . $i};
-
-            $tanggal = Carbon::createFromFormat('Y-m-d', "{$tahun}-{$bulan}-" . str_pad($i, 2, '0', STR_PAD_LEFT));
-
-            if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
-                continue;
-            }
-
-            if ($kode == 3) {
-                $izin++;
-            } elseif ($kode == 2) {
-                $cuti++;
-            } elseif ($kode == 8) {
-                $izinSetengahHari++;
-            }
-        }
-
-        $dataLembur = M_Lembur::where('karyawan_id', $id)
-            ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
-            ->whereNotNull('total_jam')
-            ->where('status', 1)
-            ->get(['tanggal', 'total_jam']);
-
-        $totalJamLembur = $dataLembur->sum('total_jam');
-
-        return [
-            'kehadiran' => 26 - $izin - $cuti - (0.5 * $izinSetengahHari),
-            'terlambat' => $terlambat,
-            'izin' => $izin,
-            'cuti' => $cuti,
-            'lembur' => $totalJamLembur,
-            'izin setengah hari' => $izinSetengahHari,
-            'cutoff_start' => $cutoffStart->format('Y-m-d'),
-            'cutoff_end' => $cutoffEnd->format('Y-m-d'),
-        ];
-    }
-
     private function numericValue($value)
     {
         return is_numeric($value) ? (int) $value : (int) str_replace(['.', ','], '', $value);
@@ -621,7 +547,7 @@ class EditPayroll extends Component
 
         // Hitung jumlah kehadiran bulan berjalan
         $jadwal = M_Jadwal::where('karyawan_id', $userId)
-            ->where('bulan_tahun', now()->format('Y-m'))
+            ->where('bulan_tahun', $this->bulanTahun)
             ->first();
 
         $izin = 0;
@@ -642,6 +568,7 @@ class EditPayroll extends Component
 
         // total kehadiran fix 26 hari - (izin + cuti)
         $kehadiran = 26 - ($izin + $cuti);
+        // dd($kehadiran);
 
         $this->rekap['kehadiran'] = $kehadiran;
 
