@@ -166,7 +166,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             , ARRAY_FILTER_USE_BOTH));
 
             // Total gaji = pendapatan - izin
-            $totalGaji = $pendapatan - $izin - $bpjs_perusahaan - $bpjs_jht_perusahaan;
+            $totalGaji = $pendapatan - $izin;
             // dd($totalGaji);
 
             $row[] = $totalGaji;
