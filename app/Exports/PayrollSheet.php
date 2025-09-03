@@ -8,8 +8,11 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
-class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
+class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, WithColumnFormatting
 {
     protected $periode;
     protected $status;
@@ -205,6 +208,20 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
         }
 
         return array_merge([$header], $rows);
+    }
+
+    public function columnFormats(): array
+    {
+        $formats = [];
+
+        $colCount = $this->headerRowCount;
+
+        for ($col = 6; $col <= $colCount; $col++) {
+            $letter = Coordinate::stringFromColumnIndex($col);
+            $formats[$letter] = '"Rp" #,##0';
+        }
+
+        return $formats;
     }
 
     public function title(): string
