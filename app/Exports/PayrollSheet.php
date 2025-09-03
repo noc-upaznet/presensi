@@ -127,7 +127,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
                 $item->periode,
                 $item->tunjangan_jabatan,
                 $item->gaji_pokok,
-                $item->lembur,
+                ($item->lembur + $item->lembur_libur),
                 $item->tunjangan_kebudayaan,
                 $item->transport,
                 $item->izin,
@@ -137,7 +137,6 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
                 $item->fee_sharing,
                 $item->insentif,
                 $item->uang_makan,
-                // $item->total_gaji,
             ];
 
             // Tambah nilai tunjangan
