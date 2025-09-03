@@ -156,9 +156,8 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             }
 
             // Ambil nilai izin (potongan)
+            $voucher = $potonganArray->firstWhere('nama', 'Voucher')['nominal'] ?? 0;
             $izin = $item->izin ?? 0;
-            $bpjs_perusahaan = $item->bpjs_perusahaan ?? 0;
-            $bpjs_jht_perusahaan = $item->bpjs_jht_perusahaan ?? 0;
             // dd($izin);
             // Jumlahkan semua nilai numeric dari row (kecuali identitas di depan)
             $pendapatan = array_sum(array_filter($row, fn($v, $i) =>
@@ -166,7 +165,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             , ARRAY_FILTER_USE_BOTH));
 
             // Total gaji = pendapatan - izin
-            $totalGaji = $pendapatan - $izin;
+            $totalGaji = $pendapatan - $izin - $voucher;
             // dd($totalGaji);
 
             $row[] = $totalGaji;
