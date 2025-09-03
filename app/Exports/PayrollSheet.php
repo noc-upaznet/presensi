@@ -147,6 +147,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 $item->fee_sharing ?? 0,
                 $item->insentif ?? 0,
                 $item->uang_makan ?? 0,
+                $item->kasbon ?? 0,
             ];
 
             // Tambah nilai tunjangan
@@ -160,8 +161,6 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 $match = $potonganArray->firstWhere('nama', $nama);
                 $row[] = $match['nominal'] ?? 0;
             }
-
-            $row[] = $item->kasbon ?? 0;
 
             $indexVoucher = array_search('Voucher', $header);
             $indexPPH21   = array_search('PPH21', $header);
@@ -179,6 +178,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $totalGaji = $pendapatan - $voucher - $izin - $pph21;
             // dd($totalGaji);
             $row[] = $totalGaji;
+            // $row[] = $item->kasbon ?? 0;
 
             // Hitung total per kolom
             $skipIndex = [0, 1, 2, 3, 4]; // kolom identitas tidak dijumlah
