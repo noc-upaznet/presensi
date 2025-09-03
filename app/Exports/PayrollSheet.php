@@ -190,10 +190,10 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $indexBPJSPT   = array_search('BPJS Kesehatan PT', $header);
             $indexBPJSJHTPT= array_search('BPJS JHT PT', $header);
             $indexVoucher = array_search('Voucher', $header);
-            $indexPPH21   = array_search('PPH21', $header);
+            $indexPPH21   = array_search('PPH 21', $header);
             
             $voucher = $potonganArray->firstWhere('nama', 'Voucher')['nominal'] ?? 0;
-            $pph21 = $potonganArray->firstWhere('nama', 'PPH21')['nominal'] ?? 0;
+            $pph21 = $potonganArray->firstWhere('nama', 'PPH 21')['nominal'] ?? 0;
             $izin = $item->izin ?? 0;
             // dd($izin);
             $pendapatan = array_sum(array_filter($row, fn($v, $i) =>
@@ -272,7 +272,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
 
             if ($header === 'Izin') {
                 $color = 'FFFF0000'; // merah
-            } elseif (in_array($header, ['Terlambat', 'BPJS Kesehatan KA', 'BPJS JHT KA', 'Voucher', 'PPH21', 'Kasbon'])) {
+            } elseif (in_array($header, ['Terlambat', 'BPJS Kesehatan KA', 'BPJS JHT KA', 'Voucher', 'PPH 21', 'Kasbon'])) {
                 $color = 'FF0070C0'; // biru
             } elseif (in_array($header, ['BPJS Kesehatan PT', 'BPJS JHT PT'])) {
                 $color = 'FFFFFF00'; // kuning
