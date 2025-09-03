@@ -299,7 +299,13 @@
                             @endforeach
                             <button type="button" class="btn btn-success mb-2" wire:click="addPotongan">+ Tambah Potongan</button>
                         </div>
-
+                        <div class="mb-3">
+                            <label for="kasbon" class="form-label fw-semibold">Kasbon</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" id="kasbon" class="form-control" wire:model.lazy="kasbon">
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="mb-3 col-md-6">
                                 <label for="izin_nominal" class="form-label fw-semibold">Potongan Izin</label>

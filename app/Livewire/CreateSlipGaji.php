@@ -112,6 +112,7 @@ class CreateSlipGaji extends Component
     public $cutoffType = 'cutoff_normal';
     public $listLemburBiasa = [];
     public $listLemburLibur = [];
+    public $kasbon = 0;
 
     public function mount($id = null, $month = null, $year = null)
     {
@@ -671,6 +672,7 @@ class CreateSlipGaji extends Component
         $insentifSpvUgr    = $this->numericValue($this->insentif_spv_ugr ?? 0);
         $lemburNominal     = $this->numericValue($this->lembur_nominal ?? 0);
         $lemburLiburNominal= $this->numericValue($this->lemburLibur_nominal ?? 0);
+        $kasbon            = $this->numericValue($this->kasbon ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -740,6 +742,7 @@ class CreateSlipGaji extends Component
             + $uangMakan
             + $inovationReward
             - $totalPotonganManual
+            - $kasbon
             - $potonganIzin
             - $potonganTerlambat
             - $this->bpjs_nominal
@@ -944,6 +947,7 @@ class CreateSlipGaji extends Component
             'inov_reward' => $this->numericValue($this->inovation_reward),
             'insentif' => $this->numericValue($this->insentif),
             'jml_psb' => $this->jml_psb,
+            'kasbon' => $this->kasbon,
             'rekap' => json_encode($this->rekap),
             'total_gaji' => (int) $this->total_gaji,
             'periode' => $this->bulanTahun,
