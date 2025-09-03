@@ -127,22 +127,21 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
                 $item->nip_karyawan,
                 $item->divisi,
                 $item->periode,
-                (int) $item->tunjangan_jabatan,
-                (int) $item->gaji_pokok,
-                (int) (($item->lembur ?? 0) + ($item->lembur_libur ?? 0)),
-                (int) $item->tunjangan_kebudayaan,
-                (int) $item->transport,
-                (int) $item->izin,
-                (int) $item->terlambat,
-                (int) $item->bpjs,
-                (int) $item->bpjs_jht,
-                (int) $item->bpjs_perusahaan,
-                (int) $item->bpjs_jht_perusahaan,
-                (int) $item->fee_sharing,
-                (int) $item->insentif,
-                (int) $item->uang_makan,
+                $item->tunjangan_jabatan,
+                $item->gaji_pokok,
+                ($item->lembur + $item->lembur_libur) ?? 0,
+                $item->tunjangan_kebudayaan ?? 0,
+                $item->transport ?? 0,
+                $item->izin ?? 0,
+                $item->terlambat ?? 0,
+                $item->bpjs ?? 0,
+                $item->bpjs_jht ?? 0,
+                $item->bpjs_perusahaan ?? 0,
+                $item->bpjs_jht_perusahaan ?? 0,
+                $item->fee_sharing ?? 0,
+                $item->insentif ?? 0,
+                $item->uang_makan ?? 0,
             ];
-            // dd($row);
 
             // Tambah nilai tunjangan
             foreach ($this->uniqueTunjangan as $nama) {
@@ -157,14 +156,15 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             }
 
             // Ambil nilai izin (potongan)
-            // $izin = $row[10];
+            $izin = $item->izin ?? 0;
+            // dd($izin);
             // Jumlahkan semua nilai numeric dari row (kecuali identitas di depan)
             $pendapatan = array_sum(array_filter($row, fn($v, $i) =>
-                !in_array($i, [0, 1, 2, 3, 4]) && is_numeric($v) // skip identitas & kolom izin (index ke-10)
+                !in_array($i, [0, 1, 2, 3, 4, 10]) && is_numeric($v) // skip identitas & kolom izin (index ke-10)
             , ARRAY_FILTER_USE_BOTH));
 
             // Total gaji = pendapatan - izin
-            $totalGaji = $pendapatan - $item->izin;
+            $totalGaji = $pendapatan - $izin;
             // dd($totalGaji);
 
             $row[] = $totalGaji;
