@@ -136,7 +136,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
                 $item->transport ?? 0,
                 $item->inov_reward ?? 0,
                 $item->izin ?? 0,
-                $item->kasbon ?? 0,
+                // $item->kasbon ?? 0,
                 $item->terlambat ?? 0,
                 $item->bpjs ?? 0,
                 $item->bpjs_jht ?? 0,
@@ -175,6 +175,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             $totalGaji = $pendapatan - $voucher - $izin - $pph21;
             // dd($totalGaji);
             $row[] = $item->kasbon;
+
             $row[] = $totalGaji;
 
             // Hitung total per kolom
@@ -230,7 +231,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
 
             if ($header === 'Izin') {
                 $color = 'FFFF0000'; // merah
-            } elseif (in_array($header, ['Terlambat', 'BPJS Kesehatan KA', 'BPJS JHT KA', 'Voucher', 'PPH21'])) {
+            } elseif (in_array($header, ['Terlambat', 'BPJS Kesehatan KA', 'BPJS JHT KA', 'Voucher', 'PPH21', 'Kasbon'])) {
                 $color = 'FF0070C0'; // biru
             } elseif (in_array($header, ['BPJS Kesehatan PT', 'BPJS JHT PT'])) {
                 $color = 'FFFFFF00'; // kuning
