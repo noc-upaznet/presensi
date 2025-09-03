@@ -85,7 +85,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             'Lembur',
             'Tunjangan Kebudayaan',
             'Transport',
-            'Inovation Reward',
+            // 'Inovation Reward',
             'Izin',
             'Terlambat',
             'BPJS Kesehatan KA',
@@ -142,7 +142,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
                 $item->fee_sharing ?? 0,
                 $item->insentif ?? 0,
                 $item->uang_makan ?? 0,
-                $item->inov_reward ?? 0,
+                // $item->inov_reward ?? 0,
             ];
 
             // Tambah nilai tunjangan
