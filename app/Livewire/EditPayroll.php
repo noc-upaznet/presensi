@@ -414,7 +414,7 @@ class EditPayroll extends Component
     {
         if ($this->karyawan) {
             return $this->karyawan->level === 'SPV'
-                && $this->karyawan->divisi === 'Sales Marketing'
+                && $this->karyawan->divisi === 'Sales & Marketing'
                 && $this->karyawan->jabatan === 'Sales Marketing'
                 && $this->karyawan->entitas === 'UGR';
         }
