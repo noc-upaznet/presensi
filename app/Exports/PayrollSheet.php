@@ -197,7 +197,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $izin = $item->izin ?? 0;
             // dd($izin);
             $pendapatan = array_sum(array_filter($row, fn($v, $i) =>
-                !in_array($i, [$indexNoSlip, $indexNama, $indexNip, $indexDivisi, $indexPeriode, $indexIzin, $indexTerlambat, $indexBPJSKA, $indexBPJSJHT, $indexBPJSPT, $indexBPJSJHTPT, $indexVoucher, $indexPPH21]) && is_numeric($v) // skip
+                !in_array($i, [0, 1, 2, 3, 4, 11, 13, 14, 15, $indexVoucher, $indexPPH21]) && is_numeric($v) // skip
             , ARRAY_FILTER_USE_BOTH));
 
             $totalGaji = $pendapatan - $izin - $voucher - $pph21;
