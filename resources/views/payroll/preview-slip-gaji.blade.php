@@ -318,7 +318,7 @@
                 </tr>
             </thead>
             @php
-                $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon;
+                $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->$bpjs_jht_perusahaan;
             @endphp
 
             <tbody>
@@ -353,6 +353,12 @@
                     <td>Kesehatan</td>
                     <td class="text-right">Rp. {{ number_format($data->bpjs) }}</td>
                 </tr>
+                @if ($data->jabatan == 'Branch Manager' || $data->entitas == 'UNB')
+                    <tr>
+                        <td>JHT PT</td>
+                        <td class="text-right">Rp. {{ number_format($data->bpjs_jht_perusahaan) }}</td>
+                    </tr>
+                @endif
                 <tr style="border-bottom: 1px solid red;">
                     <th>Total Potongan</th>
                     <th class="text-right">Rp. {{ number_format($totalPotongan) }}</th>
