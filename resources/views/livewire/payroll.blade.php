@@ -146,18 +146,25 @@
                         @endforeach
                     </select>
 
+                    <select wire:model.lazy="selectedKaryawan" class="form-select me-2" style="width: 150px;">
+                        <option value="">Karyawan</option>
+                        @foreach ($karyawanList as $item)
+                            <option value="{{ $item->id }}">{{ $item->nama_karyawan }}</option>
+                        @endforeach
+                    </select>
+
                     <select wire:model.lazy="selectedStatus" class="form-select me-2" style="width: 150px;">
                         <option value="">Status</option>
                         <option value="0">Pending</option>
                         <option value="1">Accepted</option>
                     </select>
+                    
 
                     <div class="ms-auto">
                         <button type="button" class="btn btn-sm btn-success" wire:click="export">
                             <i class="fas fa-file-export"></i> Export
                         </button>
                     </div>
-
                 </div>
 
                 <h5 class="text-secondary mb-3">

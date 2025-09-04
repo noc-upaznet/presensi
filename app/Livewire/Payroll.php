@@ -26,6 +26,8 @@ class Payroll extends Component
     public $selectedYear;
     public $selectedMonth;
     public $selectedStatus;
+    public $selectedKaryawan = '';
+    public $karyawanList = '';
     public $periode;
     public $perPage = 10;
     public $payrollIdToDelete;
@@ -82,6 +84,10 @@ class Payroll extends Component
         }
 
         $this->currentEntitas = $selectedEntitas;
+
+        $this->karyawanList = M_DataKaryawan::where('entitas', $this->currentEntitas)
+            ->orderBy('nama_karyawan', 'asc')
+            ->get();
 
         // Hitung jumlah karyawan yang belum punya slip gaji di periode tersebut
         // $karyawanQuery = M_DataKaryawan::where('entitas', $selectedEntitas);
@@ -352,6 +358,9 @@ class Payroll extends Component
             ->where('titip', 0)
             ->when($this->selectedStatus !== null && $this->selectedStatus !== '', function ($q) {
                 $q->where('accepted', $this->selectedStatus);
+            })
+            ->when($this->selectedKaryawan !== null && $this->selectedKaryawan !== '', function ($q) {
+                $q->where('karyawan_id', $this->selectedKaryawan);
             });
 
         $data2Query = PayrollModel::with('getKaryawan')
@@ -362,6 +371,9 @@ class Payroll extends Component
             })
             ->when($this->selectedStatus !== null && $this->selectedStatus !== '', function ($q) {
                 $q->where('accepted', $this->selectedStatus);
+            })
+            ->when($this->selectedKaryawan !== null && $this->selectedKaryawan !== '', function ($q) {
+                $q->where('karyawan_id', $this->selectedKaryawan);
             });
 
         // Apply filter periode jika ada
