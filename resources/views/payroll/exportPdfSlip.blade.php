@@ -326,9 +326,15 @@
                     <th colspan="2" style="text-align: left;">POTONGAN</th>
                 </tr>
             </thead>
-            @php
-                $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->bpjs_jht_perusahaan;
-            @endphp
+            @if ($data->getKaryawan->jabatan == 'Branch Manager' || $data->getkaryawan->entitas == 'UNB')
+                @php
+                    $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->bpjs_jht_perusahaan;
+                @endphp
+            @else
+                @php
+                    $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon;
+                @endphp
+            @endif
 
             <tbody>
                 <tr>
