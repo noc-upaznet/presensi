@@ -200,7 +200,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 !in_array($i, [$indexNoSlip, $indexNama, $indexNip, $indexDivisi, $indexPeriode, $indexIzin, $indexTerlambat, $indexBPJSKA, $indexBPJSJHT, $indexBPJSPT, $indexBPJSJHTPT, $indexVoucher, $indexPPH21]) && is_numeric($v) // skip
             , ARRAY_FILTER_USE_BOTH));
 
-            $totalGaji = $pendapatan - $izin;
+            $totalGaji = $pendapatan - $izin - $voucher - $pph21;
             // dd($totalGaji);
             $row[] = $totalGaji;
             // dd($izin);
