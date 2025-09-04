@@ -318,7 +318,7 @@
                 </tr>
             </thead>
             @php
-                $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->$bpjs_jht_perusahaan;
+                $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->bpjs_jht_perusahaan;
             @endphp
 
             <tbody>
