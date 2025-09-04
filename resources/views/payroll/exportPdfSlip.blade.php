@@ -305,7 +305,7 @@
                     <td class="text-right">Rp. {{ number_format($data->fee_sharing) }}</td>
                 </tr>
 
-                @if ($data->divisi == 'Sales Marketing')
+                @if ($data->divisi == 'Sales Marketing' || $data->divisi == 'Sales & Marketing')
                     <tr>
                         <td>Insentif</td>
                         <td class="text-right">Rp. {{ number_format($data->insentif) }}</td>
