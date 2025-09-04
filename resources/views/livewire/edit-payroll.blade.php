@@ -61,6 +61,7 @@
                             </div>
                         </div>
                         @if ($this->isSalesPosition())
+                            {{-- FORM UNTUK SALES --}}
                             <div class="row">
                                 <div class="mb-3 col-md-6">
                                     <label for="jumlah-psb" class="form-label fw-semibold">Jumlah PSB</label>
@@ -81,8 +82,9 @@
                                     <input type="text" id="churn" class="form-control" wire:model.lazy="churn">
                                 </div>
                             </div>
-                        @endif
-                        @if ($this->isSalesPositionSpv())
+
+                        @elseif ($this->isSalesPositionSpv())
+                            {{-- FORM UNTUK SALES SPV --}}
                             <div class="row">
                                 <div class="mb-3 col-md-6">
                                     <label for="jumlah-psb-spv" class="form-label fw-semibold">Jumlah PSB</label>
@@ -96,8 +98,9 @@
                                     </div>
                                 </div>
                             </div>
-                        @endif
-                        @if ($this->isSalesPositionSpvUGR())
+
+                        @elseif ($this->isSalesPositionSpvUGR())
+                            {{-- FORM UNTUK SALES SPV UGR --}}
                             <div class="row">
                                 <div class="mb-3 col-md-6">
                                     <label for="jumlah-psb-spv-ugr" class="form-label fw-semibold">Jumlah PSB</label>

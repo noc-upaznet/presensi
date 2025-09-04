@@ -364,6 +364,11 @@ class CreateSlipGaji extends Component
 
     public function updatedJmlPsb()
     {
+        if (!$this->karyawan) {
+            return;
+        }
+
+        // Staff Sales / Collector pakai insentif mapping
         if ($this->isSalesPosition() || $this->isCollectorPosition()) {
             $insentifMapping = [
                 1 => [1000000, 50000],
@@ -401,34 +406,23 @@ class CreateSlipGaji extends Component
             if (isset($insentifMapping[$this->jml_psb])) {
                 [$upah, $insentif] = $insentifMapping[$this->jml_psb];
 
-                // gaji pokok = 75% dari upah, tunjangan jabatan = 25% dari upah
                 $this->gaji_pokok = round($upah * 0.75);
-                $this->tunjangan_jabatan = $upah * 0.25; 
+                $this->tunjangan_jabatan = $upah * 0.25;
                 $this->insentif = $insentif;
-
-                // dd('gaji:'. $this->gaji_pokok, 'tunjangan:'. $this->tunjangan_jabatan, 'insentif:'.$this->insentif);
-
-                $this->hitungTotalGaji();
             } else {
                 $this->insentif = 0;
             }
         }
-    }
-
-    public function updatedJmlPsbSpv()
-    {
-        if ($this->isSalesPositionSpv()) {
-            $this->insentif_spv = 10000 * ((int) ($this->jml_psb_spv ?? 0));
-            $this->hitungTotalGaji();
+        // SPV UNR
+        elseif ($this->isSalesPositionSpv()) {
+            $this->insentif = 10000 * ((int) ($this->jml_psb ?? 0));
         }
-    }
-
-    public function updatedJmlPsbSpvUGR()
-    {
-        if ($this->isSalesPositionSpvUGR()) {
-            $this->insentif_spv_ugr = 50000 * ((int) ($this->jml_psb_spv_ugr ?? 0));
-            $this->hitungTotalGaji();
+        // SPV UGR
+        elseif ($this->isSalesPositionSpvUGR()) {
+            $this->insentif = 50000 * ((int) ($this->jml_psb ?? 0));
         }
+
+        $this->hitungTotalGaji();
     }
 
     public function hitungRekapPresensi()
@@ -671,12 +665,12 @@ class CreateSlipGaji extends Component
         $kebudayaan        = $this->numericValue($this->kebudayaan ?? 0);
         $feeSharing        = $this->numericValue($this->fee_sharing ?? 0);
         $insentif          = $this->numericValue($this->insentif ?? 0);
-        $insentifSpv       = $this->numericValue($this->insentif_spv ?? 0);
-        $insentifSpvUgr    = $this->numericValue($this->insentif_spv_ugr ?? 0);
+        // $insentifSpv       = $this->numericValue($this->insentif ?? 0);
+        // $insentifSpvUgr    = $this->numericValue($this->insentif ?? 0);
         $lemburNominal     = $this->numericValue($this->lembur_nominal ?? 0);
         $lemburLiburNominal= $this->numericValue($this->lemburLibur_nominal ?? 0);
         $kasbon            = $this->numericValue($this->kasbon ?? 0);
-        $churn            = $this->numericValue($this->churn ?? 0);
+        $churn             = $this->numericValue($this->churn ?? 0);
         $bpjsJhtPT         = $this->numericValue($this->bpjs_jht_perusahaan_nominal ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
@@ -738,8 +732,8 @@ class CreateSlipGaji extends Component
             + $lemburNominal
             + $lemburLiburNominal
             + $insentif
-            + $insentifSpv
-            + $insentifSpvUgr
+            // + $insentifSpv
+            // + $insentifSpvUgr
             + $tunjanganKehadiran
             + $kebudayaan
             + $feeSharing
