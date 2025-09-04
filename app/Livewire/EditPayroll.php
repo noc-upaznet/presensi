@@ -557,6 +557,7 @@ class EditPayroll extends Component
             ->first();
 
         $izin = 0;
+        $izin_setengah = 0;
         $cuti = 0;
 
         if ($jadwal) {
@@ -567,17 +568,19 @@ class EditPayroll extends Component
                         $cuti++;
                     } elseif ($jadwal->$col == 3) {
                         $izin++;
+                    } elseif ($jadwal->$col == 8) { // kode 4 = izin setengah hari
+                        $izin_setengah++;
                     }
                 }
             }
         }
-
-        // total kehadiran fix 26 hari - (izin + cuti)
-        $kehadiran = 26 - ($izin + $cuti);
-        // dd($kehadiran);
+        // dd($izin_setengah);
+        // total kehadiran fix 26 hari - (izin + cuti + 0.5 * izin_setengah)
+        $kehadiran = 26 - ($izin + $cuti + 0.5 * $izin_setengah);
 
         $this->rekap['kehadiran'] = $kehadiran;
 
+        // dd($kehadiran);
         // hitung inov reward
         $inovRewardPerHari = $this->inovation_reward / 26;
         $this->inovation_reward_jumlah = $kehadiran;
