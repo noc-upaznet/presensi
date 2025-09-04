@@ -22,11 +22,7 @@ class Dashboard extends Component
     
     public function mount()
     {
-        if (Auth::user()?->current_role !== 'admin') {
-            // Bisa redirect atau abort
-            return redirect()->route('clock-in');
-            // abort(403, 'Access Denied');
-        }
+        
         $shifts = M_JadwalShift::whereIn('nama_shift', [
             '07.00-15.00',
             '15.00-23.00',

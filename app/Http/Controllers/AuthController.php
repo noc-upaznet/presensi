@@ -33,6 +33,10 @@ class AuthController extends Controller
                 return redirect()->route('ganti-password');
             }
 
+            if ($user->current_role !== 'admin') {
+                return redirect()->route('clock-in');
+            }
+
             return redirect()->intended('dashboard');
         }
 
