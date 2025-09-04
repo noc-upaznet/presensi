@@ -35,6 +35,7 @@ class PayrollModel extends Model
         'inov_reward',
         'insentif',
         'jml_psb',
+        'churn',
         'kasbon',
         'rekap',
         'total_gaji',

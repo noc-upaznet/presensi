@@ -113,6 +113,7 @@ class CreateSlipGaji extends Component
     public $listLemburBiasa = [];
     public $listLemburLibur = [];
     public $kasbon = 0;
+    public $churn = 0;
 
     public function mount($id = null, $month = null, $year = null)
     {
@@ -652,9 +653,11 @@ class CreateSlipGaji extends Component
             } else {
                 $this->bpjs_jht_perusahaan_nominal = round($umk * 0.0424);
             }
+            // dd($this->bpjs_jht_perusahaan_nominal);
         } else {
             $this->bpjs_jht_perusahaan_nominal = 0;
         }
+        $this->hitungTotalGaji();
     }
 
     public function hitungTotalGaji()
@@ -673,6 +676,8 @@ class CreateSlipGaji extends Component
         $lemburNominal     = $this->numericValue($this->lembur_nominal ?? 0);
         $lemburLiburNominal= $this->numericValue($this->lemburLibur_nominal ?? 0);
         $kasbon            = $this->numericValue($this->kasbon ?? 0);
+        $churn            = $this->numericValue($this->churn ?? 0);
+        $bpjsJhtPT         = $this->numericValue($this->bpjs_jht_perusahaan_nominal ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -726,7 +731,7 @@ class CreateSlipGaji extends Component
         $this->bpjs_jht_nominal = round($bpjsJhtNominal);
 
         // === 8. Hitung total gaji akhir ===
-        $this->total_gaji = round(
+        $totalGaji = round(
             $gajiPokok
             + $tunjanganJabatan
             + $totalTunjangan
@@ -743,12 +748,21 @@ class CreateSlipGaji extends Component
             + $inovationReward
             - $totalPotonganManual
             - $kasbon
+            - $churn
             - $potonganIzin
             - $potonganTerlambat
             - $this->bpjs_nominal
             - $this->bpjs_jht_nominal
         );
-        // dd($this->total_gaji);
+        // dd(strtoupper($this->entitas), strtolower($this->jabatan));
+        if (
+            isset($this->entitas) && strtoupper($this->entitas) === 'UNB'
+            && isset($this->jabatan) && strtolower($this->jabatan) === 'branch manager'
+        ) {
+            $totalGaji -= $bpjsJhtPT;
+        }
+
+        $this->total_gaji = $totalGaji;
     }
 
 
@@ -947,6 +961,7 @@ class CreateSlipGaji extends Component
             'inov_reward' => $this->numericValue($this->inovation_reward),
             'insentif' => $this->numericValue($this->insentif),
             'jml_psb' => $this->jml_psb,
+            'churn' => $this->churn,
             'kasbon' => $this->kasbon,
             'rekap' => json_encode($this->rekap),
             'total_gaji' => (int) $this->total_gaji,

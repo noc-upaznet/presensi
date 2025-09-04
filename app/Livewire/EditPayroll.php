@@ -115,6 +115,7 @@ class EditPayroll extends Component
     public $listLemburLibur = [];
     public $lembur_libur = 0;
     public $kasbon = 0;
+    public $churn = 0;
 
 
     public function mount($id)
@@ -283,6 +284,7 @@ class EditPayroll extends Component
         $this->kebudayaan = $payroll->tunjangan_kebudayaan;
         $this->fee_sharing = $payroll->fee_sharing;
         $this->kasbon = $payroll->kasbon;
+        $this->churn = $payroll->churn;
 
         // Data JSON tunjangan & potongan
         $this->tunjangan = json_decode($payroll->tunjangan ?? '[]', true);
@@ -634,6 +636,7 @@ class EditPayroll extends Component
         $lemburLiburNominal= $this->numericValue($this->lembur_libur ?? 0);
         $lemburNominal     = $this->numericValue($this->lembur ?? 0);
         $kasbon            = $this->numericValue($this->kasbon ?? 0);
+        $churn            = $this->numericValue($this->churn ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -695,7 +698,8 @@ class EditPayroll extends Component
             - $this->izin_nominal
             - $this->terlambat_nominal
             - $this->bpjs_nominal
-            - $this->kasbon
+            - $kasbon
+            - $churn
             - $this->bpjs_jht_nominal
         );
         // dd($this->total_gaji);
@@ -820,6 +824,7 @@ class EditPayroll extends Component
             'terlambat' => $this->terlambat_nominal,
             'tunjangan' => json_encode($this->tunjangan),
             'potongan' => json_encode($this->potongan),
+            'churn' => $this->churn,
             'kasbon' => $this->kasbon,
             'bpjs' => $this->bpjs_nominal,
             'bpjs_perusahaan' => $this->bpjs_perusahaan_nominal,
