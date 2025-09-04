@@ -191,13 +191,14 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $indexBPJSJHTPT= array_search('BPJS JHT PT', $header);
             $indexVoucher = array_search('Voucher', $header);
             $indexPPH21   = array_search('PPH 21', $header);
+            $indexKasbon   = array_search('Kasbon', $header);
             
             $voucher = $potonganArray->firstWhere('nama', 'Voucher')['nominal'] ?? 0;
             $pph21 = $potonganArray->firstWhere('nama', 'PPH 21')['nominal'] ?? 0;
             $izin = $item->izin ?? 0;
             // dd($izin);
             $pendapatan = array_sum(array_filter($row, fn($v, $i) =>
-                !in_array($i, [0, 1, 2, 3, 4, 11, 13, 14, 15, $indexVoucher, $indexPPH21]) && is_numeric($v) // skip
+                !in_array($i, [$indexNoSlip, $indexNama, $indexNip, $indexDivisi, $indexPeriode, $indexIzin, $indexTerlambat, $indexKasbon, $indexBPJSKA, $indexBPJSJHT, $indexBPJSPT, $indexBPJSJHTPT, $indexVoucher, $indexPPH21]) && is_numeric($v) // skip
             , ARRAY_FILTER_USE_BOTH));
 
             $totalGaji = $pendapatan - $izin - $voucher - $pph21;
