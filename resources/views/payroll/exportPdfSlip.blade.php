@@ -358,7 +358,10 @@
                     <td>Kesehatan</td>
                     <td class="text-right">Rp. {{ number_format($data->bpjs) }}</td>
                 </tr>
-                @if ($data->jabatan == 'Branch Manager' || $data->entitas == 'UNB')
+                @php
+                    var_dump()
+                @endphp
+                @if ($data->getKaryawan->jabatan == 'Branch Manager' || $data->getkaryawan->entitas == 'UNB')
                     <tr>
                         <td>JHT PT</td>
                         <td class="text-right">Rp. {{ number_format($data->bpjs_jht_perusahaan) }}</td>
