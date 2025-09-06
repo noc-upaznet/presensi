@@ -874,7 +874,7 @@ class CreateSlipGaji extends Component
 
         // Ambil periode
         $periode = $this->bulanTahun; // format: "2025-06"
-        $tahun = Carbon::createFromFormat('Y-m', $periode)->format('y'); // "25"
+        $tahun = Carbon::createFromFormat('Y-m', $periode)->format('Y'); // "25"
         $bulanAngka = Carbon::createFromFormat('Y-m', $periode)->format('n'); // "6"
         $bulanRomawi = $this->toRoman($bulanAngka); // "VI"
 
@@ -896,19 +896,19 @@ class CreateSlipGaji extends Component
         }
 
         $nomorUrut = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-
+     
         // Format slip berdasarkan nama entitas
         switch (strtoupper($entitasKode)) {
             case 'UHO':
-                return "UHO/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+                return "006/DJB-UHO/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
             case 'UNR':
-                return "UNR/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+                return "006/DJB-UNR/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
             case 'UNB':
-                return "UNB/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+                return "006/DJB-UNB/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
             case 'UGR':
-                return "UGR/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+                return "006/DJB-UGR/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
             default:
-                return "{$entitasKode}/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+                return "006/DJB-{$entitasKode}/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
         }
     }
 
