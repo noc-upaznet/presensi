@@ -218,50 +218,39 @@
         }
     
         function takePhoto() {
-        // Pastikan video sudah mulai
-        if (video.readyState === 4) {
-            // Set ukuran canvas berdasarkan ukuran video
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            // Pastikan video sudah mulai
+            if (video.readyState === 4) {
+                // Set ukuran canvas berdasarkan ukuran video
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
 
-            // Balik horizontal saat menggambar ke canvas (agar tidak mirror)
-            context.save();
-            context.translate(canvas.width, 0);
-            context.scale(-1, 1);
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            context.restore();
+                // Balik horizontal saat menggambar ke canvas (agar tidak mirror)
+                context.save();
+                context.translate(canvas.width, 0);
+                context.scale(-1, 1);
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                context.restore();
 
-            // Convert gambar canvas ke Data URL (format PNG)
-            const photoDataUrl = canvas.toDataURL('image/png');
-            console.log('Foto diambil:', photoDataUrl);
+                // Convert gambar canvas ke Data URL (format PNG)
+                const photoDataUrl = canvas.toDataURL('image/png');
+                console.log('Foto diambil:', photoDataUrl);
 
-            // Dispatch event ke Livewire dengan data foto
-            Livewire.dispatch('photoTaken', { photo: photoDataUrl });
+                // Dispatch event ke Livewire dengan data foto
+                Livewire.dispatch('photoTaken', { photo: photoDataUrl });
 
-            // Hentikan video sementara (jika diperlukan)
-            video.pause();
+                // Hentikan video sementara (jika diperlukan)
+                video.pause();
 
-            // Tampilkan notifikasi (opsional)
-            // alert('Foto sudah diambil!');
+                // Tampilkan notifikasi (opsional)
+                // alert('Foto sudah diambil!');
 
-            // Tampilkan tombol "Ambil Ulang", sembunyikan tombol "Ambil Foto"
-            // btnTake.style.display = 'none';
-            // btnRetake.style.display = 'inline-block';
-        } else {
-            alert('Kamera belum siap. Silakan coba lagi.');
+                // Tampilkan tombol "Ambil Ulang", sembunyikan tombol "Ambil Foto"
+                // btnTake.style.display = 'none';
+                // btnRetake.style.display = 'inline-block';
+            } else {
+                alert('Kamera belum siap. Silakan coba lagi.');
+            }
         }
-    }
-        // function retakePhoto() {
-        //     // Lanjutkan video
-        //     video.play();
-
-        //     // Bersihkan canvas
-        //     context.clearRect(0, 0, canvas.width, canvas.height);
-
-        //     // Kembali ke tombol ambil
-        //     btnTake.style.display = 'inline-block';
-        //     btnRetake.style.display = 'none';
-        // }
 
         Livewire.on('cameraModal', (event) => {
             $('#cameraModal').modal(event.action);

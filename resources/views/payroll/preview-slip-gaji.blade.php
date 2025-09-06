@@ -323,12 +323,18 @@
                 @endphp
             @else
                 @php
-                    $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon;
+                    $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->churn;
                 @endphp
             @endif
             
 
             <tbody>
+                @if ($data->divisi == 'Sales Marketing' || $data->divisi == 'Sales' || $data->divisi == 'Sales & Marketing')
+                    <tr>
+                        <td>Churn</td>
+                        <td class="text-right">Rp. {{ number_format($data->churn) }}</td>
+                    </tr>
+                @endif
                 <tr>
                     <td>Potongan Izin</td>
                     <td class="text-right">Rp. {{ number_format($data->izin) }}</td>
