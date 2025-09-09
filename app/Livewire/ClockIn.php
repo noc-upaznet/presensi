@@ -188,6 +188,7 @@ class ClockIn extends Component
                 $distance = $this->calculateDistance($this->latitude, $this->longitude, $latDb, $lngDb);
                 if ($distance <= $radiusMaks) {
                     $dalamRadius = true;
+                    $lokasiIdTerdekat = $lokasi->id;
                     break;
                 }
             }
@@ -196,11 +197,15 @@ class ClockIn extends Component
                 session()->flash('error', 'Anda berada di luar radius lokasi yang diizinkan (maks 40 meter).');
                 return;
             }
+        } else {
+            $lokasiIdTerdekat = $this->latitude.', '. $this->longitude;
+            // dd($lokasiIdTerdekat);
         }
-    
+
         // Update clock-out
         $presensi->update([
             'clock_out' => $clockOutTime,
+            'lokasi_clock_out' => $lokasiIdTerdekat
         ]);
     
         session()->flash('success', 'Clock-out berhasil.');

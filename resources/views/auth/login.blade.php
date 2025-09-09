@@ -77,6 +77,7 @@
           <p class="login-box-msg">Silahkan Login</p>
             <form action="{{ route('login') }}" method="POST">
               @csrf
+              {{-- <input type="text" name="_token" value="{{ csrf_token() }}"> --}}
               <div class="input-group mb-3">
                   <input type="email" name="email" class="form-control" placeholder="Email" value="{{ request()->cookie('login_email') }}">
                   <div class="input-group-append">

@@ -218,37 +218,51 @@
         }
     
         function takePhoto() {
-            // Pastikan video sudah mulai
             if (video.readyState === 4) {
-                // Set ukuran canvas berdasarkan ukuran video
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
 
-                // Balik horizontal saat menggambar ke canvas (agar tidak mirror)
                 context.save();
                 context.translate(canvas.width, 0);
                 context.scale(-1, 1);
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
                 context.restore();
 
-                // Convert gambar canvas ke Data URL (format PNG)
-                const photoDataUrl = canvas.toDataURL('image/png');
-                console.log('Foto diambil:', photoDataUrl);
+                // Ambil lokasi GPS sekarang
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition((pos) => {
+                        const lat = pos.coords.latitude.toFixed(6);
+                        const lon = pos.coords.longitude.toFixed(6);
 
-                // Dispatch event ke Livewire dengan data foto
-                Livewire.dispatch('photoTaken', { photo: photoDataUrl });
+                        // Tambahkan teks koordinat di atas foto
+                        context.font = "24px Arial";
+                        context.fillStyle = "yellow";
+                        context.strokeStyle = "black"; // outline biar jelas
+                        context.lineWidth = 3;
 
-                // Hentikan video sementara (jika diperlukan)
-                video.pause();
+                        const text = `Lat: ${lat}, Lon: ${lon}`;
+                        const x = 20;
+                        const y = canvas.height - 20;
 
-                // Tampilkan notifikasi (opsional)
-                // alert('Foto sudah diambil!');
+                        context.strokeText(text, x, y);
+                        context.fillText(text, x, y);
 
-                // Tampilkan tombol "Ambil Ulang", sembunyikan tombol "Ambil Foto"
-                // btnTake.style.display = 'none';
-                // btnRetake.style.display = 'inline-block';
+                        // Convert canvas ke Data URL
+                        const photoDataUrl = canvas.toDataURL('image/png');
+                        console.log("Foto dengan koordinat:", photoDataUrl);
+
+                        // Kirim ke Livewire
+                        Livewire.dispatch('photoTaken', { photo: photoDataUrl });
+                        video.pause();
+                    }, (err) => {
+                        console.error("Gagal ambil lokasi:", err);
+                        alert("Tidak bisa mengambil lokasi GPS!");
+                    });
+                } else {
+                    alert("Browser tidak support geolocation");
+                }
             } else {
-                alert('Kamera belum siap. Silakan coba lagi.');
+                alert("Kamera belum siap. Silakan coba lagi.");
             }
         }
 

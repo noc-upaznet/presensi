@@ -64,6 +64,7 @@
                                 @endif
                                 <th>Clock In</th>
                                 <th>Clock Out</th>
+                                <th>Lokasi</th>
                                 <th>File</th>
                                 <th>Status</th>
                                 @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
@@ -85,6 +86,10 @@
                                         @endif
                                         <td style="color: var(--bs-body-color);">{{ $key->clock_in }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->clock_out }}</td>
+                                        <td>
+                                            <span>Clock-In   :</span> <span class="badge bg-primary"> {{ $key->lokasi_final}}</span><br>
+                                            <span>Clock-Out  :</span> <span class="badge bg-danger">{{ $key->lokasi_clock_out }}</span>
+                                        </td>
                                         <td style="color: var(--bs-body-color);">
                                             <img src="{{ asset('storage/' . $key->file) }}" style="max-width: 100px;" alt="Selfie" class="img-fluid" />
                                             {{-- {{ $key->file }} --}}

@@ -189,7 +189,7 @@ class ClockInSelfie extends Component
             }
         } else {
             // Jika lock = 0, ambil salah satu lokasi saja untuk disimpan (misalnya pertama)
-            $lokasiIdTerdekat = null;
+            $lokasiIdTerdekat = $this->latitude.', '. $this->longitude;
         }
     
         // Ambil jadwal shift
@@ -221,6 +221,7 @@ class ClockInSelfie extends Component
             'file' => $this->photo,
             'status' => $status,
         ];
+        // dd($data);
     
         // Simpan presensi
         M_Presensi::create($data);

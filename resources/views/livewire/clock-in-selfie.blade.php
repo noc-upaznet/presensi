@@ -47,7 +47,13 @@
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Notes</label>
                             <div class="mb-3">
-                                <span>Lokasi : </span>
+                                <span>Lokasi : </span><br>
+                                @if($latitude && $longitude)
+                                    <li class="badge bg-success text-light me-1">
+                                        Koordinat: {{ $latitude }}, {{ $longitude }}
+                                    </li>
+                                @endif
+                                <br>
                                 @foreach ($lokasisTerdekat as $lokasi)
                                     <li class="badge bg-info text-dark me-1">
                                         {{ $lokasi->nama_lokasi }}
@@ -177,23 +183,56 @@
                 const context = canvas.getContext('2d');
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
-                // Balik horizontal saat menggambar ke canvas (agar tidak mirror)
+
+                // Balik horizontal (supaya tidak mirror)
                 context.save();
                 context.translate(canvas.width, 0);
                 context.scale(-1, 1);
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
                 context.restore();
 
-                const dataURL = canvas.toDataURL('image/png');
-                photoImage.src = dataURL;
+                // Ambil lokasi GPS
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition((pos) => {
+                        const lat = pos.coords.latitude.toFixed(6);
+                        const lon = pos.coords.longitude.toFixed(6);
 
-                // Kirim ke Livewire
-                Livewire.dispatch('photoTaken', { photo: dataURL });
+                        // Tambahkan teks koordinat di atas foto
+                        context.font = "24px Arial";
+                        context.fillStyle = "yellow";
+                        context.strokeStyle = "black"; // outline biar jelas
+                        context.lineWidth = 3;
 
-                const modalEl = document.getElementById('cameraModal');
-                if (modalEl) {
-                    const modal = bootstrap.Modal.getInstance(modalEl);
-                    modal.hide();
+                        const text = `Lat: ${lat}, Lon: ${lon}`;
+                        const x = 20;
+                        const y = canvas.height - 20;
+
+                        context.strokeText(text, x, y);
+                        context.fillText(text, x, y);
+
+                        // Convert ke Data URL
+                        const dataURL = canvas.toDataURL('image/png');
+                        photoImage.src = dataURL;
+
+                        // Kirim ke Livewire + koordinat
+                        Livewire.dispatch('photoTaken', { 
+                            photo: dataURL,
+                            latitude: lat,
+                            longitude: lon
+                        });
+
+                        // Tutup modal kamera
+                        const modalEl = document.getElementById('cameraModal');
+                        if (modalEl) {
+                            const modal = bootstrap.Modal.getInstance(modalEl);
+                            modal.hide();
+                        }
+                    }, (err) => {
+                        console.error("Gagal ambil lokasi:", err);
+                        alert("Tidak bisa mengambil lokasi GPS!");
+                    });
+                } else {
+                    alert("Browser tidak support geolocation");
                 }
             }
         }
