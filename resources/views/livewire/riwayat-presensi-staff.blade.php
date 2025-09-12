@@ -18,12 +18,19 @@
     <div class="container">
         <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
             <div class="mb-4">
-                <div class="d-flex justify-content gap-2 flex-wrap mb-4">
+                <div class="d-flex justify-content-end gap-2 flex-wrap mb-4">
                     <select class="form-select" wire:model.lazy="filterkaryawan" style="width: 150px;">
                         <option value="">Pilih Karyawan</option>
                         @foreach ($karyawanList as $karyawan)
                             <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
                         @endforeach
+                    </select>
+
+                    <select class="form-select" wire:model.lazy="filterStatus" style="width: 150px;">
+                        <option value="">Pilih Status</option>
+                        <option value="0">Tepat Waktu</option>
+                        <option value="1">Terlambat</option>
+                        <option value="2">Dispensasi</option>
                     </select>
 
                     <input type="month" class="form-control" style="width: 150px;" placeholder="Bulan" wire:model.lazy="filterBulan">
@@ -42,6 +49,11 @@
                         <input type="search" class="form-control form-control-sm" placeholder="Search..." wire:model.live="search">
                     </div>
                 </div>
+                @php
+                    $currentRole = auth()->user()->current_role;
+                    $divisi = auth()->user()->karyawan->divisi ?? '-';
+                    // var_dump($currentRole, $divisi);
+                @endphp
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped">
                         <thead>
@@ -52,7 +64,12 @@
                                 <th>Clock Out</th>
                                 <th>File</th>
                                 <th>Status</th>
-                                <th>Approve</th>
+                                @if ($currentRole == 'spv')
+                                    <th>Approve</th>
+                                @endif
+                                @if (($currentRole == 'spv' && $divisi == 'Teknisi') || $currentRole == 'hr')
+                                    <th>Dispensasi</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -84,23 +101,64 @@
                                             @endif
                                         </td>
                                         
-                                            
-                                        <td>
-                                            @if ($key->lokasi_lock == 0)
-                                                @if ($key->approve == 0)
-                                                    <button class="btn btn-success btn-sm mt-2 mb-2" wire:click="approve({{ $key->id }})">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button class="btn btn-danger btn-sm" wire:click="reject({{ $key->id }})">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                @elseif ($key->approve == 1)
-                                                    <span class="badge bg-success">Approved</span>
-                                                @elseif ($key->approve == 2)
-                                                    <span class="badge bg-danger">Rejected</span>
+                                        @if ($currentRole == 'spv')
+                                            <td>
+                                                @if ($key->lokasi_lock == 0)
+                                                    @if ($key->approve == 0)
+                                                        <button class="btn btn-success btn-sm mt-2 mb-2" wire:click="approve({{ $key->id }})">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm" wire:click="reject({{ $key->id }})">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    @elseif ($key->approve == 1)
+                                                        <span class="badge bg-success">Approved</span>
+                                                    @elseif ($key->approve == 2)
+                                                        <span class="badge bg-danger">Rejected</span>
+                                                    @endif
                                                 @endif
-                                            @endif
-                                        </td>
+                                            </td>
+                                        @endif
+
+                                        @if (($currentRole == 'spv' && $divisi == 'Teknisi'))
+                                            <td>
+                                                @php
+                                                    // var_dump($key->approve_late_spv);
+                                                @endphp
+                                                @if ($key->status == "1")
+                                                    @if($key->approve_late_spv == NULL)
+                                                        <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    @elseif($key->approve_late_spv == 1)
+                                                        <span class="badge bg-success">SPV APPROVED</span>
+                                                    @endif
+                                                    @if($key->approve_late_hr == 1)
+                                                        <span class="badge bg-success">HR APPROVED</span>
+                                                    @endif
+                                                @elseif($key->status == "2")
+                                                    <span class="badge bg-primary">Dispensasi Approved</span>
+                                                @endif
+                                            </td>
+                                        @endif
+                                        @if ($currentRole == 'hr')
+                                            <td>
+                                                @if ($key->status == "1")
+                                                    @if($key->approve_late_spv == 1)
+                                                        <span class="badge bg-success">SPV APPROVED</span>
+                                                    @endif
+                                                    @if($key->approve_late_hr == NULL)
+                                                        <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    @elseif($key->approve_late_hr == 1)
+                                                        <span class="badge bg-success">HR APPROVED</span>
+                                                    @endif
+                                                @elseif($key->status == "2")
+                                                    <span class="badge bg-primary">Dispensasi Approved</span>
+                                                @endif
+                                            </td>
+                                        @endif
                                     </tr>
                                 @endforeach
                             @endif
@@ -108,7 +166,7 @@
                     </table>
                 </div>
                 <div class="mt-3">
-                    {{ $datas->links('pagination::bootstrap-5') }}
+                    {{ $datas->links() }}
                 </div>
             </div>
         </div>

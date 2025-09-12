@@ -14,6 +14,7 @@ use App\Models\JenisPotonganModel;
 use App\Models\JenisTunjanganModel;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Redirect;
 use Livewire\WithoutUrlPagination;
 
@@ -26,6 +27,8 @@ class Payroll extends Component
     public $selectedYear;
     public $selectedMonth;
     public $selectedStatus;
+    public $selectedKaryawan = '';
+    public $karyawanList = '';
     public $periode;
     public $perPage = 10;
     public $payrollIdToDelete;
@@ -52,8 +55,8 @@ class Payroll extends Component
 
     public function mount()
     {
-        $this->selectedYear = now()->year;
-        $this->selectedMonth = now()->format('n');
+        $this->selectedMonth = request()->query('month', now()->month);
+        $this->selectedYear  = request()->query('year', now()->year);
 
         // Format periode (YYYY-MM) dari bulan yang dipilih
         $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
@@ -78,8 +81,47 @@ class Payroll extends Component
 
         $this->currentEntitas = $selectedEntitas;
 
+        $this->karyawanList = M_DataKaryawan::where('entitas', $this->currentEntitas)
+            ->orderBy('nama_karyawan', 'asc')
+            ->get();
+
         // Hitung jumlah karyawan yang belum punya slip gaji di periode tersebut
         // $karyawanQuery = M_DataKaryawan::where('entitas', $selectedEntitas);
+        $this->hitungSlip();
+    }
+
+    public function createSlipGaji($month, $year)
+    {
+        return redirect()->route('create-slip-gaji-tambah', [
+            'month' => $month,
+            'year'  => $year,
+        ]);
+    }
+
+    public function updatedSelectedMonth()
+    {
+        $this->hitungSlip();
+    }
+
+    public function updatedSelectedYear()
+    {
+        $this->hitungSlip();
+    }
+
+    private function hitungSlip()
+    {
+        // Format periode (YYYY-MM) dari bulan yang dipilih
+        $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        $this->periode = $this->selectedYear . '-' . $bulanFormatted;
+
+        // Hitung tanggal cutoff
+        $cutoffEnd = \Carbon\Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 25);
+        $cutoffStart = $cutoffEnd->copy()->subMonthNoOverflow()->setDay(26);
+
+        $this->cutoffStart = $cutoffStart->format('Y-m-d');
+        $this->cutoffEnd = $cutoffEnd->format('Y-m-d');
+
+        $selectedEntitas = $this->currentEntitas;
 
         $this->jumlahBelumPunyaSlip = M_DataKaryawan::query()
             ->where('entitas', $selectedEntitas)
@@ -100,6 +142,7 @@ class Payroll extends Component
             ->count();
 
         $selectedEntitasId = M_Entitas::where('nama', $selectedEntitas)->value('id');
+
         $this->JumlahKaryawanTitip = PayrollModel::with('getKaryawan')
             ->where('titip', 1)
             ->where('periode', $this->periode)
@@ -114,8 +157,6 @@ class Payroll extends Component
             ->where('periode', $this->periode)
             ->where('payroll.entitas_id', $selectedEntitasId)
             ->count();
-
-            // dd($this->JumlahKaryawanInternal);
     }
 
     public function toggleTitip($karyawan_id)
@@ -127,6 +168,11 @@ class Payroll extends Component
 
     public function export()
     {
+        $entitasNama = session('selected_entitas', 'UHO');
+        $entitasAktif = M_Entitas::where('nama', $entitasNama)->first();
+        $entitasIdAktif = $entitasAktif?->id;
+        // dd($entitasIdAktif);
+
         $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
         $periode = $this->selectedYear . '-' . $bulanFormatted;
 
@@ -134,8 +180,9 @@ class Payroll extends Component
         ->locale('id')
         ->translatedFormat('F Y');
         $filename = 'slip_gaji_' . $periodeLokal . '.xlsx';
+        // dd($periode, $periodeLokal, $entitasIdAktif);
 
-        return Excel::download(new PayrollExport($periode, $periodeLokal), $filename);
+        return Excel::download(new PayrollExport($periode, $entitasIdAktif), $filename);
     }
 
     public function downloadSlip($id)
@@ -150,215 +197,48 @@ class Payroll extends Component
         }
     }
 
-    public function addTunjangan()
-    {
-        $this->tunjangan[] = ['nama' => '', 'nominal' => 0];
-    }
-
-    public function removeTunjangan($index)
-    {
-        unset($this->tunjangan[$index]);
-        $this->tunjangan = array_values($this->tunjangan);
-        $this->hitungTotalGaji();
-    }
-
-    public function addPotongan()
-    {
-        $this->potongan[] = ['nama' => '', 'nominal' => 0];
-    }
-
-    public function removePotongan($index)
-    {
-        unset($this->potongan[$index]);
-        $this->potongan = array_values($this->potongan);
-        $this->hitungTotalGaji();
-    }
-
-    public function updated($propertyName)
-    {
-        if (
-            str($propertyName)->startsWith('tunjangan') ||
-            str($propertyName)->startsWith('potongan') ||
-            in_array($propertyName, [
-                'gaji_pokok',
-                'tunjangan_jabatan',
-                'kebudayaan',
-                'transport',
-                'uang_makan',
-                'fee_sharing',
-                'bpjs_nominal',
-                'bpjs_jht_nominal',
-                'persentase_bpjs',
-                'persentase_bpjs_jht',
-            ])
-        ) {
-            $this->hitungTotalGaji();
-        }
-    }
-
-    public function updatedJmlPsb()
-    {
-        if ($this->isSalesPosition()) {
-            $insentifMapping = [
-                1 => [1000000, 50000],
-                2 => [1000000, 100000],
-                3 => [1000000, 150000],
-                4 => [1000000, 200000],
-                5 => [1000000, 250000],
-                6 => [1160000, 300000],
-                7 => [1160000, 350000],
-                8 => [1160000, 400000],
-                9 => [1160000, 450000],
-                10 => [1160000, 500000],
-                11 => [1508000, 825000],
-                12 => [1508000, 900000],
-                13 => [1508000, 975000],
-                14 => [1508000, 1050000],
-                15 => [1508000, 1125000],
-                16 => [1508000, 1200000],
-                17 => [1508000, 1275000],
-                18 => [1508000, 1350000],
-                19 => [1508000, 1425000],
-                20 => [2320000, 1700000],
-                21 => [2320000, 1785000],
-                22 => [2320000, 1870000],
-                23 => [2320000, 1955000],
-                24 => [2320000, 2040000],
-                25 => [2320000, 2125000],
-                26 => [2320000, 2210000],
-                27 => [2320000, 2295000],
-                28 => [2320000, 2380000],
-                29 => [2320000, 2465000],
-                30 => [2320000, 2550000],
-            ];
-
-            if (isset($insentifMapping[$this->jml_psb])) {
-                [$upah, $insentif] = $insentifMapping[$this->jml_psb];
-
-                // gaji pokok = 75% dari upah, tunjangan jabatan = 25% dari upah
-                $this->gaji_pokok = round($upah * 0.75);
-                $this->tunjangan_jabatan = round($upah * 0.25);
-                $this->insentif = $insentif;
-
-                $this->hitungTotalGaji();
-            } else {
-                $this->insentif = 0;
-            }
-        }
-    }
-
-    public function hitungTotalGaji()
-    {
-        $totalTunjangan = collect($this->tunjangan)->sum(fn($item) => (int) $item['nominal']);
-        $totalPotongan = collect($this->potongan)->sum(fn($item) => (int) $item['nominal']);
-
-        $bpjs = (int) $this->bpjs_nominal;
-        $bpjsJht = (int) $this->bpjs_jht_nominal;
-        $insentif = (int) $this->insentif;
-
-        // Hitung total gaji akhir, tambahkan insentif
-        $this->total_gaji = (int) $this->gaji_pokok
-            + $totalTunjangan
-            + (int) $this->tunjangan_jabatan
-            + (int) $this->kebudayaan
-            + (int) $this->fee_sharing
-            + $insentif
-            + (int) $this->transport
-            + (int) $this->uang_makan
-            - $totalPotongan
-            - $bpjs
-            - $bpjsJht;
-    }
-
-    public function isSalesPosition()
-    {
-        return in_array(strtolower($this->jabatan), ['sales', 'sm', 'sales marketing']);
-    }
-
-    // public function editPayroll($id)
-    // {
-    //     $payroll = PayrollModel::with('getKaryawan')->find($id);
-    //     // dd($payroll);
-    //     if ($payroll) {
-    //         $this->payroll_id = $payroll->id; // tambahkan ini untuk menyimpan ID (jika ingin update nanti)
-    //         $this->no_slip = $payroll->no_slip;
-    //         $this->karyawan_id = $payroll->karyawan_id;
-    //         $this->nama_karyawan = $payroll->getKaryawan->nama_karyawan;
-    //         $this->bulan_tahun = $payroll->periode;
-    //         $this->nip_karyawan = $payroll->nip_karyawan;
-    //         $this->divisi = $payroll->divisi;
-    //         $this->jabatan = $payroll->getKaryawan->jabatan;
-    //         $this->jml_psb = $payroll->jml_psb;
-    //         $this->insentif = $payroll->insentif;
-    //         $this->gaji_pokok = $payroll->gaji_pokok;
-    //         $this->tunjangan_jabatan = $payroll->tunjangan_jabatan;
-    //         $this->kebudayaan = $payroll->tunjangan_kebudayaan;
-    //         $this->lembur_nominal = $payroll->lembur;
-    //         $this->transport = $payroll->transport;
-    //         $this->uang_makan = $payroll->uang_makan;
-    //         $this->fee_sharing = $payroll->fee_sharing;
-    //         $this->izin_nominal = $payroll->izin;
-    //         $this->terlambat_nominal = $payroll->terlambat;
-    //         $this->tunjangan = json_decode($payroll->tunjangan, true) ?? [];
-    //         $this->potongan = json_decode($payroll->potongan, true) ?? [];
-    //         $this->bpjs_nominal = $payroll->bpjs ?? 0;
-    //         $this->bpjs_jht_nominal = $payroll->bpjs_jht ?? 0;
-
-    //         // Hitung balik persentase jika gaji pokok ada
-    //         // if ($this->gaji_pokok > 0) {
-    //         //     $this->persentase_bpjs = round(($this->bpjs_nominal / $this->gaji_pokok) * 100, 2);
-    //         //     $this->persentase_bpjs_jht = round(($this->bpjs_jht_nominal / $this->gaji_pokok) * 100, 2);
-    //         // }
-    //         $this->terlambat = $payroll->terlambat ?? 0;
-    //         $this->izin = $payroll->izin ?? 0;
-    //         $this->cuti = $payroll->cuti ?? 0;
-    //         $this->kehadiran = $payroll->kehadiran ?? 0;
-    //         $this->lembur = $payroll->lembur ?? 0;
-    //         $this->total_gaji = $payroll->total_gaji;
-
-
-    //         $this->dispatch('editPayrollModal', action: 'show'); // trigger untuk buka modal (optional)
-    //     }
-    // }
-
     public function editPayroll($id)
     {
-        return redirect()->route('edit-payroll', $id);
+        $this->periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        // dd($this->periode);
+        return redirect()
+            ->route('edit-payroll', $id)
+            ->with(['periode' => $this->periode]);
     }
 
-    public function saveEdit()
-    {
-        $payroll = PayrollModel::findOrFail($this->payroll_id);
+    // public function saveEdit()
+    // {
+    //     $payroll = PayrollModel::findOrFail($this->payroll_id);
 
-        $data = [
-            'no_slip' => $this->no_slip,
-            'karyawan_id' => $this->karyawan_id,
-            'periode' => $this->bulan_tahun,
-            'nip_karyawan' => $this->nip_karyawan,
-            'divisi' => $this->divisi,
-            'gaji_pokok' => $this->gaji_pokok,
-            'tunjangan_jabatan' => $this->tunjangan_jabatan,
-            'lembur' => $this->lembur_nominal,
-            'insentif' => $this->insentif,
-            'izin' => $this->izin_nominal,
-            'terlambat' => $this->terlambat_nominal,
-            'tunjangan' => json_encode($this->tunjangan),
-            'potongan' => json_encode($this->potongan),
-            'bpjs' => $this->bpjs_nominal,
-            'bpjs_jht' => $this->bpjs_jht_nominal,
-            'total_gaji' => $this->total_gaji,
-        ];
-        // dd($data);
-        $payroll->update($data);
+    //     $data = [
+    //         'no_slip' => $this->no_slip,
+    //         'karyawan_id' => $this->karyawan_id,
+    //         'periode' => $this->bulan_tahun,
+    //         'nip_karyawan' => $this->nip_karyawan,
+    //         'divisi' => $this->divisi,
+    //         'gaji_pokok' => $this->gaji_pokok,
+    //         'tunjangan_jabatan' => $this->tunjangan_jabatan,
+    //         'lembur' => $this->lembur_nominal,
+    //         'insentif' => $this->insentif,
+    //         'izin' => $this->izin_nominal,
+    //         'terlambat' => $this->terlambat_nominal,
+    //         'tunjangan' => json_encode($this->tunjangan),
+    //         'potongan' => json_encode($this->potongan),
+    //         'bpjs' => $this->bpjs_nominal,
+    //         'bpjs_jht' => $this->bpjs_jht_nominal,
+    //         'total_gaji' => $this->total_gaji,
+    //     ];
+    //     // dd($data);
+    //     $payroll->update($data);
 
-        $this->dispatch('swal', params: [
-            'title' => 'Data Updated',
-            'icon' => 'success',
-            'text' => 'Data has been updated successfully'
-        ]);
+    //     $this->dispatch('swal', params: [
+    //         'title' => 'Data Updated',
+    //         'icon' => 'success',
+    //         'text' => 'Data has been updated successfully'
+    //     ]);
 
-        $this->dispatch('editPayrollModal', action: 'hide');
-    }
+    //     $this->dispatch('editPayrollModal', action: 'hide');
+    // }
 
     public function confirmHapusPayroll($id)
     {
@@ -388,32 +268,47 @@ class Payroll extends Component
         }
     }
 
-    // public function UpdatedSelectedStatus()
-    // {
-    //     // dd('oke');
-    //     $query = PayrollModel::with('getKaryawan');
-    //     // Filter status karyawan
-    //     if ($this->selectedStatus === 'titip') {
-    //         $query->whereHas('getKaryawan', function ($q) {
-    //             $q->where('titip', 1);
-    //         });
-    //     } elseif ($this->selectedStatus === 'tetap') {
-    //         $query->whereHas('getKaryawan', function ($q) {
-    //             $q->whereNull('titip')->orWhere('titip', 0);
-    //         });
-    //     }
-    // }
+    public function publishAll()
+    {
+        $entitasNama = session('selected_entitas', 'UHO');
+        $entitasAktif = M_Entitas::where('nama', $entitasNama)->first();
+        $entitasIdAktif = $entitasAktif?->id;
 
-    // public function exportExcel()
-    // {
-    //     // Validasi tanggal (optional)
-    //     $this->validate([
-    //         'startDate' => 'required|date',
-    //         'endDate' => 'required|date|after_or_equal:startDate',
-    //     ]);
+        // Filter periode
+        $periode = null;
+        if ($this->selectedMonth && $this->selectedYear) {
+            $periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        }
 
-    //     return Excel::download(new PayrollExport($this->startDate, $this->endDate), 'payroll.xlsx');
-    // }
+        // Payroll utama (titip = 0)
+        $dataQuery = PayrollModel::with('getKaryawan')
+            ->where('entitas_id', $entitasIdAktif)
+            ->where('titip', 0)
+            ->when($this->selectedStatus !== null && $this->selectedStatus !== '', function ($q) {
+                $q->where('accepted', $this->selectedStatus);
+            });
+
+        // Payroll titip (titip = 1)
+        $data2Query = PayrollModel::with('getKaryawan')
+            ->where('entitas_id', $entitasIdAktif)
+            ->where('titip', 1)
+            ->whereHas('getKaryawan', function ($q) use ($entitasIdAktif) {
+                $q->where('entitas_id', '!=', $entitasIdAktif);
+            })
+            ->when($this->selectedStatus !== null && $this->selectedStatus !== '', function ($q) {
+                $q->where('accepted', $this->selectedStatus);
+            });
+
+        // Apply filter periode jika ada
+        if ($periode) {
+            $dataQuery->where('periode', $periode);
+            $data2Query->where('periode', $periode);
+        }
+
+        // Update sekaligus tanpa looping
+        $dataQuery->where('published', 0)->update(['published' => 1]);
+        $data2Query->where('published', 0)->update(['published' => 1]);
+    }
 
     public function publishPayroll($id)
     {
@@ -428,14 +323,18 @@ class Payroll extends Component
         ]);
     }
 
-    public function showModal()
+    public function showModal($id = null)
     {
-        $this->dispatch('modalPayroll', action: 'show');
+        $this->periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        // dd($this->periode);
+        $this->dispatch('modalPayroll', action: 'show', periode: $this->periode, id: encrypt($id));
     }
 
     public function showModalEks()
     {
-        $this->dispatch('modalPayrollEks', action: 'show');
+        $this->periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        // dd($this->periode);
+        $this->dispatch('modalPayrollEks', action: 'show', periode: $this->periode);
     }
 
     public function render()
@@ -443,7 +342,6 @@ class Payroll extends Component
         $entitasNama = session('selected_entitas', 'UHO');
         $entitasAktif = M_Entitas::where('nama', $entitasNama)->first();
         $entitasIdAktif = $entitasAktif?->id;
-        // dd($entitasAktif);
 
         // Filter periode
         $periode = null;
@@ -453,13 +351,25 @@ class Payroll extends Component
 
         $dataQuery = PayrollModel::with('getKaryawan')
             ->where('entitas_id', $entitasIdAktif)
-            ->where('titip', 0);
-        
+            ->where('titip', 0)
+            ->when($this->selectedStatus !== null && $this->selectedStatus !== '', function ($q) {
+                $q->where('accepted', $this->selectedStatus);
+            })
+            ->when($this->selectedKaryawan !== null && $this->selectedKaryawan !== '', function ($q) {
+                $q->where('karyawan_id', $this->selectedKaryawan);
+            });
+
         $data2Query = PayrollModel::with('getKaryawan')
             ->where('entitas_id', $entitasIdAktif)
             ->where('titip', 1)
             ->whereHas('getKaryawan', function ($q) use ($entitasNama) {
                 $q->where('entitas_id', '!=', $entitasNama);
+            })
+            ->when($this->selectedStatus !== null && $this->selectedStatus !== '', function ($q) {
+                $q->where('accepted', $this->selectedStatus);
+            })
+            ->when($this->selectedKaryawan !== null && $this->selectedKaryawan !== '', function ($q) {
+                $q->where('karyawan_id', $this->selectedKaryawan);
             });
 
         // Apply filter periode jika ada
@@ -470,12 +380,11 @@ class Payroll extends Component
 
         $data = $dataQuery->orderBy('created_at', 'desc')->paginate($this->perPage);
         $data2 = $data2Query->orderBy('created_at', 'desc')->paginate($this->perPage);
-        // dd($data2);
-
 
         return view('livewire.payroll', [
             'data' => $data,
             'data2' => $data2
         ]);
-    }    
+    }
+  
 }

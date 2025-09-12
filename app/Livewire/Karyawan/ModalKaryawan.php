@@ -93,6 +93,7 @@ class ModalKaryawan extends Component
             'gaji_pokok' => $this->form->gaji_pokok,
             'tunjangan_jabatan' => $this->form->tunjangan_jabatan,
             'bonus' => $this->form->bonus,
+            'inov_reward' => $this->form->inov_reward,
             'jenis_penggajian' => $this->form->jenis_penggajian,
             'nama_bank' => $this->form->nama_bank,
             'no_rek' => $this->form->no_rek,

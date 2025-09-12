@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Carbon\Carbon;
+use App\Models\User;
 use Livewire\Component;
 use App\Models\M_Jadwal;
 use App\Models\M_Lembur;
@@ -14,13 +15,13 @@ use App\Models\JenisPotonganModel;
 use App\Models\JenisTunjanganModel;
 use Illuminate\Support\Facades\Crypt;
 
-
 class EditPayroll extends Component
 {
     public $payroll;
     public $karyawan;
     public $divisi;
     public $jabatan;
+    public $level;
     public $gaji_pokok = 0;
     public $user_id;
     public $nip_karyawan;
@@ -40,14 +41,7 @@ class EditPayroll extends Component
     public $potongan_terpilih = [];
 
     public $bulanTahun = '';
-    public $rekap = [
-        'terlambat' => 0,
-        'izin' => 0,
-        'cuti' => 0,
-        'kehadiran' => 0,
-        'lembur' => 0,
-        'izin setengah hari' => 0,
-    ];
+    public $rekap = [];
 
     public $total_gaji = 0;
 
@@ -72,7 +66,6 @@ class EditPayroll extends Component
     public $selectedYear;
     public $periode;
     public $karyawanId;
-    public $lembur_nominal = 0;
     public $izin_nominal = 0;
     public $terlambat_nominal = 0;
     public $jml_psb = 0;
@@ -98,6 +91,7 @@ class EditPayroll extends Component
     public $fee_sharing_nominal = 0;
     public $jml_psb_spv = 0;
     public $insentif_spv = 0;
+    public $insentif_spv_ugr = 0;
     public $cutoffStart;
     public $cutoffEnd;
     public $entitasId;
@@ -117,6 +111,13 @@ class EditPayroll extends Component
     public $karyawan_id;
     public $id;
     public $bulan_tahun;
+    public $listLemburBiasa = [];
+    public $listLemburLibur = [];
+    public $lembur_libur = 0;
+    public $kasbon = 0;
+    public $churn = 0;
+    public $entitas = 0;
+
 
     public function mount($id)
     {
@@ -129,6 +130,16 @@ class EditPayroll extends Component
 
         $this->selectedYear = now()->year;
         $this->selectedMonth = now()->format('n');
+
+        // 🔥 Tangkap periode dari session
+        $this->periode = session('periode', $this->payroll->periode);
+
+        // Misal $this->periode formatnya "2025-08" (Y-m)
+        $this->bulanTahun = $this->periode;
+
+        $date = \Carbon\Carbon::createFromFormat('Y-m', $this->periode);
+        $this->cutoffStart = $date->copy()->startOfMonth();
+        $this->cutoffEnd   = $date->copy()->endOfMonth();
 
         // Normal periode
         $startNormal = Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 1);
@@ -156,21 +167,100 @@ class EditPayroll extends Component
         ];
 
         // Default set cutoff normal
-        $this->cutoffStart = $this->filterCutOffNormal['start'];
-        $this->cutoffEnd = $this->filterCutOffNormal['end'];
-        $this->bulanTahun = $this->cutoffEnd->format('Y-m');
+        // $this->cutoffStart = $this->filterCutOffNormal['start'];
+        // $this->cutoffEnd = $this->filterCutOffNormal['end'];
+        // $this->bulanTahun = $this->cutoffEnd->format('Y-m');
 
         $this->jenis_tunjangan = JenisTunjanganModel::all();
         $this->jenis_potongan = JenisPotonganModel::all();
-
         $this->loadData($id);
+        // $this->loadDataKaryawan();
+        // dd($id);
+        $this->hitungUangMakanTransport();
+        $this->hitungTotalGaji();
+
+    }
+
+    public function hitungRekap($userId)
+    {
+        if (!$this->cutoffStart || !$this->cutoffEnd) {
+            $this->rekap = [];
+            return $this->rekap;
+        }
+
+        // --- TERLAMBAT ---
+        $terlambat = M_Presensi::where('user_id', $userId)
+            ->where('status', 1)
+            ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
+            ->where(function ($q) {
+                $q->where(function ($q1) {
+                    $q1->where('lokasi_lock', 0)
+                    ->where('approve', 1);
+                })->orWhere(function ($q2) {
+                    $q2->where('lokasi_lock', 1)
+                    ->where('approve', 0);
+                });
+            })
+            ->count();
+
+            // dd($terlambat);
+
+        // --- AMBIL DATA JADWAL ---
+        $jadwal = M_Jadwal::where('karyawan_id', $userId)
+            ->where('bulan_tahun', $this->bulanTahun) // bulanTahun sudah di-set di mount
+            ->first();
+
+        $izin = 0;
+        $cuti = 0;
+        $izinSetengahHari = 0;
+
+        if ($jadwal) {
+            for ($i = 1; $i <= 31; $i++) {
+                $kolom = 'd'.$i;
+                $val = $jadwal->$kolom ?? null;
+
+                if ($val == 3) {
+                    $izin++;
+                } elseif ($val == 2) {
+                    $cuti++;
+                } elseif ($val == 8) {
+                    $izinSetengahHari++;
+                }
+            }
+        }
+
+        // --- LEMBUR JAM ---
+        $lemburJam = M_Lembur::where('karyawan_id', $userId)
+            ->where('status', 1)
+            ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
+            ->sum('total_jam');
+
+        // ✅ Hitung kehadiran (fix 26 hari kerja)
+        $this->kehadiran = 26 - ($izin + $cuti + (0.5 * $izinSetengahHari));
+        if ($this->kehadiran < 0) $this->kehadiran = 0; // jangan minus
+
+        $this->terlambat   = $terlambat ?? 0;
+        $this->izin        = ($izin ?? 0) + (0.5 * ($izinSetengahHari ?? 0));
+        $this->cuti        = $cuti ?? 0;
+        $this->lembur_jam  = $lemburJam ?? 0;
+
+        $this->rekap = [
+            'kehadiran' => $this->kehadiran,
+            'terlambat' => $this->terlambat,
+            'izin'      => $this->izin,
+            'cuti'      => $this->cuti,
+            'lembur'    => $this->lembur_jam,
+        ];
+
+        return $this->rekap;
     }
 
     public function loadData($id)
     {
-        $payroll = PayrollModel::findOrFail($id); // pastikan $id dikirim ke method
-        $this->karyawan = M_DataKaryawan::findOrFail($payroll->karyawan_id);
+        $payroll = PayrollModel::findOrFail($id);
+        // dd($payroll);
 
+        $this->karyawan = M_DataKaryawan::findOrFail($payroll->karyawan_id);
         // Data umum
         $this->no_slip = $payroll->no_slip;
         $this->periode = $payroll->periode;
@@ -185,12 +275,19 @@ class EditPayroll extends Component
         $this->gaji_pokok = $payroll->gaji_pokok;
         $this->tunjangan_jabatan = $payroll->tunjangan_jabatan;
         $this->lembur = $payroll->lembur;
+        $this->lembur_libur = $payroll->lembur_libur;
         $this->kehadiran = $rekap['kehadiran'] ?? 0;
-        $this->inovation_reward_total = $payroll->inov_reward;
-        $this->transport_total = $payroll->transport;
-        $this->uang_makan_total = $payroll->uang_makan;
+        // $this->inovation_reward = $payroll->inov_reward;
+        $this->jml_psb = $payroll->jml_psb;
+        $this->insentif = $payroll->insentif;
+        $this->transport = $payroll->transport;
+        $this->uang_makan = 15000;
+        $this->uang_makan_jumlah = $payroll->jml_uang_makan;
+        $this->transport_jumlah = $payroll->jml_transport;
         $this->kebudayaan = $payroll->tunjangan_kebudayaan;
         $this->fee_sharing = $payroll->fee_sharing;
+        $this->kasbon = $payroll->kasbon;
+        $this->churn = $payroll->churn;
 
         // Data JSON tunjangan & potongan
         $this->tunjangan = json_decode($payroll->tunjangan ?? '[]', true);
@@ -198,8 +295,7 @@ class EditPayroll extends Component
 
         // Potongan izin/terlambat
         // dd($payroll);
-        $this->izin_nominal = $payroll->izin;
-        $this->terlambat_nominal = $payroll->terlambat;
+        $this->hitungPotonganIzinTerlambat();
 
         // BPJS
         $this->bpjs = $payroll->bpjs;
@@ -220,26 +316,172 @@ class EditPayroll extends Component
         $this->bpjs_jht_perusahaan_nominal = $this->bpjs_jht_perusahaan ?? 0;
 
         // Rekap kehadiran
-        $rekap = json_decode($payroll->rekap ?? '{}', true);
-        $this->kehadiran = $rekap['kehadiran'] ?? 0;
-        $this->terlambat = $rekap['terlambat'] ?? 0;
-        $this->izin = $rekap['izin'] ?? 0;
-        $this->cuti = $rekap['cuti'] ?? 0;
-        $this->lembur_jam = $rekap['lembur'] ?? 0;
+        $this->hitungRekap($this->karyawan->id);
 
-        $this->inovation_reward_jumlah = (int) $this->kehadiran;
+        $this->hitungInovationReward();
+        // $this->inovation_reward_jumlah = (int) $this->kehadiran;
 
-        // Total gaji
-        $this->total_gaji = $payroll->total_gaji;
+        $lembur = M_Lembur::where('karyawan_id', $this->karyawan->id)
+            ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
+            ->whereNotNull('total_jam')
+            ->where('status', 1)
+            ->orderBy('tanggal')
+            ->get();
+        // dd($lembur);
+        // Reset
+        $this->lembur = 0;
+        $this->lembur_libur = 0;
+        $this->listLemburBiasa = [];
+        $this->listLemburLibur = [];
+
+        foreach ($lembur as $l) {
+            $jamLembur = $l->total_jam;
+            $jenisLembur = $l->jenis; // 1 = biasa, 2 = libur
+
+            if ($jenisLembur == 2) {
+                $this->lembur_libur += round((1 / 173) * ($this->gaji_pokok + $this->tunjangan_jabatan) * $jamLembur * 2);
+                $this->listLemburLibur[] = [
+                    'tanggal'     => $l->tanggal,
+                    'waktu_mulai' => $l->waktu_mulai,
+                    'waktu_akhir' => $l->waktu_akhir,
+                    'jam'         => $jamLembur,
+                ];
+            } else {
+                $this->lembur += round((1 / 173) * ($this->gaji_pokok + $this->tunjangan_jabatan) * $jamLembur);
+                $this->listLemburBiasa[] = [
+                    'tanggal'     => $l->tanggal,
+                    'waktu_mulai' => $l->waktu_mulai,
+                    'waktu_akhir' => $l->waktu_akhir,
+                    'jam'         => $jamLembur,
+                ];
+            }
+        }
+    }
+
+    public function hitungPotonganIzinTerlambat()
+    {
+        $this->hitungRekap($this->karyawan->id);
+        $potonganIzin = 0;
+        $potonganTerlambat = 0;
+
+        if ($this->gaji_pokok > 0 || $this->tunjangan_jabatan > 0) {
+            $perHari = ($this->gaji_pokok + $this->tunjangan_jabatan) / 26;
+            $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0);
+            $potonganIzin = round($perHari * $totalHariIzin);
+            $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 25000;
+            // dd($potonganTerlambat);
+        }
+        $this->izin_nominal = $potonganIzin; // misal 50rb per izin
+        $this->terlambat_nominal = $potonganTerlambat; // misal 20rb per terlambat
+
+        $this->hitungTotalGaji();
+    }
+
+    public function hitungUangMakanTransport()
+    {
+        if ($this->uang_makan > 0 && $this->uang_makan_jumlah > 0) {
+            $this->uang_makan_total = (float)$this->uang_makan * (float)$this->uang_makan_jumlah;
+        }
+
+        if ($this->transport > 0 && $this->transport_jumlah > 0) {
+            $this->transport_total = (float)$this->transport * (float)$this->transport_jumlah;
+        }
     }
 
     public function isSalesPosition()
     {
-        return in_array(strtolower($this->jabatan), ['sales', 'sm', 'sales marketing']);
+        // dd($this->karyawan);
+
+        if ($this->karyawan) {
+            return $this->karyawan->divisi === 'Sales Marketing'
+                && $this->karyawan->level !== 'SPV'; // exclude SPV
+        }
+        return false;
     }
+
     public function isSalesPositionSpv()
     {
-        return in_array(strtolower($this->jabatan), ['spv sales marketing', 'spv sales']);
+        if ($this->karyawan) {
+            return $this->karyawan->level === 'SPV'
+                && $this->karyawan->divisi === 'Sales Marketing'
+                && $this->karyawan->jabatan === 'Sales Marketing'
+                && $this->karyawan->entitas === 'UNR';
+        }
+        return false;
+    }
+
+    public function isSalesPositionSpvUGR()
+    {
+        if ($this->karyawan) {
+            return $this->karyawan->level === 'SPV'
+                && $this->karyawan->divisi === 'Sales & Marketing'
+                && $this->karyawan->jabatan === 'Sales Marketing'
+                && $this->karyawan->entitas === 'UGR';
+        }
+        return false;
+    }
+
+    public function updatedJmlPsb()
+    {
+        if (!$this->karyawan) {
+            return;
+        }
+
+        // Staff Sales / Collector pakai insentif mapping
+        if ($this->isSalesPosition()){
+            $insentifMapping = [
+                1 => [1000000, 50000],
+                2 => [1000000, 100000],
+                3 => [1000000, 150000],
+                4 => [1000000, 200000],
+                5 => [1000000, 250000],
+                6 => [1160000, 300000],
+                7 => [1160000, 350000],
+                8 => [1160000, 400000],
+                9 => [1160000, 450000],
+                10 => [1160000, 500000],
+                11 => [1508000, 825000],
+                12 => [1508000, 900000],
+                13 => [1508000, 975000],
+                14 => [1508000, 1050000],
+                15 => [1508000, 1125000],
+                16 => [1508000, 1200000],
+                17 => [1508000, 1275000],
+                18 => [1508000, 1350000],
+                19 => [1508000, 1425000],
+                20 => [2320000, 1700000],
+                21 => [2320000, 1785000],
+                22 => [2320000, 1870000],
+                23 => [2320000, 1955000],
+                24 => [2320000, 2040000],
+                25 => [2320000, 2125000],
+                26 => [2320000, 2210000],
+                27 => [2320000, 2295000],
+                28 => [2320000, 2380000],
+                29 => [2320000, 2465000],
+                30 => [2320000, 2550000],
+            ];
+
+            if (isset($insentifMapping[$this->jml_psb])) {
+                [$upah, $insentif] = $insentifMapping[$this->jml_psb];
+
+                $this->gaji_pokok = round($upah * 0.75);
+                $this->tunjangan_jabatan = $upah * 0.25;
+                $this->insentif = $insentif;
+            } else {
+                $this->insentif = 0;
+            }
+        }
+        // SPV UNR
+        elseif ($this->isSalesPositionSpv()) {
+            $this->insentif = 10000 * ((int) ($this->jml_psb ?? 0));
+        }
+        // SPV UGR
+        elseif ($this->isSalesPositionSpvUGR()) {
+            $this->insentif = 50000 * ((int) ($this->jml_psb ?? 0));
+        }
+
+        $this->hitungTotalGaji();
     }
 
     public function updatedBpjsDigunakan()
@@ -290,90 +532,6 @@ class EditPayroll extends Component
         }
     }
 
-    public function hitungRekapPresensi()
-    {
-        if (!$this->user_id || !$this->bulanTahun) {
-            $this->rekap = [];
-            return $this->rekap;
-        }
-
-        // Set cutoffStart dan cutoffEnd berdasarkan cutoffType dan bulanTahun
-        $this->setCutoffPeriode();
-
-        // Panggil rekapKehadiran dengan tanggal cutoff
-        $this->rekap = $this->rekapKehadiran(
-            $this->user_id,
-            $this->cutoffStart,
-            $this->cutoffEnd
-        );
-        // dd($this->rekap);
-        return $this->rekap;
-    }
-
-    public function rekapKehadiran($id, $cutoffStart, $cutoffEnd)
-    {
-        // dd($id);
-        $karyawan = M_DataKaryawan::find($id);
-        // dd($karyawan);
-
-        $presensiCollection = $karyawan->getPresensi ?? collect();
-        $presensi = $presensiCollection->filter(function ($item) use ($cutoffStart, $cutoffEnd) {
-            return Carbon::parse($item->tanggal)->between($cutoffStart, $cutoffEnd);
-        });
-        // dd($presensi);
-        $terlambat = $presensi->where('status', 1)->where('user_id', $id)->count();
-        // dd($terlambat);
-        // Ambil bulan dan tahun dari cutoffEnd (bukan dari input manual)
-        $bulan = $cutoffEnd->format('m');
-        $tahun = $cutoffEnd->format('Y');
-        $bulanTahun = $cutoffEnd->format('Y-m');
-
-        $jadwal = M_Jadwal::where('karyawan_id', $id)
-            ->where('bulan_tahun', $bulanTahun)
-            ->first();
-
-        $izin = 0;
-        $cuti = 0;
-        $izinSetengahHari = 0;
-
-        foreach (range(1, 31) as $i) {
-            $kode = $jadwal->{'d' . $i};
-
-            $tanggal = Carbon::createFromFormat('Y-m-d', "{$tahun}-{$bulan}-" . str_pad($i, 2, '0', STR_PAD_LEFT));
-
-            if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
-                continue;
-            }
-
-            if ($kode == 3) {
-                $izin++;
-            } elseif ($kode == 2) {
-                $cuti++;
-            } elseif ($kode == 8) {
-                $izinSetengahHari++;
-            }
-        }
-
-        $dataLembur = M_Lembur::where('karyawan_id', $id)
-            ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
-            ->whereNotNull('total_jam')
-            ->where('status', 1)
-            ->get(['tanggal', 'total_jam']);
-
-        $totalJamLembur = $dataLembur->sum('total_jam');
-
-        return [
-            'kehadiran' => 26 - $izin - $cuti - (0.5 * $izinSetengahHari),
-            'terlambat' => $terlambat,
-            'izin' => $izin,
-            'cuti' => $cuti,
-            'lembur' => $totalJamLembur,
-            'izin setengah hari' => $izinSetengahHari,
-            'cutoff_start' => $cutoffStart->format('Y-m-d'),
-            'cutoff_end' => $cutoffEnd->format('Y-m-d'),
-        ];
-    }
-
     private function numericValue($value)
     {
         return is_numeric($value) ? (int) $value : (int) str_replace(['.', ','], '', $value);
@@ -381,19 +539,52 @@ class EditPayroll extends Component
 
     public function hitungInovationReward()
     {
-        if (!isset($this->kehadiran)) {
-            $this->kehadiran = M_Presensi::where('user_id', $this->user_id)
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count();
+        $userId = $this->karyawan->id ?? null;
+        // dd($userId);
+        if (!$this->karyawan || !$this->karyawan->inov_reward) {
+            $this->inovation_reward = 0;
+            $this->inovation_reward_jumlah = 0;
+            $this->inovation_reward_total = 0;
+            return;
         }
 
-        // Set jumlah inovation reward sesuai kehadiran
-        $this->inovation_reward_jumlah = (int) $this->kehadiran;
+        // Simpan nilai inov_reward bulanan dari database
+        $this->inovation_reward = (float) $this->karyawan->inov_reward;
 
-        // Hitung total
-        $this->inovation_reward_total = 
-            (float) $this->inovation_reward * (float) $this->inovation_reward_jumlah;
+        // Hitung jumlah kehadiran bulan berjalan
+        $jadwal = M_Jadwal::where('karyawan_id', $userId)
+            ->where('bulan_tahun', $this->bulanTahun)
+            ->first();
+
+        $izin = 0;
+        $izin_setengah = 0;
+        $cuti = 0;
+
+        if ($jadwal) {
+            for ($i = 1; $i <= 31; $i++) {
+                $col = 'd'.$i;
+                if (isset($jadwal->$col)) {
+                    if ($jadwal->$col == 2) {
+                        $cuti++;
+                    } elseif ($jadwal->$col == 3) {
+                        $izin++;
+                    } elseif ($jadwal->$col == 8) { // kode 4 = izin setengah hari
+                        $izin_setengah++;
+                    }
+                }
+            }
+        }
+        // dd($izin_setengah);
+        // total kehadiran fix 26 hari - (izin + cuti + 0.5 * izin_setengah)
+        $kehadiran = 26 - ($izin + $cuti + 0.5 * $izin_setengah);
+
+        $this->rekap['kehadiran'] = $kehadiran;
+
+        // dd($kehadiran);
+        // hitung inov reward
+        $inovRewardPerHari = $this->inovation_reward / 26;
+        $this->inovation_reward_jumlah = $kehadiran;
+        $this->inovation_reward = round($inovRewardPerHari * $kehadiran);
     }
 
     public function updated($propertyName, $id = null)
@@ -444,11 +635,14 @@ class EditPayroll extends Component
         $tunjanganJabatan  = $this->numericValue($this->tunjangan_jabatan);
         $transport         = $this->numericValue($this->transport_total ?? 0);
         $uangMakan         = $this->numericValue($this->uang_makan_total ?? 0);
-        $inovationReward   = $this->numericValue($this->inovation_reward_total ?? 0);
+        $inovationReward   = $this->numericValue($this->inovation_reward ?? 0);
         $kebudayaan        = $this->numericValue($this->kebudayaan ?? 0);
         $feeSharing        = $this->numericValue($this->fee_sharing ?? 0);
         $insentif          = $this->numericValue($this->insentif ?? 0);
-        $insentifSpv       = $this->numericValue($this->insentif_spv ?? 0);
+        $lemburLiburNominal= $this->numericValue($this->lembur_libur ?? 0);
+        $lemburNominal     = $this->numericValue($this->lembur ?? 0);
+        $kasbon            = $this->numericValue($this->kasbon ?? 0);
+        $churn            = $this->numericValue($this->churn ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -468,36 +662,7 @@ class EditPayroll extends Component
             $totalPotonganManual += $this->numericValue($item['nominal']);
         }
 
-        // === 5. Potongan otomatis ===
-        // $potonganIzin = 0;
-        // $potonganTerlambat = 0;
-
-        // if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
-        //     $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
-        //     $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0);
-        //     $potonganIzin = round($perHari * $totalHariIzin);
-        //     $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) > 0 ? 25000 : 0;
-        // }
-
         // === 6. Hitung lembur ===
-        $jamLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
-            ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
-            ->whereNotNull('total_jam')
-            ->where('status', 1)
-            ->sum('total_jam');
-
-        $lemburNominal = 0;
-        if ($jamLembur > 0 && ($gajiPokok > 0 || $tunjanganJabatan > 0)) {
-            $jenisLembur = M_Lembur::where('karyawan_id', $this->karyawanId)
-                ->whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$this->bulanTahun])
-                ->whereNotNull('total_jam')
-                ->where('status', 1)
-                ->orderByDesc('tanggal')
-                ->value('jenis');
-
-            $faktor = ($jenisLembur == 2) ? 2 : 1;
-            $lemburNominal = (1 / 173) * ($gajiPokok + $tunjanganJabatan) * $jamLembur * $faktor;
-        }
 
         // === 7. Hitung BPJS ===
         $dasarBpjs = $gajiPokok + $tunjanganJabatan;
@@ -526,8 +691,8 @@ class EditPayroll extends Component
             + $tunjanganJabatan
             + $totalTunjangan
             + $lemburNominal
+            + $lemburLiburNominal
             + $insentif
-            + $insentifSpv
             + $tunjanganKehadiran
             + $kebudayaan
             + $feeSharing
@@ -538,11 +703,12 @@ class EditPayroll extends Component
             - $this->izin_nominal
             - $this->terlambat_nominal
             - $this->bpjs_nominal
+            - $kasbon
+            - $churn
             - $this->bpjs_jht_nominal
         );
         // dd($this->total_gaji);
     }
-
 
     public function addTunjangan()
     {
@@ -638,6 +804,7 @@ class EditPayroll extends Component
         // dd($this->id);
 
         $payroll = PayrollModel::findOrFail(decrypt($this->id));
+        // dd($payroll);
         $data = [
             'no_slip' => $this->no_slip,
             'karyawan_id' => $this->karyawan->id,
@@ -646,22 +813,31 @@ class EditPayroll extends Component
             'divisi' => $this->divisi,
             'gaji_pokok' => $this->gaji_pokok,
             'tunjangan_jabatan' => $this->tunjangan_jabatan,
-            'lembur' => $this->lembur_nominal,
+            'lembur' => $this->lembur,
+            'lembur_libur' => $this->lembur_libur,
             'uang_makan' => $this->uang_makan_total,
+            'jml_uang_makan' => $this->uang_makan_jumlah,
             'transport' => $this->transport_total,
-            'inov_reward' => $this->inovation_reward_total,
+            'jml_transport' => $this->transport_jumlah,
+            'tunjangan_kebudayaan' => $this->kebudayaan,
+            'inov_reward' => $this->inovation_reward,
+            'fee_sharing' => $this->fee_sharing,
+            'jml_psb' => $this->jml_psb,
+            'rekap' => json_encode($this->rekap),
             'insentif' => $this->insentif,
             'izin' => $this->izin_nominal,
             'terlambat' => $this->terlambat_nominal,
             'tunjangan' => json_encode($this->tunjangan),
             'potongan' => json_encode($this->potongan),
+            'churn' => $this->churn,
+            'kasbon' => $this->kasbon,
             'bpjs' => $this->bpjs_nominal,
             'bpjs_perusahaan' => $this->bpjs_perusahaan_nominal,
             'bpjs_jht' => $this->bpjs_jht_nominal,
             'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
             'total_gaji' => $this->total_gaji,
         ];
-        dd($data);
+        // dd($data);
         $payroll->update($data);
 
         $this->dispatch('swal', params: [

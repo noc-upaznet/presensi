@@ -169,7 +169,7 @@
                     <div class="company-info">
                         <h2>PT DIMENSI JARINGAN BERSINAR</h2>
                         <p>Tulungagung, Jawa Timur, Indonesia</p>
-                        <p><a href="https://www.upaznet.com" style="color: blue;">www.upaznet.com</a></p>
+                        {{-- <p><a href="https://www.upaznet.com" style="color: blue;">www.upaznet.com</a></p> --}}
                         <p class="slip-number">Slip Number&nbsp;&nbsp;&nbsp;: {{ $data->no_slip }}</p>
                     </div>
                 </td>
@@ -238,14 +238,16 @@
                 </tr>
             </thead>
             @php
+                $lembur = $data->lembur + $data->lembur_libur;
                 $totalPendapatan = $data->gaji_pokok 
                     + $data->tunjangan_jabatan 
                     + $data->tunjangan_kebudayaan
-                    + $data->lembur
-                    + $data->uanga_makan
+                    + $lembur
+                    + $data->uang_makan
                     + $data->transport
                     + $data->fee_sharing
-                    + $data->insentif;
+                    + $data->insentif
+                    + $data->inov_reward;
             @endphp
 
             <tbody>
@@ -274,22 +276,27 @@
                 @endforeach
                 <tr>
                     <td>Upah Lembur</td>
-                    <td class="text-right">Rp. {{ number_format($data->lembur) }}</td>
+                    <td class="text-right">Rp. {{ number_format($lembur) }}</td>
                 </tr>
                 <tr>
                     <td>Uang Makan</td>
-                    <td class="text-right">Rp. {{ number_format($data->uanga_makan) }}</td>
+                    <td class="text-right">Rp. {{ number_format($data->uang_makan) }}</td>
                 </tr>
                 <tr>
                     <td>Transport</td>
                     <td class="text-right">Rp. {{ number_format($data->transport) }}</td>
                 </tr>
+                @if ($data->inov_reward > 0)
+                    <tr>
+                        <td>Inovation Reward</td>
+                        <td class="text-right">Rp. {{ number_format($data->inov_reward) }}</td>
+                    </tr>
+                @endif
                 <tr>
                     <td>Fee Sharing</td>
                     <td class="text-right">Rp. {{ number_format($data->fee_sharing) }}</td>
                 </tr>
-
-                @if ($data->divisi == 'Sales Marketing')
+                @if ($data->divisi == 'Sales Marketing' || $data->divisi == 'Sales' || $data->divisi == 'Sales & Marketing')
                     <tr>
                         <td>Insentif</td>
                         <td class="text-right">Rp. {{ number_format($data->insentif) }}</td>
@@ -310,14 +317,31 @@
                     <th colspan="2" style="text-align: left;">POTONGAN</th>
                 </tr>
             </thead>
-            @php
-                $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat;
-            @endphp
+            @if ($data->getKaryawan->jabatan == 'Branch Manager' || $data->getkaryawan->entitas == 'UNB')
+                @php
+                    $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->bpjs_jht_perusahaan;
+                @endphp
+            @else
+                @php
+                    $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->churn;
+                @endphp
+            @endif
+            
 
             <tbody>
+                @if ($data->divisi == 'Sales Marketing' || $data->divisi == 'Sales' || $data->divisi == 'Sales & Marketing')
+                    <tr>
+                        <td>Churn</td>
+                        <td class="text-right">Rp. {{ number_format($data->churn) }}</td>
+                    </tr>
+                @endif
                 <tr>
                     <td>Potongan Izin</td>
                     <td class="text-right">Rp. {{ number_format($data->izin) }}</td>
+                </tr>
+                <tr>
+                    <td>Potongan Kasbon</td>
+                    <td class="text-right">Rp. {{ number_format($data->kasbon) }}</td>
                 </tr>
                 <tr>
                     <td>Potongan Terlambat</td>
@@ -342,6 +366,12 @@
                     <td>Kesehatan</td>
                     <td class="text-right">Rp. {{ number_format($data->bpjs) }}</td>
                 </tr>
+                @if ($data->getKaryawan->jabatan == 'Branch Manager' || $data->getkaryawan->entitas == 'UNB')
+                    <tr>
+                        <td>JHT PT</td>
+                        <td class="text-right">Rp. {{ number_format($data->bpjs_jht_perusahaan) }}</td>
+                    </tr>
+                @endif
                 <tr style="border-bottom: 1px solid red;">
                     <th>Total Potongan</th>
                     <th class="text-right">Rp. {{ number_format($totalPotongan) }}</th>

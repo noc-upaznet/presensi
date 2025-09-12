@@ -69,9 +69,15 @@
                   @endforeach
               </div>
           @endif
+          @if (session('error'))
+              <div class="alert alert-danger small">
+                  {{ session('error') }}
+              </div>
+          @endif
           <p class="login-box-msg">Silahkan Login</p>
             <form action="{{ route('login') }}" method="POST">
               @csrf
+              {{-- <input type="text" name="_token" value="{{ csrf_token() }}"> --}}
               <div class="input-group mb-3">
                   <input type="email" name="email" class="form-control" placeholder="Email" value="{{ request()->cookie('login_email') }}">
                   <div class="input-group-append">
@@ -105,6 +111,17 @@
         <!-- /.login-card-body -->
       </div>
     </div>
+    <script>
+        document.addEventListener('livewire:load', function () {
+            Livewire.onError((status, response) => {
+                if (status === 401 || status === 419) {
+                    // redirect ke login kalau session expired
+                    window.location.href = "{{ route('login') }}";
+                    return false; // hentikan error Livewire default
+                }
+            });
+        });
+    </script>
     <!-- /.login-box -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <!--begin::Third Party Plugin(OverlayScrollbars)-->

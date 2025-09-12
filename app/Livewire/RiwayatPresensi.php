@@ -26,6 +26,7 @@ class RiwayatPresensi extends Component
     public $filterTanggal;
     public $filterBulan;
     public $filterkaryawan;
+    public $filterStatus;
     public $karyawanList;
 
     public function mount()
@@ -121,9 +122,36 @@ class RiwayatPresensi extends Component
                 ->whereHas('getUser', function ($query) use ($entitasNama) {
                     $query->where('entitas', $entitasNama);
                 })
+                ->when($this->filterStatus !== null, function ($query) {
+                    // Filter berdasarkan status presensi
+                    if ($this->filterStatus == 0) {
+                        $query->where('status', 0); // Tepat Waktu
+                    } elseif ($this->filterStatus == 1) {
+                        $query->where('status', 1); // Terlambat
+                    } elseif ($this->filterStatus == 2) {
+                        $query->where('status', 2); // Dispensasi
+                    }
+                })
+                ->where(function ($q) {
+                    $q->whereHas('getKaryawan', function ($sub) {
+                        $sub->whereNotIn('level', ['SPV', 'Manajer']);
+                    })
+                    ->where(function ($q2) {
+                        $q2->where(function ($q3) {
+                            $q3->where('lokasi_lock', 0)
+                                ->where('approve', 1);
+                        })
+                        ->orWhere(function ($q3) {
+                            $q3->where('lokasi_lock', 1)
+                                ->where('approve', 0);
+                        });
+                    })
+                    ->orWhereHas('getKaryawan', function ($sub) {
+                        $sub->whereIn('level', ['SPV', 'Manajer']);
+                    });
+                })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
-
         } elseif (Auth::user()->hasAnyRole(['user', 'spv'])) {
             $userId = Auth::id();
             $karyawan = M_DataKaryawan::where('user_id', $userId)->first();

@@ -24,6 +24,9 @@ class Pengajuan extends Component
 
     public $filterPengajuan = '';
     public $filterBulan = '';
+    public $filterKaryawan = '';
+    public $karyawanList;
+    public $selectedKaryawan = '';
     public $status = [];
     public $search;
     public $tanggal;
@@ -38,6 +41,10 @@ class Pengajuan extends Component
         // Ambil semua status unik dari database
         $this->status = M_Pengajuan::select('status')->distinct()->get();
         $this->filterBulan = now()->format('Y-m');
+        $entitas = session('selected_entitas', 'UHO');
+        $this->karyawanList = M_DataKaryawan::where('entitas', $entitas)
+            ->orderBy('nama_karyawan')
+            ->get();
     }
 
     public function showAdd()
@@ -242,35 +249,46 @@ class Pengajuan extends Component
                     ]);
                 }
             } else {
-                // Pengaju bukan SPV, cek approval SPV dulu
-                if ($pengajuan->approve_spv == 1) {
+                // Jika pengaju bukan SPV, maka perlu approve_spv
+                if($entitasUser === 'MC'){
                     if ($status == 1) {
                         $pengajuan->approve_hr = 1;
                         $pengajuan->status = 1;
                     } elseif ($status == 2) {
                         $pengajuan->approve_hr = 2;
                         $pengajuan->status = 2;
-                        $this->dispatch('swal', params: [
-                            'title' => 'Pengajuan Rejected',
-                            'icon'  => 'error',
-                            'text'  => 'Berhasil Menolak Pengajuan ini.'
-                        ]);
                     }
-                } elseif ($pengajuan->approve_spv == 2) {
-                    $pengajuan->status = 2;
-                    $this->dispatch('swal', params: [
-                        'title' => 'Gagal Menyimpan',
-                        'icon'  => 'error',
-                        'text'  => 'SPV sudah menolak pengajuan ini.'
-                    ]);
-                    return;
-                } else {
-                    $this->dispatch('swal', params: [
-                        'title' => 'Gagal Menyimpan',
-                        'icon'  => 'error',
-                        'text'  => 'Pengajuan belum disetujui oleh SPV.'
-                    ]);
-                    return;
+                }else{
+                    if ($pengajuan->approve_spv == 1) {
+                        if ($status == 1) {
+                            $pengajuan->approve_hr = 1;
+                            $pengajuan->status = 1;
+                        } elseif ($status == 2) {
+                            $pengajuan->approve_hr = 2;
+                            $pengajuan->status = 2;
+
+                            $this->dispatch('swal', params: [
+                                'title' => 'Pengajuan Rejected',
+                                'icon' => 'error',
+                                'text' => 'Berhasil Menolak Pengajuan ini.'
+                            ]);
+                        }
+                    } elseif ($pengajuan->approve_spv == 2) {
+                        $pengajuan->status = 2;
+                        $this->dispatch('swal', params: [
+                            'title' => 'Gagal Menyimpan',
+                            'icon' => 'error',
+                            'text' => 'SPV sudah menolak pengajuan ini.'
+                        ]);
+                        return;
+                    } else {
+                        $this->dispatch('swal', params: [
+                            'title' => 'Gagal Menyimpan',
+                            'icon' => 'error',
+                            'text' => 'Pengajuan belum disetujui oleh SPV.'
+                        ]);
+                        return;
+                    }
                 }
             }
         }
@@ -339,8 +357,6 @@ class Pengajuan extends Component
 
         $this->dispatch('refresh');
     }
-
-
 
     public function render()
     {

@@ -99,4 +99,9 @@ class M_Lembur extends Model
         return Auth::user()->current_role === 'admin'
             && $this->status == 0;
     }
+
+    public function canBeDeletedBySPV()
+    {
+        return Auth::user()->current_role === 'spv';
+    }
 }

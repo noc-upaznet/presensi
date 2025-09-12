@@ -99,41 +99,47 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                         style="border-radius: 8px;">Batal</button>
-                    <button wire:click="store" class="btn btn-primary" style="border-radius: 8px;">Simpan</button>
+                    <button wire:click="store" wire:loading.attr="disabled" class="btn btn-primary" style="border-radius: 8px;">
+                        <span wire:loading wire:target="store" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="fa-solid fa-save"></i>
+                        Simpan
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Modal Edit Jenis Potongan -->
-    <div wire:ignore.self class="modal fade" id="editTunjanganModal" tabindex="-1"
-        aria-labelledby="editTunjanganModalLabel" aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="editPotonganModal" tabindex="-1"
+        aria-labelledby="editPotonganModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="editTunjanganModalLabel">Edit Jenis Potongan</h5>
+                    <h5 class="modal-title fw-bold" id="editPotonganModalLabel">Edit Jenis Potongan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form wire:submit.prevent="updatePotongan">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="nama_potongan" class="form-label">Nama Potongan</label>
-                            <input type="text" class="form-control" id="nama_potongan" wire:model="nama_potongan"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="deskripsi" class="form-label">Deskripsi</label>
-                            <input type="number" class="form-control" id="deskripsi" wire:model="deskripsi"
-                                required>
-                        </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nama_potongan" class="form-label">Nama Potongan</label>
+                        <input type="text" class="form-control" id="nama_potongan" wire:model="nama_potongan"
+                            required>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            style="border-radius: 8px;">Batal</button>
-                        <button type="submit" class="btn btn-warning" style="border-radius: 8px;">Perbarui</button>
+                    <div class="mb-3">
+                        <label for="deskripsi" class="form-label">Deskripsi</label>
+                        <input type="number" class="form-control" id="deskripsi" wire:model="deskripsi"
+                            required>
                     </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 8px;">Batal</button>
+                    <button wire:click="update" wire:loading.attr="disabled" class="btn btn-primary" style="border-radius: 8px;">
+                        <span wire:loading wire:target="update" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="fa-solid fa-save"></i>
+                        Update
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -167,6 +173,10 @@
     <script>
         Livewire.on('tambahJenisPotonganModal', (event) => {
             $('#tambahJenisPotonganModal').modal(event.action);
+        });
+
+        Livewire.on('editPotonganModal', (event) => {
+            $('#editPotonganModal').modal(event.action);
         });
 
         Livewire.on('swal', (e) => {

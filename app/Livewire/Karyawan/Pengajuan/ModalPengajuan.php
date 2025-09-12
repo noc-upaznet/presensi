@@ -146,7 +146,7 @@ class ModalPengajuan extends Component
             $hari = 'd' . $tanggal->day;
             $bulanTahun = $tanggal->format('Y-m');
 
-            $jadwal = M_Jadwal::where('user_id', $pengajuan->user_id)
+            $jadwal = M_Jadwal::where('karyawan_id', $pengajuan->karyawan_id)
                 ->where('bulan_tahun', $bulanTahun)
                 ->first();
 

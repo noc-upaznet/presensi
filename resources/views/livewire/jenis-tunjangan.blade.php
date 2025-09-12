@@ -99,7 +99,11 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                         style="border-radius: 8px;">Batal</button>
-                    <button wire:click="store" class="btn btn-primary" style="border-radius: 8px;">Simpan</button>
+                    <button wire:click="store" wire:loading.attr="disabled" class="btn btn-primary" style="border-radius: 8px;">
+                        <span wire:loading wire:target="store" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="fa-solid fa-save"></i>
+                        Simpan
+                    </button>
                 </div>
             </div>
         </div>
@@ -115,25 +119,27 @@
                     <h5 class="modal-title fw-bold" id="editTunjanganModalLabel">Edit Jenis Tunjangan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form wire:submit.prevent="updateTunjangan">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="nama_tunjangan_edit" class="form-label">Nama Tunjangan</label>
-                            <input type="text" class="form-control" id="nama_tunjangan_edit" wire:model="nama_tunjangan"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="maksimal_jumlah_edit" class="form-label">Maksimal Jumlah</label>
-                            <input type="number" class="form-control" id="maksimal_jumlah_edit"
-                                wire:model="maksimal_jumlah" required>
-                        </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nama_tunjangan_edit" class="form-label">Nama Tunjangan</label>
+                        <input type="text" class="form-control" id="nama_tunjangan_edit" wire:model="nama_tunjangan"
+                            required>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            style="border-radius: 8px;">Batal</button>
-                        <button type="submit" class="btn btn-warning" style="border-radius: 8px;">Perbarui</button>
+                    <div class="mb-3">
+                        <label for="nominal" class="form-label">Nominal</label>
+                        <input type="number" class="form-control" id="nominal"
+                            wire:model="deskripsi" required>
                     </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 8px;">Batal</button>
+                    <button wire:click="update" wire:loading.attr="disabled" class="btn btn-primary" style="border-radius: 8px;">
+                        <span wire:loading wire:target="update" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="fa-solid fa-save"></i>
+                        Update
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -171,6 +177,10 @@
     <script>
         Livewire.on('tambahJenisTunjanganModal', (event) => {
             $('#tambahJenisTunjanganModal').modal(event.action);
+        });
+
+        Livewire.on('editTunjanganModal', (event) => {
+            $('#editTunjanganModal').modal(event.action);
         });
 
         Livewire.on('swal', (e) => {

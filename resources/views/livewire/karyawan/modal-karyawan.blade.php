@@ -267,7 +267,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="bonus" class="form-label">Bonus (Jika Memenuhi Target)</label>
+                            <label for="bonus" class="form-label">Achivement Reward</label>
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="bonus">Rp.</span>
                                 <input
@@ -281,19 +281,33 @@
                             @error('form.bonus') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="jenis-penggajian" class="form-label">Jenis Penggajian <small class="text-danger">*</small></label>
-                            <div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="jenis_penggajian" id="bulanan" value="Bulanan" wire:model="form.jenis_penggajian">
-                                    <label class="form-check-label" for="bulanan">Bulanan</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="jenis_penggajian" id="harian" value="Harian" wire:model="form.jenis_penggajian">
-                                    <label class="form-check-label" for="harian">Harian</label>
-                                </div>
+                            <label for="inov_reward" class="form-label">Inovation Reward</label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="inov_reward">Rp.</span>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="inov_reward"
+                                    oninput="formatRupiah(this)"
+                                    wire:model.lazy="form.inov_reward"
+                                />
                             </div>
-                            @error('form.jenis_penggajian') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.inov_reward') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="jenis-penggajian" class="form-label">Jenis Penggajian <small class="text-danger">*</small></label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="jenis_penggajian" id="bulanan" value="Bulanan" wire:model="form.jenis_penggajian">
+                                <label class="form-check-label" for="bulanan">Bulanan</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="jenis_penggajian" id="harian" value="Harian" wire:model="form.jenis_penggajian">
+                                <label class="form-check-label" for="harian">Harian</label>
+                            </div>
+                        </div>
+                        @error('form.jenis_penggajian') <span class="text-danger">{{ $message }}</span> @enderror
                     </div>
                     <h4 style="color: blue; margin-bottom: 20px;">Rekening Bank</h4>
                     <div class="mb-3">

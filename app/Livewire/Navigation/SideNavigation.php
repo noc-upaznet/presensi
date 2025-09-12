@@ -27,6 +27,7 @@ class SideNavigation extends Component
                 $entitas = $dataKaryawan?->entitas;
                 $entitasModel = M_Entitas::where('nama', $entitas)->first();
                 $entitasIdSaatIni = $entitasModel?->nama;
+                $divisi = $dataKaryawan->divisi;
 
                 if ($dataKaryawan) {
                     $karyawanIds = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
@@ -52,18 +53,27 @@ class SideNavigation extends Component
                         ->whereMonth('tanggal', Carbon::now()->month)
                         ->whereYear('tanggal', Carbon::now()->year)
                         ->count();
-
-                    // Presensi staff
-                    $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
-                        ->where('approve', 0)
-                        ->where('user_id', '!=', $dataKaryawan->id)
-                        ->whereHas('getKaryawan', fn($q) => 
-                            $q->where('entitas', $entitasIdSaatIni)
-                            ->where('divisi', $dataKaryawan->divisi)
-                        )
-                        ->whereMonth('tanggal', Carbon::now()->month)
-                        ->whereYear('tanggal', Carbon::now()->year)
-                        ->count();
+                    if ($divisi == 'NOC'){
+                        $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
+                            ->where('approve', 0)
+                            ->where('user_id', '!=', $dataKaryawan->id)
+                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
+                                $q->where('divisi', $divisi);
+                            })
+                            ->count();
+                    } else {
+                        $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
+                            ->where('approve', 0)
+                            ->where('user_id', '!=', $dataKaryawan->id)
+                            ->whereHas('getKaryawan', fn($q) => 
+                                $q->where('entitas', $entitasIdSaatIni)
+                                ->where('divisi', $dataKaryawan->divisi)
+                            )
+                            ->whereMonth('tanggal', Carbon::now()->month)
+                            ->whereYear('tanggal', Carbon::now()->year)
+                            ->count();
+                    }
+                        // dd($countPresensiStaff);
                 } else {
                     $countPengajuan = 0;
                     $countLembur = 0;

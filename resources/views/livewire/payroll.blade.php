@@ -132,7 +132,7 @@
                 <div class="d-flex mb-3 align-items-center">
                     {{-- Dropdown Tahun --}}
                     <select wire:model.lazy="selectedYear" class="form-select me-2" style="width: 100px;">
-                        @for ($i = now()->year; $i >= 2020; $i--)
+                        @for ($i = now()->year; $i >= 2023; $i--)
                             <option value="{{ $i }}">{{ $i }}</option>
                         @endfor
                     </select>
@@ -147,12 +147,25 @@
                         @endforeach
                     </select>
 
+                    <select wire:model.lazy="selectedKaryawan" class="form-select me-2" style="width: 150px;">
+                        <option value="">Karyawan</option>
+                        @foreach ($karyawanList as $item)
+                            <option value="{{ $item->id }}">{{ $item->nama_karyawan }}</option>
+                        @endforeach
+                    </select>
+
+                    <select wire:model.lazy="selectedStatus" class="form-select me-2" style="width: 150px;">
+                        <option value="">Status</option>
+                        <option value="0">Pending</option>
+                        <option value="1">Accepted</option>
+                    </select>
+                    
+
                     <div class="ms-auto">
                         <button type="button" class="btn btn-sm btn-success" wire:click="export">
                             <i class="fas fa-file-export"></i> Export
                         </button>
                     </div>
-
                 </div>
 
                 <h5 class="text-secondary mb-3">
@@ -160,17 +173,18 @@
                 </h5>
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div>
-                        <label>
-                            Show
-                            <select wire:model="perPage" class="form-select form-select-sm d-inline-block w-auto mx-1">
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="25">25</option>
-                            </select>
-                            entries per page
-                        </label>
-                    </div>
+                    <label>
+                        Show
+                        <select wire:model="perPage" class="form-select form-select-sm d-inline-block w-auto mx-1">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                        </select>
+                        entries per page
+                    </label>
+                    <button class="btn btn-sm btn-primary" wire:click="publishAll">
+                        <i class="fas fa-square-check"></i> Publish All
+                    </button>
                 </div>
                 <h5 class="text-secondary mb-3">Data Slip Karyawan {{ $currentEntitas }}</h5>
                 <div class="table-responsive">
@@ -184,8 +198,9 @@
                                 <th>Bulan</th>
                                 <th>Grand Total</th>
                                 <th>Status Titip</th>
-                                <th>Action</th>
                                 <th>Published</th>
+                                <th>Accepted</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -215,25 +230,33 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview({{ $payroll->id }})"><i class="fa-solid fa-print"></i>
-                                            </button>
-                                            <a href="{{ route('edit-payroll', encrypt($payroll->id)) }}" 
-                                            class="btn btn-warning btn-sm" 
-                                            data-bs-toggle="tooltip" 
-                                            data-bs-placement="top" 
-                                            title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button wire:click="confirmHapusPayroll({{ $payroll->id }})"
-                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                        <td>
                                             @if ($payroll->published == 0)
                                                 <button wire:click="publishPayroll({{ $payroll->id }})" class="btn btn-primary btn-sm">Publish</button>
                                             @elseif ($payroll->published == 1)
                                                 <span class="badge bg-success">Published</span>
                                             @endif
+                                        </td>
+                                        <td>
+                                            @if ($payroll->accepted == 1)
+                                                <span class="badge bg-success">Accepted</span>
+                                            @else
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($payroll->id) }}')"><i class="fa-solid fa-print"></i>
+                                            </button>
+                                            <button 
+                                                wire:click="editPayroll('{{ encrypt($payroll->id) }}')" 
+                                                class="btn btn-warning btn-sm" 
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button wire:click="confirmHapusPayroll({{ $payroll->id }})"
+                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -254,8 +277,9 @@
                                 <th>Bulan</th>
                                 <th>Grand Total</th>
                                 <th>Status Titip</th>
-                                <th>Action</th>
                                 <th>Published</th>
+                                <th>Accepted</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -285,21 +309,33 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview({{ $key->id }})"><i class="fa-solid fa-print"></i>
+                                            @if ($key->published == 0)
+                                                <button wire:click="publishPayroll({{ $key->id }})" class="btn btn-primary btn-sm">Publish</button>
+                                            @elseif ($key->published == 1)
+                                                <span class="badge bg-success">Published</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($key->accepted == 1)
+                                                <span class="badge bg-success">Accepted</span>
+                                            @else
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-print"></i>
                                             </button>
-                                            <button wire:click="editPayroll({{ $key->id }})"
-                                                class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit"></i>
+                                            <button 
+                                                wire:click="editPayroll('{{ encrypt($key->id) }}')" 
+                                                class="btn btn-warning btn-sm" 
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="Edit">
+                                                    <i class="fas fa-edit"></i>
                                             </button>
                                             <button wire:click="confirmHapusPayroll({{ $key->id }})"
                                                 class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
                                             </button>
-                                        </td>
-                                        <td>
-                                            @if ($payroll->published == 0)
-                                                <button wire:click="publishPayroll({{ $payroll->id }})" class="btn btn-primary btn-sm">Publish</button>
-                                            @elseif ($payroll->published == 1)
-                                                <span class="badge bg-success">Published</span>
-                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -312,7 +348,7 @@
                     <span>
                         Showing {{ $data->firstItem() }} to {{ $data->lastItem() }} of {{ $data->total() }} entries
                     </span>
-                    {{ $data->links('pagination::bootstrap-5') }}
+                    {{ $data->links() }}
                 </div>
             </div>
         </div>
@@ -634,6 +670,7 @@
         });
 
         function loadSlipPreview(id) {
+            console.log(id);
             const iframe = document.getElementById('slipPreviewIframe');
             iframe.src = `/slip-gaji/html/${id}`;
             document.getElementById('downloadSlipLink').href = `/slip-gaji/download/${id}`;

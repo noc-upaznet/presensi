@@ -40,7 +40,7 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/ganti-password', GantiPassword::class)->middleware('auth')->name('ganti-password');
-Route::group(['middleware' => ['auth', 'password.expired']], function () {
+Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], function () {
     Route::get('/', Dashboard::class)->name('dashboard');
     Route::get('/clock-in', ClockIn::class)->name('clock-in');
     Route::get('/clock-in-selfie', ClockInSelfie::class)->name('clock-in-selfie');
@@ -63,7 +63,9 @@ Route::group(['middleware' => ['auth', 'password.expired']], function () {
     Route::get('/entitas', Entitas::class)->name('entitas');
     Route::get('/payroll', Payroll::class)->name('payroll');
     Route::get('/edit-payroll/{id}', EditPayroll::class)->name('edit-payroll');
-    Route::get('/create-slip-gaji/{id?}', CreateSlipGaji::class)->name('create-slip-gaji');
+    Route::get('/create-slip-gaji/{id?}/{month?}/{year?}', CreateSlipGaji::class)->name('create-slip-gaji');
+    Route::get('/create-slip-gaji-tambah/{month?}/{year?}', CreateSlipGaji::class)
+    ->name('create-slip-gaji-tambah');
     Route::get('/slip-gaji/html/{id}', [PayrollController::class, 'html'])->name('slip.html');
     Route::get('/slip-gaji/download/{id}', [PayrollController::class, 'download'])->name('slip-gaji.download');
     Route::get('/jenis-tunjangan', JenisTunjangan::class)->name('jenis-tunjangan');

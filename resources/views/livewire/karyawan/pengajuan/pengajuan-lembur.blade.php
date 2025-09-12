@@ -87,6 +87,12 @@
             @endhasanyrole
             @role('admin')
                 <div class="d-flex gap-2">
+                    <select class="form-select" wire:model.lazy="selectedKaryawan" style="width: 200px;">
+                        <option value="">Pilih Karyawan</option>
+                        @foreach($karyawanList as $karyawan)
+                            <option value="{{ $karyawan->nama_karyawan }}">{{ $karyawan->nama_karyawan }}</option>
+                        @endforeach
+                    </select>
                     <select class="form-select" wire:model.lazy="filterPengajuan" style="width: 150px;">
                         <option value="">Pilih Status</option>
                         <option value="0">Menunggu</option>
@@ -258,7 +264,9 @@
                     </table>
                 </div>
             </div>
-            {{ $pengajuanLembur->links() }}
+            <div class="mt-3">
+                {{ $pengajuanLembur->links() }}
+            </div>
         </div>
         <livewire:karyawan.pengajuan.modal-pengajuan-lembur />
     </div>

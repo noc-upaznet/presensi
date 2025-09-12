@@ -16,12 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             // 'tokenauth' => \App\Http\Middleware\TokenAuth::class,
             'password.expired' => \App\Http\Middleware\CheckPasswordExpired::class,
-            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'session.expired' => \App\Http\Middleware\expiredSession::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->renderable(function (TokenMismatchException $e, $request): RedirectResponse {
-            return redirect()->route('login')
-                ->with('error', 'Sesi Anda telah habis. Silakan login kembali.');
+        $exceptions->renderable(function (TokenMismatchException $e, $request) {
+            return response()->view('errors.419', [], 419);
         });
     })->create();

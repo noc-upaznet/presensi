@@ -8,19 +8,30 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
-class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
+class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, WithColumnFormatting
 {
     protected $periode;
     protected $status;
+    protected $entitas;
 
     protected $uniqueTunjangan = [];
     protected $uniquePotongan = [];
 
-    public function __construct($periode, $status)
+    public function __construct($periode, $status, $entitas)
     {
+        // dd($periode, $status, $entitas);
+
         $this->periode = $periode;
         $this->status = $status;
+        $this->entitas = $entitas;
+        // dd([
+        //     'entitas' => $this->entitas,
+        //     'periode' => $this->periode,
+        // ]);
     }
 
     protected $headerRowCount = 1;
@@ -28,7 +39,9 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
     public function array(): array
     {
         $query = PayrollModel::join('data_karyawan', 'payroll.karyawan_id', '=', 'data_karyawan.id')
-            ->where('payroll.periode', $this->periode);
+            ->where('payroll.periode', $this->periode)
+            ->where('payroll.entitas_id', $this->entitas)
+            ->orderBy('data_karyawan.nip_karyawan', 'asc');
 
         if ($this->status == 'titip') {
             $query->where('payroll.titip', 1);
@@ -41,8 +54,9 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
         $data = $query->select(
             'payroll.*',
             'data_karyawan.nama_karyawan',
-            'data_karyawan.nip_karyawan'
+            'data_karyawan.nip_karyawan',
         )->get();
+        // dd($data);
 
         // Ambil semua nama tunjangan dan potongan
         foreach ($data as $item) {
@@ -64,6 +78,8 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
         }
 
         // Header tetap
+        $showInovReward = collect($data)->contains(fn($item) => ($item->inov_reward ?? 0) > 0);
+
         $headerTetap = [
             'No Slip',
             'Nama Karyawan',
@@ -75,19 +91,28 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             'Lembur',
             'Tunjangan Kebudayaan',
             'Transport',
+        ];
+
+        if ($showInovReward) {
+            $headerTetap[] = 'Inovation Reward';
+        }
+
+        $headerTetap = array_merge($headerTetap, [
             'Izin',
             'Terlambat',
-            'BPJS',
-            'BPJS JHT',
+            'BPJS Kesehatan KA',
+            'BPJS JHT KA',
+            'BPJS Kesehatan PT',
+            'BPJS JHT PT',
             'Fee Sharing',
             'Insentif',
             'Uang Makan',
             'Total Gaji',
-        ];
-
+        ]);
         $headerTunjangan = array_map(fn($t) => "$t", $this->uniqueTunjangan);
         $headerPotongan = array_map(fn($p) => "$p", $this->uniquePotongan);
 
+        $indexKasbon = array_search('Kasbon', $headerTetap);
         $indexTotalGaji = array_search('Total Gaji', $headerTetap);
         $headerAwal = array_slice($headerTetap, 0, $indexTotalGaji); // Sebelum Total Gaji
         $headerAkhir = array_slice($headerTetap, $indexTotalGaji + 1); // Setelah Total Gaji (jika ada)
@@ -96,13 +121,14 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
             $headerAwal,
             $headerTunjangan,
             $headerPotongan,
+            ['Kasbon'],
             ['Total Gaji'],
             $headerAkhir // opsional, kalau memang ada kolom setelah 'Total Gaji'
         );
 
         // Hitung jumlah kolom untuk styling
         $this->headerRowCount = count($header);
-
+        $totals = []; // kosong dulu
         $rows = [];
 
         foreach ($data as $item) {
@@ -117,18 +143,26 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
                 $item->periode,
                 $item->tunjangan_jabatan,
                 $item->gaji_pokok,
-                $item->lembur,
-                $item->tunjangan_kebudayaan,
-                $item->transport,
-                $item->izin,
-                $item->terlambat,
-                $item->bpjs,
-                $item->bpjs_jht,
-                $item->fee_sharing,
-                $item->insentif,
-                $item->uang_makan,
-                // $item->total_gaji,
+                ($item->lembur + $item->lembur_libur) ?? 0,
+                $item->tunjangan_kebudayaan ?? 0,
+                $item->transport ?? 0,
             ];
+
+            if ($showInovReward) {
+                $row[] = $item->inov_reward ?? 0;
+            }
+
+            $row = array_merge($row, [
+                $item->izin ?? 0,
+                $item->terlambat ?? 0,
+                $item->bpjs ?? 0,
+                $item->bpjs_jht ?? 0,
+                $item->bpjs_perusahaan ?? 0,
+                $item->bpjs_jht_perusahaan ?? 0,
+                $item->fee_sharing ?? 0,
+                $item->insentif ?? 0,
+                $item->uang_makan ?? 0,
+            ]);
 
             // Tambah nilai tunjangan
             foreach ($this->uniqueTunjangan as $nama) {
@@ -142,12 +176,77 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
                 $row[] = $match['nominal'] ?? 0;
             }
 
-            $row[] = $item->total_gaji;
+            $row[] = $item->kasbon ?? 0;
+
+            $indexNoSlip   = array_search('No Slip', $header);
+            $indexNama     = array_search('Nama Karyawan', $header);
+            $indexNip      = array_search('NIP', $header);
+            $indexDivisi   = array_search('Divisi', $header);
+            $indexPeriode  = array_search('Periode', $header);
+            $indexIzin     = array_search('Izin', $header);
+            $indexTerlambat= array_search('Terlambat', $header);
+            $indexBPJSKA   = array_search('BPJS Kesehatan KA', $header);
+            $indexBPJSJHT  = array_search('BPJS JHT KA', $header);
+            $indexBPJSPT   = array_search('BPJS Kesehatan PT', $header);
+            $indexBPJSJHTPT= array_search('BPJS JHT PT', $header);
+            $indexVoucher = array_search('Voucher', $header);
+            $indexPPH21   = array_search('PPH 21', $header);
+            $indexKasbon   = array_search('Kasbon', $header);
+            
+            $voucher = $potonganArray->firstWhere('nama', 'Voucher')['nominal'] ?? 0;
+            $pph21 = $potonganArray->firstWhere('nama', 'PPH 21')['nominal'] ?? 0;
+            $izin = $item->izin ?? 0;
+            // dd($izin);
+            $pendapatan = array_sum(array_filter($row, fn($v, $i) =>
+                !in_array($i, [$indexNoSlip, $indexNama, $indexNip, $indexDivisi, $indexPeriode, $indexIzin, $indexTerlambat, $indexKasbon, $indexBPJSKA, $indexBPJSJHT, $indexBPJSPT, $indexBPJSJHTPT, $indexPPH21]) && is_numeric($v)
+            , ARRAY_FILTER_USE_BOTH));
+
+            $totalGaji = $pendapatan - $izin - $voucher - $pph21;
+            // dd($totalGaji);
+            $row[] = $totalGaji;
+            // dd($izin);
+
+            // Hitung total per kolom
+            $skipIndex = [0, 1, 2, 3, 4];
+            foreach ($row as $i => $value) {
+                if (!in_array($i, $skipIndex) && is_numeric($value)) {
+                    $totals[$i] = ($totals[$i] ?? 0) + $value;
+                }
+            }
 
             $rows[] = $row;
         }
 
+        // Buat footer
+        $footer = [];
+
+        if (count($rows) > 0) {
+            foreach ($rows[0] as $i => $value) {
+                if (isset($totals[$i]) && $totals[$i] > 0) {
+                    $footer[$i] = $totals[$i];
+                } else {
+                    $footer[$i] = ($i === 0 ? 'TOTAL' : '');
+                }
+            }
+
+            $rows[] = $footer;
+        }
+
         return array_merge([$header], $rows);
+    }
+
+    public function columnFormats(): array
+    {
+        $formats = [];
+
+        $colCount = $this->headerRowCount;
+
+        for ($col = 6; $col <= $colCount; $col++) {
+            $letter = Coordinate::stringFromColumnIndex($col);
+            $formats[$letter] = '"Rp" #,##0';
+        }
+
+        return $formats;
     }
 
     public function title(): string
@@ -160,10 +259,62 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
         // Bold header
         $sheet->getStyle('A1:' . $sheet->getHighestColumn() . '1')->getFont()->setBold(true);
 
-        // Border untuk semua sel yang terisi
         $highestRow = $sheet->getHighestRow();
         $highestCol = $sheet->getHighestColumn();
 
+        // Ambil header (baris 1)
+        $headers = $sheet->rangeToArray("A1:{$highestCol}1")[0];
+
+        foreach ($headers as $i => $header) {
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i + 1);
+
+            $color = null;
+            $fullCol = false; // default hanya header
+
+            if ($header === 'Izin') {
+                $color = 'FFFF0000'; // merah
+            } elseif (in_array($header, ['Terlambat', 'BPJS Kesehatan KA', 'BPJS JHT KA', 'Voucher', 'PPH 21', 'Kasbon'])) {
+                $color = 'FF0070C0'; // biru
+            } elseif (in_array($header, ['BPJS Kesehatan PT', 'BPJS JHT PT'])) {
+                $color = 'FFFFFF00'; // kuning
+            } elseif ($header === 'Total Gaji') {
+                $color = 'FFFFFF00'; // kuning
+                $fullCol = true; // warnai full kolom
+            } else {
+                $color = 'FF00B050'; // hijau
+            }
+
+            if ($color) {
+                // warnai header
+                $sheet->getStyle("{$colLetter}1")->applyFromArray([
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'color' => ['argb' => $color],
+                    ],
+                ]);
+
+                // kalau full col (misalnya Total Gaji) -> warnai semua baris
+                if ($fullCol) {
+                    $sheet->getStyle("{$colLetter}1:{$colLetter}{$highestRow}")->applyFromArray([
+                        'fill' => [
+                            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                            'color' => ['argb' => $color],
+                        ],
+                    ]);
+                }
+            }
+        }
+
+        // Bold & background untuk footer total
+        $sheet->getStyle("A{$highestRow}:{$highestCol}{$highestRow}")->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'color' => ['argb' => 'FFEFEFEF'],
+            ],
+        ]);
+
+        // Border semua
         $sheet->getStyle("A1:{$highestCol}{$highestRow}")->applyFromArray([
             'borders' => [
                 'allBorders' => [

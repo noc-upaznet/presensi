@@ -93,6 +93,12 @@
         @role('admin')
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="d-flex gap-2">
+                    <select class="form-select" wire:model.lazy="selectedKaryawan" style="width: 200px;">
+                        <option value="">Pilih Karyawan</option>
+                        @foreach($karyawanList as $karyawan)
+                            <option value="{{ $karyawan->nama_karyawan }}">{{ $karyawan->nama_karyawan }}</option>
+                        @endforeach
+                    </select>
                     <select class="form-select" wire:model.lazy="filterPengajuan" style="width: 150px;">
                         <option value="">Pilih Status</option>
                         <option value="0">Menunggu</option>
@@ -101,8 +107,6 @@
                     </select>
 
                     <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan" wire:model.lazy="filterBulan">
-
-                    {{-- <button class="btn btn-light">Pilih Waktu</button> --}}
                 </div>
             </div>
         @endrole
@@ -253,9 +257,10 @@
                             @endif
                         </tbody>
                     </table>
-                {{-- {{ $pengajuans->links() }} --}}
                 </div>
-                {{ $pengajuans->links()}}
+                <div class="mt-3">
+                    {{ $pengajuans->links() }}
+                </div>
             </div>
         </div>
     </div>

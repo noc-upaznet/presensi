@@ -61,6 +61,7 @@
                             </div>
                         </div>
                         @if ($this->isSalesPosition())
+                            {{-- FORM UNTUK SALES --}}
                             <div class="row">
                                 <div class="mb-3 col-md-6">
                                     <label for="jumlah-psb" class="form-label fw-semibold">Jumlah PSB</label>
@@ -74,18 +75,42 @@
                                     </div>
                                 </div>
                             </div>
-                        @endif
-                        @if ($this->isSalesPositionSpv())
+                            <div class="mb-3">
+                                <label for="churn" class="form-label fw-semibold">Churn</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="churn" class="form-control" wire:model.lazy="churn">
+                                </div>
+                            </div>
+
+                        @elseif ($this->isSalesPositionSpv())
+                            {{-- FORM UNTUK SALES SPV --}}
                             <div class="row">
                                 <div class="mb-3 col-md-6">
                                     <label for="jumlah-psb-spv" class="form-label fw-semibold">Jumlah PSB</label>
-                                    <input type="number" wire:model.lazy="jml_psb_spv" class="form-control" id="jumlah-psb-spv" placeholder="Masukkan Jml. PSB sales">
+                                    <input type="number" wire:model.lazy="jml_psb" class="form-control" id="jumlah-psb-spv" placeholder="Masukkan Jml. PSB sales">
                                 </div>
                                 <div class="mb-3 col-md-6">
                                     <label for="insentif-spv" class="form-label fw-semibold">Insentif</label>
                                     <div class="input-group mb-2">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" id="insentif-spv" class="form-control" disabled wire:model="insentif_spv">
+                                        <input type="text" id="insentif-spv" class="form-control" disabled wire:model="insentif">
+                                    </div>
+                                </div>
+                            </div>
+
+                        @elseif ($this->isSalesPositionSpvUGR())
+                            {{-- FORM UNTUK SALES SPV UGR --}}
+                            <div class="row">
+                                <div class="mb-3 col-md-6">
+                                    <label for="jumlah-psb-spv-ugr" class="form-label fw-semibold">Jumlah PSB</label>
+                                    <input type="number" wire:model.lazy="jml_psb" class="form-control" id="jumlah-psb-spv-ugr" placeholder="Masukkan Jml. PSB sales">
+                                </div>
+                                <div class="mb-3 col-md-6">
+                                    <label for="insentif-spv-ugr" class="form-label fw-semibold">Insentif</label>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="text" id="insentif-spv-ugr" class="form-control" disabled wire:model="insentif">
                                     </div>
                                 </div>
                             </div>
@@ -103,39 +128,98 @@
                                 <span class="input-group-text">Rp</span>
                                 <input type="text" id="tunjangan_jabatan" class="form-control" disabled wire:model="tunjangan_jabatan">
                             </div>
-                        </div>
-                        <div class="row">
+                        </div><div class="row">
                             <div class="mb-3 col-md-6">
-                                <label for="lembur_nominal" class="form-label fw-semibold">Lembur</label>
+                                <label for="lembur" class="form-label fw-semibold">
+                                    Lembur Hari Biasa
+                                </label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" id="lembur_nominal" class="form-control" disabled wire:model="lembur_nominal">
+                                    <input type="text" id="lembur" class="form-control" disabled wire:model="lembur">
                                 </div>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="lembur_libur" class="form-label fw-semibold">
+                                    Lembur Hari Libur
+                                </label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="lembur_libur" class="form-control" disabled wire:model="lembur_libur">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="mb-3 col-6">
+                                <label class="form-label fw-semibold">Daftar Lembur Hari Biasa</label>
+                                <ul class="list-group">
+                                    @foreach($listLemburBiasa as $l)
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($l['tanggal'])->format('d-m-Y') }}<br>
+                                                <strong>Waktu:</strong> {{ $l['waktu_mulai'] }} - {{ $l['waktu_akhir'] }}
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill">{{ $l['jam'] }} jam</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
                             </div>
 
-                            <div class="mb-3 col-md-6">
-                                <label for="inovation-reward" class="form-label fw-semibold">Inovation Reward</label>
-                                <div class="input-group mb-2">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="text" id="inovation-reward" class="form-control" wire:model="inovation_reward_total">
-                                </div>
+                            <div class="mb-3 col-6">
+                                <label class="form-label fw-semibold">Daftar Lembur Hari Libur</label>
+                                <ul class="list-group">
+                                    @foreach($listLemburLibur as $l)
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($l['tanggal'])->format('d-m-Y') }}<br>
+                                                <strong>Waktu:</strong> {{ $l['waktu_mulai'] }} - {{ $l['waktu_akhir'] }}
+                                            </div>
+                                            <span class="badge bg-success rounded-pill">{{ $l['jam'] }} jam</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
                             </div>
-                            
                         </div>
-                        
+                        <div class="mb-3 col-md-12">
+                            <label for="inovation_reward" class="form-label fw-semibold">Inovation Reward</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number" name="inovation_reward" class="form-control" wire:model.lazy="inovation_reward" placeholder="Nominal">
+                                <span class="input-group-text">Kehadiran</span>
+                                <input type="number" class="form-control" wire:model.lazy="inovation_reward_jumlah" placeholder="Jumlah">
+                                <span class="input-group-text">Hari</span>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="mb-3 col-md-6">
-                                <label for="uang-transport" class="form-label fw-semibold">Uang Transport</label>
+                                <label for="inovation_reward" class="form-label fw-semibold">Uang Transport</label>
                                 <div class="input-group mb-2">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="text" id="uang-transport" class="form-control" wire:model="transport_total">
+                                    <select name="transport" id="transport" class="form-select" wire:model.lazy="transport">
+                                        <option value="">Nominal</option>
+                                        <option value="5000">5.000</option>
+                                        <option value="10000">10.000</option>
+                                        <option value="15000">15.000</option>
+                                        <option value="25000">25.000</option>
+                                    </select>
+                                    <span class="input-group-text">X</span>
+                                    <input type="number" class="form-control" wire:model.lazy="transport_jumlah" placeholder="Jumlah">
+                                </div>
+
+                                {{-- Menampilkan total hasil perkalian --}}
+                                <div class="fw-bold">
+                                    Total: {{ number_format($transport_total, 0, ',', '.') }}
                                 </div>
                             </div>
                             <div class="mb-3 col-md-6">
-                                <label for="uang-makan" class="form-label fw-semibold">Uang Makan</label>
+                                <label for="potongan" class="form-label fw-semibold">Uang Makan</label>
                                 <div class="input-group mb-2">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="text" id="uang-makan" class="form-control" wire:model="uang_makan_total">
+                                    <input type="number" name="uang_makan" class="form-control" wire:model.lazy="uang_makan" placeholder="Nominal">
+                                    <span class="input-group-text">X</span>
+                                    <input type="number" class="form-control" wire:model.lazy="uang_makan_jumlah" placeholder="Jumlah">
+                                </div>
+
+                                {{-- Menampilkan total hasil perkalian --}}
+                                <div class="fw-bold">
+                                    Total: {{ number_format($uang_makan_total, 0, ',', '.') }}
                                 </div>
                             </div>
                         </div>
@@ -211,7 +295,13 @@
                             @endforeach
                             <button type="button" class="btn btn-success mb-2" wire:click="addPotongan">+ Tambah Potongan</button>
                         </div>
-
+                        <div class="mb-3">
+                            <label for="kasbon" class="form-label fw-semibold">Kasbon</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" id="kasbon" class="form-control" wire:model.lazy="kasbon">
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="mb-3 col-md-6">
                                 <label for="izin" class="form-label fw-semibold">Potongan Izin</label>
