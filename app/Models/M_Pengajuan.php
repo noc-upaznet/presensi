@@ -32,34 +32,67 @@ class M_Pengajuan extends Model
         return $this->belongsTo(M_DataKaryawan::class, 'karyawan_id');
     }
 
-    public function pengajuRole()
+    public function pengajuRole(string $role): bool
     {
-        return optional(optional($this->getKaryawan)->user)->current_role;
+        return optional(optional($this->getKaryawan)->user)->hasRole($role) ?? false;
     }
 
-    public function canBeApprovedBySpv()
+    public function canBeApprovedBySpv(): bool
     {
-        $pengajuRole = optional(optional($this->getKaryawan)->user)->current_role;
-        return Auth::user()->current_role === 'spv'
-            && $this->status == 0
-            // && in_array($pengajuRole, ['user']);
-            && in_array($this->pengajuRole(), ['user'])
-            && $this->approve_spv == 0;
+        $auth = auth()->user();
+
+        // Hanya untuk SPV
+        if (! $auth || ! $auth->hasRole('spv')) {
+            return false;
+        }
+
+        // Cek status pengajuan dan approve_spv
+        if ($this->status != 0 || $this->approve_spv != 0) {
+            return false;
+        }
+
+        // Hanya jika pengaju punya role 'user'
+        return $this->pengajuRole('user');
     }
 
-    public function canBeApprovedByHr()
+    public function canBeApprovedByHr(): bool
     {
-        return Auth::user()->current_role === 'hr'
-            && $this->approve_hr == 0
-            && $this->status == 0
-            && in_array($this->pengajuRole(), ['user', 'spv']);
+        $auth = auth()->user();
+
+        // Hanya untuk user dengan role HR
+        if (! $auth || ! $auth->hasRole('hr')) {
+            return false;
+        }
+
+        // Cek status approval dan status pengajuan
+        if ($this->approve_hr != 0 || $this->status != 0) {
+            return false;
+        }
+
+        // Hanya jika pengaju punya role 'user' atau 'spv'
+        if ($this->pengajuRole('user') || $this->pengajuRole('spv')) {
+            return true;
+        }
+
+        return false;
     }
 
-    public function canBeApprovedByAdmin()
+    public function canBeApprovedByAdmin(): bool
     {
-        return Auth::user()->current_role === 'admin'
-            && $this->status == 0
-            && in_array($this->pengajuRole(), ['hr', 'admin']);
+        $auth = auth()->user();
+
+        // Hanya untuk admin
+        if (! $auth || ! $auth->hasRole('admin')) {
+            return false;
+        }
+
+        // Hanya kalau pengaju punya role HR
+        if (! $this->pengajuRole('hr')) {
+            return false;
+        }
+
+        // Hanya kalau belum diapprove admin
+        return is_null($this->approve_admin);
     }
 
     public function canBeDeletedByAdmin()

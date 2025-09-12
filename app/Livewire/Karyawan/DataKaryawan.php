@@ -8,10 +8,12 @@ use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Crypt;
 use App\Livewire\Forms\TambahDataKaryawanForm;
+use Livewire\WithoutUrlPagination;
 
 class DataKaryawan extends Component
 {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
+    protected $paginationTheme = 'bootstrap';
     public $search;
     public int $perPage = 10;
     public TambahDataKaryawanForm $form;

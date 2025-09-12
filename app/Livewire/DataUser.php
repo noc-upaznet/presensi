@@ -5,10 +5,11 @@ namespace App\Livewire;
 use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\WithoutUrlPagination;
 
 class DataUser extends Component
 {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
     protected $paginationTheme = 'bootstrap';
     public $listeners = ['refreshTable' => '$refresh'];
     public $search = '';

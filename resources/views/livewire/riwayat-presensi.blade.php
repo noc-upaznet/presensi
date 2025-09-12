@@ -22,14 +22,14 @@
                     $currentRole = auth()->user()->current_role;
                 @endphp
                 <div class="d-flex justify-content gap-2 flex-wrap mb-4">
-                    @if ($currentRole == 'admin')
+                    @hasanyrole('admin|spv|hr')
                         <select class="form-select" wire:model.lazy="filterkaryawan" style="width: 150px;">
                             <option value="">Pilih Karyawan</option>
                             @foreach ($karyawanList as $karyawan)
                                 <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
                             @endforeach
                         </select>
-                    @endif
+                    @endhasanyrole
 
                     <input type="month" class="form-control" style="width: 150px;" placeholder="Bulan" wire:model.lazy="filterBulan">
 
@@ -53,16 +53,16 @@
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
-                                @if (auth()->user()->current_role != 'user')
+                                @hasanyrole('admin|spv|hr')
                                     <th>Nama Karyawan</th>
-                                @endif
+                                @endhasanyrole
                                 <th>Clock In</th>
                                 <th>Clock Out</th>
                                 <th>File</th>
                                 <th>Status</th>
-                                @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
+                                @hasanyrole('admin|spv|hr')
                                     <th>Action</th>
-                                @endif
+                                @endhasanyrole
                             </tr>
                         </thead>
                         <tbody>
@@ -74,9 +74,9 @@
                                 @foreach($datas as $key)
                                     <tr>
                                         <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
-                                        @if (auth()->user()->current_role != 'user')
+                                        @hasanyrole('admin|spv|hr')
                                             <td style="color: var(--bs-body-color);">{{ $key->getUser->nama_karyawan }}</td>
-                                        @endif
+                                        @endhasanyrole
                                         <td style="color: var(--bs-body-color);">{{ $key->clock_in }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->clock_out }}</td>
                                         <td style="color: var(--bs-body-color);">
@@ -94,21 +94,15 @@
                                                 <span class="badge bg-secondary">Unknown</span>
                                             @endif
                                         </td>
-                                        @if (auth()->user()->current_role == 'admin' || auth()->user()->current_role == 'hr' || auth()->user()->current_role == 'spv')
+                                        @hasanyrole('admin|spv|hr')
                                             <td>
-                                                <button class="btn btn-warning btn-sm" wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-        
-                                                <!-- Tombol Buka Modal -->
-                                                {{-- <button wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"
-                                                    class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                    data-bs-target="#hapusPresensiModal">
-                                                    <i class="fas fa-trash"></i>
-                                                </button> --}}
-        
+                                                @can('presensi-edit')
+                                                    <button class="btn btn-warning btn-sm" wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                @endcan
                                             </td>
-                                        @endif
+                                        @endhasanyrole
                                     </tr>
                                 @endforeach
                             @endif

@@ -47,7 +47,7 @@
             }
         }
     </style>
-
+    
     <div class="content-wrapper p-4">
         <div class="d-flex justify-content-between align-items-center mb-3" style="color: var(--bs-body-color);">
             <h3>Dashboard</h3>

@@ -34,35 +34,65 @@ class M_Lembur extends Model
         return $this->belongsTo(M_DataKaryawan::class, 'karyawan_id');
     }
 
-    public function pengajuRole()
+    public function pengajuRole(string $role): bool
     {
-        return optional(optional($this->getKaryawan)->user)->current_role;
+        return optional(optional($this->getKaryawan)->user)->hasRole($role) ?? false;
     }
 
-    public function canBeApprovedBySpv()
+    public function canBeApprovedBySpv(): bool
     {
-        $pengajuRole = optional(optional($this->getKaryawan)->user)->current_role;
-        return Auth::user()->current_role === 'spv'
-            && $this->status == 0
-            // && in_array($pengajuRole, ['user']);
-            && in_array($this->pengajuRole(), ['user'])
-            && $this->approve_spv == 0;
+        $auth = auth()->user();
+
+        // Hanya untuk SPV
+        if (! $auth || ! $auth->hasRole('spv')) {
+            return false;
+        }
+
+        // Cek status pengajuan dan approve_spv
+        if ($this->status != 0 || $this->approve_spv != 0) {
+            return false;
+        }
+
+        // Hanya jika pengaju punya role 'user'
+        return $this->pengajuRole('user');
     }
 
-    public function canBeApprovedByHr()
+    public function canBeApprovedByHr(): bool
     {
-        return Auth::user()->current_role === 'hr'
-            && $this->approve_hr == 0
-            && $this->status == 0
-            && in_array($this->pengajuRole(), ['user', 'spv']);
+        $auth = auth()->user();
+
+        // Hanya untuk HR
+        if (! $auth || ! $auth->hasRole('hr')) {
+            return false;
+        }
+
+        // Cek status approval dan status pengajuan
+        if ($this->approve_hr != 0 || $this->status != 0) {
+            return false;
+        }
+
+        // Pengaju harus user atau spv
+        return $this->pengajuRole('user') || $this->pengajuRole('spv');
     }
 
-    public function canBeApprovedByAdmin()
+    public function canBeApprovedByAdmin(): bool
     {
-        return Auth::user()->current_role === 'admin'
-            && $this->status == 0
-            && in_array($this->pengajuRole(), ['hr', 'admin']);
+        $auth = auth()->user();
+
+        // Hanya untuk Admin
+        if (! $auth || ! $auth->hasRole('admin')) {
+            return false;
+        }
+
+        // Cek status pengajuan
+        if ($this->status != 0) {
+            return false;
+        }
+
+        // Pengaju harus HR atau Admin
+        return $this->pengajuRole('hr') || $this->pengajuRole('admin');
     }
+
 
     public function canBeDeletedByAdmin()
     {

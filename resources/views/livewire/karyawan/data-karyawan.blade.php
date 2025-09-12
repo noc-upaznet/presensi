@@ -23,8 +23,10 @@
     <div class="container-fluid">
       <div class="mb-4">
         <div class="card-header">
-          <a href="{{ route('tambah-data-karyawan') }}"><button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Tambah</button></a>
-          <button wire:click="showModalImport" class="btn btn-success"><i class="fa-solid fa-file-excel"></i> Import</button>
+          @can('karyawan-create')
+            <a href="{{ route('tambah-data-karyawan') }}"><button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Tambah</button></a>
+            <button wire:click="showModalImport" class="btn btn-success"><i class="fa-solid fa-file-excel"></i> Import</button>
+          @endcan
         </div>
         <!-- /.card-header -->
       </div>
@@ -89,7 +91,7 @@
               </tbody>
             </table>
           </div>
-          {{ $datas->links('pagination::bootstrap-5') }}
+          {{ $datas->links() }}
         </div>
       </div>
   </div>

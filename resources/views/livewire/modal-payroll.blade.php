@@ -34,9 +34,11 @@
                                             <td>{{ $item->nama_karyawan }}</td>
                                             <td>{{ $item->nip_karyawan }}</td>
                                             <td>
-                                                <a href="{{ route('create-slip-gaji', ['id' => encrypt($item->id)]) }}" class="btn btn-sm btn-primary">
-                                                    <i class="fa-solid fa-money-bill"></i> Slip Gaji
-                                                </a>
+                                                @can('payroll-create')
+                                                    <a href="{{ route('create-slip-gaji', ['id' => encrypt($item->id)]) }}" class="btn btn-sm btn-primary">
+                                                        <i class="fa-solid fa-money-bill"></i> Slip Gaji
+                                                    </a>
+                                                @endcan
                                             </td>
                                         </tr>
                                     @endforeach
@@ -86,9 +88,11 @@
                                             <td>{{ $item->nama_karyawan }}</td>
                                             <td>{{ $item->nip_karyawan }}</td>
                                             <td>
-                                                <a href="{{ route('create-slip-gaji', ['id' => encrypt($item->id)]) }}" class="btn btn-sm btn-primary">
-                                                    <i class="fa-solid fa-money-bill"></i> Slip Gaji
-                                                </a>
+                                                @can('payroll-create')
+                                                    <a href="{{ route('create-slip-gaji', ['id' => encrypt($item->id)]) }}" class="btn btn-sm btn-primary">
+                                                        <i class="fa-solid fa-money-bill"></i> Slip Gaji
+                                                    </a>
+                                                @endcan
                                             </td>
                                         </tr>
                                     @endforeach

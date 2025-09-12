@@ -64,6 +64,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 
     @livewireStyles
   </head>
@@ -353,78 +355,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Select2 -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-      
-      // $(document).ready(function () {
-      //     $('#lokasiSelect').select2({
-      //         dropdownParent: $('#rolePresensiModal') // tetap wajib kalau di dalam modal
-      //     });
-          
-      //     // Dapatkan komponen Livewire aktif
-      //     function getLivewireComponent() {
-      //         if (
-      //             typeof window.Livewire === 'undefined' ||
-      //             typeof window.Livewire.components === 'undefined' ||
-      //             typeof window.Livewire.components.componentsById === 'undefined'
-      //         ) {
-      //             return null;
-      //         }
-
-      //         const components = window.Livewire.components.componentsById;
-      //         const keys = Object.keys(components);
-      //         if (keys.length === 0) return null;
-
-      //         const firstKey = keys[0];
-      //         return components[firstKey] || null;
-      //     }
-
-      //     // Sinkronkan perubahan select ke Livewire
-      //     document.addEventListener('livewire:load', function () {
-      //         initSelect();
-      //     });
-
-      //     document.addEventListener('livewire:update', function () {
-      //         initSelect();
-      //     });
-
-      //     function initSelect() {
-      //         const $select = $('#lokasiSelect');
-      //         if ($select.length) {
-      //             $select.select2();
-      //             console.log('Select2 initialized ✅');
-
-      //             $select.off('select2:select').on('select2:select', function () {
-      //                 const selectedValues = ($(this).val() || []).map(Number);
-      //                 console.log('SELECTED VALUES:', selectedValues);
-
-      //                 const wireEl = this.closest('[wire\\:id]');
-      //                 const componentId = wireEl ? wireEl.getAttribute('wire:id') : null;
-      //                 const livewireInstance = componentId ? Livewire.find(componentId) : null;
-
-      //                 if (livewireInstance) {
-      //                     livewireInstance.set('lokasi_presensi', selectedValues);
-      //                     console.log('Dikirim ke Livewire:', selectedValues);
-      //                 } else {
-      //                     console.warn('Livewire instance tidak ditemukan.');
-      //                 }
-      //             });
-      //         } else {
-      //             console.warn('Select element tidak ditemukan');
-      //         }
-      //     }
-
-      //     // Jika komponen Livewire update, reset value Select2
-      //     window.Livewire.hook('message.processed', () => {
-      //         const livewireInstance = getLivewireComponent();
-      //         if (livewireInstance) {
-      //             const selected = livewireInstance.get('lokasi_presensi');
-      //             $('#lokasiSelect').val(selected).trigger('change');
-      //         }
-      //     });
-      // });
-
       $('#rolePresensiModal').on('shown.bs.modal', function () {
           const $select = $('#lokasiSelect');
 

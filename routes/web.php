@@ -31,6 +31,7 @@ use App\Livewire\Karyawan\Pengajuan\Pengajuan;
 use App\Livewire\Karyawan\TambahPembagianShift;
 use App\Livewire\Karyawan\Shifts\TemplateMingguan;
 use App\Livewire\Karyawan\Pengajuan\PengajuanLembur;
+use App\Livewire\ManageUser;
 use App\Livewire\SlipGaji;
 
 // Route::redirect('/', '/login');
@@ -41,7 +42,6 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/ganti-password', GantiPassword::class)->middleware('auth')->name('ganti-password');
 Route::group(['middleware' => ['auth', 'password.expired']], function () {
     Route::get('/', Dashboard::class)->name('dashboard');
-    Route::get('/dashboard', Dashboard::class)->name('dashboard');
     Route::get('/clock-in', ClockIn::class)->name('clock-in');
     Route::get('/clock-in-selfie', ClockInSelfie::class)->name('clock-in-selfie');
     Route::view('/profile', 'profile')->name('profile');
@@ -70,4 +70,5 @@ Route::group(['middleware' => ['auth', 'password.expired']], function () {
     Route::get('/jenis-potongan', JenisPotongan::class)->name('jenis-potongan');
     Route::get('/riwayat-presensi-staff', RiwayatPresensiStaff::class)->name('riwayat-presensi-staff');
     Route::get('/slip-gaji', SlipGaji::class)->name('slip-gaji');
+    Route::get('/manage-user', ManageUser::class)->name('manage-user');
 });

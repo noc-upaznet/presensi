@@ -15,10 +15,12 @@ use App\Models\JenisTunjanganModel;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Redirect;
+use Livewire\WithoutUrlPagination;
 
 class Payroll extends Component
 {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
+    protected $paginationTheme = 'bootstrap';
 
     public $search = '';
     public $selectedYear;
@@ -50,11 +52,6 @@ class Payroll extends Component
 
     public function mount()
     {
-        if (Auth::user()?->current_role !== 'admin') {
-            // Bisa redirect atau abort
-            return redirect()->route('dashboard');
-            // abort(403, 'Access Denied');
-        }
         $this->selectedYear = now()->year;
         $this->selectedMonth = now()->format('n');
 

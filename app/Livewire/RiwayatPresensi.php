@@ -5,14 +5,15 @@ namespace App\Livewire;
 use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\M_Presensi;
+use Livewire\WithPagination;
+use App\Models\M_DataKaryawan;
+use Livewire\WithoutUrlPagination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use App\Models\M_DataKaryawan;
-use Livewire\WithPagination;
 
 class RiwayatPresensi extends Component
 {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
     protected $paginationTheme = 'bootstrap';
 
     public $editId;
@@ -101,7 +102,7 @@ class RiwayatPresensi extends Component
     {
         $entitasNama = session('selected_entitas', 'UHO');
 
-        if (Auth::user()->current_role == 'admin' || Auth::user()->current_role == 'hr') {
+        if (Auth::user()->hasAnyRole(['admin', 'hr'])) {
             $datas = M_Presensi::with('getUser')
                 ->when($this->filterTanggal, function ($query) {
                     $query->whereDate('created_at', $this->filterTanggal);
@@ -120,28 +121,10 @@ class RiwayatPresensi extends Component
                 ->whereHas('getUser', function ($query) use ($entitasNama) {
                     $query->where('entitas', $entitasNama);
                 })
-                ->where(function ($q) {
-                    $q->whereHas('getKaryawan', function ($sub) {
-                        $sub->whereNotIn('level', ['SPV', 'Manajer']);
-                    })
-                    ->where(function ($q2) {
-                        $q2->where(function ($q3) {
-                            $q3->where('lokasi_lock', 0)
-                                ->where('approve', 1);
-                        })
-                        ->orWhere(function ($q3) {
-                            $q3->where('lokasi_lock', 1)
-                                ->where('approve', 0);
-                        });
-                    })
-                    ->orWhereHas('getKaryawan', function ($sub) {
-                        $sub->whereIn('level', ['SPV', 'Manajer']);
-                    });
-                })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
-                // dd($datas);
-        } elseif (Auth::user()->current_role == 'user' || Auth::user()->current_role == 'spv') {
+
+        } elseif (Auth::user()->hasAnyRole(['user', 'spv'])) {
             $userId = Auth::id();
             $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
             $karyawanId = $karyawan ? $karyawan->id : null;
@@ -159,26 +142,12 @@ class RiwayatPresensi extends Component
                             ->whereYear('created_at', Carbon::now()->year);
                     }
                 })
-                ->where(function ($q) {
-                    $q->whereHas('getKaryawan', function ($sub) {
-                        $sub->whereNotIn('level', ['SPV', 'Manajer']);
-                    })
-                    ->where(function ($q2) {
-                        $q2->where(function ($q3) {
-                            $q3->where('lokasi_lock', 0)
-                                ->where('approve', 1);
-                        })
-                        ->orWhere(function ($q3) {
-                            $q3->where('lokasi_lock', 1)
-                                ->where('approve', 0);
-                        });
-                    })
-                    ->orWhereHas('getKaryawan', function ($sub) {
-                        $sub->whereIn('level', ['SPV', 'Manajer']);
-                    });
-                })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
+
+        } else {
+            // fallback supaya tidak error
+            $datas = collect();
         }
 
         return view('livewire.riwayat-presensi', [

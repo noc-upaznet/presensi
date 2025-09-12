@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payroll', function (Blueprint $table) {
-            $table->boolean('titip')->default(false)->after('entitas_id');
+            // $table->boolean('titip')->default(false)->after('entitas_id');
         });
     }
 

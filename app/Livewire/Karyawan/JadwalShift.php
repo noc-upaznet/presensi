@@ -10,11 +10,12 @@ use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use App\Livewire\Forms\TambahDataKaryawanForm;
+use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
 
 class JadwalShift extends Component
 {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
     protected $paginationTheme = 'bootstrap';
     public TambahDataKaryawanForm $form;
     

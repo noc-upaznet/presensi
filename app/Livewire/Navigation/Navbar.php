@@ -19,29 +19,17 @@ class Navbar extends Component
 
     public function mount()
     {
-        // Default ke 'UHO' jika belum ada entitas yang dipilih
-        $this->selectedEntitas = Session::get('selected_entitas', 'UHO');
-
-        // Ambil semua entitas dari DB
-        $this->entitasList = M_Entitas::all();
-        // Tambahkan manual opsi 'All Branch' ke dropdown
-        $this->entitasList = M_Entitas::all()->pluck('nama')->values();
+        $this->selectedEntitas = session('selected_entitas', 'UHO');
 
         $user = Auth::user();
+
         if ($user) {
-            $this->roles = $user->roles->pluck('role')->toArray();
-            $this->currentRole = $user->current_role;
+            $this->roles = $user->roles->pluck('name')->toArray();
 
-            // Ambil data karyawan untuk cek jabatan
-            $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
-
-            // Logika menampilkan role switcher
-            $this->showRoleSwitcher =
-                // Punya role HR dan SPV
-                (in_array('hr', $this->roles) && in_array('spv', $this->roles)) ||
-
-                // Atau role SPV dan jabatan di karyawan = HR
-                (in_array('spv', $this->roles) && $dataKaryawan && strtolower($dataKaryawan->jabatan) === 'hr');
+            // Ambil hanya branch yang dimiliki user
+            $this->entitasList = $user->branches()
+                ->pluck('nama', 'id')
+                ->toArray();
         }
     }
 

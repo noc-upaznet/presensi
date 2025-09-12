@@ -10,10 +10,12 @@ use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
 use App\Models\RoleLokasiModel;
 use Illuminate\Support\Facades\Crypt;
+use Livewire\WithoutUrlPagination;
 
 class RoleLokasi extends Component
 {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
+    protected $paginationTheme = 'bootstrap';
 
     public $search = '';
 

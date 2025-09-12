@@ -10,11 +10,12 @@ use App\Models\M_Lembur;
 use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
 
 class PengajuanLembur extends Component
 {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
     protected $paginationTheme = 'bootstrap';
 
     public LemburForm $form;
@@ -62,12 +63,15 @@ class PengajuanLembur extends Component
             return;
         }
 
-        $userRole = Auth::user()->current_role;
-        $pengajuRole = optional(optional($pengajuan->getKaryawan)->user)->current_role;
-        // dd($pengajuRole);
+        $user = Auth::user();
+        $userRoles = $user->getRoleNames()->toArray(); // array: ['spv', 'hr', ...]
+        $pengajuRoles = optional(optional($pengajuan->getKaryawan)->user)
+            ?->getRoleNames()
+            ->toArray() ?? [];
+        // dd($pengajuRoles);
 
         // SPV approval
-        if ($userRole === 'spv') {
+        if (in_array('spv', $userRoles)) {
             if ($status == 1) {
                 $pengajuan->approve_spv = 1;
             } elseif ($status == 2) {
@@ -75,26 +79,25 @@ class PengajuanLembur extends Component
                 $pengajuan->status = 2;
             }
         }
-        
-        // HR approval
-        if ($userRole === 'hr') {
-            if ($pengajuRole === 'spv') {
-            // Jika pengaju adalah SPV, langsung bisa diapprove HR
+
+        // === HR approval ===
+        if (in_array('hr', $userRoles)) {
+            if (in_array('spv', $pengajuRoles)) {
+                // Pengaju SPV, HR boleh langsung approve
                 if ($status == 1) {
                     $pengajuan->approve_hr = 1;
                     $pengajuan->status = 1;
                 } elseif ($status == 2) {
                     $pengajuan->approve_hr = 2;
                     $pengajuan->status = 2;
-
                     $this->dispatch('swal', params: [
                         'title' => 'Pengajuan Rejected',
-                        'icon' => 'error',
-                        'text' => 'Berhasil Menolak Pengajuan ini.'
+                        'icon'  => 'error',
+                        'text'  => 'Berhasil Menolak Pengajuan ini.'
                     ]);
                 }
             } else {
-            // Jika pengaju bukan SPV, maka perlu approve_spv
+                // Pengaju bukan SPV, cek approval SPV dulu
                 if ($pengajuan->approve_spv == 1) {
                     if ($status == 1) {
                         $pengajuan->approve_hr = 1;
@@ -102,39 +105,38 @@ class PengajuanLembur extends Component
                     } elseif ($status == 2) {
                         $pengajuan->approve_hr = 2;
                         $pengajuan->status = 2;
-
                         $this->dispatch('swal', params: [
                             'title' => 'Pengajuan Rejected',
-                            'icon' => 'error',
-                            'text' => 'Berhasil Menolak Pengajuan ini.'
+                            'icon'  => 'error',
+                            'text'  => 'Berhasil Menolak Pengajuan ini.'
                         ]);
                     }
                 } elseif ($pengajuan->approve_spv == 2) {
                     $pengajuan->status = 2;
                     $this->dispatch('swal', params: [
                         'title' => 'Gagal Menyimpan',
-                        'icon' => 'error',
-                        'text' => 'SPV sudah menolak pengajuan ini.'
+                        'icon'  => 'error',
+                        'text'  => 'SPV sudah menolak pengajuan ini.'
                     ]);
                     return;
                 } else {
                     $this->dispatch('swal', params: [
                         'title' => 'Gagal Menyimpan',
-                        'icon' => 'error',
-                        'text' => 'Pengajuan belum disetujui oleh SPV.'
+                        'icon'  => 'error',
+                        'text'  => 'Pengajuan belum disetujui oleh SPV.'
                     ]);
                     return;
                 }
             }
         }
 
-        // Jika pengaju adalah HR
-        elseif ($userRole === 'admin') {
-            if ($pengajuRole !== 'hr') {
+        // === Admin approval ===
+        if (in_array('admin', $userRoles)) {
+            if (!array_intersect(['hr', 'admin'], $pengajuRoles)) {
                 $this->dispatch('swal', params: [
                     'title' => 'Tidak Diizinkan',
-                    'icon' => 'error',
-                    'text' => 'Admin hanya bisa menyetujui pengajuan dari HR.'
+                    'icon'  => 'error',
+                    'text'  => 'Admin hanya bisa menyetujui pengajuan dari HR.'
                 ]);
                 return;
             }
@@ -148,7 +150,7 @@ class PengajuanLembur extends Component
             }
         }
 
-        // Final status = 1 jika semua approval positif
+        // Final status kalau SPV & HR sudah approve
         if ($pengajuan->approve_spv == 1 && $pengajuan->approve_hr == 1) {
             $pengajuan->status = 1;
         }
@@ -168,74 +170,79 @@ class PengajuanLembur extends Component
     {
         $query = M_Lembur::with('getKaryawan');
         $user = Auth::user();
-    
+
         // Ambil nama entitas dari session
         $entitas = session('selected_entitas', 'UHO');
-    
-        if ($user->current_role === 'user') {
-            // Jika user biasa, hanya lihat lembur miliknya
+
+        // 🔹 User biasa → hanya lemburnya sendiri
+        if ($user->hasRole('user')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
                 $query->where('karyawan_id', $dataKaryawan->id);
             }
 
-        } elseif ($user->current_role === 'admin') {
-            // Jika admin, filter berdasarkan entitas dari session
+        // 🔹 Admin → semua karyawan dalam entitas terpilih
+        } elseif ($user->hasRole('admin')) {
             $entitasModel = \App\Models\M_Entitas::where('nama', $entitas)->first();
             if ($entitasModel) {
                 $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
 
-        } elseif ($user->current_role === 'spv') {
-            // Jika SPV, hanya bisa melihat karyawan dari entitas dan divisi yang sama
+        // 🔹 SPV → hanya karyawan dengan divisi + entitas sama
+        } elseif ($user->hasRole('spv')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan && $dataKaryawan->divisi) {
                 if (strtolower($dataKaryawan->divisi) === 'noc') {
+                    // Divisi NOC → tanpa filter entitas
                     $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
-                    ->pluck('id');
-                } else if ($dataKaryawan->entitas) {
-                    // Untuk divisi lain, filter entitas dan divisi
-                    $karyawanIdList = M_DataKaryawan::where('entitas', $dataKaryawan->entitas)
-                    ->where('divisi', $dataKaryawan->divisi)
-                    ->pluck('id');
+                        ->pluck('id');
+                } elseif ($dataKaryawan->entitas) {
+                    // Divisi lain → filter divisi + entitas
+                    $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
+                        ->where('entitas', $dataKaryawan->entitas)
+                        ->pluck('id');
                 } else {
                     $karyawanIdList = collect();
                 }
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
-        } elseif ($user->current_role === 'hr') {
-            // Jika HR, bisa melihat semua karyawan dari semua entitas
-            $karyawanIdList = M_DataKaryawan::pluck('id');
-            $query->whereIn('karyawan_id', $karyawanIdList);
+
+        // 🔹 HR → semua karyawan dari semua entitas
+        } elseif ($user->hasRole('hr')) {
+            $entitasModel = \App\Models\M_Entitas::where('nama', $entitas)->first();
+            if ($entitasModel) {
+                $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
+                $query->whereIn('karyawan_id', $karyawanIdList);
+            }
         }
-        // Jika HR atau SPV, tidak difilter entitas → bisa lihat semua data
-    
-        // Filter status pengajuan
+
+        // 🔹 Filter status pengajuan
         if (in_array($this->filterPengajuan, ['0', '1', '2'], true)) {
             $query->where('status', (int) $this->filterPengajuan);
         }
-    
-        // Filter bulan
+
+        // 🔹 Filter bulan
         if (!empty($this->filterBulan)) {
             $bulan = date('m', strtotime($this->filterBulan));
             $tahun = date('Y', strtotime($this->filterBulan));
             $query->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
         }
-    
-        // Search
+
+        // 🔹 Search
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('tanggal', 'like', '%' . $this->search . '%')
-                  ->orWhere('id', 'like', '%' . $this->search . '%');
+                    ->orWhere('id', 'like', '%' . $this->search . '%');
             });
         }
-    
+
         $pengajuanLembur = $query->latest()->paginate(10);
-    
+
         return view('livewire.karyawan.pengajuan.pengajuan-lembur', [
             'pengajuanLembur' => $pengajuanLembur,
         ]);
     }
+
 
 }

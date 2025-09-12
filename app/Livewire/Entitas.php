@@ -4,12 +4,14 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\M_Entitas;
-use Illuminate\Support\Facades\Crypt;
 use Livewire\WithPagination;
+use Livewire\WithoutUrlPagination;
+use Illuminate\Support\Facades\Crypt;
 
 class Entitas extends Component
 {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
+    protected $paginationTheme = 'bootstrap';
 
     public $nama;
     public $deskripsi;

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pengajuan', function (Blueprint $table) {
-            $table->tinyInteger('approve_admin')->after('status')->nullable();
-        });
+        // Schema::table('pengajuan', function (Blueprint $table) {
+        //     $table->tinyInteger('approve_admin')->after('status')->nullable();
+        // });
     }
 
     /**

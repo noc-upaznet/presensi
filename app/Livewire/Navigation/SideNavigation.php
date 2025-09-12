@@ -8,6 +8,7 @@ use App\Models\M_Entitas;
 use App\Models\M_Presensi;
 use App\Models\M_Pengajuan;
 use App\Models\M_DataKaryawan;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class SideNavigation extends Component
@@ -20,9 +21,10 @@ class SideNavigation extends Component
         $countPresensiStaff = 0;
 
         if ($user) {
-            if ($user->current_role === 'spv') {
+            // 🔹 SPV
+            if ($user->hasRole('spv')) {
                 $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
-                $entitas = $dataKaryawan->entitas; // default fallback
+                $entitas = $dataKaryawan?->entitas;
                 $entitasModel = M_Entitas::where('nama', $entitas)->first();
                 $entitasIdSaatIni = $entitasModel?->nama;
 
@@ -31,44 +33,50 @@ class SideNavigation extends Component
                         ->where('entitas', $dataKaryawan->entitas)
                         ->pluck('id');
 
-                    // Untuk pengajuan cuti/izin dari karyawan satu divisi (kecuali dia sendiri)
+                    // pengajuan cuti/izin
                     $countPengajuan = M_Pengajuan::whereNull('approve_spv')
                         ->where('status', 0)
                         ->whereIn('karyawan_id', $karyawanIds)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
-                        ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
-                            $q->where('entitas', $entitasIdSaatIni);
-                        })
+                        ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
+                        ->whereMonth('tanggal', Carbon::now()->month)
+                        ->whereYear('tanggal', Carbon::now()->year)
                         ->count();
 
-                    // Untuk pengajuan lembur dari karyawan satu divisi (kecuali dia sendiri)
+                    // Lembur
                     $countLembur = M_Lembur::whereNull('approve_spv')
                         ->where('status', 0)
                         ->whereIn('karyawan_id', $karyawanIds)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
-                        ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
-                            $q->where('entitas', $entitasIdSaatIni);
-                        })
+                        ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
+                        ->whereMonth('tanggal', Carbon::now()->month)
+                        ->whereYear('tanggal', Carbon::now()->year)
                         ->count();
 
+                    // Presensi staff
                     $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
                         ->where('approve', 0)
                         ->where('user_id', '!=', $dataKaryawan->id)
-                        ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
-                            $q->where('entitas', $entitasIdSaatIni);
-                        })
+                        ->whereHas('getKaryawan', fn($q) => 
+                            $q->where('entitas', $entitasIdSaatIni)
+                            ->where('divisi', $dataKaryawan->divisi)
+                        )
+                        ->whereMonth('tanggal', Carbon::now()->month)
+                        ->whereYear('tanggal', Carbon::now()->year)
                         ->count();
-                        // dd($countPresensiStaff);
                 } else {
                     $countPengajuan = 0;
                     $countLembur = 0;
                     $countPresensiStaff = 0;
                 }
-            } elseif ($user->current_role === 'hr') {
-                $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
 
+            // 🔹 HR
+            } elseif ($user->hasRole('hr')) {
+                $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
+                $entitas = $dataKaryawan?->entitas;
+                
                 if ($dataKaryawan) {
-                    // Pengajuan cuti/izin (hanya yang sudah disetujui SPV, belum disetujui HR, dan bukan milik HR itu sendiri)
+                    // Pengajuan
                     $countPengajuan = M_Pengajuan::where(function ($q) {
                             $q->where('approve_spv', 1)
                             ->orWhereNull('approve_spv');
@@ -76,9 +84,12 @@ class SideNavigation extends Component
                         ->whereNull('approve_hr')
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
+                        ->whereMonth('tanggal', Carbon::now()->month)
+                        ->whereYear('tanggal', Carbon::now()->year)
                         ->count();
 
-                    // Pengajuan lembur (sama seperti di atas)
+                    // Lembur
                     $countLembur = M_Lembur::where(function ($q) {
                             $q->where('approve_spv', 1)
                             ->orWhereNull('approve_spv');
@@ -86,37 +97,45 @@ class SideNavigation extends Component
                         ->whereNull('approve_hr')
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
+                        ->whereMonth('tanggal', Carbon::now()->month)
+                        ->whereYear('tanggal', Carbon::now()->year)
                         ->count();
                 } else {
                     $countPengajuan = 0;
                     $countLembur = 0;
                 }
-            } elseif ($user->current_role === 'admin') {
-                $entitas = session('selected_entitas', 'UHO'); // default fallback
+
+            // 🔹 Admin
+            } elseif ($user->hasRole('admin')) {
+                $entitas = session('selected_entitas', 'UHO');
                 $entitasModel = M_Entitas::where('nama', $entitas)->first();
                 $entitasIdSaatIni = $entitasModel?->nama;
 
-                 $countPengajuan = M_Pengajuan::whereNull('approve_admin')
+                $countPengajuan = M_Pengajuan::whereNull('approve_admin')
                     ->where('status', 0)
-                    ->whereMonth('created_at', now()->month)
-                    ->whereYear('created_at', now()->year)
+                    ->whereMonth('tanggal', now()->month)
+                    ->whereYear('tanggal', now()->year)
                     ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
                         $q->where('entitas', $entitasIdSaatIni);
                     })
+                    ->whereMonth('tanggal', Carbon::now()->month)
+                    ->whereYear('tanggal', Carbon::now()->year)
                     ->count();
-                // dd($entitasIdSaatIni);
 
-                // Pengajuan lembur yang belum disetujui admin
                 $countLembur = M_Lembur::whereNull('approve_admin')
                     ->where('status', 0)
-                    ->whereMonth('created_at', now()->month)
-                    ->whereYear('created_at', now()->year)
+                    ->whereMonth('tanggal', now()->month)
+                    ->whereYear('tanggal', now()->year)
                     ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
                         $q->where('entitas', $entitasIdSaatIni);
                     })
+                    ->whereMonth('tanggal', Carbon::now()->month)
+                    ->whereYear('tanggal', Carbon::now()->year)
                     ->count();
             }
         }
+
 
 
         return view('livewire.navigation.side-navigation', [

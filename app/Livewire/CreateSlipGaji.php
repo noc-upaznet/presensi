@@ -110,9 +110,6 @@ class CreateSlipGaji extends Component
 
     public function mount($id = null, $month = null, $year = null)
     {
-        if (Auth::user()?->current_role !== 'admin') {
-            return redirect()->route('dashboard');
-        }
         if (!Auth::check()) {
             session(['redirect_after_login' => url()->current()]);
             return redirect()->to(route('login'));

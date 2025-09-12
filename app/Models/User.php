@@ -3,10 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
@@ -24,6 +25,7 @@ class User extends Authenticatable
         'password',
         'current_role',
         'password_expired',
+        'entitas_id',
     ];
 
     /**
@@ -60,13 +62,49 @@ class User extends Authenticatable
         return $this->hasMany(M_Presensi::class);
     }
 
-    public function roles()
+    // public function roles()
+    // {
+    //     return $this->hasMany(UserRole::class);
+    // }
+
+    // public function hasRole($role)
+    // {
+    //     return $this->roles->pluck('role')->contains($role);
+    // }
+
+    public function branch()
     {
-        return $this->hasMany(UserRole::class);
+        return $this->belongsTo(M_Entitas::class);
     }
 
-    public function hasRole($role)
+    public function branch_ids()
     {
-        return $this->roles->pluck('role')->contains($role);
+        $branch_ids = DB::table('user_has_branches')->where('user_id', $this->id)->pluck('entitas_id')->toArray();
+        return $branch_ids;
+    }
+    public function branches()
+    {
+        $branch_ids = DB::table('user_has_branches')
+        ->where('user_id', $this->id)
+        ->pluck('entitas_id')
+        ->toArray();
+        // dd([
+        //     'user_id'    => $this->id,
+        //     'entitas_id' => $branch_ids,
+        // ]);
+
+        $branchs = M_Entitas::whereIn('id', $branch_ids)->get();
+        // dd($branchs);
+        return $branchs;
+    }
+
+    public function assignBranch($branch_ids)
+    {
+        DB::table('user_has_branches')->where('user_id', $this->id)->delete();
+        $model = DB::table('user_has_branches');
+
+        foreach ($branch_ids as $branch_id) {
+            $model->updateOrInsert(['user_id' => $this->id, 'entitas_id' => $branch_id]);
+        }
     }
 }

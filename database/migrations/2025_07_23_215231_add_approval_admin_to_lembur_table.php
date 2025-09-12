@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('lembur', function (Blueprint $table) {
-            $table->tinyInteger('approve_admin')->after('status')->nullable();
-        });
+        // Schema::table('lembur', function (Blueprint $table) {
+        //     $table->tinyInteger('approve_admin')->after('status')->nullable();
+        // });
     }
 
     /**

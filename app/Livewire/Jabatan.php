@@ -5,11 +5,13 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\M_Jabatan;
 use Illuminate\Support\Facades\Crypt;
+use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
 
 class Jabatan extends Component
 {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
+    protected $paginationTheme = 'bootstrap';
     public $nama_jabatan;
     public $deskripsi;
     public $has_staff = false; // Default value

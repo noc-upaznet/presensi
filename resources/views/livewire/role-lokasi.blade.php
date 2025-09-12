@@ -89,7 +89,7 @@
                     </div>
                 </div>
                 <div class="pt-3">
-                    {{ $lokasiList->links('pagination::bootstrap-5') }}
+                    {{ $lokasiList->links() }}
                 </div>
             </div>
             <!-- End Card Wrapper -->

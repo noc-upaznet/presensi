@@ -9,12 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('password_expired')->default(false);
-        });
-    }
+    // public function up(): void
+    // {
+    //     Schema::table('users', function (Blueprint $table) {
+    //         $table->boolean('password_expired')->default(false);
+    //     });
+    // }
 
     /**
      * Reverse the migrations.

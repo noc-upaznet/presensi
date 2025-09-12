@@ -9,10 +9,12 @@ use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Livewire\WithoutUrlPagination;
 
 class RiwayatPresensiStaff extends Component
 {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
+    protected $paginationTheme = 'bootstrap';
     public $karyawanList;
     public $filterTanggal;
     public $filterBulan;

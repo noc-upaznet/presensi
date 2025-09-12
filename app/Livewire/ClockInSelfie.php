@@ -32,11 +32,6 @@ class ClockInSelfie extends Component
     
     public function mount()
     {
-        if (Auth::user()?->current_role !== 'user' && Auth::user()?->current_role !== 'har' && Auth::user()?->current_role !== 'spv') {
-            // Bisa redirect atau abort
-            return redirect()->route('dashboard');
-            // abort(403, 'Access Denied');
-        }
         $this->lokasisTerdekat = collect();
         $this->photo = session('selfie_path');
     }
