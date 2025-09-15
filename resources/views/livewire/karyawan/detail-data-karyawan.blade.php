@@ -5,9 +5,6 @@
         <div class="border rounded-4 p-4">
             <h6 class="fw-bold text-primary">Detail Informasi Pribadi</h6>
             <div class="row align-items-start mt-3">
-                {{-- <div class="col-md-3 text-center">
-                    <img src="assets/img/avatar2.png" class="square-circle border" alt="Foto Karyawan">
-                </div> --}}
                 <div class="col-md-12" style="color: var(--bs-body-color);">
                     <div class="row">
                         <div class="col-md-6">
@@ -107,6 +104,139 @@
                 <span>Alamat Domisili</span>
                 <span>: {{ $karyawan->alamat_domisili ?? '-' }}</span>
             </div>
+
+            <hr class="my-4">
+
+            <h6 class="fw-bold text-primary mb-3">Data Keluarga</h6>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>NO</th>
+                            <th>HUBUNGAN KELUARGA</th>
+                            <th>NAMA</th>
+                            <th>NIK</th>
+                            <th>JENIS KELAMIN</th>
+                            <th>TEMPAT LAHIR</th>
+                            <th>TANGGAL LAHIR</th>
+                            <th>AGAMA</th>
+                            <th>PENDIDIKAN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>SUAMI</td>
+                            <td>{{ $karyawan->nama_karyawan ?? '-' }}</td>
+                            <td>{{ $karyawan->nik ?? '-' }}</td>
+                            <td>{{ $karyawan->jenis_kelamin ?? '-' }}</td>
+                            <td>{{ $karyawan->tempat_lahir ?? '-' }}</td>
+                            <td>{{ $karyawan->tanggal_lahir ?? '-' }}</td>
+                            <td>{{ $karyawan->agama ?? '-' }}</td>
+                            <td>{{ $karyawan->pendidikan ?? '-' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="table table-bordered table-striped">
+                    <thead class="table-primary">
+                        <tr>
+                            <th rowspan="2">NO</th>
+                            <th rowspan="2">STATUS PERKAWINAN</th>
+                            <th rowspan="2">TANGGAL PERKAWINAN</th>
+                            <th rowspan="2">STATUS HUBUNGAN<br>DALAM KELUARGA</th>
+                            <th rowspan="2">KEWARGANEGARAAN</th>
+                            <th colspan="2">DOKUMEN IMIGRASI</th>
+                            <th colspan="2">NAMA ORANG TUA</th>
+                        </tr>
+                        <tr>
+                            <th>NO PASPOR</th>
+                            <th>NO KITAP</th>
+                            <th>AYAH</th>
+                            <th>IBU</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Menikah</td>
+                            <td>12-05-2018</td>
+                            <td>Kepala Keluarga</td>
+                            <td>Indonesia</td>
+                            <td>A1234567</td>
+                            <td>-</td>
+                            <td>Budi</td>
+                            <td>Siti</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h6 class="fw-bold text-primary mb-3">Data Tanggungan (Suami/Istri/Anak) (Dependent Data of Husband/Wife/Children) </h6>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>NO</th>
+                            <th>HUBUNGAN KELUARGA</th>
+                            <th>NAMA</th>
+                            <th>NIK</th>
+                            <th>JENIS KELAMIN</th>
+                            <th>TEMPAT LAHIR</th>
+                            <th>TANGGAL LAHIR</th>
+                            <th>PENDIDIKAN</th>
+                            <th>PEKERJAAN</th>
+                            <th>NO TELEPHONE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>SUAMI</td>
+                            <td>{{ $karyawan->nama_karyawan ?? '-' }}</td>
+                            <td>{{ $karyawan->nik ?? '-' }}</td>
+                            <td>{{ $karyawan->jenis_kelamin ?? '-' }}</td>
+                            <td>{{ $karyawan->tempat_lahir ?? '-' }}</td>
+                            <td>{{ $karyawan->tanggal_lahir ?? '-' }}</td>
+                            <td>{{ $karyawan->pendidikan ?? '-' }}</td>
+                            <td>{{ $karyawan->pendidikan ?? '-' }}</td>
+                            <td>{{ $karyawan->pendidikan ?? '-' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h6 class="fw-bold text-primary mb-3 mt-3">RIWAYAT PENDIDIKAN (EDUCATIONAL BACKGROUND) </h6>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>NO</th>
+                            <th>JENJANG PENDIDIKAN</th>
+                            <th>NAMA SEKOLAH / INSTITUT</th>
+                            <th>TAHUN MULAI</th>
+                            <th>TAHUN AKHIR</th>
+                            <th>JURUSAN</th>
+                            <th>NILAI/IPK (CGPA)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>SUAMI</td>
+                            <td>{{ $karyawan->nama_karyawan ?? '-' }}</td>
+                            <td>{{ $karyawan->nik ?? '-' }}</td>
+                            <td>{{ $karyawan->jenis_kelamin ?? '-' }}</td>
+                            <td>{{ $karyawan->tempat_lahir ?? '-' }}</td>
+                            <td>{{ $karyawan->tanggal_lahir ?? '-' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h6 class="fw-bold text-primary mb-3 mt-3">PENGALAMAN KERJA</h6>
 
             <hr class="my-4">
     

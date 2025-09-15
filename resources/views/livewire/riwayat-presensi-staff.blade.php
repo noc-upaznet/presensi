@@ -50,10 +50,9 @@
                     </div>
                 </div>
                 @php
-                    $currentRole = auth()->user()->current_role;
                     $divisi = auth()->user()->karyawan->divisi ?? '-';
-                    // var_dump($currentRole, $divisi);
                 @endphp
+
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped">
                         <thead>
@@ -62,106 +61,109 @@
                                 <th>Nama Karyawan</th>
                                 <th>Clock In</th>
                                 <th>Clock Out</th>
+                                <th>Lokasi</th>
                                 <th>File</th>
                                 <th>Status</th>
-                                @if ($currentRole == 'spv')
+                                @role('spv-sales')
                                     <th>Approve</th>
-                                @endif
-                                @if (($currentRole == 'spv' && $divisi == 'Teknisi') || $currentRole == 'hr')
+                                @endrole
+                                {{-- @if( (auth()->user()->hasRole('spv') && $divisi === 'Teknisi') 
+                                    || auth()->user()->hasRole('hr')) --}}
+                                @hasanyrole('spv-teknisi|hr')
                                     <th>Dispensasi</th>
-                                @endif
+                                @endhasanyrole
                             </tr>
                         </thead>
                         <tbody>
-                            @if ($datas->isEmpty())
+                            @forelse ($datas as $key)
                                 <tr>
-                                    <td colspan="9" class="text-center" style="color: var(--bs-body-color);">Data tidak ditemukan</td>
-                                </tr>
-                            @else
-                                @foreach($datas as $key)
-                                    <tr>
-                                        <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
-                                        @if (auth()->user()->current_role != 'user')
-                                            <td style="color: var(--bs-body-color);">{{ $key->getUser->nama_karyawan }}</td>
-                                        @endif
-                                        <td style="color: var(--bs-body-color);">{{ $key->clock_in }}</td>
-                                        <td style="color: var(--bs-body-color);">{{ $key->clock_out }}</td>
-                                        <td style="color: var(--bs-body-color);">
-                                            <img src="{{ asset('storage/' . $key->file) }}" style="max-width: 100px;" alt="Selfie" class="img-fluid" />
-                                        </td>
+                                    <td>{{ $key->tanggal }}</td>
+
+                                    <td>{{ $key->getUser->nama_karyawan }}</td>
+
+                                    <td>{{ $key->clock_in }}</td>
+                                    <td>{{ $key->clock_out }}</td>
+                                    <td>
+                                        <span>Clock-In   :</span> <span class="badge bg-primary"> {{ $key->lokasi_final}}</span><br>
+                                        <span>Clock-Out  :</span> <span class="badge bg-danger">{{ $key->lokasi_clock_out }}</span>
+                                    </td>
+                                    <td>
+                                        <img src="{{ asset('storage/'.$key->file) }}" style="max-width:100px" class="img-fluid" alt="Selfie">
+                                    </td>
+                                    <td>
+                                        @switch($key->status)
+                                            @case("0") <span class="badge bg-success">Tepat Waktu</span> @break
+                                            @case("1") <span class="badge bg-danger">Terlambat</span> @break
+                                            @case("2") <span class="badge bg-primary">Dispensasi</span> @break
+                                            @default <span class="badge bg-secondary">Unknown</span>
+                                        @endswitch
+                                    </td>
+
+                                    {{-- Approve untuk SPV --}}
+                                    @role('spv-sales')
                                         <td>
-                                            @if ($key->status == "0")
-                                                <span class="badge bg-success">Tepat Waktu</span>
-                                            @elseif ($key->status == "1")
-                                                <span class="badge bg-danger">Terlambat</span>
-                                            @elseif ($key->status == "2")
-                                                <span class="badge bg-primary">Dispensasi</span>
-                                            @else
-                                                <span class="badge bg-secondary">Unknown</span>
+                                            @if($key->lokasi_lock == 0)
+                                                @if ($key->approve == 0)
+                                                    <button class="btn btn-success btn-sm mt-2 mb-2" wire:click="approve({{ $key->id }})">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button class="btn btn-danger btn-sm" wire:click="reject({{ $key->id }})">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                @elseif ($key->approve == 1)
+                                                    <span class="badge bg-success">Approved</span>
+                                                @elseif ($key->approve == 2)
+                                                    <span class="badge bg-danger">Rejected</span>
+                                                @endif
                                             @endif
                                         </td>
-                                        
-                                        @if ($currentRole == 'spv')
-                                            <td>
-                                                @if ($key->lokasi_lock == 0)
-                                                    @if ($key->approve == 0)
-                                                        <button class="btn btn-success btn-sm mt-2 mb-2" wire:click="approve({{ $key->id }})">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                        <button class="btn btn-danger btn-sm" wire:click="reject({{ $key->id }})">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
-                                                    @elseif ($key->approve == 1)
-                                                        <span class="badge bg-success">Approved</span>
-                                                    @elseif ($key->approve == 2)
-                                                        <span class="badge bg-danger">Rejected</span>
-                                                    @endif
-                                                @endif
-                                            </td>
-                                        @endif
+                                    @endrole
 
-                                        @if (($currentRole == 'spv' && $divisi == 'Teknisi'))
-                                            <td>
-                                                @php
-                                                    // var_dump($key->approve_late_spv);
-                                                @endphp
-                                                @if ($key->status == "1")
-                                                    @if($key->approve_late_spv == NULL)
-                                                        <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                    @elseif($key->approve_late_spv == 1)
-                                                        <span class="badge bg-success">SPV APPROVED</span>
-                                                    @endif
-                                                    @if($key->approve_late_hr == 1)
-                                                        <span class="badge bg-success">HR APPROVED</span>
-                                                    @endif
-                                                @elseif($key->status == "2")
-                                                    <span class="badge bg-primary">Dispensasi Approved</span>
+                                    {{-- Dispensasi SPV Teknisi --}}
+                                    @role('spv-teknisi')
+                                        <td>
+                                            @if ($key->status == "1")
+                                                @if(is_null($key->approve_late_spv))
+                                                    <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                @elseif($key->approve_late_spv == 1)
+                                                    <span class="badge bg-success">SPV APPROVED</span>
                                                 @endif
-                                            </td>
-                                        @endif
-                                        @if ($currentRole == 'hr')
-                                            <td>
-                                                @if ($key->status == "1")
-                                                    @if($key->approve_late_spv == 1)
-                                                        <span class="badge bg-success">SPV APPROVED</span>
-                                                    @endif
-                                                    @if($key->approve_late_hr == NULL)
-                                                        <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                    @elseif($key->approve_late_hr == 1)
-                                                        <span class="badge bg-success">HR APPROVED</span>
-                                                    @endif
-                                                @elseif($key->status == "2")
-                                                    <span class="badge bg-primary">Dispensasi Approved</span>
+                                                @if($key->approve_late_hr == 1)
+                                                    <span class="badge bg-success">HR APPROVED</span>
                                                 @endif
-                                            </td>
-                                        @endif
-                                    </tr>
-                                @endforeach
-                            @endif
+                                            @elseif($key->status == "2")
+                                                <span class="badge bg-primary">Dispensasi Approved</span>
+                                            @endif
+                                        </td>
+                                    @endrole
+
+                                    {{-- Dispensasi HR --}}
+                                    @role('hr')
+                                        <td>
+                                            @if ($key->status == "1")
+                                                @if($key->approve_late_spv == 1)
+                                                    <span class="badge bg-success">SPV APPROVED</span>
+                                                @endif
+                                                @if(is_null($key->approve_late_hr))
+                                                    <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                @elseif($key->approve_late_hr == 1)
+                                                    <span class="badge bg-success">HR APPROVED</span>
+                                                @endif
+                                            @elseif($key->status == "2")
+                                                <span class="badge bg-primary">Dispensasi Approved</span>
+                                            @endif
+                                        </td>
+                                    @endrole
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted">Data tidak ditemukan</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

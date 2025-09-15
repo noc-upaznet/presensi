@@ -18,18 +18,15 @@
     <div class="container">
         <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
             <div class="mb-4">
-                @php
-                    $currentRole = auth()->user()->current_role;
-                @endphp
                 <div class="d-flex justify-content gap-2 flex-wrap mb-4">
-                    @hasanyrole('admin|spv|hr')
+                    @role('admin')
                         <select class="form-select" wire:model.lazy="filterkaryawan" style="width: 150px;">
                             <option value="">Pilih Karyawan</option>
                             @foreach ($karyawanList as $karyawan)
                                 <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
                             @endforeach
                         </select>
-                    @endhasanyrole
+                    @endrole
 
                     <input type="month" class="form-control" style="width: 150px;" placeholder="Bulan" wire:model.lazy="filterBulan">
 
@@ -53,17 +50,19 @@
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
-                                @hasanyrole('admin|spv|hr')
+                                @role('admin')
                                     <th>Nama Karyawan</th>
-                                @endhasanyrole
+                                @endrole
                                 <th>Clock In</th>
                                 <th>Clock Out</th>
+                                @role('admin')
                                 <th>Lokasi</th>
+                                @endrole
                                 <th>File</th>
                                 <th>Status</th>
-                                @hasanyrole('admin|spv|hr')
+                                @role('admin')
                                     <th>Action</th>
-                                @endhasanyrole
+                                @endrole
                             </tr>
                         </thead>
                         <tbody>
@@ -75,15 +74,17 @@
                                 @foreach($datas as $key)
                                     <tr>
                                         <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
-                                        @hasanyrole('admin|spv|hr')
+                                        @role('admin')
                                             <td style="color: var(--bs-body-color);">{{ $key->getUser->nama_karyawan }}</td>
-                                        @endhasanyrole
+                                        @endrole
                                         <td style="color: var(--bs-body-color);">{{ $key->clock_in }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->clock_out }}</td>
-                                        <td>
-                                            <span>Clock-In   :</span> <span class="badge bg-primary"> {{ $key->lokasi_final}}</span><br>
-                                            <span>Clock-Out  :</span> <span class="badge bg-danger">{{ $key->lokasi_clock_out }}</span>
-                                        </td>
+                                        @role('admin')
+                                            <td>
+                                                <span>Clock-In   :</span> <span class="badge bg-primary"> {{ $key->lokasi_final}}</span><br>
+                                                <span>Clock-Out  :</span> <span class="badge bg-danger">{{ $key->lokasi_clock_out }}</span>
+                                            </td>
+                                        @endrole
                                         <td style="color: var(--bs-body-color);">
                                             <img src="{{ asset('storage/' . $key->file) }}" style="max-width: 100px;" alt="Selfie" class="img-fluid" />
                                             {{-- {{ $key->file }} --}}
@@ -99,7 +100,7 @@
                                                 <span class="badge bg-secondary">Unknown</span>
                                             @endif
                                         </td>
-                                        @hasanyrole('admin|spv|hr')
+                                        @role('admin')
                                             <td>
                                                 @can('presensi-edit')
                                                     <button class="btn btn-warning btn-sm" wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
@@ -107,7 +108,7 @@
                                                     </button>
                                                 @endcan
                                             </td>
-                                        @endhasanyrole
+                                        @endrole
                                     </tr>
                                 @endforeach
                             @endif

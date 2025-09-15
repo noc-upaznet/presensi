@@ -171,7 +171,7 @@ class JadwalShift extends Component
             $query->where('bulan_tahun', 'like', $this->filterBulan . '%');
         }
 
-        if ($user->current_role === 'spv') {
+        if ($user->hasRole('spv')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
@@ -181,7 +181,7 @@ class JadwalShift extends Component
                 ->where('entitas', $entitas);
             });
 
-        } elseif ($user->current_role === 'admin') {
+        } elseif ($user->hasRole('admin')) {
             $entitas = session('selected_entitas', 'UHO');
 
             $query->whereHas('getKaryawan', function ($q) use ($entitas) {
