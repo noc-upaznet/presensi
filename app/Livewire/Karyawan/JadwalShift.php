@@ -36,9 +36,14 @@ class JadwalShift extends Component
     {
         $this->bulan_tahun = now()->format('Y-m');
         $this->filterBulan = now()->format('Y-m');
-        $entitas = session('selected_entitas', 'UHO');
+        $user = Auth::user();
+        $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+        $divisi = $karyawan->divisi;
+        $entitas = $karyawan->entitas;
+        // $entitas = session('selected_entitas', 'UHO');
 
         $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
+            ->where('divisi', $divisi)
             ->orderBy('nama_karyawan')
             ->get();
         $this->applyFilters();
@@ -175,6 +180,7 @@ class JadwalShift extends Component
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
+            // dd($entitas);
 
             $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitas) {
                 $q->where('divisi', $divisi)

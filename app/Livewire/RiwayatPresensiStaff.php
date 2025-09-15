@@ -132,10 +132,11 @@ class RiwayatPresensiStaff extends Component
     public function render()
     {
         $userId = Auth::id();
+        $user = Auth::user();
         // Ambil data karyawan dari user yang login
         $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
         // dd($karyawan);
-        $currentRole = Auth::user()->current_role;
+        // $currentRole = Auth::user()->current_role;
 
         $divisi = $karyawan->divisi;
         // dd($divisi);
@@ -143,7 +144,7 @@ class RiwayatPresensiStaff extends Component
 
         $entitasNama = $karyawan->entitas;
         // dd($entitasNama);
-        if($currentRole === 'spv')
+        if($user->hasRole('spv'))
         {
             if ($divisi === 'NOC') {
                 $datas = M_Presensi::with('getUser')
@@ -213,7 +214,7 @@ class RiwayatPresensiStaff extends Component
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
             }
-        }elseif ($currentRole === 'hr') {
+        }elseif ($user->hasRole('hr')) {
             $entitasNama = session('selected_entitas', 'UHO');
 
             $datas = M_Presensi::with('getUser')
