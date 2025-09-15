@@ -72,7 +72,8 @@ class PengajuanLembur extends Component
         }
 
         $user = Auth::user();
-        $userRoles = $user->getRoleNames()->toArray(); // array: ['spv', 'hr', ...]
+        $entitas = \App\Models\M_Entitas::where('nama', 'MC')->first();
+        $userRoles = $user->getRoleNames()->toArray();
         $pengajuRoles = optional(optional($pengajuan->getKaryawan)->user)
             ?->getRoleNames()
             ->toArray() ?? [];
@@ -105,7 +106,7 @@ class PengajuanLembur extends Component
                     ]);
                 }
             } else {
-                if ($entitasUser === 'MC'){
+                if ($entitas === 'MC'){
                     if ($status == 1) {
                         $pengajuan->approve_hr = 1;
                         $pengajuan->status = 1;
