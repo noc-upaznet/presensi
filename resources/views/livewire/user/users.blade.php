@@ -62,11 +62,11 @@
                         @endif
                     </td>
                     <td>
-                        @can('user-edit')
+                        {{-- @can('user-edit') --}}
                             <button class="btn btn-warning btn-sm  mt-1" data-bs-toggle="tooltip" data-bs-placement="top"
                                 data-bs-title="Edit" wire:click="showEdit('{{ $id }}')"><i
                                     class="bi bi-pencil-square"></i></button>
-                        @endcan
+                        {{-- @endcan --}}
                         @can('user-edit')
                             <button class="btn btn-warning btn-sm  mt-1" data-bs-toggle="tooltip" data-bs-placement="top"
                                 data-bs-title="Edit" wire:click="showEditPassword('{{ $id }}')"><i

@@ -107,7 +107,7 @@
 
             <hr class="my-4">
 
-            <h6 class="fw-bold text-primary mb-3">Data Keluarga</h6>
+            <h6 class="fw-bold text-primary mb-3">DATA KELUARGA (FAMILY MEMBER OF KK) </h6>
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
                     <thead class="table-primary">
