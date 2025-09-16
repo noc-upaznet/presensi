@@ -38,14 +38,26 @@ class JadwalShift extends Component
         $this->filterBulan = now()->format('Y-m');
         $user = Auth::user();
         $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
-        $divisi = $karyawan->divisi;
-        $entitas = $karyawan->entitas;
-        // $entitas = session('selected_entitas', 'UHO');
 
-        $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
-            ->where('divisi', $divisi)
-            ->orderBy('nama_karyawan')
-            ->get();
+        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk'))
+        {
+            $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+            $divisi = $karyawan->divisi;
+            // dd($divisi);
+            $entitas = $karyawan->entitas;
+            // $entitas = session('selected_entitas', 'UHO');
+
+            $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
+                ->where('divisi', $divisi)
+                ->orderBy('nama_karyawan')
+                ->get();
+        }elseif ($user->hasRole('admin')){
+            $entitas = session('selected_entitas', 'UHO');
+
+            $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
+                ->orderBy('nama_karyawan')
+                ->get();
+        }
         $this->applyFilters();
     }
 
