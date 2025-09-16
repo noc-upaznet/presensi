@@ -103,7 +103,7 @@ class RiwayatPresensi extends Component
     {
         $entitasNama = session('selected_entitas', 'UHO');
 
-        if (Auth::user()->hasAnyRole(['admin', 'hr'])) {
+        if (Auth::user()->hasAnyRole(['admin'])) {
             $datas = M_Presensi::with('getUser')
                 ->when($this->filterTanggal, function ($query) {
                     $query->whereDate('created_at', $this->filterTanggal);
@@ -152,7 +152,7 @@ class RiwayatPresensi extends Component
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
-        } elseif (Auth::user()->hasAnyRole(['user', 'spv'])) {
+        } elseif (Auth::user()->hasAnyRole(['user', 'spv', 'hr'])) {
             $userId = Auth::id();
             $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
             $karyawanId = $karyawan ? $karyawan->id : null;

@@ -60,7 +60,7 @@ class ModalJadwalShift extends Component
             ->toArray();
             // dd($jadwalId);
         
-        if ($user->hasRole('spv')) {    
+        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {    
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
@@ -69,7 +69,7 @@ class ModalJadwalShift extends Component
                 ->whereNotIn('id', $jadwalId)
                 ->orderBy('nama_karyawan')
                 ->get();
-        } elseif ($user->hasRole('admin')) {
+        } elseif ($user->hasAnyRole('admin|hr')) {
             $entitas = session('selected_entitas', 'UHO');
             $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
                 ->whereNotIn('id', $jadwalId)
@@ -260,7 +260,7 @@ class ModalJadwalShift extends Component
         $jadwalId = M_Jadwal::where('bulan_tahun', $this->bulan_tahun)
             ->pluck('karyawan_id')
             ->toArray();
-        if ($user->hasRole('spv')) {
+        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
@@ -270,7 +270,7 @@ class ModalJadwalShift extends Component
                 ->whereNotIn('id', $jadwalId) // filter
                 ->orderBy('nama_karyawan')
                 ->get();
-        } elseif ($user->hasRole('admin')) {
+        } elseif ($user->hasAnyRole('admin|hr')) {
             $entitas = session('selected_entitas', 'UHO');
 
             $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
