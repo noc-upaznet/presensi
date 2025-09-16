@@ -234,7 +234,7 @@
                 @endhasanyrole
                 
                 {{-- Extra untuk SPV --}}
-                @role('spv')
+                @hasanyrole('spv|hr')
                     <li class="nav-item">
                         <a href="{{ route('riwayat-presensi-staff') }}"
                            class="nav-link {{ request()->routeIs('riwayat-presensi-staff') ? 'active' : '' }}">
@@ -253,7 +253,7 @@
                            <p>Slip Gaji</p>
                         </a>
                     </li>
-                @endrole
+                @endhasanyrole
 
                 {{-- Pengajuan khusus user --}}
                 @role('user')
