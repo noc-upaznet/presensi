@@ -109,11 +109,14 @@ class TambahDataKaryawan extends Component
         ]);
         $this->form->validate();
 
+        $entitas = M_Entitas::where('nama', $this->form->entitas)->first();
+
         $dataUser = [
             'name' => $this->form->nama_karyawan,
             'email' => $this->form->email,
             'password' => bcrypt($this->password),
-            'current_role' => 'user',
+            'current_role' => '',
+            'entitas_id' => $entitas?->id,
         ];
         // dd($dataUser);
 
