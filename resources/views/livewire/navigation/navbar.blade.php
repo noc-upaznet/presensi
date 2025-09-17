@@ -52,31 +52,6 @@
           </ul>
         </li>
 
-      {{-- Dropdown Switch Role jika user punya lebih dari 1 role --}}
-        @if(Auth::check() && count($roles) > 1)
-          <li class="nav-item dropdown border border-secondary rounded ms-2">
-            <button class="btn btn-link nav-link py-2 px-2 dropdown-toggle d-flex align-items-center rounded text-secondary"
-                    id="dropdown-role"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">
-              <span id="dropdown-role-text">Role: {{ strtoupper($currentRole) }}</span>
-            </button>
-
-            <ul class="dropdown-menu dropdown-menu-end border border-secondary rounded shadow"
-                aria-labelledby="dropdown-role"
-                style="--bs-dropdown-min-width: 10rem; z-index:1055;">
-              @foreach ($roles as $role)
-                <li>
-                  <button class="dropdown-item d-flex align-items-center text-secondary"
-                          wire:click="switchRole('{{ $role }}')">
-                    {{ strtoupper($role) }}
-                  </button>
-                </li>
-              @endforeach
-            </ul>
-          </li>
-        @endif
       @endhasanyrole
 
       {{-- User Menu --}}

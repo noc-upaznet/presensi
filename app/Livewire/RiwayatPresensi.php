@@ -103,7 +103,7 @@ class RiwayatPresensi extends Component
     {
         $entitasNama = session('selected_entitas', 'UHO');
 
-        if (Auth::user()->hasAnyRole(['admin'])) {
+        if (Auth::user()->hasRole(['admin'])) {
             $datas = M_Presensi::with('getUser')
                 ->when($this->filterTanggal, function ($query) {
                     $query->whereDate('created_at', $this->filterTanggal);

@@ -71,6 +71,7 @@
                                     || auth()->user()->hasRole('hr')) --}}
                                 @hasanyrole('spv-teknisi|hr')
                                     <th>Dispensasi</th>
+                                    <th>Action</th>
                                 @endhasanyrole
                             </tr>
                         </thead>
@@ -123,7 +124,7 @@
                                     @role('spv-teknisi')
                                         <td>
                                             @if ($key->status == "1")
-                                                @if(is_null($key->approve_late_spv))
+                                                @if(empty($key->approve_late_spv))
                                                     <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
                                                         <i class="fas fa-check"></i>
                                                     </button>
@@ -142,20 +143,29 @@
                                     {{-- Dispensasi HR --}}
                                     @role('hr')
                                         <td>
-                                            @if ($key->status == "1")
-                                                @if($key->approve_late_spv == 1)
-                                                    <span class="badge bg-success">SPV APPROVED</span>
+                                            @can('dispensasi-approve')
+                                                @if ($key->status == "1")
+                                                    @if($key->approve_late_spv == 1)
+                                                        <span class="badge bg-success">SPV APPROVED</span>
+                                                    @endif
+                                                    @if(empty($key->approve_late_hr))
+                                                        <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    @elseif($key->approve_late_hr == 1)
+                                                        <span class="badge bg-success">HR APPROVED</span>
+                                                    @endif
+                                                @elseif($key->status == "2")
+                                                    <span class="badge bg-primary">Dispensasi Approved</span>
                                                 @endif
-                                                @if(is_null($key->approve_late_hr))
-                                                    <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                @elseif($key->approve_late_hr == 1)
-                                                    <span class="badge bg-success">HR APPROVED</span>
-                                                @endif
-                                            @elseif($key->status == "2")
-                                                <span class="badge bg-primary">Dispensasi Approved</span>
-                                            @endif
+                                            @endcan
+                                        </td>
+                                        <td>
+                                            @can('presensi-edit')
+                                                <button class="btn btn-warning btn-sm" wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            @endcan
                                         </td>
                                     @endrole
                                 </tr>
@@ -169,6 +179,32 @@
                 </div>
                 <div class="mt-3">
                     {{ $datas->links() }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div wire:ignore.self class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3 container">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" wire:model="status">
+                            @foreach($statusList as $key => $label)
+                                <option value="{{ $key }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button" wire:click="updateStatus" class="btn btn-primary">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>

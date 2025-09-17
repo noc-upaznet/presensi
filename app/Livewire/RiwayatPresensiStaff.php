@@ -21,6 +21,14 @@ class RiwayatPresensiStaff extends Component
     public $filterBulan;
     public $filterkaryawan;
     public $filterStatus = '';
+    public $editId;
+    public $status;
+
+    public $statusList = [
+        0 => 'Tepat Waktu',
+        1 => 'Terlambat',
+        2 => 'Dispensasi',
+    ];
 
     public function mount()
     {
@@ -92,14 +100,14 @@ class RiwayatPresensiStaff extends Component
         $presensi = M_Presensi::find($id);
 
         if ($presensi) {
-            $role = Auth::user()->current_role;
+            $user = Auth::user();
 
             // cari level karyawan yang presensi
             $karyawan = M_DataKaryawan::where('id', $presensi->user_id)->first();
 
-            if ($role === 'spv') {
+            if ($user->hasRole('spv')) {
                 $presensi->approve_late_spv = 1;
-            } elseif ($role === 'hr') {
+            } elseif ($user->hasRole('hr')) {
                 $presensi->approve_late_hr = 1;
             }
 
@@ -126,6 +134,43 @@ class RiwayatPresensiStaff extends Component
                 'text'  => 'Approval berhasil disimpan'
             ]);
         }
+    }
+
+    public function showModal($id)
+    {
+        $decryptedId = Crypt::decrypt($id);
+        $this->editId = $decryptedId;
+
+        $data = M_Presensi::find($decryptedId);
+        // dd($data);
+        if (!$data) {
+            session()->flash('error', 'Data tiket tidak ditemukan!');
+            return;
+        }
+
+        $this->status = $data->status;
+        $this->dispatch('editModal', action: 'show');
+    }
+
+    public function updateStatus()
+    {
+        // Cari data berdasarkan ID yang sudah didekripsi sebelumnya
+        $data = M_Presensi::find($this->editId);
+        // dd($data);
+        if (!$data) {
+            session()->flash('error', 'Data presensi tidak ditemukan!');
+            return;
+        }
+
+        // Update field status dengan nilai dari form
+        $data->status = $this->status;
+        $data->save();
+
+        // Reset form jika perlu
+        $this->reset(['editId', 'status']);
+
+        // Tutup modal
+        $this->dispatch('editModal', action: 'hide');
     }
 
 
@@ -245,7 +290,7 @@ class RiwayatPresensiStaff extends Component
                 })
                 ->where('user_id', '!=', $karyawanId)
                 ->whereHas('getUser', function ($q) use ($entitasNama) {
-                    $q->where('divisi', 'Teknisi')
+                    $q
                     ->where('entitas', $entitasNama); // filter entitas dari session
                 })
                 ->orderBy('created_at', 'desc')

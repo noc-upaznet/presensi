@@ -68,146 +68,6 @@ class Pengajuan extends Component
         $this->dispatch('modalEditPengajuan', action: 'show');
     }
 
-    // public function updateStatus($id, $status = null)
-    // {
-    //     $pengajuan = M_Pengajuan::find($id);
-    //     // dd($pengajuan);
-
-    //     if (!$pengajuan) {
-    //         return;
-    //     }
-
-    //     $userRole = Auth::user()->current_role;
-    //     $pengajuRole = optional(optional($pengajuan->getKaryawan)->user)->current_role;
-    //     // dd($pengajuRole);
-
-    //     // SPV approval
-    //     if ($userRole === 'spv') {
-    //         if ($status == 1) {
-    //             $pengajuan->approve_spv = 1;
-    //         } elseif ($status == 2) {
-    //             $pengajuan->approve_spv = 2;
-    //             $pengajuan->status = 2;
-    //         }
-    //     }
-        
-    //     // HR approval
-    //     if ($userRole === 'hr') {
-    //         if ($pengajuRole === 'spv') {
-    //         // Jika pengaju adalah SPV, langsung bisa diapprove HR
-    //             if ($status == 1) {
-    //                 $pengajuan->approve_hr = 1;
-    //                 $pengajuan->status = 1;
-    //             } elseif ($status == 2) {
-    //                 $pengajuan->approve_hr = 2;
-    //                 $pengajuan->status = 2;
-
-    //                 $this->dispatch('swal', params: [
-    //                     'title' => 'Pengajuan Rejected',
-    //                     'icon' => 'error',
-    //                     'text' => 'Berhasil Menolak Pengajuan ini.'
-    //                 ]);
-    //             }
-    //         } else {
-    //         // Jika pengaju bukan SPV, maka perlu approve_spv
-    //             if ($pengajuan->approve_spv == 1) {
-    //                 if ($status == 1) {
-    //                     $pengajuan->approve_hr = 1;
-    //                     $pengajuan->status = 1;
-    //                 } elseif ($status == 2) {
-    //                     $pengajuan->approve_hr = 2;
-    //                     $pengajuan->status = 2;
-
-    //                     $this->dispatch('swal', params: [
-    //                         'title' => 'Pengajuan Rejected',
-    //                         'icon' => 'error',
-    //                         'text' => 'Berhasil Menolak Pengajuan ini.'
-    //                     ]);
-    //                 }
-    //             } elseif ($pengajuan->approve_spv == 2) {
-    //                 $pengajuan->status = 2;
-    //                 $this->dispatch('swal', params: [
-    //                     'title' => 'Gagal Menyimpan',
-    //                     'icon' => 'error',
-    //                     'text' => 'SPV sudah menolak pengajuan ini.'
-    //                 ]);
-    //                 return;
-    //             } else {
-    //                 $this->dispatch('swal', params: [
-    //                     'title' => 'Gagal Menyimpan',
-    //                     'icon' => 'error',
-    //                     'text' => 'Pengajuan belum disetujui oleh SPV.'
-    //                 ]);
-    //                 return;
-    //             }
-    //         }
-    //     }
-
-    //     // Jika pengaju adalah HR
-    //     elseif ($userRole === 'admin') {
-    //         if (!in_array($pengajuRole, ['hr', 'admin'])) {
-    //             $this->dispatch('swal', params: [
-    //                 'title' => 'Tidak Diizinkan',
-    //                 'icon' => 'error',
-    //                 'text' => 'Admin hanya bisa menyetujui pengajuan dari HR.'
-    //             ]);
-    //             return;
-    //         }
-
-    //         if ($status == 1) {
-    //             $pengajuan->approve_admin = 1;
-    //             $pengajuan->status = 1;
-    //         } elseif ($status == 2) {
-    //             $pengajuan->approve_admin = 2;
-    //             $pengajuan->status = 2;
-    //         }
-    //     }
-
-    //     // Final status = 1 jika semua approval positif
-    //     if ($pengajuan->approve_spv == 1 && $pengajuan->approve_hr == 1) {
-    //         $pengajuan->status = 1;
-    //     }
-
-    //     $pengajuan->save();
-
-    //     // Jika disetujui, update jadwal
-    //     if ($pengajuan->status == 1) {
-    //         $tanggal = Carbon::parse($pengajuan->tanggal);
-    //         $hari = 'd' . $tanggal->day;
-    //         $bulanTahun = $tanggal->format('Y-m');
-
-    //         $jadwal = M_Jadwal::where('karyawan_id', $pengajuan->karyawan_id)
-    //             ->where('bulan_tahun', $bulanTahun)
-    //             ->first();
-
-    //         if ($jadwal) {
-    //             $pengajuan->jadwal_sebelumnya = $jadwal->$hari;
-    //             $pengajuan->save();
-
-    //             $jadwal->$hari = $pengajuan->shift_id;
-    //             $jadwal->save();
-    //         } else {
-    //             $pengajuan->jadwal_sebelumnya = null;
-    //             $pengajuan->save();
-
-    //             $jadwalBaru = new M_Jadwal([
-    //                 'karyawan_id' => $pengajuan->karyawan_id,
-    //                 'bulan_tahun' => $bulanTahun,
-    //                 $hari => $pengajuan->shift_id,
-    //             ]);
-    //             $jadwalBaru->save();
-    //         }
-    //     }
-
-    //     $this->dispatch('swal', params: [
-    //         'title' => 'Status Diperbarui',
-    //         'icon' => 'success',
-    //         'text' => 'Status dan jadwal berhasil diperbarui.'
-    //     ]);
-
-    //     $this->dispatch('refresh');
-    // }
-
     public function updateStatus($id, $status = null)
     {
         $pengajuan = M_Pengajuan::find($id);
@@ -217,11 +77,12 @@ class Pengajuan extends Component
         }
 
         $user = Auth::user();
-        $userRoles = $user->getRoleNames()->toArray(); // array: ['spv', 'hr', ...]
+        $userRoles = $user->getRoleNames()->toArray();
         $pengajuRoles = optional(optional($pengajuan->getKaryawan)->user)
             ?->getRoleNames()
             ->toArray() ?? [];
-
+        $entitasUser = optional($pengajuan->getKaryawan)->entitas;
+        $divisi = optional($pengajuan->getKaryawan)->divisi;
         // === SPV approval ===
         if (in_array('spv', $userRoles)) {
             if ($status == 1) {
@@ -234,6 +95,23 @@ class Pengajuan extends Component
 
         // === HR approval ===
         if (in_array('hr', $userRoles)) {
+            if ($divisi === 'HR') {
+                if ($status == 1) {
+                    $pengajuan->approve_hr  = 1;
+                    $pengajuan->approve_spv = 1; // auto SPV
+                    $pengajuan->status      = 1;
+                } elseif ($status == 2) {
+                    $pengajuan->approve_hr  = 2;
+                    $pengajuan->approve_spv = 2;
+                    $pengajuan->status      = 2;
+
+                    $this->dispatch('swal', params: [
+                        'title' => 'Pengajuan Rejected',
+                        'icon'  => 'error',
+                        'text'  => 'Berhasil menolak pengajuan ini.'
+                    ]);
+                }
+            }
             if (in_array('spv', $pengajuRoles)) {
                 // Pengaju SPV, HR boleh langsung approve
                 if ($status == 1) {

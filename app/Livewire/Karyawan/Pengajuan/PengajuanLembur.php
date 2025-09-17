@@ -77,6 +77,7 @@ class PengajuanLembur extends Component
         $pengajuRoles = optional(optional($pengajuan->getKaryawan)->user)
             ?->getRoleNames()
             ->toArray() ?? [];
+        $divisi = optional($pengajuan->getKaryawan)->divisi;
         // dd($pengajuRoles);
 
         // SPV approval
@@ -91,6 +92,23 @@ class PengajuanLembur extends Component
 
         // === HR approval ===
         if (in_array('hr', $userRoles)) {
+            if ($divisi === 'HR') {
+                if ($status == 1) {
+                    $pengajuan->approve_hr  = 1;
+                    $pengajuan->approve_spv = 1; // auto SPV
+                    $pengajuan->status      = 1;
+                } elseif ($status == 2) {
+                    $pengajuan->approve_hr  = 2;
+                    $pengajuan->approve_spv = 2;
+                    $pengajuan->status      = 2;
+
+                    $this->dispatch('swal', params: [
+                        'title' => 'Pengajuan Rejected',
+                        'icon'  => 'error',
+                        'text'  => 'Berhasil menolak pengajuan ini.'
+                    ]);
+                }
+            }
             if (in_array('spv', $pengajuRoles)) {
                 // Pengaju SPV, HR boleh langsung approve
                 if ($status == 1) {
