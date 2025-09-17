@@ -72,7 +72,7 @@ class M_Lembur extends Model
         }
 
         // Pengaju harus user atau spv
-        return $this->pengajuRole('user') || $this->pengajuRole('spv');
+        return $this->pengajuRole('user') || $this->pengajuRole('spv') || $this->pengajuRole('branch-manager');
     }
 
     public function canBeApprovedByAdmin(): bool

@@ -71,7 +71,7 @@
     </div>
 
     <div class="container mt-4">
-        @hasanyrole('user|spv|hr')
+        @hasanyrole('user|spv|hr|branch-manager')
             <div class="d-flex justify-content-between align-items-center mb-3 pengajuan-table-controls flex-wrap">
                 <button class="btn btn-primary mb-2 me-2" wire:click="showAdd">
                     <i class="bi bi-plus"></i> Tambah
@@ -192,7 +192,7 @@
                                                 <span class="badge bg-danger">Ditolak</span>
                                             @endif
                                         </td>
-                                        @role('user')
+                                        @hasanyrole('user|branch-manager')
                                             @can('pengajuan-edit')
                                                 @if ($key->approve_spv == 0 && $key->approve_hr == 0)
                                                     <td class="text-center" style="color: var(--bs-body-color);">
@@ -204,7 +204,7 @@
                                                     </td>
                                                 @endif
                                             @endcan
-                                        @endrole
+                                        @endhasanyrole
                                         <td class="text-center" style="color: var(--bs-body-color);">
                                             {{-- Tombol Approve SPV --}}
                                             @role('spv')
@@ -215,6 +215,11 @@
                                                     <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">
                                                         <i class="bi bi-x-square"></i>
                                                     </button>
+                                                @endif
+                                                @if ($key->approve_hr == 0)
+                                                    <button class="btn btn-sm btn-warning mb-2" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                @else
+                                                    <button class="btn btn-sm btn-warning mb-2" disabled><i class="fa-solid fa-pen-to-square"></i></button>
                                                 @endif
                                                 <button class="btn btn-sm btn-danger mb-2" wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
                                                     <i class="bi bi-trash"></i>

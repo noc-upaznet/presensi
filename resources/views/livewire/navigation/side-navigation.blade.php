@@ -50,7 +50,7 @@
                     </li>
                 @endrole
 
-                @hasanyrole('user|spv')
+                @hasanyrole('user|spv|branch-manager')
                     <li class="nav-item">
                         <a href="{{ route('clock-in') }}"
                            class="nav-link {{ request()->routeIs('clock-in') ? 'active' : '' }}">
@@ -256,7 +256,7 @@
                 @endhasanyrole
 
                 {{-- Pengajuan khusus user --}}
-                @role('user')
+                @hasanyrole('user|branch-manager')
                     <li class="nav-item menu-open">
                         <a href="#" class="nav-link active">
                             <i class="bi bi-clipboard-plus"></i>
@@ -293,7 +293,7 @@
                            <p>Slip Gaji</p>
                         </a>
                     </li>
-                @endrole
+                @endhasanyrole
                 @role('admin')
                     @can('manage-user')
                         <li class="nav-item">

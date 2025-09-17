@@ -70,7 +70,7 @@
 
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 lembur-header">
-            @hasanyrole('user|spv|hr')
+            @hasanyrole('user|spv|hr|branch-manager')
                 <button class="btn btn-primary" wire:click="showAdd">
                     <i class="bi bi-plus"></i> Tambah
                 </button>

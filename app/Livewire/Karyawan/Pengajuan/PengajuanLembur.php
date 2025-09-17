@@ -123,6 +123,21 @@ class PengajuanLembur extends Component
                         'text'  => 'Berhasil Menolak Pengajuan ini.'
                     ]);
                 }
+            }elseif (in_array('branch-manager', $pengajuRoles)) {
+                // hanya HR yang boleh approve
+                if ($status == 1) {
+                    $pengajuan->approve_hr = 1;
+                    $pengajuan->status     = 1;
+                } elseif ($status == 2) {
+                    $pengajuan->approve_hr = 2;
+                    $pengajuan->status     = 2;
+
+                    $this->dispatch('swal', params: [
+                        'title' => 'Pengajuan Ditolak',
+                        'icon'  => 'error',
+                        'text'  => 'Berhasil menolak pengajuan branch-manager.'
+                    ]);
+                }
             } else {
                 if ($entitas === 'MC'){
                     if ($status == 1) {
@@ -213,7 +228,7 @@ class PengajuanLembur extends Component
         $entitas = session('selected_entitas', 'UHO');
 
         // 🔹 User biasa → hanya lemburnya sendiri
-        if ($user->hasRole('user')) {
+        if ($user->hasRole('user|branch-manager')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
                 $query->where('karyawan_id', $dataKaryawan->id);

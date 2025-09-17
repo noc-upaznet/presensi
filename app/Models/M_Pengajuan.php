@@ -70,7 +70,7 @@ class M_Pengajuan extends Model
         }
 
         // Hanya jika pengaju punya role 'user' atau 'spv'
-        if ($this->pengajuRole('user') || $this->pengajuRole('spv')) {
+        if ($this->pengajuRole('user') || $this->pengajuRole('spv') || $this->pengajuRole('branch-manager')) {
             return true;
         }
 
