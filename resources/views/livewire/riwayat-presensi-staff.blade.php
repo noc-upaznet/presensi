@@ -86,7 +86,7 @@
                                     <td>{{ $key->clock_out }}</td>
                                     <td>
                                         <span>Clock-In   :</span> <span class="badge bg-primary"> {{ $key->lokasi_final}}</span><br>
-                                        <span>Clock-Out  :</span> <span class="badge bg-danger">{{ $key->lokasi_clock_out }}</span>
+                                        <span>Clock-Out  :</span> <span class="badge bg-danger">{{ $key->lokasi_clock_out_final }}</span>
                                     </td>
                                     <td>
                                         <img src="{{ asset('storage/'.$key->file) }}" style="max-width:100px" class="img-fluid" alt="Selfie">

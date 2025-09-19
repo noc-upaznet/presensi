@@ -82,7 +82,7 @@
                                         @role('admin')
                                             <td>
                                                 <span>Clock-In   :</span> <span class="badge bg-primary"> {{ $key->lokasi_final}}</span><br>
-                                                <span>Clock-Out  :</span> <span class="badge bg-danger">{{ $key->lokasi_clock_out }}</span>
+                                                <span>Clock-Out  :</span> <span class="badge bg-danger">{{ $key->lokasi_clock_out_final }}</span>
                                             </td>
                                         @endrole
                                         <td style="color: var(--bs-body-color);">

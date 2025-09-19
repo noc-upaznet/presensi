@@ -59,4 +59,29 @@ class M_Presensi extends Model
             return json_decode($this->lokasi, true)[0] ?? null;
         }
     }
+
+    public function getLokasiClockOutFinalAttribute()
+    {
+        $val = $this->lokasi_clock_out;
+
+        if (!$val) {
+            return null;
+        }
+
+        // Jika value hanya angka (id lokasi)
+        if (is_numeric($val)) {
+            return Lokasi::find($val)->nama_lokasi ?? 'Tidak Diketahui';
+        }
+
+        // Kalau bentuknya JSON array (contoh: "[3]")
+        if (str_starts_with($val, '[')) {
+            $decoded = json_decode($val, true);
+            if (is_array($decoded) && isset($decoded[0]) && is_numeric($decoded[0])) {
+                return Lokasi::find($decoded[0])->nama_lokasi ?? 'Tidak Diketahui';
+            }
+        }
+
+        // Selain itu, anggap koordinat (langsung tampilkan)
+        return $val;
+    }
 }
