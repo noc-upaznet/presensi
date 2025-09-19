@@ -27,6 +27,9 @@ class TambahDataKaryawan extends Component
     public $jabatan;
     public $password;
     public $total_upah;
+    public $keluargas = [];
+    public $tanggungans = [];
+    public $pendidikans = [];
 
     public function mount()
     {
@@ -43,13 +46,6 @@ class TambahDataKaryawan extends Component
             $this->form->alamatDomisili = '';
         }
     }
-
-    // public function updatedFormAlamatKTP($value)
-    // {
-    //     if ($this->form->gunakanAlamatKTP) {
-    //         $this->form->alamatDomisili = $value;
-    //     }
-    // }
 
     public function nextStep() {
         // Validasi field yang wajib diisi pada step saat ini
@@ -167,6 +163,7 @@ class TambahDataKaryawan extends Component
         // dd($data);
             
         M_DataKaryawan::create($data);
+        // dd($dataKaryawan);
         
         $this->form->reset();
 

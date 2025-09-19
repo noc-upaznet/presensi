@@ -235,13 +235,14 @@
                                 @error('form.alamatDomisili') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
+                        
                         <div align="right">
                             @if ($step > 1)
-                                <button type="button" wire:click="prevStep" class="btn btn-secondary">Kembali</button>
+                                <button type="button" wire:click="prevStep" class="btn btn-secondary"><i class="bi bi-arrow-left-circle-fill"></i> Kembali</button>
                             @endif
                         
                             @if ($step < 3)
-                                <button type="button" wire:click="nextStep" class="btn btn-primary">Selanjutnya</button>
+                                <button type="button" wire:click="nextStep" class="btn btn-primary">Selanjutnya <i class="bi bi-arrow-right-circle-fill"></i></button>
                             @else
                                 <button type="button" wire:click="store" class="btn btn-success">Simpan</button>
                             @endif
@@ -343,11 +344,11 @@
                         </div>
                         <div align="right">
                             @if ($step > 1)
-                                <button type="button" wire:click="prevStep" class="btn btn-secondary">Kembali</button>
+                                <button type="button" wire:click="prevStep" class="btn btn-secondary"><i class="bi bi-arrow-left-circle-fill"></i> Kembali</button>
                             @endif
                         
                             @if ($step < 3)
-                                <button type="button" wire:click="nextStep" class="btn btn-primary">Selanjutnya</button>
+                                <button type="button" wire:click="nextStep" class="btn btn-primary">Selanjutnya <i class="bi bi-arrow-right-circle-fill"></i></button>
                             @else
                                 <button type="button" wire:click="store" class="btn btn-success">Simpan</button>
                             @endif
@@ -549,6 +550,8 @@
             rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
             input.value = rupiah;
         }
+
+
     </script>
     
 @endpush
