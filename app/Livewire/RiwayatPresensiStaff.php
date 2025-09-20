@@ -99,41 +99,48 @@ class RiwayatPresensiStaff extends Component
     {
         $presensi = M_Presensi::find($id);
 
-        if ($presensi) {
-            $user = Auth::user();
+        if (!$presensi) {
+            session()->flash('error', 'Data presensi tidak ditemukan!');
+            return;
+        }
 
-            // cari level karyawan yang presensi
-            $karyawan = M_DataKaryawan::where('id', $presensi->user_id)->first();
+        $user = Auth::user();
 
-            if ($user->hasRole('spv')) {
-                $presensi->approve_late_spv = 1;
-            } elseif ($user->hasRole('hr')) {
-                $presensi->approve_late_hr = 1;
-            }
+        // cari level karyawan yang presensi
+        $karyawan = M_DataKaryawan::where('id', $presensi->user_id)->first();
 
-            // === logika status ===
-            if ($presensi->status == 1) {
-                if ($karyawan && $karyawan->level === 'SPV') {
-                    // kalau karyawan adalah SPV -> hanya butuh approve HR
-                    if ($presensi->approve_late_hr == 1) {
-                        $presensi->status = 2;
-                    }
-                } else {
-                    // kalau bukan SPV -> butuh approve SPV + HR
-                    if ($presensi->approve_late_spv == 1 && $presensi->approve_late_hr == 1) {
-                        $presensi->status = 2;
-                    }
+        // === simpan status lama sebelum diubah ===
+        $presensi->previous_status = $presensi->status;
+
+        // === proses approval ===
+        if ($user->hasRole('spv')) {
+            $presensi->approve_late_spv = 1;
+        } elseif ($user->hasRole('hr')) {
+            $presensi->approve_late_hr = 1;
+        }
+
+        // === logika perubahan status ===
+        if ($presensi->status == 1) {
+            if ($karyawan && $karyawan->level === 'SPV') {
+                // kalau karyawan adalah SPV -> hanya butuh approve HR
+                if ($presensi->approve_late_hr == 1) {
+                    $presensi->status = 2;
+                }
+            } else {
+                // kalau bukan SPV -> butuh approve SPV + HR
+                if ($presensi->approve_late_spv == 1 && $presensi->approve_late_hr == 1) {
+                    $presensi->status = 2;
                 }
             }
-
-            $presensi->save();
-
-            $this->dispatch('swal', params: [
-                'title' => 'Presensi Approved',
-                'icon'  => 'success',
-                'text'  => 'Approval berhasil disimpan'
-            ]);
         }
+
+        $presensi->save();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Presensi Approved',
+            'icon'  => 'success',
+            'text'  => "Status berubah dari {$presensi->previous_status} ke {$presensi->status}"
+        ]);
     }
 
     public function showModal($id)
@@ -154,19 +161,29 @@ class RiwayatPresensiStaff extends Component
 
     public function updateStatus()
     {
-        // Cari data berdasarkan ID yang sudah didekripsi sebelumnya
+        // Cari data berdasarkan ID
         $data = M_Presensi::find($this->editId);
-        // dd($data);
+
         if (!$data) {
             session()->flash('error', 'Data presensi tidak ditemukan!');
             return;
         }
 
-        // Update field status dengan nilai dari form
+        // Simpan status lama sebelum diganti
+        $data->previous_status = $data->status;
+
+        // Update field status dengan nilai baru dari form
         $data->status = $this->status;
         $data->save();
 
-        // Reset form jika perlu
+        // Opsional: tampilkan notifikasi
+        $this->dispatch('swal', params: [
+            'title' => 'Berhasil',
+            'text'  => "Status berubah dari {$data->previous_status} ke {$data->status}",
+            'icon'  => 'success'
+        ]);
+
+        // Reset form
         $this->reset(['editId', 'status']);
 
         // Tutup modal
@@ -302,7 +319,4 @@ class RiwayatPresensiStaff extends Component
             'datas' => $datas
         ]);
     }
-
-
-
 }

@@ -61,6 +61,15 @@
                 @endhasanyrole
 
                 {{-- Data Master khusus Admin --}}
+                @can('karyawan-edit')
+                    <li class="nav-item">
+                        <a href="{{ route('data-karyawan') }}"
+                           class="nav-link {{ request()->routeIs('data-karyawan') ? 'active' : '' }}">
+                           <i class="bi bi-person-add"></i>
+                           <p>Data Karyawan</p>
+                        </a>
+                    </li>
+                @endcan
                 @hasanyrole('admin|hr')
                     <li class="nav-item">
                         <a href="{{ route('data-karyawan') }}"
@@ -94,7 +103,6 @@
                         </a>
                     </li>
 
-                    {{-- Lokasi --}}
                     <li class="nav-item menu-open">
                         <a href="#" class="nav-link active">
                             <i class="bi bi-map"></i>
@@ -134,7 +142,6 @@
                         </a>
                     </li>
 
-                    {{-- Payroll --}}
                     <li class="nav-item menu-open">
                         <a href="#" class="nav-link active">
                             <i class="bi bi-clipboard-plus"></i>
