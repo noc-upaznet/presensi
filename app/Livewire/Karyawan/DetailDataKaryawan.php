@@ -50,6 +50,7 @@ class DetailDataKaryawan extends Component
     public $label;
     public $values = [];
     public $editing = [];
+    public $edit_id;
 
     protected $rules = [
         'value' => 'nullable|string|max:255',
@@ -231,7 +232,219 @@ class DetailDataKaryawan extends Component
         $this->dispatch('modalTambahPendidikan', action: 'hide');
     }
 
+    public function showEditKeluarga($id)
+    {
+        $dataFamily = M_Family::findOrFail($id);
+        $this->edit_id = $id;
+        // dd($this->edit_id);
 
+        $this->relationships = $dataFamily->relationships;
+        $this->name = $dataFamily->name;
+        $this->nik = $dataFamily->nik;
+        $this->gender = $dataFamily->gender;
+        $this->place_of_birth = $dataFamily->place_of_birth;
+        $this->date_of_birth = $dataFamily->date_of_birth;
+        $this->religion = $dataFamily->religion;
+        $this->education = $dataFamily->education;
+        $this->dispatch('modalEditKeluarga', action: 'show');
+    }
+
+    public function updateKeluarga()
+    {
+        if ($this->edit_id) {
+            $dataFamily = M_Family::findOrFail($this->edit_id);
+            $data = [
+                'relationships' => $this->relationships,
+                'name' => $this->name,
+                'nik' => $this->nik,
+                'gender' => $this->gender,
+                'place_of_birth' => $this->place_of_birth,
+                'date_of_birth' => $this->date_of_birth,
+                'religion' => $this->religion,
+                'education' => $this->education,
+            ];
+            // dd($data);
+            $dataFamily->update($data);
+        }
+
+        $this->reset(['relationships', 'name', 'nik', 'gender', 'place_of_birth', 'date_of_birth', 'religion', 'education']);
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Updated',
+            'icon' => 'success',
+            'text' => 'Data has been updated successfully'
+        ]);
+
+        $this->dispatch('modalEditKeluarga', action: 'hide');
+    }
+
+    public function showEditRelationship($id)
+    {
+        $dataFamily = M_Family::findOrFail($id);
+        $this->edit_id = $id;
+        // dd($this->edit_id);
+
+        $this->marital_status = $dataFamily->marital_status;
+        $this->wedding_date = $dataFamily->wedding_date;
+        $this->relationship_in_family = $dataFamily->relationship_in_family;
+        $this->citizenship = $dataFamily->citizenship;
+        $this->father = $dataFamily->father;
+        $this->mother = $dataFamily->mother;
+
+        $this->dispatch('modalEditRelationship', action: 'show');
+    }
+
+    public function updateRelationship()
+    {
+        if ($this->edit_id) {
+            $dataFamily = M_Family::findOrFail($this->edit_id);
+            $data = [
+                'marital_status' => $this->marital_status,
+                'wedding_date' => $this->wedding_date,
+                'relationship_in_family' => $this->relationship_in_family,
+                'citizenship' => $this->citizenship,
+                'father' => $this->father,
+                'mother' => $this->mother,
+            ];
+            // dd($data);
+            $dataFamily->update($data);
+        }
+
+        $this->reset(['marital_status', 'wedding_date', 'relationship_in_family', 'citizenship', 'father', 'mother']);
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Updated',
+            'icon' => 'success',
+            'text' => 'Data has been updated successfully'
+        ]);
+
+        $this->dispatch('modalEditRelationship', action: 'hide');
+    }
+
+    public function showEditTanggungan($id)
+    {
+        $dataDependent = M_Dependents::findOrFail($id);
+        $this->edit_id = $id;
+        // dd($this->edit_id);
+
+        $this->relationships = $dataDependent->relationships;
+        $this->name = $dataDependent->name;
+        $this->gender = $dataDependent->gender;
+        $this->place_of_birth = $dataDependent->place_of_birth;
+        $this->date_of_birth = $dataDependent->date_of_birth;
+        $this->education = $dataDependent->education;
+        $this->profession = $dataDependent->profession;
+        $this->no_telp = $dataDependent->no_telp;
+
+        $this->dispatch('modalEditTanggungan', action: 'show');
+    }
+
+    public function updateTanggungan()
+    {
+        if ($this->edit_id) {
+            $modalEditTanggungan = M_Dependents::findOrFail($this->edit_id);
+            $data = [
+                'relationships' => $this->relationships,
+                'name' => $this->name,
+                'gender' => $this->gender,
+                'place_of_birth' => $this->place_of_birth,
+                'date_of_birth' => $this->date_of_birth,
+                'education' => $this->education,
+                'profession' => $this->profession,
+                'no_telp' => $this->no_telp,
+            ];
+            // dd($data);
+            $modalEditTanggungan->update($data);
+        }
+
+        $this->reset(['relationships', 'name', 'gender', 'place_of_birth', 'date_of_birth', 'profession', 'education', 'no_telp']);
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Updated',
+            'icon' => 'success',
+            'text' => 'Data has been updated successfully'
+        ]);
+
+        $this->dispatch('modalEditTanggungan', action: 'hide');
+    }
+
+    public function showEditEducation($id)
+    {
+        $dataEducation = M_EducationExperience::findOrFail($id);
+        $this->edit_id = $id;
+        // dd($this->edit_id);
+
+        $this->level_of_education = $dataEducation->level_of_education;
+        $this->institution = $dataEducation->institution;
+        $this->start_date = $dataEducation->start_date;
+        $this->end_date = $dataEducation->end_date;
+        $this->major = $dataEducation->major;
+        $this->nilai = $dataEducation->nilai;
+
+        $this->dispatch('modalEditPendidikan', action: 'show');
+    }
+
+    public function updateEducation()
+    {
+        if ($this->edit_id) {
+            $dataEducation = M_EducationExperience::findOrFail($this->edit_id);
+            $data = [
+                'level_of_education' => $this->level_of_education,
+                'institution' => $this->institution,
+                'start_date' => $this->start_date,
+                'end_date' => $this->end_date,
+                'major' => $this->major,
+                'nilai' => $this->nilai,
+            ];
+            // dd($data);
+            $dataEducation->update($data);
+        }
+
+        $this->reset(['level_of_education', 'institution', 'start_date', 'end_date', 'major', 'nilai']);
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Updated',
+            'icon' => 'success',
+            'text' => 'Data has been updated successfully'
+        ]);
+
+        $this->dispatch('modalEditPendidikan', action: 'hide');
+    }
+
+    public function showEditExperience($id)
+    {
+        $dataExperience = M_EducationExperience::findOrFail($id);
+        $this->edit_id = $id;
+        // dd($this->edit_id);
+
+        $this->company = $dataExperience->company;
+        $this->employment_period = $dataExperience->employment_period;
+
+        $this->dispatch('modalEditExperience', action: 'show');
+    }
+
+    public function updateExperience()
+    {
+        if ($this->edit_id) {
+            $dataExperience = M_EducationExperience::findOrFail($this->edit_id);
+            $data = [
+                'company' => $this->company,
+                'employment_period' => $this->employment_period,
+            ];
+            // dd($data);
+            $dataExperience->update($data);
+        }
+
+        $this->reset(['company', 'employment_period']);
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Updated',
+            'icon' => 'success',
+            'text' => 'Data has been updated successfully'
+        ]);
+
+        $this->dispatch('modalEditExperience', action: 'hide');
+    }
 
     public function render()
     {
