@@ -72,14 +72,6 @@
                 @endcan
                 @hasanyrole('admin|hr')
                     <li class="nav-item">
-                        <a href="{{ route('data-karyawan') }}"
-                           class="nav-link {{ request()->routeIs('data-karyawan') ? 'active' : '' }}">
-                           <i class="bi bi-person-add"></i>
-                           <p>Data Karyawan</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
                         <a href="{{ route('template-mingguan') }}"
                            class="nav-link {{ request()->routeIs('template-mingguan') ? 'active' : '' }}">
                            <i class="bi bi-calendar2-plus"></i>
