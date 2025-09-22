@@ -228,16 +228,13 @@
                                    @endif
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            {{-- <li class="nav-item">
                                 <a href="{{ route('dispensasi') }}"
                                    class="nav-link {{ request()->routeIs('dispensasi') ? 'active' : '' }}">
                                    <i class="nav-icon bi bi-circle"></i>
                                    <p>Pengajuan Dispensasi</p>
-                                   {{-- @if ($lemburMenungguCount > 0)
-                                       <span class="badge bg-danger ms-2">{{ $lemburMenungguCount }}</span>
-                                   @endif --}}
                                 </a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </li>
                 @endhasanyrole
@@ -292,16 +289,13 @@
                                    @endif
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            {{-- <li class="nav-item">
                                 <a href="{{ route('dispensasi') }}"
                                    class="nav-link {{ request()->routeIs('dispensasi') ? 'active' : '' }}">
                                    <i class="nav-icon bi bi-circle"></i>
                                    <p>Pengajuan Dispensasi</p>
-                                   {{-- @if ($lemburMenungguCount > 0)
-                                       <span class="badge bg-danger ms-2">{{ $lemburMenungguCount }}</span>
-                                   @endif --}}
                                 </a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </li>
 
