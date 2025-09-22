@@ -42,7 +42,7 @@ class Users extends Component
             'name' => $this->form->name,
             'email' => $this->form->email,
             'password' => bcrypt($this->form->password),
-            'entitas_id' => M_Entitas::where('nama', session('selected_entitas', 'UHO'))->value('id')
+            'branch_id' => M_Entitas::where('nama', session('selected_entitas', 'UHO'))->value('id')
         ];
         // dd($data);
         // dd([
@@ -157,7 +157,7 @@ class Users extends Component
         $entitas = session('selected_entitas', 'UHO');
         $this->user_branches = M_Entitas::all();
         // dd($this->user_branches);
-        $users = User::where('entitas_id', M_Entitas::where('nama', $entitas)->value('id'))
+        $users = User::where('branch_id', M_Entitas::where('nama', $entitas)->value('id'))
             ->whereAny([
                 'name'
             ], 'like', '%' . $this->tableSearch . '%')
