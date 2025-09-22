@@ -84,18 +84,18 @@ class User extends Authenticatable
 
     public function branch_ids()
     {
-        $branch_ids = DB::table('user_has_branches')->where('user_id', $this->id)->pluck('entitas_id')->toArray();
+        $branch_ids = DB::table('user_has_branches')->where('user_id', $this->id)->pluck('branch_id')->toArray();
         return $branch_ids;
     }
     public function branches()
     {
         $branch_ids = DB::table('user_has_branches')
         ->where('user_id', $this->id)
-        ->pluck('entitas_id')
+        ->pluck('branch_id')
         ->toArray();
         // dd([
         //     'user_id'    => $this->id,
-        //     'entitas_id' => $branch_ids,
+        //     'branch_id' => $branch_ids,
         // ]);
 
         $branchs = M_Entitas::whereIn('id', $branch_ids)->get();
@@ -109,7 +109,7 @@ class User extends Authenticatable
         $model = DB::table('user_has_branches');
 
         foreach ($branch_ids as $branch_id) {
-            $model->updateOrInsert(['user_id' => $this->id, 'entitas_id' => $branch_id]);
+            $model->updateOrInsert(['user_id' => $this->id, 'branch_id' => $branch_id]);
         }
     }
 }
