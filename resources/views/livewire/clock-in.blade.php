@@ -120,13 +120,10 @@
                         
                         <canvas id="canvas" style="display:none;"></canvas>
                     </div>
-                    {{-- <video id="video" width="100%" style="border-radius: 10px; background: #eee;"></video>
-                    <canvas id="canvas" style="display:none; margin-top: 10px;"></canvas> --}}
                 </div>
 
                 <div class="modal-footer justify-content-center">
                     <button type="button" id="btnTake" class="btn btn-primary" onclick="takePhoto()">Ambil Foto</button>
-                    {{-- <button type="button" id="btnRetake" style="display: none;" class="btn btn-primary" onclick="retakePhoto()">Ambil Ulang</button> --}}
                 </div>
             </div>
         </div>
@@ -170,6 +167,9 @@
     <script>
         let stream = null;
         let video, canvas, context, btnTake, btnRetake;
+        let coords = "";
+        let animationId = null;
+        let logoImg;
 
         window.onload = function () {
             video = document.getElementById('video');
@@ -178,89 +178,93 @@
             btnTake = document.getElementById('btnTake');
             btnRetake = document.getElementById('btnRetake');
 
-            // startCamera();
+            getCoords();
         };
-    
+
+        // dipanggil ketika klik tombol "Show Camera"
+        function showCamera() {
+            startCamera();
+        }
+
         function startCamera() {
-            const video = document.getElementById('video');
-    
-            navigator.mediaDevices.getUserMedia({ video: true })
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }) // kamera depan
                 .then((s) => {
                     stream = s;
                     video.srcObject = stream;
-                    video.play();  // Mulai video
+
+                    // tunggu sampai metadata video siap
+                    video.onloadedmetadata = () => {
+                        video.play();
+                        drawOverlay(); // mulai gambar setelah video punya dimensi
+                    };
                 })
                 .catch((err) => {
-                    console.error('Gagal akses kamera', err);
-                    alert('Gagal mengakses kamera. Pastikan izin kamera diberikan.');
+                    console.error("Gagal akses kamera", err);
+                    alert("Gagal mengakses kamera. Pastikan izin kamera diberikan.");
                 });
         }
-    
+
         function stopCamera() {
-            const video = document.getElementById('video');
-    
-            // Hentikan semua tracks
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
                 stream = null;
             }
-    
-            // Reset video element
             video.pause();
             video.srcObject = null;
-            video.removeAttribute('src');
-            video.load();  // Reset video element
-    
-            // Force close camera to ensure light turns off
-            if (typeof video.srcObject !== 'undefined') {
-                video.srcObject = null;
+            video.removeAttribute("src");
+            video.load();
+            cancelAnimationFrame(animationId);
+        }
+
+        function getCoords() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    coords = `Lat: ${pos.coords.latitude.toFixed(6)}, Lon: ${pos.coords.longitude.toFixed(6)}`;
+                }, (err) => console.warn("Gagal ambil lokasi:", err));
             }
         }
-    
+
+        function drawOverlay() {
+            if (!video.videoWidth) {
+                animationId = requestAnimationFrame(drawOverlay);
+                return;
+            }
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            context.save();
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);           // mirror
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            context.restore();
+
+            // overlay waktu & koordinat
+            context.font = "24px Arial";
+            context.fillStyle = "yellow";
+            context.strokeStyle = "black";
+            context.lineWidth = 3;
+
+            const time = new Date().toLocaleString();
+            context.strokeText(time, 20, canvas.height - 50);
+            context.fillText(time, 20, canvas.height - 50);
+
+            if (coords) {
+                context.strokeText(coords, 20, canvas.height - 20);
+                context.fillText(coords, 20, canvas.height - 20);
+            }
+
+            animationId = requestAnimationFrame(drawOverlay);
+        }
+
         function takePhoto() {
-            if (video.readyState === 4) {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
+            // pastikan video benar-benar sudah playing
+            if (video.readyState >= 2) {
+                const photoDataUrl = canvas.toDataURL("image/jpeg", 0.4);
+                Livewire.dispatch("photoTaken", { photo: photoDataUrl });
 
-                context.save();
-                context.translate(canvas.width, 0);
-                context.scale(-1, 1);
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                context.restore();
-
-                // Ambil lokasi GPS sekarang
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition((pos) => {
-                        const lat = pos.coords.latitude.toFixed(6);
-                        const lon = pos.coords.longitude.toFixed(6);
-
-                        // Tambahkan teks koordinat di atas foto
-                        context.font = "24px Arial";
-                        context.fillStyle = "yellow";
-                        context.strokeStyle = "black"; // outline biar jelas
-                        context.lineWidth = 3;
-
-                        const text = `Lat: ${lat}, Lon: ${lon}`;
-                        const x = 20;
-                        const y = canvas.height - 20;
-
-                        context.strokeText(text, x, y);
-                        context.fillText(text, x, y);
-
-                        // Convert canvas ke Data URL
-                        const photoDataUrl = canvas.toDataURL('image/png');
-                        console.log("Foto dengan koordinat:", photoDataUrl);
-
-                        // Kirim ke Livewire
-                        Livewire.dispatch('photoTaken', { photo: photoDataUrl });
-                        video.pause();
-                    }, (err) => {
-                        console.error("Gagal ambil lokasi:", err);
-                        alert("Tidak bisa mengambil lokasi GPS!");
-                    });
-                } else {
-                    alert("Browser tidak support geolocation");
-                }
+                video.pause();
+                cancelAnimationFrame(animationId);
             } else {
                 alert("Kamera belum siap. Silakan coba lagi.");
             }
