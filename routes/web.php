@@ -26,6 +26,7 @@ use App\Livewire\Karyawan\PembagianShift;
 use App\Http\Controllers\PayrollController;
 use App\Livewire\EditPayroll;
 use App\Livewire\Karyawan\DetailDataKaryawan;
+use App\Livewire\Karyawan\Pengajuan\Dispensasi;
 use App\Livewire\Karyawan\TambahDataKaryawan;
 use App\Livewire\Karyawan\Pengajuan\Pengajuan;
 use App\Livewire\Karyawan\TambahPembagianShift;
@@ -73,4 +74,5 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/riwayat-presensi-staff', RiwayatPresensiStaff::class)->name('riwayat-presensi-staff');
     Route::get('/slip-gaji', SlipGaji::class)->name('slip-gaji');
     Route::get('/manage-user', ManageUser::class)->name('manage-user');
+    Route::get('/dispensasi', Dispensasi::class)->name('dispensasi');
 });

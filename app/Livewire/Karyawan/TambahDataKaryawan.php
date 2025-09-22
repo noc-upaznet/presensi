@@ -111,8 +111,7 @@ class TambahDataKaryawan extends Component
             'name' => $this->form->nama_karyawan,
             'email' => $this->form->email,
             'password' => bcrypt($this->password),
-            'current_role' => '',
-            'entitas_id' => $entitas?->id,
+            'branch_id' => $entitas?->id,
         ];
         // dd($dataUser);
 
