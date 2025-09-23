@@ -1,4 +1,7 @@
 <div>
+    @assets
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    @endassets
     <div class="app-content-header">
         <div class="container-fluid">
             <div class="row">
@@ -246,6 +249,8 @@
 </div>
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const lokasiSelect = document.getElementById('lokasiSelect');
@@ -295,6 +300,75 @@
         Livewire.on('swal', (e) => {
             Swal.fire(e.params);
         });
+
+        $('#rolePresensiModal').on('shown.bs.modal', function () {
+          const $select = $('#lokasiSelect');
+
+          if ($select.length) {
+              $select.select2({
+                  dropdownParent: $('#rolePresensiModal')
+              });
+
+              // Set nilai awal dari Livewire ke Select2
+              const livewireInstance = Livewire.find($select.closest('[wire\\:id]').attr('wire:id'));
+              if (livewireInstance) {
+                  const selected = livewireInstance.get('lokasi_presensi');
+                  $select.val(selected).trigger('change');
+              }
+
+              $select.on('change', function () {
+                  const selectedValues = ($(this).val() || []).map(Number);
+                  livewireInstance.set('lokasi_presensi', selectedValues);
+                  console.log('Dikirim ke Livewire:', selectedValues);
+              });
+          }
+      });
+
+      $('#editRolePresensiModal').on('shown.bs.modal', function () {
+          const $select = $('#lokasiSelect2');
+
+          if ($select.length) {
+              $select.select2({
+                  dropdownParent: $('#editRolePresensiModal')
+              });
+
+              // Set nilai awal dari Livewire ke Select2
+              const livewireInstance = Livewire.find($select.closest('[wire\\:id]').attr('wire:id'));
+              if (livewireInstance) {
+                  const selected = livewireInstance.get('lokasi_presensi');
+                  $select.val(selected).trigger('change');
+              }
+
+              $select.on('change', function () {
+                  const selectedValues = ($(this).val() || []).map(Number);
+                  livewireInstance.set('lokasi_presensi', selectedValues);
+                  console.log('Dikirim ke Livewire:', selectedValues);
+              });
+          }
+      });
+
+      $('#modalAdd').on('shown.bs.modal', function () {
+          const $select = $('#selectJabatan');
+
+          if ($select.length) {
+              $select.select2({
+                  dropdownParent: $('#modalAdd')
+              });
+
+              // Set nilai awal dari Livewire ke Select2
+              const livewireInstance = Livewire.find($select.closest('[wire\\:id]').attr('wire:id'));
+              if (livewireInstance) {
+                  const selected = livewireInstance.get('nama_jabatan');
+                  $select.val(selected).trigger('change');
+              }
+
+              $select.on('change', function () {
+                  const selectedValues = ($(this).val() || []).map(Number);
+                  livewireInstance.set('nama_jabatan', selectedValues);
+                  console.log('Dikirim ke Livewire:', selectedValues);
+              });
+          }
+      });
         
     </script>
 @endpush
