@@ -201,7 +201,8 @@
                 @endhasanyrole
 
                 {{-- Approval untuk hr, spv, admin --}}
-                @hasanyrole('hr|spv|admin')
+                {{-- @hasanyrole('spv|admin|hr') --}}
+                @can('pengajuan-approve')
                     <li class="nav-item menu-open">
                         <a href="#" class="nav-link active">
                             <i class="bi bi-clipboard-plus"></i>
@@ -228,16 +229,24 @@
                                    @endif
                                 </a>
                             </li>
-                            {{-- <li class="nav-item">
+                            <li class="nav-item">
                                 <a href="{{ route('dispensasi') }}"
                                    class="nav-link {{ request()->routeIs('dispensasi') ? 'active' : '' }}">
                                    <i class="nav-icon bi bi-circle"></i>
-                                   <p>Pengajuan Dispensasi</p>
+                                   <p>Dispensasi</p>
                                 </a>
-                            </li> --}}
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('sharing') }}"
+                                   class="nav-link {{ request()->routeIs('sharing') ? 'active' : '' }}">
+                                   <i class="nav-icon bi bi-circle"></i>
+                                   <p>Fee Sharing</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
-                @endhasanyrole
+                @endcan
+                {{-- @endhasanyrole --}}
                 
                 {{-- Extra untuk SPV --}}
                 @hasanyrole('spv|hr')
@@ -289,13 +298,20 @@
                                    @endif
                                 </a>
                             </li>
-                            {{-- <li class="nav-item">
+                            <li class="nav-item">
                                 <a href="{{ route('dispensasi') }}"
                                    class="nav-link {{ request()->routeIs('dispensasi') ? 'active' : '' }}">
                                    <i class="nav-icon bi bi-circle"></i>
-                                   <p>Pengajuan Dispensasi</p>
+                                   <p>Dispensasi</p>
                                 </a>
-                            </li> --}}
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('sharing') }}"
+                                   class="nav-link {{ request()->routeIs('sharing') ? 'active' : '' }}">
+                                   <i class="nav-icon bi bi-circle"></i>
+                                   <p>Fee Sharing</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
 

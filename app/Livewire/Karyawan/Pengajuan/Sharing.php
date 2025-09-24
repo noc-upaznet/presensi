@@ -6,13 +6,14 @@ use App\Livewire\Forms\DispensasiForm;
 use App\Models\M_DataKaryawan;
 use App\Models\M_Dispensation;
 use App\Models\M_Presensi;
+use App\Models\M_Sharing;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 
-class Dispensasi extends Component
+class Sharing extends Component
 {
     use WithFileUploads;
     public DispensasiForm $form;
@@ -41,7 +42,7 @@ class Dispensasi extends Component
 
         $path = null;
         if ($this->file) {
-            $path = $this->file->store('file-pengajuan-dispensasi', 'public');
+            $path = $this->file->store('file-pengajuan-sharing', 'public');
         }
         // dd(auth()->id());
         $data = [
@@ -53,7 +54,7 @@ class Dispensasi extends Component
         // dd($data);
 
         // Simpan data ke database
-        M_Dispensation::create($data);
+        M_Sharing::create($data);
 
         // Reset input
         $this->form->reset();
@@ -71,8 +72,8 @@ class Dispensasi extends Component
 
     public function updateStatus($id, $status = null)
     {
-        $pengajuan = M_Dispensation::find($id);
-
+        $pengajuan = M_Sharing::find($id);
+        // dd($pengajuan);
         if (!$pengajuan) {
             return;
         }
@@ -104,27 +105,12 @@ class Dispensasi extends Component
 
         $pengajuan->save();
 
-        if ($pengajuan->status == 1) {
-            M_Presensi::where('user_id', $pengajuan->karyawan_id)
-                ->whereDate('tanggal', $pengajuan->date)
-                ->update([
-                    'previous_status' => DB::raw('status'),
-                    'status'          => 2
-                ]);
-        }
-
-        $this->dispatch('swal', params: [
-            'title' => 'Status Diperbarui',
-            'icon'  => 'success',
-            'text'  => 'Status dan jadwal berhasil diperbarui.'
-        ]);
-
         $this->dispatch('refresh');
     }
     
     public function render()
     {
-        $query = M_Dispensation::with(['getKaryawan']);
+        $query = M_Sharing::with(['getKaryawan']);
         $user = Auth::user();
         $entitas = session('selected_entitas', 'UHO'); // default ke 'UHO'
 
@@ -139,6 +125,7 @@ class Dispensasi extends Component
         } elseif ($user->hasRole('admin')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
+
         // 🔹 HR → semua karyawan semua entitas
         } elseif ($user->hasRole('hr')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
@@ -165,10 +152,10 @@ class Dispensasi extends Component
             });
         }
 
-        $pengajuanDispens = $query->latest()->paginate(10);
+        $datas = $query->latest()->paginate(10);
 
-        return view('livewire.karyawan.pengajuan.dispensasi',[
-            'pengajuanDispens' => $pengajuanDispens
+        return view('livewire.karyawan.pengajuan.sharing',[
+            'datas' => $datas
         ]);
     }
 }

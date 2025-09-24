@@ -32,6 +32,7 @@ use App\Livewire\Karyawan\Pengajuan\Pengajuan;
 use App\Livewire\Karyawan\TambahPembagianShift;
 use App\Livewire\Karyawan\Shifts\TemplateMingguan;
 use App\Livewire\Karyawan\Pengajuan\PengajuanLembur;
+use App\Livewire\Karyawan\Pengajuan\Sharing;
 use App\Livewire\ManageUser;
 use App\Livewire\SlipGaji;
 
@@ -75,4 +76,5 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/slip-gaji', SlipGaji::class)->name('slip-gaji');
     Route::get('/manage-user', ManageUser::class)->name('manage-user');
     Route::get('/dispensasi', Dispensasi::class)->name('dispensasi');
+    Route::get('/sharing', Sharing::class)->name('sharing');
 });

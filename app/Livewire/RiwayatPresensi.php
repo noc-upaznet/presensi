@@ -57,7 +57,7 @@ class RiwayatPresensi extends Component
 
     public function updateStatus()
     {
-        // Cari data berdasarkan ID yang sudah didekripsi sebelumnya
+        // Cari data berdasarkan ID
         $data = M_Presensi::find($this->editId);
 
         if (!$data) {
@@ -65,11 +65,21 @@ class RiwayatPresensi extends Component
             return;
         }
 
-        // Update field status dengan nilai dari form
+        // Simpan status lama sebelum diganti
+        $data->previous_status = $data->status;
+
+        // Update field status dengan nilai baru dari form
         $data->status = $this->status;
         $data->save();
 
-        // Reset form jika perlu
+        // Opsional: tampilkan notifikasi
+        $this->dispatch('swal', params: [
+            'title' => 'Berhasil',
+            'text'  => "Status berubah dari {$data->previous_status} ke {$data->status}",
+            'icon'  => 'success'
+        ]);
+
+        // Reset form
         $this->reset(['editId', 'status']);
 
         // Tutup modal

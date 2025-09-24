@@ -57,6 +57,7 @@
                                 <th>Clock Out</th>
                                 @role('admin')
                                 <th>Lokasi</th>
+                                <th>Old Status</th>
                                 @endrole
                                 <th>File</th>
                                 <th>Status</th>
@@ -83,6 +84,17 @@
                                             <td>
                                                 <span>Clock-In   :</span> <span class="badge bg-primary"> {{ $key->lokasi_final}}</span><br>
                                                 <span>Clock-Out  :</span> <span class="badge bg-danger">{{ $key->lokasi_clock_out_final }}</span>
+                                            </td>
+                                            <td>
+                                                @if ($key->previous_status == "0")
+                                                    <span class="badge bg-success">Tepat Waktu</span>
+                                                @elseif ($key->previous_status == "1")
+                                                    <span class="badge bg-danger">Terlambat</span>
+                                                @elseif ($key->previous_status == "2")
+                                                    <span class="badge bg-primary">Dispensasi</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Unknown</span>
+                                                @endif
                                             </td>
                                         @endrole
                                         <td style="color: var(--bs-body-color);">

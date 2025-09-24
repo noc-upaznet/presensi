@@ -55,11 +55,11 @@
         <div class="container-fluid">
           <!--begin::Row-->
           <div class="row">
-            <div class="col-sm-6"><h3 class="mb-0" style="color: var(--bs-body-color);">Daftar Pengajuan Dispensasi</h3></div>
+            <div class="col-sm-6"><h3 class="mb-0" style="color: var(--bs-body-color);">Daftar Pengajuan Fee Sharing</h3></div>
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-end">
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Pengajuan Dispensasi</li>
+                <li class="breadcrumb-item active" aria-current="page">Pengajuan Fee Sharing</li>
               </ol>
             </div>
           </div>
@@ -134,12 +134,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if ($pengajuanDispens->isEmpty())
+                            @if ($datas->isEmpty())
                                 <tr>
                                     <td colspan="9" class="text-center" style="color: var(--bs-body-color);">Data tidak ditemukan</td>
                                 </tr>
                             @else
-                                @foreach ($pengajuanDispens as $key)
+                                @foreach ($datas as $key)
                                     <tr>
                                         <td style="color: var(--bs-body-color);">{{ $key->date }}</td>
                                         @hasanyrole('admin|hr')
@@ -176,7 +176,7 @@
                                             @endif
                                         </td>
                                         @can('pengajuan-edit')
-                                            @if ($key->approve_spv == 0 && $key->approve_hr == 0)
+                                            @if ($key->approve_hr == 0)
                                                 <td class="text-center" style="color: var(--bs-body-color);">
                                                     <button class="btn btn-sm btn-warning mb-2" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
                                                 </td>
@@ -209,16 +209,15 @@
                 </div>
             </div>
             <div class="mt-3">
-                {{-- {{ $pengajuanLembur->links() }} --}}
+                {{ $datas->links() }}
             </div>
         </div>
-        
         <div wire:ignore.self class="modal fade" id="modalTambahPengajuan" tabindex="-1" aria-labelledby="modalTambahPengajuanLabel"
-            aria-hidden="true">
+        aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header bg-danger">
-                        <h5 class="modal-title text-white" id="modalTambahPengajuanLabel">Pengajuan Dispensasi Keterlambatan</h5>
+                    <div class="modal-header bg-info">
+                        <h5 class="modal-title text-white" id="modalTambahPengajuanLabel">Pengajuan Fee Sharing</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                     </div>
 

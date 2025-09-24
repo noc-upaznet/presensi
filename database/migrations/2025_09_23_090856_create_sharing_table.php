@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dispensation', function (Blueprint $table) {
+        Schema::create('sharing', function (Blueprint $table) {
             $table->id();
             $table->integer('karyawan_id');
             $table->date('date');
             $table->string('description');
-            $table->string('file');
-            $table->integer('status')->default(0);
+            $table->string('file')->nullable();
             $table->integer('approve_hr')->default(0);
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('dispensation');
+        Schema::dropIfExists('sharing');
     }
 };
