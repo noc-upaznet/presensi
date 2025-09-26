@@ -72,7 +72,7 @@ class PengajuanLembur extends Component
         }
 
         $user = Auth::user();
-        $entitas = \App\Models\M_Entitas::where('nama', 'MC')->first();
+        $entitas = optional($pengajuan->getKaryawan)->entitas;
         $userRoles = $user->getRoleNames()->toArray();
         $pengajuRoles = optional(optional($pengajuan->getKaryawan)->user)
             ?->getRoleNames()
