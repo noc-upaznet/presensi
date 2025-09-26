@@ -147,7 +147,7 @@ class Pengajuan extends Component
             }
             // Jika bukan kasus di atas → ikuti flow SPV dulu
             else {
-                if ($entitasUser === 'MC') {
+                if (in_array($entitasUser, ['MC', 'FC'])) {
                     if ($status == 1) {
                         $pengajuan->approve_hr = 1;
                         $pengajuan->status     = 1;

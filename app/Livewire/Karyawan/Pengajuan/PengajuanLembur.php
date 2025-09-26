@@ -139,7 +139,7 @@ class PengajuanLembur extends Component
                     ]);
                 }
             } else {
-                if ($entitas === 'MC'){
+                if (in_array($entitas, ['MC', 'FC'])){
                     if ($status == 1) {
                         $pengajuan->approve_hr = 1;
                         $pengajuan->status = 1;
