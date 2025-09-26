@@ -62,6 +62,7 @@
                                 <th>Clock In</th>
                                 <th>Clock Out</th>
                                 <th>Lokasi</th>
+                                <th>Old Status</th>
                                 <th>File</th>
                                 <th>Status</th>
                                 @role('spv-sales')
@@ -69,10 +70,10 @@
                                 @endrole
                                 {{-- @if( (auth()->user()->hasRole('spv') && $divisi === 'Teknisi') 
                                     || auth()->user()->hasRole('hr')) --}}
-                                @hasanyrole('spv-teknisi|hr')
+                                {{-- @hasanyrole('spv-teknisi|hr')
                                     <th>Dispensasi</th>
                                     <th>Action</th>
-                                @endhasanyrole
+                                @endhasanyrole --}}
                             </tr>
                         </thead>
                         <tbody>
@@ -87,6 +88,14 @@
                                     <td>
                                         <span>Clock-In   :</span> <span class="badge bg-primary"> {{ $key->lokasi_final}}</span><br>
                                         <span>Clock-Out  :</span> <span class="badge bg-danger">{{ $key->lokasi_clock_out_final }}</span>
+                                    </td>
+                                    <td>
+                                        @switch($key->previous_status)
+                                            @case("0") <span class="badge bg-success">Tepat Waktu</span> @break
+                                            @case("1") <span class="badge bg-danger">Terlambat</span> @break
+                                            @case("2") <span class="badge bg-primary">Dispensasi</span> @break
+                                            @default <span class="badge bg-secondary">Unknown</span>
+                                        @endswitch
                                     </td>
                                     <td>
                                         <img src="{{ asset('storage/'.$key->file) }}" style="max-width:100px" class="img-fluid" alt="Selfie">
@@ -121,7 +130,7 @@
                                     @endrole
 
                                     {{-- Dispensasi SPV Teknisi --}}
-                                    @role('spv-teknisi')
+                                    {{-- @role('spv-teknisi')
                                         <td>
                                             @if ($key->status == "1")
                                                 @if(empty($key->approve_late_spv))
@@ -138,10 +147,10 @@
                                                 <span class="badge bg-primary">Dispensasi Approved</span>
                                             @endif
                                         </td>
-                                    @endrole
+                                    @endrole --}}
 
                                     {{-- Dispensasi HR --}}
-                                    @role('hr')
+                                    {{-- @role('hr')
                                         <td>
                                             @can('dispensasi-approve')
                                                 @if ($key->status == "1")
@@ -167,7 +176,7 @@
                                                 </button>
                                             @endcan
                                         </td>
-                                    @endrole
+                                    @endrole --}}
                                 </tr>
                             @empty
                                 <tr>
