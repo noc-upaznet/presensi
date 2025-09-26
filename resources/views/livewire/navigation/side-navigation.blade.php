@@ -70,7 +70,106 @@
                         </a>
                     </li>
                 @endcan
+                @can('pengajuan-approve')
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link active">
+                            <i class="bi bi-clipboard-plus"></i>
+                            <p>Approval<i class="nav-arrow bi bi-chevron-right"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview" style="margin-left: 20px;">
+                            <li class="nav-item">
+                                <a href="{{ route('pengajuan') }}"
+                                   class="nav-link {{ request()->routeIs('pengajuan') ? 'active' : '' }}">
+                                   <i class="nav-icon bi bi-circle"></i>
+                                   <p>Pengajuan Cuti/Izin</p>
+                                   @if ($pengajuanMenungguCount > 0)
+                                       <span class="badge bg-danger ms-2">{{ $pengajuanMenungguCount }}</span>
+                                   @endif
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('pengajuan-lembur') }}"
+                                   class="nav-link {{ request()->routeIs('pengajuan-lembur') ? 'active' : '' }}">
+                                   <i class="nav-icon bi bi-circle"></i>
+                                   <p>Pengajuan Lembur</p>
+                                   @if ($lemburMenungguCount > 0)
+                                       <span class="badge bg-danger ms-2">{{ $lemburMenungguCount }}</span>
+                                   @endif
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('dispensasi') }}"
+                                   class="nav-link {{ request()->routeIs('dispensasi') ? 'active' : '' }}">
+                                   <i class="nav-icon bi bi-circle"></i>
+                                   <p>Dispensasi</p>
+                                   @if ($DispensasiMenungguCount > 0)
+                                        <span class="badge bg-danger ms-2">{{ $DispensasiMenungguCount }}</span>
+                                    @endif
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('sharing') }}"
+                                   class="nav-link {{ request()->routeIs('sharing') ? 'active' : '' }}">
+                                   <i class="nav-icon bi bi-circle"></i>
+                                   <p>Fee Sharing</p>
+                                   @if ($FeeSharingMenungguCount > 0)
+                                        <span class="badge bg-danger ms-2">{{ $FeeSharingMenungguCount }}</span>
+                                    @endif
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endcan
+                {{-- Riwayat Presensi (semua role) --}}
+                <li class="nav-item">
+                    <a href="{{ route('riwayat-presensi') }}"
+                       class="nav-link {{ request()->routeIs('riwayat-presensi') ? 'active' : '' }}">
+                       <i class="bi bi-list-task"></i>
+                       <p>Riwayat Presensi</p>
+                    </a>
+                </li>
+                @hasanyrole('spv|hr')
+                    <li class="nav-item">
+                        <a href="{{ route('riwayat-presensi-staff') }}"
+                           class="nav-link {{ request()->routeIs('riwayat-presensi-staff') ? 'active' : '' }}">
+                           <i class="bi bi-list-task"></i>
+                           <p>Riwayat Presensi Staff</p>
+                           @if ($PresensiMenungguCount > 0)
+                               <span class="badge bg-danger ms-2">{{ $PresensiMenungguCount }}</span>
+                           @endif
+                        </a>
+                    </li>
+                @endhasanyrole
                 @hasanyrole('admin|hr')
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link active">
+                            <i class="bi bi-clipboard-plus"></i>
+                            <p>Payroll<i class="nav-arrow bi bi-chevron-right"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview" style="margin-left: 20px;">
+                            <li class="nav-item">
+                                <a href="{{ route('payroll') }}"
+                                class="nav-link {{ request()->routeIs('payroll') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Slip Gaji</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('jenis-tunjangan') }}"
+                                class="nav-link {{ request()->routeIs('jenis-tunjangan') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Jenis Tunjangan</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('jenis-potongan') }}"
+                                class="nav-link {{ request()->routeIs('jenis-potongan') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Jenis Potongan</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <a href="{{ route('template-mingguan') }}"
                            class="nav-link {{ request()->routeIs('template-mingguan') ? 'active' : '' }}">
@@ -133,46 +232,7 @@
                            <p>Data Master</p>
                         </a>
                     </li>
-
-                    <li class="nav-item menu-open">
-                        <a href="#" class="nav-link active">
-                            <i class="bi bi-clipboard-plus"></i>
-                            <p>Payroll<i class="nav-arrow bi bi-chevron-right"></i></p>
-                        </a>
-                        <ul class="nav nav-treeview" style="margin-left: 20px;">
-                            <li class="nav-item">
-                                <a href="{{ route('payroll') }}"
-                                class="nav-link {{ request()->routeIs('payroll') ? 'active' : '' }}">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>Slip Gaji</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('jenis-tunjangan') }}"
-                                class="nav-link {{ request()->routeIs('jenis-tunjangan') ? 'active' : '' }}">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>Jenis Tunjangan</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('jenis-potongan') }}"
-                                class="nav-link {{ request()->routeIs('jenis-potongan') ? 'active' : '' }}">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>Jenis Potongan</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
                 @endhasanyrole
-
-                {{-- Riwayat Presensi (semua role) --}}
-                <li class="nav-item">
-                    <a href="{{ route('riwayat-presensi') }}"
-                       class="nav-link {{ request()->routeIs('riwayat-presensi') ? 'active' : '' }}">
-                       <i class="bi bi-list-task"></i>
-                       <p>Riwayat Presensi</p>
-                    </a>
-                </li>
 
                 @hasanyrole('spv-teknisi|spv-helpdesk')
                      <li class="nav-item">
@@ -200,67 +260,7 @@
                     </li>
                 @endhasanyrole
 
-                {{-- Approval untuk hr, spv, admin --}}
-                {{-- @hasanyrole('spv|admin|hr') --}}
-                @can('pengajuan-approve')
-                    <li class="nav-item menu-open">
-                        <a href="#" class="nav-link active">
-                            <i class="bi bi-clipboard-plus"></i>
-                            <p>Approval<i class="nav-arrow bi bi-chevron-right"></i></p>
-                        </a>
-                        <ul class="nav nav-treeview" style="margin-left: 20px;">
-                            <li class="nav-item">
-                                <a href="{{ route('pengajuan') }}"
-                                   class="nav-link {{ request()->routeIs('pengajuan') ? 'active' : '' }}">
-                                   <i class="nav-icon bi bi-circle"></i>
-                                   <p>Pengajuan Cuti/Izin</p>
-                                   @if ($pengajuanMenungguCount > 0)
-                                       <span class="badge bg-danger ms-2">{{ $pengajuanMenungguCount }}</span>
-                                   @endif
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('pengajuan-lembur') }}"
-                                   class="nav-link {{ request()->routeIs('pengajuan-lembur') ? 'active' : '' }}">
-                                   <i class="nav-icon bi bi-circle"></i>
-                                   <p>Pengajuan Lembur</p>
-                                   @if ($lemburMenungguCount > 0)
-                                       <span class="badge bg-danger ms-2">{{ $lemburMenungguCount }}</span>
-                                   @endif
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('dispensasi') }}"
-                                   class="nav-link {{ request()->routeIs('dispensasi') ? 'active' : '' }}">
-                                   <i class="nav-icon bi bi-circle"></i>
-                                   <p>Dispensasi</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('sharing') }}"
-                                   class="nav-link {{ request()->routeIs('sharing') ? 'active' : '' }}">
-                                   <i class="nav-icon bi bi-circle"></i>
-                                   <p>Fee Sharing</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                @endcan
-                {{-- @endhasanyrole --}}
-                
-                {{-- Extra untuk SPV --}}
                 @hasanyrole('spv|hr')
-                    <li class="nav-item">
-                        <a href="{{ route('riwayat-presensi-staff') }}"
-                           class="nav-link {{ request()->routeIs('riwayat-presensi-staff') ? 'active' : '' }}">
-                           <i class="bi bi-list-task"></i>
-                           <p>Riwayat Presensi Staff</p>
-                           @if ($PresensiMenungguCount > 0)
-                               <span class="badge bg-danger ms-2">{{ $PresensiMenungguCount }}</span>
-                           @endif
-                        </a>
-                    </li>
-
                     <li class="nav-item">
                         <a href="{{ route('slip-gaji') }}"
                            class="nav-link {{ request()->routeIs('slip-gaji') ? 'active' : '' }}">
@@ -269,6 +269,12 @@
                         </a>
                     </li>
                 @endhasanyrole
+
+                {{-- Approval untuk hr, spv, admin --}}
+                {{-- @hasanyrole('spv|admin|hr') --}}
+                {{-- @endhasanyrole --}}
+                
+                {{-- Extra untuk SPV --}}
 
                 {{-- Pengajuan khusus user --}}
                 @hasanyrole('user|branch-manager')

@@ -8,6 +8,8 @@ use App\Models\M_Entitas;
 use App\Models\M_Presensi;
 use App\Models\M_Pengajuan;
 use App\Models\M_DataKaryawan;
+use App\Models\M_Dispensation;
+use App\Models\M_Sharing;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,6 +21,8 @@ class SideNavigation extends Component
         $countPengajuan = 0;
         $countLembur = 0;
         $countPresensiStaff = 0;
+        $countDispensasi = 0;
+        $countFeeSharing = 0;
 
         if ($user) {
             // 🔹 SPV
@@ -111,9 +115,30 @@ class SideNavigation extends Component
                         ->whereMonth('tanggal', Carbon::now()->month)
                         ->whereYear('tanggal', Carbon::now()->year)
                         ->count();
+
+                    $countDispensasi = M_Dispensation::
+                        where('approve_hr', 0)
+                        ->where('status', 0)
+                        ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
+                        ->whereMonth('date', Carbon::now()->month)
+                        ->whereYear('date', Carbon::now()->year)
+                        ->count();
+
+                    $countFeeSharing = M_Sharing::
+                        where('approve_hr', 0)
+                        ->where('status', 0)
+                        ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
+                        ->whereMonth('date', Carbon::now()->month)
+                        ->whereYear('date', Carbon::now()->year)
+                        ->count();
+                    // dd($countDispensasi);
                 } else {
                     $countPengajuan = 0;
                     $countLembur = 0;
+                    $countDispensasi = 0;
+                    $countFeeSharing = 0;
                 }
 
             // 🔹 Admin
@@ -152,6 +177,8 @@ class SideNavigation extends Component
             'pengajuanMenungguCount' => $countPengajuan,
             'lemburMenungguCount' => $countLembur,
             'PresensiMenungguCount' => $countPresensiStaff,
+            'DispensasiMenungguCount' => $countDispensasi,
+            'FeeSharingMenungguCount' => $countFeeSharing,
         ]);
     }
 }
