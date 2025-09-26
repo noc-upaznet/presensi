@@ -80,6 +80,7 @@ class TambahDataKaryawanForm extends Form
 
     public $bonus = '';
     public $inov_reward = '';
+    public $kasbon = '';
 
     #[Validate('required', 'Nama Bank')]
     public $nama_bank = '';

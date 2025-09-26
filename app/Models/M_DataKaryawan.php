@@ -38,6 +38,7 @@ class M_DataKaryawan extends Model
         'tunjangan_jabatan',
         'bonus',
         'inov_reward',
+        'kasbon',
         'jenis_penggajian',
         'nama_bank',
         'no_rek',
