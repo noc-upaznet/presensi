@@ -245,14 +245,10 @@
                                 </div>
                             </div>
                             <div class="mb-3 col-md-6">
-                                <label for="potongan" class="form-label fw-semibold">Bonus Fee Sharing</label>
+                                <label for="fee_sharing_nominal" class="form-label fw-semibold">Bonus Fee Sharing</label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
-                                    <select name="fee_sharing" class="form-select" wire:model.lazy="fee_sharing">
-                                        <option value="">-- Pilih Nominal --</option>
-                                        <option value="100000">100000</option>
-                                        <option value="200000">200000</option>
-                                    </select>
+                                    <input type="text" id="fee_sharing_nominal" class="form-control" wire:model.lazy="fee_sharing_nominal">
                                 </div>
                             </div>
                         </div>
@@ -335,7 +331,7 @@
                             <input type="checkbox" wire:model.lazy="bpjs_digunakan" class="form-check-input" id="bpjsCheckbox">
                             <label class="form-check-label" for="bpjsCheckbox">BPJS Kesehatan</label>
                         </div>
-
+                       
                         @if($bpjs_digunakan)
                             <div class="row mt-2 mb-2">
                                 <div class="col-md-6">
