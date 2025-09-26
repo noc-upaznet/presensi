@@ -271,9 +271,9 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $color = null;
             $fullCol = false; // default hanya header
 
-            if ($header === 'Izin') {
+            if (in_array($header, ['Izin', 'PPH 21'])) {
                 $color = 'FFFF0000'; // merah
-            } elseif (in_array($header, ['Terlambat', 'BPJS Kesehatan KA', 'BPJS JHT KA', 'Voucher', 'PPH 21', 'Kasbon'])) {
+            } elseif (in_array($header, ['Terlambat', 'BPJS Kesehatan KA', 'BPJS JHT KA', 'Voucher', 'Kasbon'])) {
                 $color = 'FF0070C0'; // biru
             } elseif (in_array($header, ['BPJS Kesehatan PT', 'BPJS JHT PT'])) {
                 $color = 'FFFFFF00'; // kuning

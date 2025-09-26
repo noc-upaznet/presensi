@@ -239,11 +239,7 @@
                                 <label for="potongan" class="form-label fw-semibold">Bonus Fee Sharing</label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
-                                    <select name="fee_sharing" class="form-select" wire:model.lazy="fee_sharing">
-                                        <option value="">-- Pilih Nominal --</option>
-                                        <option value="100000">100000</option>
-                                        <option value="200000">200000</option>
-                                    </select>
+                                    <input type="text" id="fee_sharing" class="form-control" wire:model.lazy="fee_sharing">
                                 </div>
                             </div>
                         </div>

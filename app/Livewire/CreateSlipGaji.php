@@ -12,6 +12,7 @@ use App\Models\M_DataKaryawan;
 use Illuminate\Support\Carbon;
 use App\Models\JenisPotonganModel;
 use App\Models\JenisTunjanganModel;
+use App\Models\M_Sharing;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
@@ -112,8 +113,9 @@ class CreateSlipGaji extends Component
     public $cutoffType = 'cutoff_normal';
     public $listLemburBiasa = [];
     public $listLemburLibur = [];
-    public $kasbon = 0;
+    public $kasbon;
     public $churn = 0;
+    public $bpjsKaryawan;
 
     public function mount($id = null, $month = null, $year = null)
     {
@@ -172,6 +174,7 @@ class CreateSlipGaji extends Component
                 $dataKaryawanId = Crypt::decrypt($id);
                 $dataKaryawan = M_DataKaryawan::findOrFail($dataKaryawanId);
                 $this->karyawanId = $dataKaryawan->user_id;
+                $this->bpjsKaryawan = $dataKaryawan;
 
                 $this->loadDataKaryawan($dataKaryawanId);
                 $this->rekap = $this->hitungRekapPresensi($this->user_id, $this->bulanTahun);
@@ -215,6 +218,14 @@ class CreateSlipGaji extends Component
                     }
                 }
 
+                $this->kasbon = $dataKaryawan->kasbon;
+                $this->fee_sharing = M_Sharing::where('karyawan_id', $dataKaryawanId)
+                    ->whereBetween('date', [$this->cutoffStart, $this->cutoffEnd])
+                    ->where('status', 1)
+                    ->exists();
+
+                $this->fee_sharing_nominal = $this->fee_sharing ? 100000 : 0;
+
                 $this->inovation_reward_jumlah = (int) $this->rekap['kehadiran'];
                 $this->izin_nominal = 0;
                 if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
@@ -229,6 +240,13 @@ class CreateSlipGaji extends Component
             } catch (DecryptException $e) {
                 abort(403, 'ID tidak valid');
             }
+        }
+
+        if(!empty($this->bpjsKaryawan->no_bpjs)){
+            $this->bpjs_digunakan = true;
+        }
+        if(!empty($this->bpjsKaryawan->no_bpjs_tk)){
+            $this->bpjs_jht_digunakan = true;
         }
 
         $this->hitungInovationReward();
@@ -596,14 +614,10 @@ class CreateSlipGaji extends Component
         }
     }
 
-    public function updatedFeeSharingDigunakan()
-    {
-        $this->hitungTotalGaji();
-    }
-
     public function updatedBpjsDigunakan()
     {
         $this->hitungTotalGaji();
+
     }
 
     public function updatedBpjsJhtDigunakan()
@@ -660,7 +674,7 @@ class CreateSlipGaji extends Component
         $uangMakan         = $this->numericValue($this->uang_makan_total ?? 0);
         $inovationReward   = $this->numericValue($this->inovation_reward ?? 0);
         $kebudayaan        = $this->numericValue($this->kebudayaan ?? 0);
-        $feeSharing        = $this->numericValue($this->fee_sharing ?? 0);
+        $feeSharing        = $this->numericValue($this->fee_sharing_nominal ?? 0);
         $insentif          = $this->numericValue($this->insentif ?? 0);
         // $insentifSpv       = $this->numericValue($this->insentif ?? 0);
         // $insentifSpvUgr    = $this->numericValue($this->insentif ?? 0);
@@ -948,7 +962,7 @@ class CreateSlipGaji extends Component
             'jml_uang_makan' => $this->numericValue($this->uang_makan_jumlah),
             'transport' => $this->numericValue($this->transport_total),
             'jml_transport' => $this->numericValue($this->transport_jumlah),
-            'fee_sharing' => $this->numericValue($this->fee_sharing),
+            'fee_sharing' => $this->numericValue($this->fee_sharing_nominal),
             'inov_reward' => $this->numericValue($this->inovation_reward),
             'insentif' => $this->numericValue($this->insentif),
             'jml_psb' => $this->jml_psb,
