@@ -113,12 +113,6 @@ class Dispensasi extends Component
                 ]);
         }
 
-        $this->dispatch('swal', params: [
-            'title' => 'Status Diperbarui',
-            'icon'  => 'success',
-            'text'  => 'Status dan jadwal berhasil diperbarui.'
-        ]);
-
         $this->dispatch('refresh');
     }
     
