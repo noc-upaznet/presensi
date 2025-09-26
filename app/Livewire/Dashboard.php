@@ -97,13 +97,14 @@ class Dashboard extends Component
         $entitasIdSaatIni = $entitasModel?->id;
 
         $karyawanIds = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
-        $karyawanIdTitip = M_DataKaryawan::where('entitas', '!=', $entitas)->pluck('id');
+        $karyawanIdTitip = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
 
         // Filter berdasarkan ID karyawan dari entitas tersebut
-        $totalGaji = PayrollModel::whereIn('karyawan_id', $karyawanIds)->sum('total_gaji');
+        $totalGaji = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+                    ->where('periode', now()->format('Y-m'))
+                    ->sum('total_gaji');
         $totalGajiLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            ->whereMonth('periode', now()->subMonth()->month)
-            ->whereYear('periode', now()->subMonth()->year)
+            ->where('periode', now()->subMonth()->format('Y-m'))
             ->sum('total_gaji');
 
         if ($totalGajiLastMonth > 0) {
@@ -116,15 +117,13 @@ class Dashboard extends Component
         }
 
         $totalGajiTitip = PayrollModel::whereIn('karyawan_id', $karyawanIdTitip)
-            ->where('entitas_id', $entitasIdSaatIni)
+            ->where('periode', now()->format('Y-m'))
             ->where('titip', 1)
             ->sum('total_gaji');
             // dd($totalGajiTitip);
         $totalGajiTitipLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIdTitip)
-            ->where('entitas_id', $entitasIdSaatIni)
             ->where('titip', 1)
-            ->whereMonth('periode', now()->subMonth()->month)
-            ->whereYear('periode', now()->subMonth()->year)
+            ->where('periode', now()->subMonth()->format('Y-m'))
             ->sum('total_gaji');
         if ($totalGajiTitipLastMonth > 0) {
             $diffTitip = $totalGajiTitip - $totalGajiTitipLastMonth;
@@ -135,10 +134,11 @@ class Dashboard extends Component
             $noteTotalGajiTitip = 'Data bulan lalu tidak tersedia';
         }
         
-        $totalBpjskes = PayrollModel::whereIn('karyawan_id', $karyawanIds)->sum('bpjs_perusahaan');
+        $totalBpjskes = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', now()->format('Y-m'))
+            ->sum('bpjs_perusahaan');
         $totalBpjsKesLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            ->whereMonth('periode', now()->subMonth()->month)
-            ->whereYear('periode', now()->subMonth()->year)
+            ->where('periode', now()->subMonth()->format('Y-m'))
             ->sum('bpjs_perusahaan');
         if ($totalBpjsKesLastMonth > 0) {
             $diff = $totalBpjskes - $totalBpjsKesLastMonth;
@@ -149,10 +149,11 @@ class Dashboard extends Component
             $noteTotalBpjskes = 'Data bulan lalu tidak tersedia';
         }
 
-        $totalBpjsJht = PayrollModel::whereIn('karyawan_id', $karyawanIds)->sum('bpjs_jht_perusahaan');
+        $totalBpjsJht = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', now()->format('Y-m'))
+            ->sum('bpjs_jht_perusahaan');
         $totalBpjsJhtLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            ->whereMonth('periode', now()->subMonth()->month)
-            ->whereYear('periode', now()->subMonth()->year)
+            ->where('periode', now()->subMonth()->format('Y-m'))
             ->sum('bpjs_jht_perusahaan');
         if ($totalBpjsJhtLastMonth > 0) {
             $diffJht = $totalBpjsJht - $totalBpjsJhtLastMonth;
