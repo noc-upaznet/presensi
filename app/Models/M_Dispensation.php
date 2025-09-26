@@ -27,24 +27,6 @@ class M_Dispensation extends Model
         return optional(optional($this->getKaryawan)->user)->hasRole($role) ?? false;
     }
 
-    public function canBeApprovedBySpv(): bool
-    {
-        $auth = auth()->user();
-
-        // Hanya untuk SPV
-        if (! $auth || ! $auth->hasRole('spv')) {
-            return false;
-        }
-
-        // Cek status pengajuan dan approve_spv
-        if ($this->status != 0 || $this->approve_spv != 0) {
-            return false;
-        }
-
-        // Hanya jika pengaju punya role 'user'
-        return $this->pengajuRole('user');
-    }
-
     public function canBeApprovedByHr(): bool
     {
         $auth = auth()->user();
@@ -60,24 +42,6 @@ class M_Dispensation extends Model
         }
 
         // Pengaju harus user atau spv
-        return $this->pengajuRole('user') || $this->pengajuRole('spv') || $this->pengajuRole('branch-manager');
-    }
-
-    public function canBeApprovedByAdmin(): bool
-    {
-        $auth = auth()->user();
-
-        // Hanya untuk Admin
-        if (! $auth || ! $auth->hasRole('admin')) {
-            return false;
-        }
-
-        // Cek status pengajuan
-        if ($this->status != 0) {
-            return false;
-        }
-
-        // Pengaju harus HR atau Admin
-        return $this->pengajuRole('hr') || $this->pengajuRole('admin');
+        return $this->pengajuRole('user') || $this->pengajuRole('spv') || $this->pengajuRole('branch-manager') || $this->pengajuRole('hr');
     }
 }

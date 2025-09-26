@@ -175,17 +175,6 @@
                                                 <span class="badge bg-danger">Ditolak</span>
                                             @endif
                                         </td>
-                                        @can('pengajuan-edit')
-                                            @if ($key->approve_spv == 0 && $key->approve_hr == 0)
-                                                <td class="text-center" style="color: var(--bs-body-color);">
-                                                    <button class="btn btn-sm btn-warning mb-2" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                                                </td>
-                                            @else
-                                                <td class="text-center" style="color: var(--bs-body-color);">
-                                                    <button class="btn btn-sm btn-warning mb-2" disabled><i class="fa-solid fa-pen-to-square"></i></button>
-                                                </td>
-                                            @endif
-                                        @endcan
                                         <td class="text-center" style="color: var(--bs-body-color);">
                                             @role('hr')
                                                 @if ($key->canBeApprovedByHr())
@@ -195,11 +184,18 @@
                                                     <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">
                                                         <i class="bi bi-x-square"></i>
                                                     </button>
+                                                    {{-- <button class="btn btn-sm btn-danger mb-2" wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button> --}}
                                                 @endif
-                                                <button class="btn btn-sm btn-danger mb-2" wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
                                             @endrole
+                                            @can('pengajuan-edit')
+                                                @if ($key->approve_spv == 0 && $key->approve_hr == 0)
+                                                    <button class="btn btn-sm btn-warning mb-2" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                @else
+                                                    <button class="btn btn-sm btn-warning mb-2" disabled><i class="fa-solid fa-pen-to-square"></i></button>
+                                                @endif
+                                            @endcan
                                         </td>
                                     </tr>
                                 @endforeach

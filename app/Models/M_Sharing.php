@@ -41,6 +41,6 @@ class M_Sharing extends Model
         }
 
         // Pengaju harus user atau spv
-        return $this->pengajuRole('user') || $this->pengajuRole('spv') || $this->pengajuRole('branch-manager');
+        return $this->pengajuRole('user') || $this->pengajuRole('spv') || $this->pengajuRole('branch-manager') || $this->pengajuRole('hr');
     }
 }
