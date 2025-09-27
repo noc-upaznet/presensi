@@ -82,6 +82,10 @@
                             <span class="badge bg-danger text-light me-2 px-2" style="font-size: 20px;">
                                 Jadwal tidak ada
                             </span>
+                        @elseif ($hasPendingClockOut)
+                            <button class="btn btn-primary px-4 me-2" wire:click="showClockOutModal">
+                                <i class="fas fa-arrow-right-from-bracket me-2"></i> Clock Out Tertunda
+                            </button>
                         @elseif (!$hasClockedIn)
                             <button class="btn btn-success px-4 me-2" wire:click="showCamera">
                                 <i class="fas fa-arrow-right-to-bracket me-2"></i> Clock In

@@ -24,6 +24,7 @@ class ClockIn extends Component
     public $jamKeluar = '-';
     public $hasClockedIn;
     public $hasClockedOut;
+    public $hasPendingClockOut;
     public float|null $latitude = null;
     public float|null $longitude = null;
     public $lokasis;
@@ -65,14 +66,48 @@ class ClockIn extends Component
             return;
         }
 
+        // $today = now()->toDateString();
+        // $presensi = M_Presensi::where('user_id', $karyawanId)
+        //     ->where('tanggal', $today)
+        //     ->first();
+
+        // if ($presensi) {
+        //     $this->hasClockedIn = $presensi->clock_in !== '00:00:00';
+        //     $this->hasClockedOut = $presensi->clock_out !== '00:00:00';
+        // }
+
         $today = now()->toDateString();
-        $presensi = M_Presensi::where('user_id', $karyawanId)
+        $yesterday = now()->subDay()->toDateString();
+
+        // 🔹 cek presensi hari ini
+        $presensiToday = M_Presensi::where('user_id', $karyawanId)
             ->where('tanggal', $today)
             ->first();
 
-        if ($presensi) {
-            $this->hasClockedIn = $presensi->clock_in !== '00:00:00';
-            $this->hasClockedOut = $presensi->clock_out !== '00:00:00';
+        if ($presensiToday && $presensiToday->clock_in !== '00:00:00' && $presensiToday->clock_out === '00:00:00') {
+            // Hari ini sudah clock-in tapi belum clock-out → tampil tombol Clock Out biasa
+            $this->hasClockedIn = true;
+            $this->hasClockedOut = false;
+            $this->hasPendingClockOut = false;
+        } else {
+            // Kalau bukan kasus hari ini → cek presensi sebelumnya yang belum clock-out
+            $presensiYesterday = M_Presensi::where('user_id', $karyawanId)
+                ->where('tanggal', $yesterday)   // 🔹 khusus tanggal kemarin saja
+                ->where('clock_in', '!=', '00:00:00')
+                ->where('clock_out', '00:00:00')
+                ->first();
+                // dd($presensiYesterday);
+
+            if ($presensiYesterday) {
+                $this->hasClockedIn = true;
+                $this->hasClockedOut = false;
+                $this->hasPendingClockOut = true; // 🔹 ini yang muncul “Clock Out Tertunda”
+            } else {
+                // Tidak ada presensi tertinggal, fallback normal
+                $this->hasClockedIn  = $presensiToday?->clock_in !== null && $presensiToday?->clock_in !== '00:00:00';
+                $this->hasClockedOut = $presensiToday?->clock_out !== null && $presensiToday?->clock_out !== '00:00:00';
+                $this->hasPendingClockOut = false;
+            }
         }
     }
 
@@ -135,9 +170,10 @@ class ClockIn extends Component
     
         // Ambil data presensi hari ini
         $presensi = M_Presensi::where('user_id', $karyawanId)
-            ->where('tanggal', $tanggal)
+            ->where('clock_out', '00:00:00')
+            ->orderByDesc('tanggal')
             ->first();
-    
+        // dd($presensi);
         if (!$presensi) {
             session()->flash('error', 'Data presensi tidak ditemukan.');
             return;
