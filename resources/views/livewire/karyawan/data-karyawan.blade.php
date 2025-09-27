@@ -1,3 +1,12 @@
+@push('styles')
+  <style>
+    .lembur-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 1rem;
+    }
+  </style>
+@endpush
 <div>
   <div class="app-content-header">
     <!--begin::Container-->
@@ -23,10 +32,20 @@
     <div class="container-fluid">
       <div class="mb-4">
         <div class="card-header">
-          @can('karyawan-create')
-            <a href="{{ route('tambah-data-karyawan') }}"><button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Tambah</button></a>
-            <button wire:click="showModalImport" class="btn btn-success"><i class="fa-solid fa-file-excel"></i> Import</button>
-          @endcan
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 lembur-header">
+            <div class="d-flex gap-2">
+              @can('karyawan-create')
+                <a href="{{ route('tambah-data-karyawan') }}"><button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Tambah</button></a>
+                <button wire:click="showModalImport" class="btn btn-success"><i class="fa-solid fa-file-excel"></i> Import</button>
+              @endcan
+              <select class="form-select" wire:model.lazy="filterStatus" style="width: 150px;">
+                  <option value="">Pilih Status</option>
+                  <option value="PKWT Kontrak">PKWT Kontrak</option>
+                  <option value="Probation">Probation</option>
+                  <option value="OJT">OJT</option>
+              </select>
+            </div>
+          </div>
         </div>
         <!-- /.card-header -->
       </div>
@@ -85,7 +104,9 @@
                     <td class="text-center">
                       <button type="button" wire:click="DetailDataKaryawan('{{ Crypt::encrypt($key->id) }}')" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></button>
                       <button type="button" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')" class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                      <button type="button" wire:click="confirmHapusKaryawan('{{ Crypt::encrypt($key->id) }}')" class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                      @can('karyawan-delete')
+                        <button type="button" wire:click="confirmHapusKaryawan('{{ Crypt::encrypt($key->id) }}')" class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                      @endcan
                     </td>
                   </tr>
                 @endforeach

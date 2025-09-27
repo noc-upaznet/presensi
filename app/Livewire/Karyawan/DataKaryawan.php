@@ -29,6 +29,8 @@ class DataKaryawan extends Component
         'refreshTable' => '$refresh',
     ];
 
+    public $filterStatus = '';
+
     public function showEdit($id)
     {
         $this->form->resetValidation();
@@ -119,6 +121,10 @@ class DataKaryawan extends Component
         // Filter berdasarkan entitas jika bukan 'All'
         if ($selectedEntitas !== 'All') {
             $query->where('entitas', $selectedEntitas);
+        }
+
+        if (in_array($this->filterStatus, ['PKWT Kontrak', 'Probation', 'OJT'], true)) {
+            $query->where('status_karyawan', $this->filterStatus);
         }
 
         if ($this->search) {
