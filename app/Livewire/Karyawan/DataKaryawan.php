@@ -12,6 +12,7 @@ use App\Livewire\Forms\TambahDataKaryawanForm;
 use App\Models\M_Lembur;
 use App\Models\M_Pengajuan;
 use App\Models\PayrollModel;
+use App\Models\User;
 use Livewire\WithoutUrlPagination;
 
 class DataKaryawan extends Component
@@ -75,31 +76,38 @@ class DataKaryawan extends Component
 
     public function delete()
     {
-        // dd($this->deleteKaryawan);
         if ($this->deleteKaryawan) {
-        // Hapus jadwal terkait
-        M_Jadwal::where('karyawan_id', $this->deleteKaryawan)->delete();
+            // Ambil data karyawan
+            $karyawan = M_DataKaryawan::find($this->deleteKaryawan);
 
-        M_Pengajuan::where('karyawan_id', $this->deleteKaryawan)->delete();
+            if ($karyawan) {
+                // Hapus data yang berelasi dengan karyawan_id
+                M_Jadwal::where('karyawan_id', $karyawan->id)->delete();
+                M_Pengajuan::where('karyawan_id', $karyawan->id)->delete();
+                PayrollModel::where('karyawan_id', $karyawan->id)->delete();
+                M_Lembur::where('karyawan_id', $karyawan->id)->delete();
 
-        PayrollModel::where('karyawan_id', $this->deleteKaryawan)->delete();
+                // 🔹 Hapus user terkait (jika ada)
+                if ($karyawan->user_id) {
+                    User::find($karyawan->user_id)?->delete();
+                }
 
-        M_Lembur::where('karyawan_id', $this->deleteKaryawan)->delete();
+                // Baru hapus data karyawan
+                $karyawan->delete();
+            }
 
-        // Baru hapus data karyawan
-        M_DataKaryawan::find($this->deleteKaryawan)?->delete();
-
-        $this->dispatch(
-            'swal', params: [
-            'title' => 'Data Deleted',
-            'icon' => 'success',
-            'text' => 'Data has been deleted successfully',
-            'showConfirmButton' => false,
-            'timer' => 1500
-        ]);
-        $this->deleteKaryawan = null;
+            $this->dispatch(
+                'swal', params: [
+                'title' => 'Data Deleted',
+                'icon' => 'success',
+                'text' => 'Data has been deleted successfully',
+                'showConfirmButton' => false,
+                'timer' => 1500
+            ]);
+            $this->deleteKaryawan = null;
+        }
     }
-    }
+
 
     public function render()
     {
