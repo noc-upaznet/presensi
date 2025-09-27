@@ -9,6 +9,9 @@ use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Crypt;
 use App\Livewire\Forms\TambahDataKaryawanForm;
+use App\Models\M_Lembur;
+use App\Models\M_Pengajuan;
+use App\Models\PayrollModel;
 use Livewire\WithoutUrlPagination;
 
 class DataKaryawan extends Component
