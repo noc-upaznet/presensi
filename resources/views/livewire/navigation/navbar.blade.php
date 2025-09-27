@@ -25,7 +25,7 @@
     <ul class="navbar-nav ms-auto">
 
       {{-- Dropdown Entitas khusus Admin --}}
-      @hasanyrole('admin|hr')
+      @hasanyrole('admin|hr|user')
         <li class="nav-item dropdown border border-secondary rounded ms-2">
           <button class="btn btn-link nav-link py-2 px-2 dropdown-toggle d-flex align-items-center rounded text-secondary"
                   id="dropdown-entitas"
