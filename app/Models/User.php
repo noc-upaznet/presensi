@@ -25,7 +25,7 @@ class User extends Authenticatable
         'password',
         'current_role',
         'password_expired',
-        'entitas_id',
+        'branch_id',
     ];
 
     /**
