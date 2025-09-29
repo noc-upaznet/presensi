@@ -139,8 +139,9 @@ class DataKaryawan extends Component
                 ->paginate($this->perPage);
         } else {
             $datas = $query
-                ->latest()
+                ->orderBy('nama_karyawan', 'asc')
                 ->paginate($this->perPage);
+
         }
         return view('livewire.karyawan.data-karyawan', [
             'datas' => $datas,
