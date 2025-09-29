@@ -35,8 +35,36 @@ use App\Livewire\Karyawan\Pengajuan\PengajuanLembur;
 use App\Livewire\Karyawan\Pengajuan\Sharing;
 use App\Livewire\ManageUser;
 use App\Livewire\SlipGaji;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 
 // Route::redirect('/', '/login');
+// Halaman lupa password
+Route::get('/forgot-password', function () {
+    return view('auth.forgot-password');
+})->name('password.request');
+
+// Proses reset password langsung
+Route::post('/forgot-password', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|min:8|confirmed',
+    ]);
+
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user) {
+        return back()->withErrors(['email' => 'Email tidak ditemukan']);
+    }
+
+    $user->password = Hash::make($request->password);
+    $user->save();
+
+    return redirect()->route('login')->with('status', 'Password berhasil direset, silahkan login.');
+})->name('password.update');
+
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);

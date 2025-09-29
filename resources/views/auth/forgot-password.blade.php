@@ -59,57 +59,40 @@
     <div class="login-box">
       <div class="card card-outline card-primary">
         <div class="card-header">
-          <h1 class="mb-0 text-center" style="font-weight: bolder; font-size: 40px;"><b>Sistem Presensi</b></h1>
+          <h1 class="mb-0 text-center" style="font-weight: bolder; font-size: 40px;"><b>Lupa Password</b></h1>
         </div>
         <div class="card-body login-card-body">
-          @if ($errors->any())
-              <div class="alert alert-danger small">
-                  @foreach ($errors->all() as $error)
-                      <div>{{ $error }}</div>
-                  @endforeach
-              </div>
-          @endif
-          @if (session('error'))
-              <div class="alert alert-danger small">
-                  {{ session('error') }}
-              </div>
-          @endif
-          <p class="login-box-msg">Silahkan Login</p>
-            <form action="{{ route('login') }}" method="POST">
-              @csrf
-              {{-- <input type="text" name="_token" value="{{ csrf_token() }}"> --}}
-              <div class="input-group mb-3">
-                  <input type="email" name="email" class="form-control" placeholder="Email" value="{{ request()->cookie('login_email') }}">
-                  <div class="input-group-append">
-                      <div class="input-group-text">
-                          <span class="bi bi-envelope-fill"></span>
-                      </div>
-                  </div>
-              </div>
-              <div class="input-group mb-3">
-                  <input type="password" name="password" class="form-control" placeholder="Password" value="{{ request()->cookie('login_password') }}">
-                  <div class="input-group-append">
-                      <div class="input-group-text">
-                          <span class="bi bi-lock-fill"></span>
-                      </div>
-                  </div>
-              </div>
-
-              <label>
-                  <input type="checkbox" name="remember_form"
-                        {{ request()->cookie('login_email') ? 'checked' : '' }}>
-                  Ingat Email & Password
-              </label>
-
-              <div class="social-auth-links text-center mb-3 d-grid gap-2">
-                  <button type="submit" class="btn btn-primary" style="text-align: center">Login</button>
-              </div>
-              <div class="d-flex justify-content-center mt-3">
-                  <a href="{{ route('password.request') }}">Lupa Password?</a>
-              </div>
+            @if ($errors->any())
+                <div class="alert alert-danger small">
+                    @foreach ($errors->all() as $error)
+                        <div>{{ $error }}</div>
+                    @endforeach
+                </div>
+            @endif
+            @if (session('status'))
+                <div class="alert alert-success small">
+                    {{ session('status') }}
+                </div>
+            @endif
+            <form method="POST" action="{{ route('password.update') }}">
+                @csrf
+                <div class="mb-3">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control" required autofocus>
+                </div>
+                <div class="mb-3">
+                <label>Password Baru</label>
+                <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                <label>Konfirmasi Password</label>
+                <input type="password" name="password_confirmation" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Reset Password</button>
             </form>
-
-          
+            <div class="mt-3 text-center">
+                <a href="{{ route('login') }}">Kembali ke Login</a>
+            </div>
         </div>
         <!-- /.login-card-body -->
       </div>
