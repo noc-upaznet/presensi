@@ -472,6 +472,58 @@ class DetailDataKaryawan extends Component
         $this->dispatch('modalEditExperience', action: 'hide');
     }
 
+    public function deleteKeluarga($id)
+    {
+        // dd($id);
+        $dataFamily = M_Family::findOrFail($id);
+        $dataFamily->delete();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Deleted',
+            'icon' => 'success',
+            'text' => 'Data has been deleted successfully'
+        ]);
+    }
+
+    public function deleteTanggungan($id)
+    {
+        // dd($id);
+        $dataDependent = M_Dependents::findOrFail($id);
+        $dataDependent->delete();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Deleted',
+            'icon' => 'success',
+            'text' => 'Data has been deleted successfully'
+        ]);
+    }
+
+    public function deletePendidikan($id)
+    {
+        // dd($id);
+        $dataEducation = M_Education::findOrFail($id);
+        $dataEducation->delete();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Deleted',
+            'icon' => 'success',
+            'text' => 'Data has been deleted successfully'
+        ]);
+    }
+
+    public function deleteExperience($id)
+    {
+        // dd($id);
+        $dataExperience = M_WorkExperience::findOrFail($id);
+        $dataExperience->delete();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Deleted',
+            'icon' => 'success',
+            'text' => 'Data has been deleted successfully'
+        ]);
+    }
+
     public function render()
     {
         $this->familys = M_Family::where('karyawan_id', $this->id)->get();

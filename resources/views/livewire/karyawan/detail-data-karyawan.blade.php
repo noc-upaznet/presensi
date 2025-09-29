@@ -207,8 +207,11 @@
                                 <td>{{ $item->religion ?? '-' }}</td>
                                 <td>{{ $item->education ?? '-' }}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm" wire:click="showEditKeluarga('{{ $item->id }}')">
+                                    <button class="btn btn-warning btn-sm mt-2" wire:click="showEditKeluarga('{{ $item->id }}')">
                                         <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm mt-2" wire:click="deleteKeluarga('{{ $item->id }}')">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -247,8 +250,11 @@
                                 <td>{{ $item->father }}</td>
                                 <td>{{ $item->mother }}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm" wire:click="showEditRelationship('{{ $item->id }}')">
+                                    <button class="btn btn-warning btn-sm mt-2" wire:click="showEditRelationship('{{ $item->id }}')">
                                         <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm mt-2" wire:click="deleteKeluarga('{{ $item->id }}')">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -298,8 +304,11 @@
                                 <td>{{ $item->profession ?? '-' }}</td>
                                 <td>{{ $item->no_telp ?? '-' }}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm" wire:click="showEditTanggungan('{{ $item->id }}')">
+                                    <button class="btn btn-warning btn-sm mt-2" wire:click="showEditTanggungan('{{ $item->id }}')">
                                         <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm mt-2" wire:click="deleteTanggungan('{{ $item->id }}')">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -346,8 +355,11 @@
                                 <td>{{ $item->major ?? '-' }}</td>
                                 <td>{{ $item->nilai ?? '-' }}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm" wire:click="showEditEducation('{{ $item->id }}')">
+                                    <button class="btn btn-warning btn-sm mt-2" wire:click="showEditEducation('{{ $item->id }}')">
                                         <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm mt-2" wire:click="deletePendidikan('{{ $item->id }}')">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -385,8 +397,11 @@
                                 <td>{{ $item->company }}</td>
                                 <td>{{ $item->employment_period ?? '-' }}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm" wire:click="showEditExperience('{{ $item->id }}')">
+                                    <button class="btn btn-warning btn-sm mt-2" wire:click="showEditExperience('{{ $item->id }}')">
                                         <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm mt-2" wire:click="deleteExperience('{{ $item->id }}')">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
