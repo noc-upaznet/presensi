@@ -6,8 +6,9 @@ use App\Models\M_AdditionalDataEmployee;
 use Livewire\Component;
 use App\Models\M_DataKaryawan;
 use App\Models\M_Dependents;
-use App\Models\M_EducationExperience;
+use App\Models\M_Education;
 use App\Models\M_Family;
+use App\Models\M_WorkExperience;
 use Illuminate\Support\Facades\Crypt;
 
 class DetailDataKaryawan extends Component
@@ -45,6 +46,7 @@ class DetailDataKaryawan extends Component
     public $nilai;
     public $company;
     public $employment_period;
+    public $workExperience;
 
     public $field;
     public $label;
@@ -215,12 +217,10 @@ class DetailDataKaryawan extends Component
             'end_date' => $this->end_date,
             'major' => $this->major,
             'nilai' => $this->nilai,
-            'company' => $this->company,
-            'employment_period' => $this->employment_period,
         ];
         // dd($data);
 
-        M_EducationExperience::create($data);
+        M_Education::create($data);
 
         $this->dispatch('swal', params: [
             'title' => 'Data Saved',
@@ -230,6 +230,32 @@ class DetailDataKaryawan extends Component
 
         // Tutup modal
         $this->dispatch('modalTambahPendidikan', action: 'hide');
+    }
+
+    public function showAddExperience()
+    {
+        $this->dispatch('modalTambahExperience', action: 'show');
+    }
+
+    public function saveExperience()
+    {
+        $data = [
+            'karyawan_id' => $this->id,
+            'company' => $this->company,
+            'employment_period' => $this->employment_period,
+        ];
+        // dd($data);
+
+        M_WorkExperience::create($data);
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Saved',
+            'icon' => 'success',
+            'text' => 'Data has been saved successfully'
+        ]);
+
+        // Tutup modal
+        $this->dispatch('modalTambahExperience', action: 'hide');
     }
 
     public function showEditKeluarga($id)
@@ -370,7 +396,7 @@ class DetailDataKaryawan extends Component
 
     public function showEditEducation($id)
     {
-        $dataEducation = M_EducationExperience::findOrFail($id);
+        $dataEducation = M_Education::findOrFail($id);
         $this->edit_id = $id;
         // dd($this->edit_id);
 
@@ -387,7 +413,7 @@ class DetailDataKaryawan extends Component
     public function updateEducation()
     {
         if ($this->edit_id) {
-            $dataEducation = M_EducationExperience::findOrFail($this->edit_id);
+            $dataEducation = M_Education::findOrFail($this->edit_id);
             $data = [
                 'level_of_education' => $this->level_of_education,
                 'institution' => $this->institution,
@@ -413,7 +439,7 @@ class DetailDataKaryawan extends Component
 
     public function showEditExperience($id)
     {
-        $dataExperience = M_EducationExperience::findOrFail($id);
+        $dataExperience = M_WorkExperience::findOrFail($id);
         $this->edit_id = $id;
         // dd($this->edit_id);
 
@@ -426,7 +452,7 @@ class DetailDataKaryawan extends Component
     public function updateExperience()
     {
         if ($this->edit_id) {
-            $dataExperience = M_EducationExperience::findOrFail($this->edit_id);
+            $dataExperience = M_WorkExperience::findOrFail($this->edit_id);
             $data = [
                 'company' => $this->company,
                 'employment_period' => $this->employment_period,
@@ -450,11 +476,13 @@ class DetailDataKaryawan extends Component
     {
         $this->familys = M_Family::where('karyawan_id', $this->id)->get();
         $this->dependents = M_Dependents::where('karyawan_id', $this->id)->get();
-        $this->educations = M_EducationExperience::where('karyawan_id', $this->id)->get();
+        $this->educations = M_Education::where('karyawan_id', $this->id)->get();
+        $this->workExperience = M_WorkExperience::where('karyawan_id', $this->id)->get();
         return view('livewire.karyawan.detail-data-karyawan', [
             'dataFamilys' => $this->familys,
             'dataDependents' => $this->dependents,
             'dataEducations' => $this->educations,
+            'dataWorkExperience' => $this->workExperience,
         ]);
     }
 }

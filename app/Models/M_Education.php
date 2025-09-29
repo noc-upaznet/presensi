@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class M_EducationExperience extends Model
+class M_Education extends Model
 {
-    protected $table = 'education_and_experience';
+    protected $table = 'education';
     protected $fillable = [
         'karyawan_id',
         'level_of_education',
@@ -15,7 +15,5 @@ class M_EducationExperience extends Model
         'end_date',
         'major',
         'nilai',
-        'company',
-        'employment_period',
     ];
 }
