@@ -35,7 +35,7 @@
                             <td class="bio-label">TEMPAT LAHIR<br><small>(PLACE OF BIRTH)</small></td>
                             <td>: {{ $karyawan->tempat_lahir }}</td>
                             <td class="bio-label">TANGGAL LAHIR<br><small>(DATE OF BIRTH)</small></td>
-                            <td>: {{ $karyawan->tanggal_lahir }}</td>
+                            <td>: {{ \Carbon\Carbon::parse($karyawan->tanggal_lahir)->locale('id')->translatedFormat('d F Y') }}</td>
                         </tr>
                         <tr>
                             <td class="bio-label">JENIS KELAMIN<br><small>(GENDER)</small></td>
@@ -203,7 +203,7 @@
                                 <td>{{ $item->nik ?? '-' }}</td>
                                 <td>{{ $item->gender ?? '-' }}</td>
                                 <td>{{ $item->place_of_birth ?? '-' }}</td>
-                                <td>{{ $item->date_of_birth ?? '-' }}</td>
+                                <td>{{ \Carbon\Carbon::parse($item->date_of_birth)->locale('id')->translatedFormat('d F Y') }}</td>
                                 <td>{{ $item->religion ?? '-' }}</td>
                                 <td>{{ $item->education ?? '-' }}</td>
                                 <td>
@@ -244,7 +244,7 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $item->marital_status }}</td>
-                                <td>{{ $item->wedding_date }}</td>
+                                <td>{{ \Carbon\Carbon::parse($item->wedding_date)->locale('id')->translatedFormat('d F Y') }}</td>
                                 <td>{{ $item->relationship_in_family }}</td>
                                 <td>{{ $item->citizenship }}</td>
                                 <td>{{ $item->father }}</td>
@@ -299,7 +299,7 @@
                                 <td>{{ $item->name ?? '-' }}</td>
                                 <td>{{ $item->gender ?? '-' }}</td>
                                 <td>{{ $item->place_of_birth ?? '-' }}</td>
-                                <td>{{ $item->date_of_birth ?? '-' }}</td>
+                                <td>{{ \Carbon\Carbon::parse($item->date_of_birth)->locale('id')->translatedFormat('d F Y') }}</td>
                                 <td>{{ $item->education ?? '-' }}</td>
                                 <td>{{ $item->profession ?? '-' }}</td>
                                 <td>{{ $item->no_telp ?? '-' }}</td>
@@ -748,83 +748,6 @@
             </div>
         </div>
     </div>
-
-    {{-- <div wire:ignore.self class="modal fade" id="modalTambahPendidikan" tabindex="-1" aria-labelledby="modalTambahPendidikanLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-info">
-                    <h5 class="modal-title text-white" id="modalTambahPendidikanLabel">RIWAYAT PENDIDIKAN (EDUCATIONAL BACKGROUND)</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                </div>
-                <div class="mt-3 p-3 mb-3">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="level_of_education" class="form-label">Jenjang</label>
-                            <input type="text" class="form-control" id="level_of_education" wire:model="level_of_education" name="level_of_education" placeholder="SMA/STRATA 1">
-                            @error('form.level_of_education') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="institution" class="form-label">Nama Sekolah/Institut/Universitas</label>
-                            <input type="text" class="form-control" id="institution" wire:model="institution" name="institution">
-                            @error('form.institution') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="start_date" class="form-label">Tahun Mulai</label>
-                            <input type="date" class="form-control" id="start_date" wire:model="start_date" name="start_date">
-                            @error('form.start_date') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="end_date" class="form-label">Tahun Akhir</label>
-                            <input type="date" class="form-control" id="end_date" wire:model="end_date" name="end_date">
-                            @error('form.end_date') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="major" class="form-label">Jurusan</label>
-                            <input type="text" class="form-control" id="major" wire:model="major" name="major">
-                            @error('form.major') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="nilai" class="form-label">Nilai/IPK(CGPA)</label>
-                            <input type="text" class="form-control" id="nilai" wire:model="nilai" name="nilai">
-                            @error('form.nilai') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-
-                    <h4 class="mt-3" style="color: blue; margin-bottom: 20px;">PENGALAMAN KERJA</h4>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="company" class="form-label">Perusahaan</label>
-                            <input type="text" class="form-control" id="company" wire:model="company" name="company" placeholder="PT. xxx">
-                            @error('form.company') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="employment_period" class="form-label">Periode Kerja</label>
-                            <input type="text" class="form-control" id="employment_period" wire:model="employment_period" name="employment_period" placeholder="Jan 2025 - Des 2025">
-                            @error('form.employment_period') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary w-md-auto" wire:click='savePendidikan' wire:loading.attr="disabled" wire:target="savePendidikan">
-                            <div wire:loading wire:target="savePendidikan" class="spinner-border spinner-border-sm" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <span wire:loading.remove wire:target="savePendidikan"><i class="fa fa-save"></i> Simpan</span>
-                            <span wire:loading wire:target="savePendidikan">Loading...</span>
-                        </button>
-                        <button type="button" class="btn btn-secondary w-md-auto"
-                            data-bs-dismiss="modal">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> --}}
 
     <div wire:ignore.self class="modal fade" id="modalTambahPendidikan" tabindex="-1" aria-labelledby="modalTambahPendidikanLabel"
         aria-hidden="true">
