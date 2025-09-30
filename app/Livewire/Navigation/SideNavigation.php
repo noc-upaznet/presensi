@@ -39,24 +39,46 @@ class SideNavigation extends Component
                         ->pluck('id');
 
                     // pengajuan cuti/izin
-                    $countPengajuan = M_Pengajuan::whereNull('approve_spv')
-                        ->where('status', 0)
-                        ->whereIn('karyawan_id', $karyawanIds)
-                        ->where('karyawan_id', '!=', $dataKaryawan->id)
-                        ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
-                        ->whereMonth('tanggal', Carbon::now()->month)
-                        ->whereYear('tanggal', Carbon::now()->year)
-                        ->count();
+                    if ($divisi == 'NOC'){
+                        $countPengajuan = M_Pengajuan::where('approve_spv', 0)
+                            ->where('status', 0)
+                            ->where('karyawan_id', '!=', $dataKaryawan->id)
+                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
+                                $q->where('divisi', $divisi);
+                            })
+                            ->count();
+                    }else{
+                        $countPengajuan = M_Pengajuan::whereNull('approve_spv')
+                            ->where('status', 0)
+                            ->whereIn('karyawan_id', $karyawanIds)
+                            ->where('karyawan_id', '!=', $dataKaryawan->id)
+                            ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
+                            ->whereMonth('tanggal', Carbon::now()->month)
+                            ->whereYear('tanggal', Carbon::now()->year)
+                            ->count();
+                    }
 
                     // Lembur
-                    $countLembur = M_Lembur::whereNull('approve_spv')
-                        ->where('status', 0)
-                        ->whereIn('karyawan_id', $karyawanIds)
-                        ->where('karyawan_id', '!=', $dataKaryawan->id)
-                        ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
-                        ->whereMonth('tanggal', Carbon::now()->month)
-                        ->whereYear('tanggal', Carbon::now()->year)
-                        ->count();
+                    if ($divisi == 'NOC'){
+                        $countLembur = M_Lembur::where('approve_spv', 0)
+                            ->where('status', 0)
+                            ->where('karyawan_id', '!=', $dataKaryawan->id)
+                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
+                                $q->where('divisi', $divisi);
+                            })
+                            ->count();
+                    }else{
+                        $countLembur = M_Lembur::whereNull('approve_spv')
+                            ->where('status', 0)
+                            ->whereIn('karyawan_id', $karyawanIds)
+                            ->where('karyawan_id', '!=', $dataKaryawan->id)
+                            ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
+                            ->whereMonth('tanggal', Carbon::now()->month)
+                            ->whereYear('tanggal', Carbon::now()->year)
+                            ->count();
+                    }
+                    
+                    // Presensi Staff
                     if ($divisi == 'NOC'){
                         $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
                             ->where('approve', 0)
@@ -87,9 +109,10 @@ class SideNavigation extends Component
             // 🔹 HR
             } elseif ($user->hasRole('hr')) {
                 $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
-                $entitas = $dataKaryawan?->entitas;
+                $entitas = session('selected_entitas', 'UHO');
                 
                 if ($dataKaryawan) {
+                    // dd($entitas);
                     // Pengajuan
                     $countPengajuan = M_Pengajuan::where(function ($q) {
                             $q->where('approve_spv', 1)
