@@ -260,6 +260,16 @@
                     </li>
                 @endhasanyrole
 
+                @can('jadwal-shift-create')
+                    <li class="nav-item">
+                        <a href="{{ route('jadwal-shift') }}"
+                           class="nav-link {{ request()->routeIs('jadwal-shift') ? 'active' : '' }}">
+                           <i class="bi bi-calendar-range"></i>
+                           <p>Jadwal Shift</p>
+                        </a>
+                    </li>
+                @endcan
+
                 @hasanyrole('spv|hr')
                     <li class="nav-item">
                         <a href="{{ route('slip-gaji') }}"

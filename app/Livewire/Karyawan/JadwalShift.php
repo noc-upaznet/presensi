@@ -62,6 +62,14 @@ class JadwalShift extends Component
                 ->whereNotIn('id', $jadwalId)
                 ->orderBy('nama_karyawan')
                 ->get();
+        } elseif ($user->hasRole('user')) {
+            $divisi = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+            $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
+                ->where('divisi', $divisi)
+                ->whereNotIn('id', $jadwalId)
+                ->orderBy('nama_karyawan')
+                ->get();
         }
         $this->applyFilters();
     }
@@ -184,7 +192,8 @@ class JadwalShift extends Component
     {
         $query = M_Jadwal::with('getKaryawan');
         $user = Auth::user();
-
+        $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+        // dd($karyawan);
         if (!empty($this->filterKaryawan)) {
             $query->where('karyawan_id', $this->filterKaryawan);
         }
@@ -209,6 +218,13 @@ class JadwalShift extends Component
 
             $query->whereHas('getKaryawan', function ($q) use ($entitas) {
                 $q->where('entitas', $entitas);
+            });
+        } elseif ($user->hasRole('user') && $karyawan->entitas == 'MC') {
+            $divisi = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+            $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitas) {
+                $q->where('divisi', $divisi)
+                ->where('entitas', $entitas);
             });
         }
         $jadwals = $query->paginate(10);

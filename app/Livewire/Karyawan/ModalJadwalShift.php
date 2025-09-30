@@ -256,12 +256,11 @@ class ModalJadwalShift extends Component
     {
         $this->bulan_tahun = now()->format('Y-m');
         $user = Auth::user();
-
+        $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
         $jadwalId = M_Jadwal::where('bulan_tahun', $this->bulan_tahun)
             ->pluck('karyawan_id')
             ->toArray();
         if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
-            $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
 
@@ -274,6 +273,14 @@ class ModalJadwalShift extends Component
             $entitas = session('selected_entitas', 'UHO');
 
             $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
+                ->whereNotIn('id', $jadwalId)
+                ->orderBy('nama_karyawan')
+                ->get();
+        } elseif ($user->hasRole('user')) {
+            $divisi = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+            $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
+                ->where('divisi', $divisi)
                 ->whereNotIn('id', $jadwalId)
                 ->orderBy('nama_karyawan')
                 ->get();
