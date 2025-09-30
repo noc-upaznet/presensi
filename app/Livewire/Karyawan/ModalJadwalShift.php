@@ -277,11 +277,8 @@ class ModalJadwalShift extends Component
                 ->orderBy('nama_karyawan')
                 ->get();
         } elseif ($user->hasRole('user')) {
-            $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
             $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
-                ->where('divisi', $divisi)
-                ->whereNotIn('id', $jadwalId)
                 ->orderBy('nama_karyawan')
                 ->get();
         }
