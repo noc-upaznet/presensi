@@ -120,7 +120,6 @@ class CreateSlipGaji extends Component
     public function mount($id = null, $month = null, $year = null)
     {
         if ($month && str_contains($month, '-')) {
-            // misal $month = "2025-09"
             [$year, $month] = explode('-', $month);
         }
         // dd($id, $month, $year);
