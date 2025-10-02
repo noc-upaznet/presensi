@@ -19,6 +19,7 @@ class Dispensasi extends Component
     public $file;
     public $filterPengajuan;
     public $search;
+    public $editId;
 
     public function showAdd()
     {
@@ -67,6 +68,63 @@ class Dispensasi extends Component
         // Tutup modal
         $this->dispatch('modalTambahPengajuan', action: 'hide');
         $this->dispatch('refresh');
+    }
+
+    public function showEdit($id)
+    {
+        $pengajuan = M_Dispensation::find(decrypt($id));
+        $this->editId = $id;
+        if (!$pengajuan) {
+            return;
+        }
+        $path = null;
+        if ($this->file) {
+            $path = $this->file->store('file-pengajuan-dispensasi', 'public');
+        }
+
+        // Pastikan hanya karyawan yang membuat pengajuan yang bisa mengedit
+        $user = Auth::user();
+        $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
+
+        if ($dataKaryawan && $pengajuan->karyawan_id == $dataKaryawan->id) {
+            // Isi form dengan data dari database
+            $this->form->date = Carbon::parse($pengajuan->date)->format('Y-m-d');
+            $this->form->description = $pengajuan->description;
+            $this->file = $path ? str_replace('public/', 'storage/', $path) : $pengajuan->file;
+
+            // Tampilkan modal
+            $this->dispatch('modalEditPengajuan', action: 'show');
+        }
+    }
+
+    public function saveEdit()
+    {
+        $pengajuan = M_Dispensation::find(decrypt($this->editId));
+        if (!$pengajuan) {
+            return;
+        }
+
+        $path = null;
+        if ($this->file) {
+            $path = $this->file->store('file-pengajuan-dispensasi', 'public');
+        }
+
+        $data = [
+            'date' => $this->form->date,
+            'description' => $this->form->description,
+            'file' => $path ? str_replace('public/', 'storage/', $path) : $pengajuan->file,
+        ];
+        // dd($data);
+        $pengajuan->update($data);
+
+        $this->form->reset();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Updated',
+            'icon' => 'success',
+            'text' => 'Data has been updated successfully'
+        ]);
+        $this->dispatch('modalEditPengajuan', action: 'hide');
     }
 
     public function updateStatus($id, $status = null)

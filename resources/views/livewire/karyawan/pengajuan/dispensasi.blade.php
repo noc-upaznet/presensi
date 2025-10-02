@@ -108,11 +108,15 @@
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        <label>Show <select class="form-select form-select-sm d-inline-block w-auto">
-                                <option>5</option>
-                                <option>10</option>
-                                <option>20</option>
-                            </select> entries per page</label>
+                        <label>
+                            Show 
+                            <select wire:model="perPage" class="form-select form-select-sm d-inline-block w-auto">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                            </select> 
+                            entries per page
+                        </label>
                     </div>
                     <div>
                         <input type="text" class="form-control form-control-sm rounded-end-0" placeholder="Tanggal" wire:model.live="search">
@@ -205,7 +209,7 @@
                 </div>
             </div>
             <div class="mt-3">
-                {{-- {{ $pengajuanLembur->links() }} --}}
+                {{ $pengajuanDispens->links() }}
             </div>
         </div>
         
@@ -260,6 +264,58 @@
                 </div>
             </div>
         </div>
+
+        <div wire:ignore.self class="modal fade" id="modalEditPengajuan" tabindex="-1" aria-labelledby="modalEditPengajuanLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger">
+                        <h5 class="modal-title text-white" id="modalEditPengajuanLabel">Pengajuan Dispensasi Keterlambatan</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <form>
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <label for="tanggal" class="form-label fw-semibold">Tanggal <small class="text-danger">*</small></label>
+                                <input type="date" class="form-control" id="tanggal" wire:model="form.date">
+                                @error('form.date') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="keterangan" class="form-label fw-semibold">Keterangan <small class="text-danger">*</small></label>
+                                <input type="text" class="form-control" id="keterangan" placeholder="Contoh: Ban bocor" wire:model="form.description">
+                                @error('form.description') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="file" class="form-label fw-semibold">File</label>
+                                <input type="file" class="form-control" id="file" wire:model="file" accept=".jpg,.jpeg,.png">
+                                <small class="text-danger">
+                                    @if (session()->has('error'))
+                                        {{ session('error') }}
+                                    @else
+                                        Ukuran maksimal file: 2MB
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary  w-100 w-md-auto" wire:click='saveEdit' wire:loading.attr="disabled" wire:target="saveEdit">
+                                <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <span wire:loading.remove wire:target="saveEdit"><i class="fa fa-save"></i> Simpan</span>
+                                <span wire:loading wire:target="saveEdit">Loading...</span>
+                            </button>
+                            <button type="button" class="btn btn-secondary w-100 w-md-auto"
+                                data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="modal fade" id="modalGambar" tabindex="-1" aria-labelledby="modalGambarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -285,8 +341,8 @@
             $('#modalTambahPengajuan').modal(event.action);
         });
 
-        Livewire.on('modalEditPengajuanLembur', (event) => {
-            $('#modalEditPengajuanLembur').modal(event.action);
+        Livewire.on('modalEditPengajuan', (event) => {
+            $('#modalEditPengajuan').modal(event.action);
         });
 
         // Livewire.on('modalEditJadwal', (event) => {
