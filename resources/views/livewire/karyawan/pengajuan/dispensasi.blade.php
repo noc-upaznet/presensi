@@ -108,7 +108,7 @@
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        <label>
+                        {{-- <label>
                             Show 
                             <select wire:model="perPage" class="form-select form-select-sm d-inline-block w-auto">
                                 <option value="5">5</option>
@@ -116,7 +116,7 @@
                                 <option value="20">20</option>
                             </select> 
                             entries per page
-                        </label>
+                        </label> --}}
                     </div>
                     <div>
                         <input type="text" class="form-control form-control-sm rounded-end-0" placeholder="Tanggal" wire:model.live="search">
@@ -208,7 +208,7 @@
                     </table>
                 </div>
             </div>
-            <div class="mt-3">
+            <div>
                 {{ $pengajuanDispens->links() }}
             </div>
         </div>

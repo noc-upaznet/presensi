@@ -7,6 +7,7 @@ use App\Models\M_DataKaryawan;
 use App\Models\M_Dispensation;
 use App\Models\M_Presensi;
 use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -19,6 +20,7 @@ class Dispensasi extends Component
 {
     use WithFileUploads;
     use WithPagination, WithoutUrlPagination;
+    protected $paginationTheme = 'bootstrap';
     public DispensasiForm $form;
     public $file;
     public $filterPengajuan;
@@ -238,11 +240,11 @@ class Dispensasi extends Component
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('id', 'like', '%' . $this->search . '%')
-                    ->orWhere('tanggal', 'like', '%' . $this->search . '%');
+                    ->orWhere('date', 'like', '%' . $this->search . '%');
             });
         }
 
-        $pengajuanDispens = $query->latest()->paginate(10);
+        $pengajuanDispens = $query->latest()->paginate(3);
 
         return view('livewire.karyawan.pengajuan.dispensasi',[
             'pengajuanDispens' => $pengajuanDispens

@@ -20,6 +20,7 @@ class Sharing extends Component
     use WithFileUploads;
     public DispensasiForm $form;
     use WithPagination, WithoutUrlPagination;
+    protected $paginationTheme = 'bootstrap';
     public $file;
     public $filterPengajuan;
     public $search;
