@@ -70,10 +70,9 @@
                                 @endrole
                                 {{-- @if( (auth()->user()->hasRole('spv') && $divisi === 'Teknisi') 
                                     || auth()->user()->hasRole('hr')) --}}
-                                {{-- @hasanyrole('spv-teknisi|hr')
-                                    <th>Dispensasi</th>
+                                @hasrole('hr')
                                     <th>Action</th>
-                                @endhasanyrole --}}
+                                @endhasrole
                             </tr>
                         </thead>
                         <tbody>
@@ -150,8 +149,8 @@
                                     @endrole --}}
 
                                     {{-- Dispensasi HR --}}
-                                    {{-- @role('hr')
-                                        <td>
+                                    @role('hr')
+                                        {{-- <td>
                                             @can('dispensasi-approve')
                                                 @if ($key->status == "1")
                                                     @if($key->approve_late_spv == 1)
@@ -168,7 +167,7 @@
                                                     <span class="badge bg-primary">Dispensasi Approved</span>
                                                 @endif
                                             @endcan
-                                        </td>
+                                        </td> --}}
                                         <td>
                                             @can('presensi-edit')
                                                 <button class="btn btn-warning btn-sm" wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
@@ -176,7 +175,7 @@
                                                 </button>
                                             @endcan
                                         </td>
-                                    @endrole --}}
+                                    @endrole
                                 </tr>
                             @empty
                                 <tr>
