@@ -242,9 +242,16 @@
                     <tbody>
                         @forelse ($dataFamilys as $item)
                             <tr>
+                                @php
+                                    var_dump($item->wedding_date);
+                                @endphp
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $item->marital_status }}</td>
-                                <td>{{ \Carbon\Carbon::parse($item->wedding_date)->locale('id')->translatedFormat('d F Y') }}</td>
+                                @if ($item->wedding_date == null)
+                                    <td>-</td>
+                                @else
+                                    <td>{{ \Carbon\Carbon::parse($item->wedding_date)->locale('id')->translatedFormat('d F Y') }}</td>
+                                @endif
                                 <td>{{ $item->relationship_in_family }}</td>
                                 <td>{{ $item->citizenship }}</td>
                                 <td>{{ $item->father }}</td>
@@ -557,9 +564,9 @@
                             @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="name" class="form-label">Tanggal Lahir</label>
-                            <input type="date" class="form-control" id="name" wire:model="date_of_birth" name="name">
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            <label for="date_of_birth" class="form-label">Tanggal Lahir</label>
+                            <input type="date" class="form-control" id="date_of_birth" wire:model="date_of_birth" name="date_of_birth">
+                            @error('form.date_of_birth') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
@@ -601,9 +608,9 @@
                             @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="name" class="form-label">Tanggal Perkawinan</label>
-                            <input type="date" class="form-control" id="name" wire:model="wedding_date" name="name">
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            <label for="wedding_date" class="form-label">Tanggal Perkawinan</label>
+                            <input type="date" class="form-control" id="wedding_date" wire:model="wedding_date" name="wedding_date">
+                            @error('form.wedding_date') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
@@ -1263,20 +1270,27 @@
                 btn.addEventListener('click', function () {
                     const row  = btn.closest('tr');
                     const cell = row.querySelector('.value-cell');
+                    const field = row.dataset.field; // ambil nama field dari tr
 
-                    // Jika belum dalam mode edit
                     if (!cell.querySelector('input')) {
                         const currentValue = cell.textContent.trim();
-                        cell.innerHTML = `<input type="text" class="form-control form-control-sm" value="${currentValue === '-' ? '' : currentValue}">`;
+
+                        // cek apakah field adalah Mulai Masuk → pakai type="month"
+                        if (field === 'start_date') {
+                            // format ke YYYY-MM
+                            let dateValue = currentValue !== '-' ? currentValue : '';
+                            cell.innerHTML = `<input type="month" class="form-control form-control-sm" value="${dateValue}">`;
+                        } else {
+                            cell.innerHTML = `<input type="text" class="form-control form-control-sm" value="${currentValue === '-' ? '' : currentValue}">`;
+                        }
+
                         btn.innerHTML = '<i class="bi bi-save"></i> Simpan';
                         btn.classList.remove('btn-warning');
                         btn.classList.add('btn-success');
                     } else {
                         // Mode save → ambil nilai, kirim ke server (ajax/Livewire)
                         const newValue = cell.querySelector('input').value;
-                        const field    = row.dataset.field;
 
-                        // contoh ajax sederhana
                         fetch(`/karyawan/additional/update`, {
                             method: 'POST',
                             headers: {
@@ -1304,5 +1318,6 @@
                 });
             });
         });
+
     </script>
 @endpush
