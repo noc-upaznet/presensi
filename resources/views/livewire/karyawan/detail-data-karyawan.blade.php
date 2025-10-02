@@ -528,6 +528,7 @@
                             <label class="form-label">Hubungan Keluarga</label>
                             <select class="form-select" wire:model="relationships">
                                 <option value="">-- Pilih --</option>
+                                <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
                                 <option value="SUAMI">SUAMI</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
@@ -679,6 +680,7 @@
                             <label class="form-label">Hubungan Keluarga</label>
                             <select class="form-select" wire:model="relationships">
                                 <option value="">-- Pilih --</option>
+                                <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
                                 <option value="SUAMI">SUAMI</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
@@ -870,6 +872,7 @@
                             <label class="form-label">Hubungan Keluarga</label>
                             <select class="form-select" wire:model="relationships">
                                 <option value="">-- Pilih --</option>
+                                <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
                                 <option value="SUAMI">SUAMI</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
@@ -1046,6 +1049,7 @@
                             <label class="form-label">Hubungan Keluarga</label>
                             <select class="form-select" wire:model="relationships">
                                 <option value="">-- Pilih --</option>
+                                <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
                                 <option value="SUAMI">SUAMI</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
