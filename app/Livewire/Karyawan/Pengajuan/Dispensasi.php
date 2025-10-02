@@ -57,7 +57,7 @@ class Dispensasi extends Component
             'karyawan_id' => M_DataKaryawan::where('user_id', Auth::id())->value('id'),
             'date'        => $this->form->date,
             'description' => $this->form->description,
-            'file'        => $path ? str_replace('public/', 'storage/', $path) : null,
+            'file'        => $path,
         ];
 
         M_Dispensation::create($data);
@@ -244,7 +244,7 @@ class Dispensasi extends Component
             });
         }
 
-        $pengajuanDispens = $query->latest()->paginate(3);
+        $pengajuanDispens = $query->latest()->paginate(25);
 
         return view('livewire.karyawan.pengajuan.dispensasi',[
             'pengajuanDispens' => $pengajuanDispens
