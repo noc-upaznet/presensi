@@ -35,7 +35,7 @@
                                             <td>{{ $item->nip_karyawan }}</td>
                                             <td>
                                                 @can('payroll-create')
-                                                    <a href="{{ route('create-slip-gaji', ['id' => encrypt($item->id)]) }}" class="btn btn-sm btn-primary">
+                                                    <a href="{{ route('create-slip-gaji', ['id' => encrypt($item->id), 'month' => $periode, 'year' => $periode]) }}" class="btn btn-sm btn-primary">
                                                         <i class="fa-solid fa-money-bill"></i> Slip Gaji
                                                     </a>
                                                 @endcan
@@ -53,12 +53,12 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="modalPayrollEks" tabindex="-1" aria-labelledby="modalPayrollLabel"
+    <div wire:ignore.self class="modal fade" id="modalPayrollEks" tabindex="-1" aria-labelledby="modalPayrollEksLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-info">
-                    <h5 class="modal-title text-white" id="modalPayrollLabel">Slip Gaji</h5>
+                    <h5 class="modal-title text-white" id="modalPayrollEksLabel">Slip Gaji</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 <div class="modal-body">

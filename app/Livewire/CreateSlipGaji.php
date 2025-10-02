@@ -119,6 +119,11 @@ class CreateSlipGaji extends Component
 
     public function mount($id = null, $month = null, $year = null)
     {
+        if ($month && str_contains($month, '-')) {
+            // misal $month = "2025-09"
+            [$year, $month] = explode('-', $month);
+        }
+        // dd($id, $month, $year);
         if (!Auth::check()) {
             session(['redirect_after_login' => url()->current()]);
             return redirect()->to(route('login'));
