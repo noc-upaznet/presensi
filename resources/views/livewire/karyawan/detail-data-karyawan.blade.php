@@ -605,6 +605,8 @@
                                 <option selected value="">-- Pilih --</option>
                                 <option value="KAWIN TERCATAT">KAWIN TERCATAT</option>
                                 <option value="BELUM KAWIN">BELUM KAWIN</option>
+                                <option value="CERAI MATI">CERAI MATI</option>
+                                <option value="CERAI HIDUP">CERAI HIDUP</option>
                             </select>
                             @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
@@ -974,6 +976,8 @@
                                 <option selected value="">-- Pilih --</option>
                                 <option value="KAWIN TERCATAT">KAWIN TERCATAT</option>
                                 <option value="BELUM KAWIN">BELUM KAWIN</option>
+                                <option value="CERAI MATI">CERAI MATI</option>
+                                <option value="CERAI HIDUP">CERAI HIDUP</option>
                             </select>
                             @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
