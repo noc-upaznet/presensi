@@ -572,7 +572,7 @@ class CreateSlipGaji extends Component
         }
 
         // Hitung nilai per hari
-        $inovRewardPerHari = $inovRewardDasar / 26;
+        $inovRewardPerHari = (int) str_replace('.', '', $inovRewardDasar) / 26;
         // Set jumlah inovation reward sesuai kehadiran
         $this->inovation_reward_jumlah = (int) $this->rekap['kehadiran'];
 
