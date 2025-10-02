@@ -238,7 +238,8 @@
 
                             <div class="mb-3">
                                 <label for="file" class="form-label fw-semibold">File</label>
-                                <input type="file" class="form-control" id="file" wire:model="file" accept=".jpg,.jpeg,.png">
+                                <input type="file" wire:model="file" class="form-control" accept="image/*">
+                                @error('file') <span class="text-danger">{{ $message }}</span> @enderror
                                 <small class="text-danger">
                                     @if (session()->has('error'))
                                         {{ session('error') }}
@@ -290,6 +291,18 @@
 
                             <div class="mb-3">
                                 <label for="file" class="form-label fw-semibold">File</label>
+                                @if($oldFile)
+                                    <div class="mb-2">
+                                        <p>File lama:</p>
+                                        <img src="{{ asset('storage/' . $oldFile) }}" class="img-thumbnail" width="150">
+                                        <button type="button" class="btn btn-danger btn-sm mt-2" wire:click="removeOldFile">
+                                            Hapus File Lama
+                                        </button>
+                                    </div>
+                                @endif
+
+                                {{-- <input type="file" wire:model="file" class="form-control" accept="image/*">
+                                @error('file') <span class="text-danger">{{ $message }}</span> @enderror --}}
                                 <input type="file" class="form-control" id="file" wire:model="file" accept=".jpg,.jpeg,.png">
                                 <small class="text-danger">
                                     @if (session()->has('error'))

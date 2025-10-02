@@ -12,11 +12,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
+use Livewire\WithoutUrlPagination;
+use Livewire\WithPagination;
 
 class Sharing extends Component
 {
     use WithFileUploads;
     public DispensasiForm $form;
+    use WithPagination, WithoutUrlPagination;
     public $file;
     public $filterPengajuan;
     public $search;

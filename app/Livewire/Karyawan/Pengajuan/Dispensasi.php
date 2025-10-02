@@ -9,17 +9,22 @@ use App\Models\M_Presensi;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
+use Livewire\WithoutUrlPagination;
+use Livewire\WithPagination;
 
 class Dispensasi extends Component
 {
     use WithFileUploads;
+    use WithPagination, WithoutUrlPagination;
     public DispensasiForm $form;
     public $file;
     public $filterPengajuan;
     public $search;
     public $editId;
+    public $oldFile;
 
     public function showAdd()
     {
@@ -30,42 +35,41 @@ class Dispensasi extends Component
     {
         $this->form->validate();
 
-        if ($this->file) {
-            // dd($this->file);
+        // Validasi file kalau ada
+        if ($this->file instanceof UploadedFile) {
             $this->validate([
                 'file' => 'nullable|mimes:jpg,jpeg,png|max:2048',
             ], [
-                'file.max' => 'Ukuran file maksimal 2MB.',
+                'file.max'   => 'Ukuran file maksimal 2MB.',
                 'file.mimes' => 'Format file harus JPG, JPEG, PNG.',
             ]);
         }
 
+        // Simpan file kalau ada upload
         $path = null;
-        if ($this->file) {
+        if ($this->file instanceof UploadedFile) {
             $path = $this->file->store('file-pengajuan-dispensasi', 'public');
         }
-        // dd(auth()->id());
+
         $data = [
             'karyawan_id' => M_DataKaryawan::where('user_id', Auth::id())->value('id'),
-            'date' => $this->form->date,
+            'date'        => $this->form->date,
             'description' => $this->form->description,
-            'file' => $path ? str_replace('public/', 'storage/', $path) : null,
+            'file'        => $path ? str_replace('public/', 'storage/', $path) : null,
         ];
-        // dd($data);
 
-        // Simpan data ke database
         M_Dispensation::create($data);
 
         // Reset input
         $this->form->reset();
+        $this->file = null;
 
         $this->dispatch('swal', params: [
             'title' => 'Data Saved',
-            'icon' => 'success',
-            'text' => 'Data has been saved successfully'
+            'icon'  => 'success',
+            'text'  => 'Data has been saved successfully'
         ]);
 
-        // Tutup modal
         $this->dispatch('modalTambahPengajuan', action: 'hide');
         $this->dispatch('refresh');
     }
@@ -74,25 +78,21 @@ class Dispensasi extends Component
     {
         $pengajuan = M_Dispensation::find(decrypt($id));
         $this->editId = $id;
+
         if (!$pengajuan) {
             return;
         }
-        $path = null;
-        if ($this->file) {
-            $path = $this->file->store('file-pengajuan-dispensasi', 'public');
-        }
 
-        // Pastikan hanya karyawan yang membuat pengajuan yang bisa mengedit
         $user = Auth::user();
         $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
 
         if ($dataKaryawan && $pengajuan->karyawan_id == $dataKaryawan->id) {
-            // Isi form dengan data dari database
-            $this->form->date = Carbon::parse($pengajuan->date)->format('Y-m-d');
+            $this->form->date        = Carbon::parse($pengajuan->date)->format('Y-m-d');
             $this->form->description = $pengajuan->description;
-            $this->file = $path ? str_replace('public/', 'storage/', $path) : $pengajuan->file;
 
-            // Tampilkan modal
+            $this->file = null;
+            $this->oldFile = $pengajuan->file;
+
             $this->dispatch('modalEditPengajuan', action: 'show');
         }
     }
@@ -105,27 +105,52 @@ class Dispensasi extends Component
         }
 
         $path = null;
-        if ($this->file) {
+
+        // kalau ada upload file baru
+        if ($this->file instanceof \Illuminate\Http\UploadedFile) {
+            $this->validate([
+                'file' => 'nullable|mimes:jpg,jpeg,png|max:2048',
+            ]);
+
+            // hapus file lama kalau ada
+            if ($pengajuan->file && Storage::disk('public')->exists(str_replace('storage/', '', $pengajuan->file))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $pengajuan->file));
+            }
+
+            // simpan file baru
             $path = $this->file->store('file-pengajuan-dispensasi', 'public');
         }
 
         $data = [
-            'date' => $this->form->date,
+            'date'        => $this->form->date,
             'description' => $this->form->description,
-            'file' => $path ? str_replace('public/', 'storage/', $path) : $pengajuan->file,
+            'file'        => $path 
+                                ? str_replace('public/', 'storage/', $path) 
+                                : $this->oldFile,
         ];
-        // dd($data);
+
         $pengajuan->update($data);
 
         $this->form->reset();
+        $this->file = null;
+        $this->oldFile = null;
 
         $this->dispatch('swal', params: [
             'title' => 'Data Updated',
-            'icon' => 'success',
-            'text' => 'Data has been updated successfully'
+            'icon'  => 'success',
+            'text'  => 'Data has been updated successfully'
         ]);
         $this->dispatch('modalEditPengajuan', action: 'hide');
     }
+
+    public function removeOldFile()
+    {
+        if ($this->oldFile && Storage::disk('public')->exists(str_replace('storage/', '', $this->oldFile))) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $this->oldFile));
+        }
+        $this->oldFile = null;
+    }
+
 
     public function updateStatus($id, $status = null)
     {
