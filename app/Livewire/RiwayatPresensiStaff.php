@@ -45,7 +45,7 @@ class RiwayatPresensiStaff extends Component
 
         $divisi = $karyawan ? $karyawan->divisi : null;
 
-        if ($currentRole === 'hr') {
+        if ($user->hasRole('hr')) {
             // HR bisa pilih entitas via session
             $selectedEntitas = session('selected_entitas', 'all');
 
