@@ -222,7 +222,7 @@ class CreateSlipGaji extends Component
                     }
                 }
 
-                $this->kasbon = $dataKaryawan->kasbon;
+                $this->kasbon = $dataKaryawan->kasbon ?? 0;
                 $this->fee_sharing = M_Sharing::where('karyawan_id', $dataKaryawanId)
                     ->whereBetween('date', [$this->cutoffStart, $this->cutoffEnd])
                     ->where('status', 1)

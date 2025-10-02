@@ -577,9 +577,7 @@ class EditPayroll extends Component
         // dd($izin_setengah);
         // total kehadiran fix 26 hari - (izin + cuti + 0.5 * izin_setengah)
         $kehadiran = 26 - ($izin + $cuti + 0.5 * $izin_setengah);
-
         $this->rekap['kehadiran'] = $kehadiran;
-
         // dd($kehadiran);
         // hitung inov reward
         $inovRewardPerHari = $this->inovation_reward / 26;
