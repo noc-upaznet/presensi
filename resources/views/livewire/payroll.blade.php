@@ -121,7 +121,7 @@
                     $year = $selectedYear ?? now()->year;
                 @endphp
                 @can('payroll-create')
-                    <a href="{{ route('create-slip-gaji', ['month' => $month, 'year' => $year]) }}" class="btn btn-sm btn-primary">
+                    <a href="{{ route('create-slip-gaji-tambah', ['month' => $month, 'year' => $year]) }}" class="btn btn-sm btn-primary">
                         <i class="fa-solid fa-plus"></i>
                         Tambah
                     </a>
