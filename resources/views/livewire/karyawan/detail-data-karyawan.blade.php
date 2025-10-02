@@ -532,6 +532,7 @@
                                 <option value="SUAMI">SUAMI</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="LAINNYA">LAINNYA</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -625,6 +626,7 @@
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="LAINNYA">LAINNYA</option>
                             </select>
                             @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
@@ -686,6 +688,7 @@
                                 <option value="SUAMI">SUAMI</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="LAINNYA">LAINNYA</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -878,6 +881,7 @@
                                 <option value="SUAMI">SUAMI</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="LAINNYA">LAINNYA</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -996,6 +1000,7 @@
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="LAINNYA">LAINNYA</option>
                             </select>
                             @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
@@ -1057,6 +1062,7 @@
                                 <option value="SUAMI">SUAMI</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="LAINNYA">LAINNYA</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
