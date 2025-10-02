@@ -246,8 +246,21 @@ class Dispensasi extends Component
 
         $pengajuanDispens = $query->latest()->paginate(25);
 
+        $tanggalList = $pengajuanDispens->pluck('date')->unique();
+
+        $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
+
+        $presensiClockIn = M_Presensi::whereIn('user_id', $karyawanIdList)
+            ->whereIn('tanggal', $tanggalList) // sesuai tanggal pengajuan
+            ->whereNotNull('clock_in')
+            ->get()
+            ->groupBy(function($item) {
+                return $item->user_id.'-'.$item->tanggal;
+            });
+
         return view('livewire.karyawan.pengajuan.dispensasi',[
-            'pengajuanDispens' => $pengajuanDispens
+            'pengajuanDispens' => $pengajuanDispens,
+            'presensiClockIn' => $presensiClockIn,
         ]);
     }
 }

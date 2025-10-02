@@ -131,6 +131,7 @@
                                     <th>Nama Karyawan</th>
                                 @endhasanyrole
                                 <th>Keterangan</th>
+                                <th>Clock-in</th>
                                 <th>File</th>
                                 <th>Approve</th>
                                 <th>Status</th>
@@ -150,6 +151,11 @@
                                             <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}</td>
                                         @endhasanyrole
                                         <td style="color: var(--bs-body-color);">{{ $key->description }}</td>
+                                        @php
+                                            $keyPresensi = $key->karyawan_id . '-' . $key->date;
+                                            $clockIn = $presensiClockIn[$keyPresensi][0]->clock_in ?? null;
+                                        @endphp
+                                        <td style="color: var(--bs-body-color);">{{ $clockIn }}</td>
                                         <td style="color: var(--bs-body-color);">
                                             @if ($key->file)
                                                 <img src="{{ asset('storage/' . $key->file) }}"
