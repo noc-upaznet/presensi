@@ -25,7 +25,8 @@
     <ul class="navbar-nav ms-auto">
 
       {{-- Dropdown Entitas khusus Admin --}}
-      @hasanyrole('admin|hr|user')
+      {{-- @hasanyrole('admin|hr|user') --}}
+      @can('branches-view')
         <li class="nav-item dropdown border border-secondary rounded ms-2">
           <button class="btn btn-link nav-link py-2 px-2 dropdown-toggle d-flex align-items-center rounded text-secondary"
                   id="dropdown-entitas"
@@ -51,8 +52,10 @@
             @endforeach
           </ul>
         </li>
+      @endcan
+        
 
-      @endhasanyrole
+      {{-- @endhasanyrole --}}
 
       {{-- User Menu --}}
       <li class="nav-item dropdown user-menu">
