@@ -117,65 +117,7 @@
     
             <hr class="my-4">
     
-            {{-- <div class="row" style="color: var(--bs-body-color);">
-                <div class="col-md-6">
-                    <h6 class="fw-bold text-primary">Informasi Pribadi</h6>
-                    <div class="mb-1 d-flex justify-content-between">
-                        <span>Jenis Kelamin</span> <span>: {{ $karyawan->jenis_kelamin ?? '-' }}</span>
-                    </div>
-                    <div class="mb-1 d-flex justify-content-between">
-                        <span>NIK</span> <span>: {{ $karyawan->nik ?? '-' }}</span>
-                    </div>
-                    <div class="mb-1 d-flex justify-content-between">
-                        <span>Agama</span> <span>: {{ $karyawan->agama ?? '-' }}</span>
-                    </div>
-                    <div class="mb-1 d-flex justify-content-between">
-                        <span>Divisi</span> <span>: {{ $karyawan->divisi ?? '-' }}</span>
-                    </div>
-                    <div class="mb-1 d-flex justify-content-between">
-                        <span>Jabatan</span> <span>: {{ $karyawan->jabatan ?? '-' }}</span>
-                    </div>
-                    <div class="mb-1 d-flex justify-content-between">
-                        <span>Level</span> <span>: {{ $karyawan->level ?? '-' }}</span>
-                    </div>
-                    <div class="mb-1 d-flex justify-content-between">
-                        <span>Entitas</span> <span>: {{ $karyawan->entitas ?? '-' }}</span>
-                    </div>
-                    <div class="mb-1 d-flex justify-content-between">
-                        <span>Tanggal Kontrak</span> <span>: {{ $karyawan->tgl_masuk ?? '-' }}</span>
-                    </div>
-                    <div class="mb-1 d-flex justify-content-between">
-                        <span>Tanggal Habis Kontrak</span> <span>: {{ $karyawan->tgl_keluar ?? '-' }}</span>
-                    </div>
-                    <div class="mb-1 d-flex justify-content-between">
-                        <span>Status Hubungan Kerja</span> <span>: {{ $karyawan->status_karyawan ?? '-' }}</span>
-                    </div>
-                </div>
-    
-                <div class="col-md-6">
-                    <h6 class="fw-bold text-primary">Informasi Kontak</h6>
-                    <div class="mb-1 d-flex justify-content-between">
-                        <span>No.HP</span> <span>: {{ $karyawan->no_hp ?? '-' }}</span>
-                    </div>
-                    <div class="mb-1 d-flex justify-content-between">
-                        <span>Email</span> <span>: {{ $karyawan->email ?? '-' }}</span>
-                    </div>
-                </div>
-            </div>
-    
-            <hr class="my-4">
-    
-            <h6 class="fw-bold text-primary">Informasi Alamat</h6>
-            <div class="d-flex justify-content-between" style="color: var(--bs-body-color);">
-                <span>Alamat KTP</span>
-                <span>: {{ $karyawan->alamat_ktp ?? '-' }}</span>
-            </div>
-            <div class="d-flex justify-content-between" style="color: var(--bs-body-color);">
-                <span>Alamat Domisili</span>
-                <span>: {{ $karyawan->alamat_domisili ?? '-' }}</span>
-            </div> --}}
-
-            <hr class="my-4">
+            {{-- Data Keluarga --}}
 
             <h6 class="fw-bold text-primary mb-3">DATA KELUARGA (FAMILY MEMBER OF KK) </h6>
             <div class="table-responsive">
