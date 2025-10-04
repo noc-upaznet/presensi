@@ -602,9 +602,14 @@
                             <select class="form-select" wire:model="marital_status" id="relationships" name="relationships">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="KAWIN TERCATAT">KAWIN TERCATAT</option>
+                                <option value="KAWIN BELUM TERCATAT">KAWIN BELUM TERCATAT</option>
                                 <option value="BELUM KAWIN">BELUM KAWIN</option>
-                                <option value="CERAI MATI">CERAI MATI</option>
-                                <option value="CERAI HIDUP">CERAI HIDUP</option>
+                                <option value="CERAI MATI TERCATAT">CERAI MATI TERCATAT</option>
+                                <option value="CERAI HIDUP TERCATAT">CERAI HIDUP TERCATAT</option>
+                                <option value="CERAI MATI BELUM TERCATAT">CERAI MATI BELUM TERCATAT</option>
+                                <option value="CERAI HIDUP BELUM TERCATAT">CERAI HIDUP BELUM TERCATAT</option>
+                                <option value="CERAI TERCATAT">CERAI TERCATAT</option>
+                                <option value="CERAI BELUM TERCATAT">CERAI BELUM TERCATAT</option>
                             </select>
                             @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
@@ -623,6 +628,7 @@
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="CUCU">CUCU</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                             @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
@@ -976,9 +982,14 @@
                             <select class="form-select" wire:model="marital_status" id="relationships" name="relationships">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="KAWIN TERCATAT">KAWIN TERCATAT</option>
+                                <option value="KAWIN BELUM TERCATAT">KAWIN BELUM TERCATAT</option>
                                 <option value="BELUM KAWIN">BELUM KAWIN</option>
-                                <option value="CERAI MATI">CERAI MATI</option>
-                                <option value="CERAI HIDUP">CERAI HIDUP</option>
+                                <option value="CERAI MATI TERCATAT">CERAI MATI TERCATAT</option>
+                                <option value="CERAI HIDUP TERCATAT">CERAI HIDUP TERCATAT</option>
+                                <option value="CERAI MATI BELUM TERCATAT">CERAI MATI BELUM TERCATAT</option>
+                                <option value="CERAI HIDUP BELUM TERCATAT">CERAI HIDUP BELUM TERCATAT</option>
+                                <option value="CERAI TERCATAT">CERAI TERCATAT</option>
+                                <option value="CERAI BELUM TERCATAT">CERAI BELUM TERCATAT</option>
                             </select>
                             @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
@@ -997,6 +1008,7 @@
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="CUCU">CUCU</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                             @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
