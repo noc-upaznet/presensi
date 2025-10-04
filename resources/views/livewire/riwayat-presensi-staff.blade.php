@@ -85,8 +85,19 @@
                                     <td>{{ $key->clock_in }}</td>
                                     <td>{{ $key->clock_out }}</td>
                                     <td>
-                                        <span>Clock-In   :</span> <span class="badge bg-primary"> {{ $key->lokasi_final}}</span><br>
-                                        <span>Clock-Out  :</span> <span class="badge bg-danger">{{ $key->lokasi_clock_out_final }}</span>
+                                        <span>Clock-In :</span> 
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($key->lokasi_final) }}" 
+                                        target="_blank" 
+                                        class="badge bg-primary text-decoration-none">
+                                            {{ $key->lokasi_final }}
+                                        </a>
+                                        <br>
+                                        <span>Clock-Out :</span> 
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($key->lokasi_clock_out_final) }}" 
+                                        target="_blank" 
+                                        class="badge bg-danger text-decoration-none">
+                                            {{ $key->lokasi_clock_out_final }}
+                                        </a>
                                     </td>
                                     <td>
                                         @switch($key->previous_status)
