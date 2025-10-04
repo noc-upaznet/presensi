@@ -570,6 +570,7 @@
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="ORANG TUA">ORANG TUA</option>
                                 <option value="MENANTU">MENANTU</option>
                                 <option value="CUCU">CUCU</option>
                                 <option value="LAINNYA">LAINNYA</option>
@@ -951,6 +952,7 @@
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="ORANG TUA">ORANG TUA</option>
                                 <option value="MENANTU">MENANTU</option>
                                 <option value="CUCU">CUCU</option>
                                 <option value="LAINNYA">LAINNYA</option>
