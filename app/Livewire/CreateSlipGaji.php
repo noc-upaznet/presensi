@@ -895,8 +895,14 @@ class CreateSlipGaji extends Component
         $bulanRomawi = $this->toRoman($bulanAngka); // "VI"
 
         // Hitung jumlah slip yang sudah dicetak untuk periode tersebut (per entitas)
-        $lastSlip = PayrollModel::where('periode', $periode)
-            ->when($entitasModel, function ($query) use ($entitasModel) {
+        // $lastSlip = PayrollModel::where('periode', $periode)
+        //     ->when($entitasModel, function ($query) use ($entitasModel) {
+        //         return $query->where('entitas_id', $entitasModel->id);
+        //     })
+        //     ->orderByDesc('id')
+        //     ->first();
+
+        $lastSlip = PayrollModel::when($entitasModel, function ($query) use ($entitasModel) {
                 return $query->where('entitas_id', $entitasModel->id);
             })
             ->orderByDesc('id')
