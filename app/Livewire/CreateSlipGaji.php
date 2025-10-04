@@ -888,7 +888,8 @@ class CreateSlipGaji extends Component
         $entitasKode = $entitasModel?->nama ?? 'UHO';
 
         // Ambil periode
-        $periode = $this->bulanTahun; // format: "2025-06"
+
+        $periode = now()->format('Y-m');
         $tahun = Carbon::createFromFormat('Y-m', $periode)->format('Y'); // "25"
         $bulanAngka = Carbon::createFromFormat('Y-m', $periode)->format('n'); // "6"
         $bulanRomawi = $this->toRoman($bulanAngka); // "VI"
