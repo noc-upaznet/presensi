@@ -27,14 +27,6 @@ class updateNoSlip extends Command
      */
     public function handle()
     {
-        // Mapping bulan angka ke romawi
-        $bulanRomawi = [
-            '01' => 'I',  '02' => 'II', '03' => 'III',
-            '04' => 'IV', '05' => 'V',  '06' => 'VI',
-            '07' => 'VII','08' => 'VIII','09' => 'IX',
-            '10' => 'X',  '11' => 'XI', '12' => 'XII',
-        ];
-
         $entitas = M_Entitas::all();
 
         foreach ($entitas as $item) {
@@ -44,14 +36,19 @@ class updateNoSlip extends Command
                 // Pecah no_slip berdasarkan "/"
                 $parts = explode('/', $slip->no_slip);
 
-                // Struktur: [0]=006, [1]=DJB-xxx, [2]=HR, [3]=2025, [4]=IX, [5]=001
+                // Struktur: [0]=006, [1]=DJB-MC, [2]=HR, [3]=2025, [4]=X, [5]=003
+                $prefix = $parts[0];
+                $entitasPart = $parts[1];
+                $hr = $parts[2];
                 $tahun = $parts[3];
-                $bulan = $parts[4]; // ini yang mau dicek
+                $bulan = $parts[4];
                 $nomor = $parts[5];
 
-                // Jika bulan sekarang IX (September) → ganti jadi X (Oktober)
-                if ($bulan === 'IX') {
-                    $new_noSlip = "{$parts[0]}/{$parts[1]}/{$parts[2]}/{$tahun}/X/{$nomor}";
+                // Hanya ubah kalau entitasPart = DJB-MC
+                if ($entitasPart === 'DJB-MC') {
+                    $entitasPart = 'MC'; // ganti langsung ke MC
+
+                    $new_noSlip = "{$prefix}/{$entitasPart}/{$hr}/{$tahun}/{$bulan}/{$nomor}";
 
                     $slip->no_slip = $new_noSlip;
                     $slip->save();
