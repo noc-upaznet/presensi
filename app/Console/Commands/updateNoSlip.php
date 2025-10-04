@@ -27,16 +27,37 @@ class updateNoSlip extends Command
      */
     public function handle()
     {
+        // Mapping bulan angka ke romawi
+        $bulanRomawi = [
+            '01' => 'I',  '02' => 'II', '03' => 'III',
+            '04' => 'IV', '05' => 'V',  '06' => 'VI',
+            '07' => 'VII','08' => 'VIII','09' => 'IX',
+            '10' => 'X',  '11' => 'XI', '12' => 'XII',
+        ];
+
         $entitas = M_Entitas::all();
-        foreach ($entitas as $item)
-        {
+
+        foreach ($entitas as $item) {
             $slips = PayrollModel::where('entitas_id', $item->id)->get();
-            foreach ($slips as $slip){
-                preg_match('/(.*)\/(.*)\/(.*)\/(\d*)\z/', $slip->no_slip, $output_array);
-                $new_noSlip = "006/DJB-{$item->nama}/HR/20".$output_array['2']."/".$output_array['3']."/".$output_array['4'];
-                $this->info($new_noSlip);
-                $slip->no_slip=$new_noSlip;
-                $slip->save();
+
+            foreach ($slips as $slip) {
+                // Pecah no_slip berdasarkan "/"
+                $parts = explode('/', $slip->no_slip);
+
+                // Struktur: [0]=006, [1]=DJB-xxx, [2]=HR, [3]=2025, [4]=IX, [5]=001
+                $tahun = $parts[3];
+                $bulan = $parts[4]; // ini yang mau dicek
+                $nomor = $parts[5];
+
+                // Jika bulan sekarang IX (September) → ganti jadi X (Oktober)
+                if ($bulan === 'IX') {
+                    $new_noSlip = "{$parts[0]}/{$parts[1]}/{$parts[2]}/{$tahun}/X/{$nomor}";
+
+                    $slip->no_slip = $new_noSlip;
+                    $slip->save();
+
+                    $this->info("Updated: {$slip->id} → {$new_noSlip}");
+                }
             }
         }
     }
