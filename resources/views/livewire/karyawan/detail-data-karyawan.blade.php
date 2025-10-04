@@ -242,9 +242,6 @@
                     <tbody>
                         @forelse ($dataFamilys as $item)
                             <tr>
-                                @php
-                                    var_dump($item->wedding_date);
-                                @endphp
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $item->marital_status }}</td>
                                 @if ($item->wedding_date == null)
