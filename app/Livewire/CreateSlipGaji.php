@@ -771,6 +771,7 @@ class CreateSlipGaji extends Component
             strtolower(trim($this->jabatan)) === 'branch manager'
         ) {
             $totalGaji -= ($bpjsJhtPT + $bpjsPT);
+            dd($totalGaji);
         }
 
         $this->total_gaji = $totalGaji;
