@@ -256,6 +256,7 @@ class CreateSlipGaji extends Component
         $this->hitungInovationReward();
         $this->no_slip = $this->generateNoSlip();
         $this->hitungTotalGaji();
+        dd($this->entitas, $this->jabatan, $this->bpjs_jht_perusahaan_nominal, $this->bpjs_perusahaan_nominal );
     }
 
     public function setCutoffPeriode()
@@ -1004,8 +1005,6 @@ class CreateSlipGaji extends Component
 
     public function render()
     {
-        dd($this->entitas, $this->jabatan, $this->bpjs_jht_perusahaan_nominal, $this->bpjs_perusahaan_nominal );
-
         return view('livewire.create-slip-gaji');
     }
 }
