@@ -182,7 +182,7 @@ class EditPayroll extends Component
         // $this->loadDataKaryawan();
         // dd($id);
         $this->hitungUangMakanTransport();
-        dd($this->entitas, $this->jabatan);
+        // dd($this->entitas, $this->jabatan);
         $this->hitungTotalGaji();
 
     }
