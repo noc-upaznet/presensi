@@ -371,6 +371,10 @@
                         <td>JHT PT</td>
                         <td class="text-right">Rp. {{ number_format($data->bpjs_jht_perusahaan) }}</td>
                     </tr>
+                    <tr>
+                        <td>Kesehatan PT</td>
+                        <td class="text-right">Rp. {{ number_format($data->bpjs_perusahaan) }}</td>
+                    </tr>
                 @endif
                 <tr style="border-bottom: 1px solid red;">
                     <th>Total Potongan</th>
