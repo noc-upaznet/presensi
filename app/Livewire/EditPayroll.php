@@ -131,6 +131,9 @@ class EditPayroll extends Component
         $selectedEntitas = session('selected_entitas', 'UHO');
         $this->entitas = $selectedEntitas;
 
+        $jabatan = M_DataKaryawan::where('id', $this->payroll->karyawan_id)->value('jabatan');
+        $this->jabatan = $jabatan;
+
         $this->selectedYear = now()->year;
         $this->selectedMonth = now()->format('n');
 
