@@ -319,7 +319,7 @@
             </thead>
             @if ($data->getKaryawan->jabatan == 'Branch Manager' || $data->getkaryawan->entitas == 'UNB')
                 @php
-                    $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon - $data->bpjs_jht_perusahaan - $data->bpjs_perusahaan;
+                    $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->bpjs_jht_perusahaan + $data->bpjs_perusahaan;
                 @endphp
             @else
                 @php
