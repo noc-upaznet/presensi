@@ -116,7 +116,7 @@ class EditPayroll extends Component
     public $lembur_libur = 0;
     public $kasbon = 0;
     public $churn = 0;
-    public $entitas = 0;
+    public $entitas;
 
 
     public function mount($id)
@@ -128,10 +128,12 @@ class EditPayroll extends Component
             abort(404, 'Data tidak ditemukan atau ID tidak valid.');
         }
 
+        $selectedEntitas = session('selected_entitas', 'UHO');
+        $this->entitas = $selectedEntitas;
+
         $this->selectedYear = now()->year;
         $this->selectedMonth = now()->format('n');
 
-        // 🔥 Tangkap periode dari session
         $this->periode = session('periode', $this->payroll->periode);
 
         // Misal $this->periode formatnya "2025-08" (Y-m)
