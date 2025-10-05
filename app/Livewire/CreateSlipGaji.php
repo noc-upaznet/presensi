@@ -766,10 +766,11 @@ class CreateSlipGaji extends Component
         );
         // dd(strtoupper($this->entitas), strtolower($this->jabatan));
         if (
-            isset($this->entitas) && strtoupper($this->entitas) === 'UNB'
-            && isset($this->jabatan) && strtolower($this->jabatan) === 'branch manager'
+            isset($this->entitas, $this->jabatan) &&
+            strtoupper(trim($this->entitas)) === 'UNB' &&
+            strtolower(trim($this->jabatan)) === 'branch manager'
         ) {
-            $totalGaji -= $bpjsJhtPT + $bpjsPT;
+            $totalGaji -= ($bpjsJhtPT + $bpjsPT);
         }
 
         $this->total_gaji = $totalGaji;
