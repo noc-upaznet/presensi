@@ -773,7 +773,6 @@ class CreateSlipGaji extends Component
             $totalGaji -= ($bpjsJhtPT + $bpjsPT);
         }
         $this->total_gaji = $totalGaji;
-        dd($this->total_gaji);
     }
 
 
@@ -1003,8 +1002,8 @@ class CreateSlipGaji extends Component
         return redirect()->route('payroll');
     }
 
-    // public function render()
-    // {
-    //     return view('livewire.create-slip-gaji');
-    // }
+    public function render()
+    {
+        return view('livewire.create-slip-gaji');
+    }
 }

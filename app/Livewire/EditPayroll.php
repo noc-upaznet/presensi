@@ -684,7 +684,7 @@ class EditPayroll extends Component
         $this->bpjs_jht_nominal = round($bpjsJhtNominal);
 
         // === 8. Hitung total gaji akhir ===
-        $this->total_gaji = round(
+        $totalGaji = round(
             $gajiPokok
             + $tunjanganJabatan
             + $totalTunjangan
@@ -705,6 +705,14 @@ class EditPayroll extends Component
             - $churn
             - $this->bpjs_jht_nominal
         );
+        if (
+            isset($this->entitas, $this->jabatan) &&
+            strtoupper(trim($this->entitas)) === 'UNB' &&
+            strtolower(trim($this->jabatan)) === 'branch manager'
+        ) {
+            $totalGaji -= ($this->bpjs_perusahaan + $this->bpjs_jht_perusahaan);
+        }
+        $this->total_gaji = $totalGaji;
         // dd($this->total_gaji);
     }
 
