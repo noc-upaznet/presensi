@@ -773,7 +773,7 @@ class CreateSlipGaji extends Component
             $totalGaji -= ($bpjsJhtPT + $bpjsPT);
             dd($totalGaji);
         }
-
+        dd($this->entitas, $this->jabatan, $bpjsJhtPT, $bpjsPT, $totalGaji);
         $this->total_gaji = $totalGaji;
     }
 
