@@ -1003,8 +1003,8 @@ class CreateSlipGaji extends Component
         return redirect()->route('payroll');
     }
 
-    public function render()
-    {
-        return view('livewire.create-slip-gaji');
-    }
+    // public function render()
+    // {
+    //     return view('livewire.create-slip-gaji');
+    // }
 }
