@@ -771,9 +771,7 @@ class CreateSlipGaji extends Component
             strtolower(trim($this->jabatan)) === 'branch manager'
         ) {
             $totalGaji -= ($bpjsJhtPT + $bpjsPT);
-            dd($totalGaji);
         }
-        dd($this->entitas, $this->jabatan, $bpjsJhtPT, $bpjsPT, $totalGaji);
         $this->total_gaji = $totalGaji;
     }
 
@@ -1006,6 +1004,8 @@ class CreateSlipGaji extends Component
 
     public function render()
     {
+        dd($this->entitas, $this->jabatan, $this->bpjs_jht_perusahaan_nominal, $this->bpjs_perusahaan_nominal );
+
         return view('livewire.create-slip-gaji');
     }
 }
