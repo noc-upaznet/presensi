@@ -687,6 +687,7 @@ class CreateSlipGaji extends Component
         $kasbon            = $this->numericValue($this->kasbon ?? 0);
         $churn             = $this->numericValue($this->churn ?? 0);
         $bpjsJhtPT         = $this->numericValue($this->bpjs_jht_perusahaan_nominal ?? 0);
+        $bpjsPT            = $this->numericValue($this->bpjs_perusahaan_nominal ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -768,7 +769,7 @@ class CreateSlipGaji extends Component
             isset($this->entitas) && strtoupper($this->entitas) === 'UNB'
             && isset($this->jabatan) && strtolower($this->jabatan) === 'branch manager'
         ) {
-            $totalGaji -= $this->bpjs_jht_nominal + $this->bpjs_nominal;
+            $totalGaji -= $bpjsJhtPT + $bpjsPT;
         }
 
         $this->total_gaji = $totalGaji;
