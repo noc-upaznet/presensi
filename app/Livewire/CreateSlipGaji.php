@@ -256,7 +256,6 @@ class CreateSlipGaji extends Component
         $this->hitungInovationReward();
         $this->no_slip = $this->generateNoSlip();
         $this->hitungTotalGaji();
-        dd($this->entitas, $this->jabatan, $this->bpjs_jht_perusahaan_nominal, $this->bpjs_perusahaan_nominal );
     }
 
     public function setCutoffPeriode()
@@ -774,6 +773,7 @@ class CreateSlipGaji extends Component
             $totalGaji -= ($bpjsJhtPT + $bpjsPT);
         }
         $this->total_gaji = $totalGaji;
+        dd($this->total_gaji);
     }
 
 
