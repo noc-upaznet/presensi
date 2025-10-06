@@ -30,6 +30,7 @@
                             <option value="Admin">Admin</option>
                             <option value="Recruitment">Recruitment</option>
                             <option value="Asisten">Asisten</option>
+                            <option value="CRM">CRM</option>
                         </select>
                     </div>
                     <div class="mb-3">
