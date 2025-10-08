@@ -31,6 +31,7 @@
                             <option value="Recruitment">Recruitment</option>
                             <option value="Asisten">Asisten</option>
                             <option value="CRM">CRM</option>
+                            <option value="Kepala Konter">Kepala Konter</option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -95,6 +96,8 @@
                             <option value="Admin">Admin</option>
                             <option value="Recruitment">Recruitment</option>
                             <option value="Asisten">Asisten</option>
+                            <option value="CRM">CRM</option>
+                            <option value="Kepala Konter">Kepala Konter</option>
                         </select>
                     </div>
                     <div class="mb-3">
