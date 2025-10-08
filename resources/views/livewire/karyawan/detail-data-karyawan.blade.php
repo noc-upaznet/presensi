@@ -533,6 +533,7 @@
                                 <option value="SMP">SMP</option>
                                 <option value="SD">SD</option>
                                 <option value="DIPLOMA IV/STRATA 1">DIPLOMA IV/STRATA 1</option>
+                                <option value="STRATA 2">STRATA 2</option>
                             </select>
                             @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
@@ -676,6 +677,7 @@
                                 <option value="SMP">SMP</option>
                                 <option value="SD">SD</option>
                                 <option value="DIPLOMA IV/STRATA 1">DIPLOMA IV/STRATA 1</option>
+                                <option value="STRATA 2">STRATA 2</option>
                             </select>
                             @error('form.education') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
@@ -890,6 +892,7 @@
                                 <option value="SMP">SMP</option>
                                 <option value="SD">SD</option>
                                 <option value="DIPLOMA IV/STRATA 1">DIPLOMA IV/STRATA 1</option>
+                                <option value="STRATA 2">STRATA 2</option>
                             </select>
                             @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
@@ -1058,6 +1061,7 @@
                                 <option value="SMP">SMP</option>
                                 <option value="SD">SD</option>
                                 <option value="DIPLOMA IV/STRATA 1">DIPLOMA IV/STRATA 1</option>
+                                <option value="STRATA 2">STRATA 2</option>
                             </select>
                             @error('form.education') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
