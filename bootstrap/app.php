@@ -20,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->renderable(function (TokenMismatchException $e, $request) {
-            return response()->view('errors.419', [], 419);
-        });
+        // $exceptions->renderable(function (TokenMismatchException $e, $request) {
+        //     return response()->view('errors.419', [], 419);
+        // });
     })->create();
