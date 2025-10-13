@@ -29,20 +29,73 @@ class ClockInSelfie extends Component
     public float|null $latitude = null;
     public float|null $longitude = null;
     public $lokasisTerdekat = [];
+    public $errorMessage = null;
     
     public function mount()
     {
         $this->lokasisTerdekat = collect();
         $this->photo = session('selfie_path');
+        // $radius = 100;
+
+        // $this->dispatch('lokasi-terdekat-diperbarui', [
+        //     'lokasi' => $this->lokasisTerdekat,
+        //     'radius' => $radius,
+        // ]);
+    }
+
+    #[On('lokasiAwal')]
+    public function LokasiAwal($longitude, $latitude)
+    {
+        $this->latitude = $latitude;
+        $this->longitude = $longitude;
+
+        if (!$this->latitude || !$this->longitude) {
+            $this->errorMessage = 'Gagal mendapatkan lokasi.';
+            return;
+        }
+
+        $this->hitungLokasiTerdekat();
+
+        $radiusMaks = 0.04; // 40 meter (0.04 km)
+        foreach ($this->lokasisTerdekat as $lokasi) {
+            if ($lokasi->jarak > $radiusMaks) {
+                $this->errorMessage = 'Anda berada di luar radius lokasi yang diizinkan (maks 40 meter).';
+                return;
+            }
+        }
+
+        $this->errorMessage = null;
+
+        $lokasis = collect($this->lokasisTerdekat);
+
+        // 🔹 Ubah ke array sebelum dikirim ke JS
+        $lokasiArray = $lokasis->map(function ($lokasi) {
+            return [
+                'nama_lokasi' => $lokasi->nama_lokasi ?? 'Tidak diketahui',
+                'koordinat'   => $lokasi->koordinat ?? '-',
+                'jarak'       => round($lokasi->jarak * 1000, 2), // meter
+            ];
+        })->values()->toArray();
+
+        $this->dispatch('lokasi-terdekat-diperbarui', lokasi: $lokasiArray, radius: 40);
+    }
+
+
+    public function reloadLocation()
+    {
+        sleep(2);
+        $this->dispatch('ambilUlangLokasi');
     }
 
     public function updatedLatitude()
     {
+        $this->dispatch('updateMap', $this->latitude, $this->longitude);
         $this->hitungLokasiTerdekat();
     }
     
     public function updatedLongitude()
     {
+        $this->dispatch('updateMap', $this->latitude, $this->longitude);
         $this->hitungLokasiTerdekat();
     }
     
@@ -86,6 +139,7 @@ class ClockInSelfie extends Component
     #[On('photoTaken')]
     public function handlePhotoTaken($photo)
     {
+        // dd($photo);
         // Bersihkan prefix dan decode
         $base64Image = preg_replace('#^data:image/\w+;base64,#i', '', $photo);
         $image = base64_decode($base64Image);
@@ -98,6 +152,8 @@ class ClockInSelfie extends Component
 
         // Simpan path ke properti
         $this->photo = 'selfies/' . $filename;
+
+        $this->clockIn();
     }
 
     public function clockIn()
@@ -222,7 +278,7 @@ class ClockInSelfie extends Component
         M_Presensi::create($data);
     
         $this->reset(['photo']);
-        session()->flash('success', 'Clock-in berhasil.');
+        // session()->flash('success', 'Clock-in berhasil.');
         return redirect()->route('clock-in');
     }
 

@@ -115,7 +115,8 @@ class ClockIn extends Component
     public function showCamera()
     {
         // Emit event untuk membuka kamera
-        $this->dispatch('cameraModal', action: 'show');
+        // $this->dispatch('cameraModal', action: 'show');
+        return redirect()->route('clock-in-selfie');
     }
 
     #[On('photoTaken')]
