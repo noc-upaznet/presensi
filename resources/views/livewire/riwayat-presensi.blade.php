@@ -130,6 +130,10 @@
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                 @endcan
+                                                <button class="btn btn-sm btn-danger btn-sm  mt-1"
+                                                    wire:click="$dispatch('modal-confirm-delete', {id:'{{ Crypt::encrypt($key->id) }}' ,action: 'show'})">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
                                             </td>
                                         @endrole
                                     </tr>

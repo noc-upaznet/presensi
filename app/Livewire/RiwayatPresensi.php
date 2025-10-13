@@ -88,25 +88,13 @@ class RiwayatPresensi extends Component
 
     public function delete($id)
     {
-        $jadwal = M_Presensi::findOrFail(Crypt::decrypt($id));
-        // dd($jadwal);
-        $jadwal->delete();
+        M_Presensi::find(Crypt::decrypt($id))->delete();
+        $this->dispatch('modal-confirm-delete', action: 'hide');
         $this->dispatch('swal', params: [
-            'title' => 'Data Deleted',
+            'title' => 'Presensi deleted',
+            'text' => 'Presensi deleted successfully',
             'icon' => 'success',
-            'text' => 'Data has been deleted successfully'
         ]);
-        $this->dispatch('modal-confirm-delete', action: 'show');
-    }
-
-    public function confirmHapusPresensi($id)
-    {
-        $decryptedId = Crypt::decrypt($id);
-        $this->editId = $decryptedId;
-        // dd($decryptedId);
-        $data = M_Presensi::find($decryptedId);
-        // $this->lokasi_id = $lokasi->id;
-        // $this->nama_lokasi = $lokasi->nama;
     }
 
     public function render()
