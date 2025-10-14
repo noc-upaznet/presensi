@@ -83,7 +83,7 @@
                         <button class="btn btn-success w-100 mt-3" id="clockInBtn">
                             <span id="btnText">Ambil Foto</span>
                             <span id="btnSpinner" class="d-none">
-                                <i class="fas fa-spinner fa-spin me-2"></i> Memproses...
+                                <i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...
                             </span>
                         </button>
                     </div>
@@ -110,23 +110,18 @@
         document.addEventListener('livewire:initialized', () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    (position) => {
+                    function(position) {
                         const lat = position.coords.latitude;
                         const lng = position.coords.longitude;
-
-                        console.log('Mengirim lokasi awal ke Livewire:', lat, lng);
-
-                        // Kirim event ke komponen Livewire
-                        Livewire.dispatch('lokasiAwal', {
-                            latitude: lat,
-                            longitude: lng
-                        });
+                        console.log("Lokasi akurat:", lat, lng);
                     },
-                    (error) => {
-                        console.error('Gagal mendapatkan lokasi:', error);
-                        Livewire.dispatch('lokasiError', {
-                            message: 'Tidak dapat mengakses lokasi. Aktifkan GPS Anda.'
-                        });
+                    function(error) {
+                        console.error("Gagal mendapatkan lokasi:", error);
+                        alert("Aktifkan GPS dan pastikan sinyal kuat.");
+                    }, {
+                        enableHighAccuracy: true, // pakai GPS satelit
+                        timeout: 15000, // tunggu maksimal 15 detik
+                        maximumAge: 0 // jangan pakai lokasi lama
                     }
                 );
             } else {
@@ -196,7 +191,7 @@
 
                 clockInBtn.disabled = true;
                 const originalText = clockInBtn.innerHTML;
-                clockInBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i> Memproses...`;
+                clockInBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...`;
 
                 if (video && canvas && photoImage) {
                     const context = canvas.getContext('2d');
