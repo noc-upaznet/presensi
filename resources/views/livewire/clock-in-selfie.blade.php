@@ -80,7 +80,12 @@
                             </div>
                         </div>
 
-                        <button class="btn btn-success w-100 mt-3" id="clockInBtn">Ambil Foto</button>
+                        <button class="btn btn-success w-100 mt-3" id="clockInBtn">
+                            <span id="btnText">Ambil Foto</span>
+                            <span id="btnSpinner" class="d-none">
+                                <i class="fas fa-spinner fa-spin me-2"></i> Memproses...
+                            </span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -188,6 +193,10 @@
                     alert('Kamera belum aktif.');
                     return;
                 }
+
+                clockInBtn.disabled = true;
+                const originalText = clockInBtn.innerHTML;
+                clockInBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i> Memproses...`;
 
                 if (video && canvas && photoImage) {
                     const context = canvas.getContext('2d');
