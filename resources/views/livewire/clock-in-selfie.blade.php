@@ -113,7 +113,12 @@
                     function(position) {
                         const lat = position.coords.latitude;
                         const lng = position.coords.longitude;
-                        console.log("Lokasi akurat:", lat, lng);
+                        // console.log("Lokasi akurat:", lat, lng);
+
+                        Livewire.dispatch('lokasiAwal', {
+                            latitude: lat,
+                            longitude: lng
+                        });
                     },
                     function(error) {
                         console.error("Gagal mendapatkan lokasi:", error);
