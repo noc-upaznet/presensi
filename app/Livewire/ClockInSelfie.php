@@ -51,23 +51,26 @@ class ClockInSelfie extends Component
         $this->hitungLokasiTerdekat();
 
         $radiusMaks = 0.04; // 40 meter (0.04 km)
+        $sudahDekat = false;
+
         foreach ($this->lokasisTerdekat as $lokasi) {
-            if ($lokasi->jarak > $radiusMaks) {
-                $this->errorMessage = 'Anda berada di luar radius lokasi yang diizinkan (maks 40 meter).';
-                return;
+            if ($lokasi->jarak <= $radiusMaks) {
+                $sudahDekat = true;
             }
         }
 
-        $this->errorMessage = null;
+        if ($sudahDekat) {
+            $this->dispatch('lokasiStop', message: 'Anda sudah berada di lokasi yang diizinkan.');
+            $this->errorMessage = null;
+        } else {
+            $this->errorMessage = 'Anda berada di luar radius lokasi yang diizinkan (maks 40 meter).';
+        }
 
-        $lokasis = collect($this->lokasisTerdekat);
-
-        // 🔹 Ubah ke array sebelum dikirim ke JS
-        $lokasiArray = $lokasis->map(function ($lokasi) {
+        $lokasiArray = $this->lokasisTerdekat->map(function ($lokasi) {
             return [
                 'nama_lokasi' => $lokasi->nama_lokasi ?? 'Tidak diketahui',
                 'koordinat'   => $lokasi->koordinat ?? '-',
-                'jarak'       => round($lokasi->jarak * 1000, 2), // meter
+                'jarak'       => round($lokasi->jarak * 1000, 2),
             ];
         })->values()->toArray();
 
@@ -286,7 +289,6 @@ class ClockInSelfie extends Component
         // Hapus session supaya foto sebelumnya gak muncul lagi
         session()->forget($this->photo);
     }
-
 
     private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {

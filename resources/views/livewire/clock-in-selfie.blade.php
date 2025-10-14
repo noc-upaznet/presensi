@@ -107,34 +107,83 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        document.addEventListener('livewire:initialized', () => {
-            if (navigator.geolocation) {
+        let map = null;
+        let userMarker = null;
+        let markersGroup = null;
+        let lokasiInterval = null;
+
+        window.initMapOnce = function() {
+            if (window.mapInitialized) return; // cegah init ganda
+            window.mapInitialized = true;
+
+            if (!navigator.geolocation) {
+                Livewire.dispatch('lokasiError', {
+                    message: 'Browser tidak mendukung geolokasi.',
+                });
+                return;
+            }
+
+            function updateLocation() {
                 navigator.geolocation.getCurrentPosition(
-                    function(position) {
+                    (position) => {
                         const lat = position.coords.latitude;
                         const lng = position.coords.longitude;
-                        // console.log("Lokasi akurat:", lat, lng);
 
                         Livewire.dispatch('lokasiAwal', {
                             latitude: lat,
                             longitude: lng
                         });
+                        console.log('📍 Lokasi dikirim:', lat, lng);
+
+                        // === Inisialisasi map hanya sekali ===
+                        if (!map) {
+                            map = L.map('map').setView([lat, lng], 18);
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '&copy; OpenStreetMap contributors',
+                            }).addTo(map);
+                        }
+
+                        // === Hapus marker user lama (kalau ada) ===
+                        if (userMarker) {
+                            map.removeLayer(userMarker);
+                        }
+
+                        // === Tambahkan marker baru ===
+                        userMarker = L.marker([lat, lng], {
+                            icon: L.icon({
+                                iconUrl: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                                iconSize: [32, 32],
+                            }),
+                        }).addTo(map).bindPopup('Posisi Anda').openPopup();
+
+                        // === Geser peta ke posisi baru ===
+                        map.panTo([lat, lng]);
                     },
-                    function(error) {
-                        console.error("Gagal mendapatkan lokasi:", error);
-                        alert("Aktifkan GPS dan pastikan sinyal kuat.");
+                    (error) => {
+                        console.error('❌ Gagal mendapatkan lokasi:', error);
                     }, {
-                        enableHighAccuracy: true, // pakai GPS satelit
-                        timeout: 15000, // tunggu maksimal 15 detik
-                        maximumAge: 0 // jangan pakai lokasi lama
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 0,
                     }
                 );
-            } else {
-                Livewire.dispatch('lokasiError', {
-                    message: 'Browser Anda tidak mendukung geolokasi.'
-                });
             }
 
+            // Jalankan pertama kali dan tiap 5 detik
+            updateLocation();
+            lokasiInterval = setInterval(updateLocation, 2000);
+
+            Livewire.on('lokasiStop', (data) => {
+                console.log('⛔ Lokasi cukup dekat, hentikan update:', data.message);
+                clearInterval(lokasiInterval);
+            });
+        };
+
+
+
+        // Jalankan sekali saat Livewire siap
+        document.addEventListener('livewire:initialized', () => {
+            initMapOnce();
             Livewire.on('ambilUlangLokasi', () => {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
@@ -163,9 +212,38 @@
                     });
                 }
             });
-
-            let map, markersGroup;
         });
+
+        // === Event lokasi kantor ===
+        window.addEventListener('lokasi-terdekat-diperbarui', (event) => {
+            const lokasisTerdekat = event.detail.lokasi || [];
+            const radiusMeter = event.detail.radius || 40;
+
+            if (!map) return;
+
+            if (markersGroup) map.removeLayer(markersGroup);
+
+            const layers = [];
+            lokasisTerdekat.forEach((lokasi) => {
+                if (!lokasi.koordinat) return;
+                const [lat, lng] = lokasi.koordinat.split(',').map(Number);
+                const marker = L.marker([lat, lng]).bindPopup(`<b>${lokasi.nama_lokasi}</b>`);
+                const circle = L.circle([lat, lng], {
+                    color: 'green',
+                    fillColor: '#2ecc71',
+                    fillOpacity: 0.25,
+                    radius: radiusMeter,
+                });
+                layers.push(marker, circle);
+            });
+
+            if (layers.length > 0) {
+                markersGroup = L.featureGroup(layers).addTo(map);
+                // ⚠️ Jangan pakai fitBounds() otomatis, agar tidak re-render user marker
+                // map.fitBounds(markersGroup.getBounds().pad(0.3));
+            }
+        });
+
 
         document.addEventListener('DOMContentLoaded', async () => {
             const video = document.getElementById('video');
@@ -313,139 +391,5 @@
         }
 
         updateDate();
-
-        var map = null;
-        var markersGroup = null;
-
-        document.addEventListener("DOMContentLoaded", function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        const lat = position.coords.latitude;
-                        const lng = position.coords.longitude;
-
-                        // Isi input tersembunyi Livewire
-                        const inputLat = document.querySelector('input[wire\\:model\\.live="latitude"]');
-                        const inputLng = document.querySelector('input[wire\\:model\\.live="longitude"]');
-
-                        if (inputLat && inputLng) {
-                            inputLat.value = lat;
-                            inputLng.value = lng;
-                            inputLat.dispatchEvent(new Event('input', {
-                                bubbles: true
-                            }));
-                            inputLng.dispatchEvent(new Event('input', {
-                                bubbles: true
-                            }));
-                        }
-
-                        console.log("Lokasi pengguna:", lat, lng);
-
-                        // Inisialisasi peta jika belum ada
-                        if (!window.map) {
-                            window.map = L.map('map').setView([lat, lng], 18); // zoom lebih dekat
-                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                attribution: '&copy; OpenStreetMap contributors'
-                            }).addTo(map);
-                        }
-
-                        // Tambahkan marker posisi pengguna
-                        L.marker([lat, lng], {
-                            icon: L.icon({
-                                iconUrl: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-                                iconSize: [32, 32]
-                            })
-                        }).addTo(map).bindPopup('Posisi Anda').openPopup();
-                    },
-                    function(error) {
-                        console.error("Gagal mendapatkan lokasi:", error);
-                        alert("Gagal mengambil lokasi. Aktifkan GPS dan izinkan akses lokasi.");
-                    }, {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    }
-                );
-            } else {
-                alert("Browser tidak mendukung geolocation.");
-            }
-        });
-
-        window.addEventListener('lokasi-terdekat-diperbarui', function(event) {
-            const lokasisTerdekat = event.detail.lokasi || [];
-            const radiusMeter = event.detail.radius || 40;
-            const lat = parseFloat(event.detail.latitude);
-            const lng = parseFloat(event.detail.longitude);
-
-            console.log('Lokasi diterima:', lokasisTerdekat);
-            console.log('Radius diterima:', radiusMeter);
-
-            if (!map) {
-                map = L.map('map').setView([-7.290293, 112.727097], 15);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; OpenStreetMap contributors'
-                }).addTo(map);
-            }
-
-            if (markersGroup) {
-                map.removeLayer(markersGroup);
-            }
-
-            const layers = [];
-
-            lokasisTerdekat.forEach(lokasi => {
-                if (!lokasi.koordinat) return;
-
-                const [lat, lng] = lokasi.koordinat.split(',').map(Number);
-
-                const marker = L.marker([lat, lng]).bindPopup(`<b>${lokasi.nama_lokasi}</b>`);
-                const circle = L.circle([lat, lng], {
-                    color: 'green',
-                    fillColor: '#2ecc71',
-                    fillOpacity: 0.25,
-                    radius: radiusMeter
-                });
-
-                layers.push(marker, circle);
-            });
-
-            markersGroup = L.featureGroup(layers).addTo(map);
-            if (layers.length > 0) map.fitBounds(markersGroup.getBounds().pad(0.3));
-
-            // Terima event dari Livewire ketika lokasi diperbarui
-            Livewire.on('updateMap', (lat, lng, radius = 40) => {
-                const newLatLng = [lat, lng];
-
-                // Geser peta ke lokasi baru
-                map.setView(newLatLng, 17);
-
-                // Update marker
-                if (marker) {
-                    marker.setLatLng(newLatLng);
-                } else {
-                    marker = L.marker(newLatLng).addTo(map);
-                }
-
-                // Update circle radius
-                if (circle) {
-                    circle.setLatLng(newLatLng);
-                } else {
-                    circle = L.circle(newLatLng, {
-                        radius: radius,
-                        color: 'green',
-                        fillColor: '#A4FBA6',
-                        fillOpacity: 0.3
-                    }).addTo(map);
-                }
-            });
-        });
-
-        window.addEventListener('lokasi-terlalu-jauh', function() {
-            if (markersGroup) {
-                map.removeLayer(markersGroup);
-                markersGroup = null;
-            }
-            alert('Anda berada di luar radius lokasi yang diizinkan (maks 40 meter).');
-        });
     </script>
 </div>
