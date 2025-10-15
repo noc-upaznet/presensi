@@ -130,23 +130,26 @@ class RiwayatPresensi extends Component
                         $query->where('status', 2); // Dispensasi
                     }
                 })
-                ->where($entitasNama !== 'UNB', function ($q) {
-                    $q->whereHas('getKaryawan', function ($sub) {
-                        $sub->whereNotIn('level', ['SPV', 'Manajer']);
-                    })
-                        ->where(function ($q2) {
-                            $q2->where(function ($q3) {
-                                $q3->where('lokasi_lock', 0)
-                                    ->where('approve', 1);
-                            })
-                                ->orWhere(function ($q3) {
-                                    $q3->where('lokasi_lock', 1)
-                                        ->where('approve', 0);
-                                });
+                ->when($entitasNama !== 'UNB', function ($query) {
+                    // Hanya terapkan filter approve untuk entitas selain UNB
+                    $query->where(function ($q) {
+                        $q->whereHas('getKaryawan', function ($sub) {
+                            $sub->whereNotIn('level', ['SPV', 'Manajer']);
                         })
-                        ->orWhereHas('getKaryawan', function ($sub) {
-                            $sub->whereIn('level', ['SPV', 'Manajer']);
-                        });
+                            ->where(function ($q2) {
+                                $q2->where(function ($q3) {
+                                    $q3->where('lokasi_lock', 0)
+                                        ->where('approve', 1);
+                                })
+                                    ->orWhere(function ($q3) {
+                                        $q3->where('lokasi_lock', 1)
+                                            ->where('approve', 0);
+                                    });
+                            })
+                            ->orWhereHas('getKaryawan', function ($sub) {
+                                $sub->whereIn('level', ['SPV', 'Manajer']);
+                            });
+                    });
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
