@@ -147,13 +147,13 @@ class RiwayatPresensi extends Component
                                     });
                             })
                             ->orWhereHas('getKaryawan', function ($sub) {
-                                $sub->whereIn('level', ['SPV', 'Manajer']);
+                                $sub->whereIn('level', ['SPV', 'Manajer', 'Branch Manager']);
                             });
                     });
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
-        } elseif (Auth::user()->hasAnyRole(['user', 'spv', 'hr'])) {
+        } elseif (Auth::user()->hasAnyRole(['user', 'spv', 'hr', 'branch-manager'])) {
             $userId = Auth::id();
             $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
             $karyawanId = $karyawan ? $karyawan->id : null;
