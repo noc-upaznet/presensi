@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Crypt;
 use App\Livewire\Forms\TambahDataKaryawanForm;
 use App\Models\M_Lembur;
 use App\Models\M_Pengajuan;
+use App\Models\M_Presensi;
 use App\Models\PayrollModel;
 use App\Models\User;
 use Livewire\WithoutUrlPagination;
@@ -88,6 +89,8 @@ class DataKaryawan extends Component
                 M_Pengajuan::where('karyawan_id', $karyawan->id)->delete();
                 PayrollModel::where('karyawan_id', $karyawan->id)->delete();
                 M_Lembur::where('karyawan_id', $karyawan->id)->delete();
+                M_Presensi::where('user_id', $karyawan->id)->delete();
+                User::where('id', $karyawan->user_id)->delete();
 
                 // 🔹 Hapus user terkait (jika ada)
                 if ($karyawan->user_id) {
@@ -99,13 +102,15 @@ class DataKaryawan extends Component
             }
 
             $this->dispatch(
-                'swal', params: [
-                'title' => 'Data Deleted',
-                'icon' => 'success',
-                'text' => 'Data has been deleted successfully',
-                'showConfirmButton' => false,
-                'timer' => 1500
-            ]);
+                'swal',
+                params: [
+                    'title' => 'Data Deleted',
+                    'icon' => 'success',
+                    'text' => 'Data has been deleted successfully',
+                    'showConfirmButton' => false,
+                    'timer' => 1500
+                ]
+            );
             $this->deleteKaryawan = null;
         }
     }
@@ -141,7 +146,6 @@ class DataKaryawan extends Component
             $datas = $query
                 ->orderBy('nama_karyawan', 'asc')
                 ->paginate($this->perPage);
-
         }
         return view('livewire.karyawan.data-karyawan', [
             'datas' => $datas,
