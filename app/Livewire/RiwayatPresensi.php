@@ -130,23 +130,23 @@ class RiwayatPresensi extends Component
                         $query->where('status', 2); // Dispensasi
                     }
                 })
-                ->where(function ($q) {
+                ->where($entitasNama !== 'UNB', function ($q) {
                     $q->whereHas('getKaryawan', function ($sub) {
                         $sub->whereNotIn('level', ['SPV', 'Manajer']);
                     })
-                    ->where(function ($q2) {
-                        $q2->where(function ($q3) {
-                            $q3->where('lokasi_lock', 0)
-                                ->where('approve', 1);
+                        ->where(function ($q2) {
+                            $q2->where(function ($q3) {
+                                $q3->where('lokasi_lock', 0)
+                                    ->where('approve', 1);
+                            })
+                                ->orWhere(function ($q3) {
+                                    $q3->where('lokasi_lock', 1)
+                                        ->where('approve', 0);
+                                });
                         })
-                        ->orWhere(function ($q3) {
-                            $q3->where('lokasi_lock', 1)
-                                ->where('approve', 0);
+                        ->orWhereHas('getKaryawan', function ($sub) {
+                            $sub->whereIn('level', ['SPV', 'Manajer']);
                         });
-                    })
-                    ->orWhereHas('getKaryawan', function ($sub) {
-                        $sub->whereIn('level', ['SPV', 'Manajer']);
-                    });
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
@@ -170,7 +170,6 @@ class RiwayatPresensi extends Component
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
-
         } else {
             // fallback supaya tidak error
             $datas = collect();
@@ -180,5 +179,4 @@ class RiwayatPresensi extends Component
             'datas' => $datas
         ]);
     }
-
 }
