@@ -134,7 +134,7 @@ class RiwayatPresensi extends Component
                     // Hanya terapkan filter approve untuk entitas selain UNB
                     $query->where(function ($q) {
                         $q->whereHas('getKaryawan', function ($sub) {
-                            $sub->whereNotIn('level', ['SPV', 'Manajer']);
+                            $sub->whereNotIn('level', ['SPV', 'Manajer, Branch Manager']);
                         })
                             ->where(function ($q2) {
                                 $q2->where(function ($q3) {
