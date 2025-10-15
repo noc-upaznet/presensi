@@ -19,7 +19,7 @@ class Pengajuan extends Component
     public PengajuanForm $form;
     use WithPagination, WithoutUrlPagination;
     protected $paginationTheme = 'bootstrap';
-    
+
     protected $listeners = ['refreshTable' => 'refresh'];
 
     public $filterPengajuan = '';
@@ -147,7 +147,7 @@ class Pengajuan extends Component
             }
             // Jika bukan kasus di atas → ikuti flow SPV dulu
             else {
-                if (in_array($entitasUser, ['MC', 'FC'])) {
+                if (in_array($entitasUser, ['MC'])) {
                     if ($status == 1) {
                         $pengajuan->approve_hr = 1;
                         $pengajuan->status     = 1;
@@ -268,12 +268,12 @@ class Pengajuan extends Component
                 $query->where('karyawan_id', $dataKaryawan->id);
             }
 
-        // 🔹 Admin → semua karyawan di entitas
+            // 🔹 Admin → semua karyawan di entitas
         } elseif ($user->hasRole('admin')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
 
-        // 🔹 SPV → hanya karyawan di divisinya
+            // 🔹 SPV → hanya karyawan di divisinya
         } elseif ($user->hasRole('spv')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
@@ -290,7 +290,7 @@ class Pengajuan extends Component
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
 
-        // 🔹 HR → semua karyawan semua entitas
+            // 🔹 HR → semua karyawan semua entitas
         } elseif ($user->hasRole('hr')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
@@ -322,6 +322,4 @@ class Pengajuan extends Component
             'pengajuans' => $pengajuan,
         ]);
     }
-
-
 }

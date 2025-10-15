@@ -123,7 +123,7 @@ class PengajuanLembur extends Component
                         'text'  => 'Berhasil Menolak Pengajuan ini.'
                     ]);
                 }
-            }elseif (in_array('branch-manager', $pengajuRoles)) {
+            } elseif (in_array('branch-manager', $pengajuRoles)) {
                 // hanya HR yang boleh approve
                 if ($status == 1) {
                     $pengajuan->approve_hr = 1;
@@ -139,7 +139,7 @@ class PengajuanLembur extends Component
                     ]);
                 }
             } else {
-                if (in_array($entitas, ['MC', 'FC'])){
+                if (in_array($entitas, ['MC'])) {
                     if ($status == 1) {
                         $pengajuan->approve_hr = 1;
                         $pengajuan->status = 1;
@@ -234,7 +234,7 @@ class PengajuanLembur extends Component
                 $query->where('karyawan_id', $dataKaryawan->id);
             }
 
-        // 🔹 Admin → semua karyawan dalam entitas terpilih
+            // 🔹 Admin → semua karyawan dalam entitas terpilih
         } elseif ($user->hasRole('admin')) {
             $entitasModel = \App\Models\M_Entitas::where('nama', $entitas)->first();
             if ($entitasModel) {
@@ -242,7 +242,7 @@ class PengajuanLembur extends Component
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
 
-        // 🔹 SPV → hanya karyawan dengan divisi + entitas sama
+            // 🔹 SPV → hanya karyawan dengan divisi + entitas sama
         } elseif ($user->hasRole('spv')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan && $dataKaryawan->divisi) {
@@ -261,7 +261,7 @@ class PengajuanLembur extends Component
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
 
-        // 🔹 HR → semua karyawan dari semua entitas
+            // 🔹 HR → semua karyawan dari semua entitas
         } elseif ($user->hasRole('hr')) {
             $entitasModel = \App\Models\M_Entitas::where('nama', $entitas)->first();
             if ($entitasModel) {
@@ -296,6 +296,4 @@ class PengajuanLembur extends Component
             'pengajuanLembur' => $pengajuanLembur,
         ]);
     }
-
-
 }
