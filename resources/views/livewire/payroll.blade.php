@@ -120,12 +120,12 @@
                     $month = $selectedMonth ?? now()->subMonth()->format('n');
                     $year = $selectedYear ?? now()->year;
                 @endphp
-                {{-- @can('payroll-create')
+                @can('payroll-create')
                     <a href="{{ route('create-slip-gaji-tambah', ['month' => $month, 'year' => $year]) }}" class="btn btn-sm btn-primary">
                         <i class="fa-solid fa-plus"></i>
                         Tambah
                     </a>
-                @endcan --}}
+                @endcan
             </div>
 
             <div class="card-body">

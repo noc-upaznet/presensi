@@ -231,9 +231,10 @@ class Dispensasi extends Component
 
         // 🔹 Filter Bulan
         if (!empty($this->filterBulan)) {
+            dd($this->filterBulan);
             $bulan = date('m', strtotime($this->filterBulan));
             $tahun = date('Y', strtotime($this->filterBulan));
-            $query->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
+            $query->whereMonth('date', $bulan)->whereYear('date', $tahun);
         }
 
         // 🔹 Search

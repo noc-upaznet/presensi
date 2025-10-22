@@ -8,6 +8,7 @@ use App\Models\M_Dispensation;
 use App\Models\M_Presensi;
 use App\Models\M_Sharing;
 use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -34,42 +35,42 @@ class Sharing extends Component
     {
         $this->form->validate();
 
-        if ($this->file) {
-            // dd($this->file);
+        // Validasi file kalau ada
+        if ($this->file instanceof UploadedFile) {
             $this->validate([
                 'file' => 'nullable|mimes:jpg,jpeg,png|max:2048',
             ], [
-                'file.max' => 'Ukuran file maksimal 2MB.',
+                'file.max'   => 'Ukuran file maksimal 2MB.',
                 'file.mimes' => 'Format file harus JPG, JPEG, PNG.',
             ]);
         }
 
+        // Simpan file kalau ada upload
         $path = null;
-        if ($this->file) {
-            $path = $this->file->store('file-pengajuan-sharing', 'public');
+        if ($this->file instanceof UploadedFile) {
+            $path = $this->file->store('file-pengajuan-dispensasi', 'public');
         }
-        // dd(auth()->id());
+
         $data = [
             'karyawan_id' => M_DataKaryawan::where('user_id', Auth::id())->value('id'),
-            'date' => $this->form->date,
+            'date'        => $this->form->date,
             'description' => $this->form->description,
-            'file' => $path ? str_replace('public/', 'storage/', $path) : null,
+            'file'        => $path,
         ];
-        // dd($data);
+        dd($data);
 
-        // Simpan data ke database
         M_Sharing::create($data);
 
         // Reset input
         $this->form->reset();
+        $this->file = null;
 
         $this->dispatch('swal', params: [
             'title' => 'Data Saved',
-            'icon' => 'success',
-            'text' => 'Data has been saved successfully'
+            'icon'  => 'success',
+            'text'  => 'Data has been saved successfully'
         ]);
 
-        // Tutup modal
         $this->dispatch('modalTambahPengajuan', action: 'hide');
         $this->dispatch('refresh');
     }

@@ -30,6 +30,7 @@ class ClockInSelfie extends Component
     public float|null $longitude = null;
     public $lokasisTerdekat = [];
     public $errorMessage = null;
+    public bool $canClockIn = false;
 
     public function mount()
     {
@@ -45,12 +46,13 @@ class ClockInSelfie extends Component
 
         if (!$this->latitude || !$this->longitude) {
             $this->errorMessage = 'Gagal mendapatkan lokasi.';
+            $this->canClockIn = false;
             return;
         }
 
         $this->hitungLokasiTerdekat();
 
-        $radiusMaks = 0.04; // 40 meter (0.04 km)
+        $radiusMaks = 0.04; // 40 meter
         $sudahDekat = false;
 
         foreach ($this->lokasisTerdekat as $lokasi) {
@@ -60,9 +62,11 @@ class ClockInSelfie extends Component
         }
 
         if ($sudahDekat) {
-            $this->dispatch('lokasiStop', message: 'Anda sudah berada di lokasi yang diizinkan.');
+            $this->canClockIn = true;
             $this->errorMessage = null;
+            $this->dispatch('lokasiStop', message: 'Anda sudah berada di lokasi yang diizinkan.');
         } else {
+            $this->canClockIn = false;
             $this->errorMessage = 'Anda berada di luar radius lokasi yang diizinkan (maks 40 meter).';
         }
 

@@ -50,7 +50,7 @@
                                     </li>
                                 @endforeach
                             </div>
-                            <button class="btn btn-danger btn-small" wire:click="reloadLocation"
+                            {{-- <button class="btn btn-danger btn-small" wire:click="reloadLocation"
                                 wire:loading.attr="disabled">
                                 <span wire:loading.remove wire:target="reloadLocation">
                                     <i class="bi bi-arrow-clockwise"></i> Lokasi
@@ -61,7 +61,7 @@
                                         aria-hidden="true"></span>
                                     Memuat Lokasi...
                                 </span>
-                            </button>
+                            </button> --}}
                         </div>
                         <div class="mb-1">
                             <label class="form-label fw-semibold d-block">Photo</label>
@@ -80,9 +80,14 @@
                             </div>
                         </div>
 
-                        <button class="btn btn-success w-100 mt-3" id="clockInBtn">
-                            <span id="btnText">Ambil Foto</span>
-                            <span id="btnSpinner" class="d-none">
+                        <button id="clockInBtn"
+                            class="btn w-100 mt-3 {{ $canClockIn ? 'btn-success' : 'btn-secondary' }}"
+                            wire:click="clockIn" wire:loading.attr="disabled" wire:target="clockIn"
+                            {{ $canClockIn ? '' : 'disabled' }}>
+                            <span wire:loading.remove wire:target="clockIn">
+                                {{ $canClockIn ? 'Ambil Foto' : 'Menunggu Lokasi...' }}
+                            </span>
+                            <span wire:loading wire:target="clockIn">
                                 <i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...
                             </span>
                         </button>
@@ -392,4 +397,6 @@
 
         updateDate();
     </script>
+
+
 </div>

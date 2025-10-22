@@ -227,13 +227,14 @@
 
                             <div class="mb-3">
                                 <label for="keterangan" class="form-label fw-semibold">Keterangan <small class="text-danger">*</small></label>
-                                <input type="text" class="form-control" id="keterangan" placeholder="Contoh: Ban bocor" wire:model="form.description">
+                                <input type="text" class="form-control" id="keterangan" placeholder="Contoh: Materi Marketing" wire:model="form.description">
                                 @error('form.description') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="mb-3">
                                 <label for="file" class="form-label fw-semibold">File</label>
-                                <input type="file" class="form-control" id="file" wire:model="file" accept=".jpg,.jpeg,.png">
+                                <input type="file" wire:model="file" class="form-control" accept="image/*">
+                                @error('file') <span class="text-danger">{{ $message }}</span> @enderror
                                 <small class="text-danger">
                                     @if (session()->has('error'))
                                         {{ session('error') }}
