@@ -54,17 +54,28 @@ class ClockInSelfie extends Component
 
         $radiusMaks = 0.04; // 40 meter
         $sudahDekat = false;
+        $lokasiTerkunci = false;
 
         foreach ($this->lokasisTerdekat as $lokasi) {
             if ($lokasi->jarak <= $radiusMaks) {
                 $sudahDekat = true;
             }
+
+            // ✅ Jika lokasi memiliki lock = 1, maka tetap boleh Clock-In
+            if ($lokasi->lock == 0) {
+                $lokasiTerkunci = true;
+            }
         }
 
-        if ($sudahDekat) {
+        if ($sudahDekat || $lokasiTerkunci) {
             $this->canClockIn = true;
             $this->errorMessage = null;
-            $this->dispatch('lokasiStop', message: 'Anda sudah berada di lokasi yang diizinkan.');
+
+            if ($lokasiTerkunci) {
+                $this->dispatch('lokasiStop', message: 'Lokasi dikunci — Clock-In tetap diizinkan.');
+            } else {
+                $this->dispatch('lokasiStop', message: 'Anda sudah berada di lokasi yang diizinkan.');
+            }
         } else {
             $this->canClockIn = false;
             $this->errorMessage = 'Anda berada di luar radius lokasi yang diizinkan (maks 40 meter).';
@@ -80,6 +91,7 @@ class ClockInSelfie extends Component
 
         $this->dispatch('lokasi-terdekat-diperbarui', lokasi: $lokasiArray, radius: 40);
     }
+
 
     public function reloadLocation()
     {
