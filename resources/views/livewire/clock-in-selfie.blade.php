@@ -252,6 +252,7 @@
             const photoImage = document.getElementById('photoImage');
             const clockInBtn = document.getElementById('clockInBtn');
             let stream = null;
+            let isProcessing = false; // ✅ Flag agar tombol tidak bisa diklik dua kali
 
             try {
                 stream = await navigator.mediaDevices.getUserMedia({
@@ -260,14 +261,12 @@
                     }
                 });
                 video.srcObject = stream;
-
                 await new Promise(resolve => {
                     video.onloadedmetadata = () => {
                         video.play();
                         resolve();
                     };
                 });
-
                 console.log('✅ Kamera aktif dan siap.');
             } catch (error) {
                 console.error('Gagal mengakses kamera:', error);
@@ -275,7 +274,6 @@
                 return;
             }
 
-            // 🔹 Pastikan frame valid sebelum capture
             async function ensureValidFrame(video, canvas, context) {
                 const width = video.videoWidth;
                 const height = video.videoHeight;
@@ -285,26 +283,25 @@
                 for (let i = 0; i < 5; i++) {
                     context.drawImage(video, 0, 0, width, height);
                     const pixels = context.getImageData(0, 0, width, height).data;
-                    const allBlack = pixels.every(v => v === 0);
-                    if (!allBlack) return true;
-                    await new Promise(r => setTimeout(r, 200));
+                    if (![...pixels].every(v => v === 0)) return true;
+                    await new Promise(r => setTimeout(r, 150));
                 }
                 return false;
             }
 
-            // 🔸 Tombol klik utama
             clockInBtn.addEventListener('click', async () => {
+                if (isProcessing) return; // ⛔ cegah klik dobel
+                isProcessing = true;
+
+                clockInBtn.disabled = true;
+                clockInBtn.classList.add('disabled');
+                clockInBtn.innerHTML =
+                    `<i class="fas fa-spinner fa-spin me-2"></i> Mengambil Foto...`;
+
                 if (!video.srcObject) {
                     alert('Kamera belum aktif.');
                     return;
                 }
-
-                // 🔹 Langsung disable tombol agar tidak bisa diklik lagi
-                clockInBtn.disabled = true;
-                clockInBtn.classList.add('disabled');
-                const originalText = clockInBtn.innerHTML;
-                clockInBtn.innerHTML =
-                    `<i class="fas fa-spinner fa-spin me-2"></i> Mengambil Foto...`;
 
                 const context = canvas.getContext('2d');
                 const width = video.videoWidth;
@@ -324,14 +321,14 @@
                     return;
                 }
 
-                // Mirror horizontal (kamera depan)
+                // Mirror horizontal
                 context.save();
                 context.translate(width, 0);
                 context.scale(-1, 1);
                 context.drawImage(video, 0, 0, width, height);
                 context.restore();
 
-                // 🔹 Ambil lokasi GPS
+                // Ambil lokasi GPS
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(async (pos) => {
                         const lat = pos.coords.latitude.toFixed(6);
@@ -358,13 +355,16 @@
                         context.strokeText(coordText, 20, height - 20);
                         context.fillText(coordText, 20, height - 20);
 
-                        // Konversi ke base64
                         const dataURL = canvas.toDataURL('image/jpeg', 0.7);
                         photoImage.src = dataURL;
                         video.style.display = 'none';
                         canvas.style.display = 'none';
 
-                        // Kirim ke Livewire
+                        // 🔹 Update tombol
+                        clockInBtn.innerHTML =
+                            `<i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...`;
+
+                        // 🔹 Kirim ke Livewire
                         Livewire.dispatch('photoTaken', {
                             photo: dataURL,
                             latitude: lat,
@@ -372,11 +372,7 @@
                             datetime: dateTime
                         });
 
-                        // 🔹 Update teks tombol agar user tahu sedang proses clock-in
-                        clockInBtn.innerHTML =
-                            `<i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...`;
-
-                        // Matikan kamera
+                        // 🔹 Matikan kamera
                         setTimeout(() => {
                             stream.getTracks().forEach(track => track.stop());
                             video.style.display = 'none';
@@ -392,29 +388,15 @@
                 }
             });
 
-            // 🔹 Pastikan tombol tetap disable selama Livewire memproses clockIn
+            // Pastikan tombol tetap disable selama proses Livewire
             Livewire.on('photoTaken', () => {
                 clockInBtn.disabled = true;
+                clockInBtn.classList.add('disabled');
                 clockInBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...`;
+                isProcessing = true;
             });
 
-            // 🔸 Jika Livewire selesai dan halaman tidak berpindah (misal gagal)
-            Livewire.hook('message.processed', (message, component) => {
-                const isClockIn = message.updateQueue.some(
-                    u => u.payload.event === 'clockIn'
-                );
-                if (isClockIn) {
-                    // Hanya aktifkan kembali jika clock-in gagal (tidak ada redirect)
-                    setTimeout(() => {
-                        if (document.body.contains(clockInBtn)) {
-                            clockInBtn.disabled = false;
-                            clockInBtn.classList.remove('disabled');
-                            clockInBtn.innerHTML =
-                                `<i class="bi bi-camera me-2"></i> Ambil Foto`;
-                        }
-                    }, 2000);
-                }
-            });
+            // ✅ Jangan pernah aktifkan kembali tombol (biar satu kali saja per halaman)
         });
 
 
