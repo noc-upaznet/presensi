@@ -268,14 +268,14 @@
                     };
                 });
 
-                console.log('Kamera aktif dan siap.');
+                console.log('✅ Kamera aktif dan siap.');
             } catch (error) {
                 console.error('Gagal mengakses kamera:', error);
                 alert('Tidak dapat mengakses kamera. Pastikan izin kamera diaktifkan.');
                 return;
             }
 
-            // 🔹 Pastikan frame tidak hitam
+            // 🔹 Pastikan frame valid sebelum capture
             async function ensureValidFrame(video, canvas, context) {
                 const width = video.videoWidth;
                 const height = video.videoHeight;
@@ -292,18 +292,19 @@
                 return false;
             }
 
+            // 🔸 Tombol klik utama
             clockInBtn.addEventListener('click', async () => {
                 if (!video.srcObject) {
                     alert('Kamera belum aktif.');
                     return;
                 }
 
-                // 🔹 Langsung disable tombol sampai reload halaman
+                // 🔹 Langsung disable tombol agar tidak bisa diklik lagi
                 clockInBtn.disabled = true;
-                clockInBtn.classList.add('disabled'); // opsional untuk style Bootstrap
+                clockInBtn.classList.add('disabled');
                 const originalText = clockInBtn.innerHTML;
                 clockInBtn.innerHTML =
-                    `<i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...`;
+                    `<i class="fas fa-spinner fa-spin me-2"></i> Mengambil Foto...`;
 
                 const context = canvas.getContext('2d');
                 const width = video.videoWidth;
@@ -311,7 +312,6 @@
 
                 if (width === 0 || height === 0) {
                     alert('Kamera belum siap menangkap gambar, coba lagi.');
-                    clockInBtn.innerHTML = originalText;
                     return;
                 }
 
@@ -321,17 +321,17 @@
                 const frameValid = await ensureValidFrame(video, canvas, context);
                 if (!frameValid) {
                     alert('Gagal menangkap gambar kamera. Silakan muat ulang halaman.');
-                    return; // tetap disable sampai user reload
+                    return;
                 }
 
-                // Mirror horizontal
+                // Mirror horizontal (kamera depan)
                 context.save();
                 context.translate(width, 0);
                 context.scale(-1, 1);
                 context.drawImage(video, 0, 0, width, height);
                 context.restore();
 
-                // Ambil lokasi GPS
+                // 🔹 Ambil lokasi GPS
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(async (pos) => {
                         const lat = pos.coords.latitude.toFixed(6);
@@ -372,14 +372,16 @@
                             datetime: dateTime
                         });
 
-                        // 🔹 Matikan kamera setelah capture
+                        // 🔹 Update teks tombol agar user tahu sedang proses clock-in
+                        clockInBtn.innerHTML =
+                            `<i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...`;
+
+                        // Matikan kamera
                         setTimeout(() => {
                             stream.getTracks().forEach(track => track.stop());
                             video.style.display = 'none';
                         }, 500);
 
-                        // ❗ Jangan aktifkan kembali tombol di sini
-                        // biarkan tetap disabled sampai Livewire redirect / halaman berganti
                     }, (err) => {
                         console.error("Gagal ambil lokasi:", err);
                         alert(
@@ -389,7 +391,32 @@
                     alert("Browser tidak support geolocation. Muat ulang halaman.");
                 }
             });
+
+            // 🔹 Pastikan tombol tetap disable selama Livewire memproses clockIn
+            Livewire.on('photoTaken', () => {
+                clockInBtn.disabled = true;
+                clockInBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...`;
+            });
+
+            // 🔸 Jika Livewire selesai dan halaman tidak berpindah (misal gagal)
+            Livewire.hook('message.processed', (message, component) => {
+                const isClockIn = message.updateQueue.some(
+                    u => u.payload.event === 'clockIn'
+                );
+                if (isClockIn) {
+                    // Hanya aktifkan kembali jika clock-in gagal (tidak ada redirect)
+                    setTimeout(() => {
+                        if (document.body.contains(clockInBtn)) {
+                            clockInBtn.disabled = false;
+                            clockInBtn.classList.remove('disabled');
+                            clockInBtn.innerHTML =
+                                `<i class="bi bi-camera me-2"></i> Ambil Foto`;
+                        }
+                    }, 2000);
+                }
+            });
         });
+
 
 
 
