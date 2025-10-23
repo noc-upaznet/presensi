@@ -334,8 +334,8 @@
                             // Kirim ke Livewire + data
                             Livewire.dispatch('photoTaken', {
                                 photo: dataURL,
-                                latitude: lat,
-                                longitude: lon,
+                                // latitude: lat,
+                                // longitude: lon,
                                 // datetime: dateTime
                             });
 
