@@ -219,32 +219,32 @@
             });
         });
 
-        window.addEventListener('lokasi-terdekat-diperbarui', (event) => {
-            const lokasisTerdekat = event.detail.lokasi || [];
-            const radiusMeter = event.detail.radius || 40;
+        // window.addEventListener('lokasi-terdekat-diperbarui', (event) => {
+        //     const lokasisTerdekat = event.detail.lokasi || [];
+        //     const radiusMeter = event.detail.radius || 40;
 
-            if (!map) return;
+        //     if (!map) return;
 
-            if (markersGroup) map.removeLayer(markersGroup);
+        //     if (markersGroup) map.removeLayer(markersGroup);
 
-            const layers = [];
-            lokasisTerdekat.forEach((lokasi) => {
-                if (!lokasi.koordinat) return;
-                const [lat, lng] = lokasi.koordinat.split(',').map(Number);
-                const marker = L.marker([lat, lng]).bindPopup(`<b>${lokasi.nama_lokasi}</b>`);
-                const circle = L.circle([lat, lng], {
-                    color: 'green',
-                    fillColor: '#2ecc71',
-                    fillOpacity: 0.25,
-                    radius: radiusMeter,
-                });
-                layers.push(marker, circle);
-            });
+        //     const layers = [];
+        //     lokasisTerdekat.forEach((lokasi) => {
+        //         if (!lokasi.koordinat) return;
+        //         const [lat, lng] = lokasi.koordinat.split(',').map(Number);
+        //         const marker = L.marker([lat, lng]).bindPopup(`<b>${lokasi.nama_lokasi}</b>`);
+        //         const circle = L.circle([lat, lng], {
+        //             color: 'green',
+        //             fillColor: '#2ecc71',
+        //             fillOpacity: 0.25,
+        //             radius: radiusMeter,
+        //         });
+        //         layers.push(marker, circle);
+        //     });
 
-            if (layers.length > 0) {
-                markersGroup = L.featureGroup(layers).addTo(map);
-            }
-        });
+        //     if (layers.length > 0) {
+        //         markersGroup = L.featureGroup(layers).addTo(map);
+        //     }
+        // });
 
         document.addEventListener('DOMContentLoaded', async () => {
             const video = document.getElementById('video');
@@ -260,23 +260,14 @@
                     }
                 });
                 video.srcObject = stream;
-
-                // Tunggu video siap
-                await new Promise(resolve => {
-                    video.onloadedmetadata = () => {
-                        video.play();
-                        resolve();
-                    };
-                });
-
-                console.log('Kamera aktif dan siap.');
+                console.log('Kamera aktif');
             } catch (error) {
                 console.error('Gagal mengakses kamera:', error);
                 alert('Tidak dapat mengakses kamera. Pastikan izin kamera diaktifkan.');
                 return;
             }
 
-            clockInBtn.addEventListener('click', async () => {
+            clockInBtn.addEventListener('click', () => {
                 if (!video.srcObject) {
                     alert('Kamera belum aktif.');
                     return;
@@ -284,91 +275,85 @@
 
                 clockInBtn.disabled = true;
                 const originalText = clockInBtn.innerHTML;
-                clockInBtn.innerHTML =
-                    `<i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...`;
+                clockInBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...`;
 
-                const context = canvas.getContext('2d');
-                const width = video.videoWidth;
-                const height = video.videoHeight;
+                if (video && canvas && photoImage) {
+                    const context = canvas.getContext('2d');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
 
-                // ✅ Pastikan ukuran video valid
-                if (width === 0 || height === 0) {
-                    alert('Kamera belum siap menangkap gambar, coba lagi.');
-                    clockInBtn.disabled = false;
-                    clockInBtn.innerHTML = originalText;
-                    return;
-                }
+                    // Balik horizontal (supaya tidak mirror)
+                    context.save();
+                    context.translate(canvas.width, 0);
+                    context.scale(-1, 1);
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    context.restore();
 
-                canvas.width = width;
-                canvas.height = height;
+                    // Ambil lokasi GPS
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition((pos) => {
+                            const lat = pos.coords.latitude.toFixed(6);
+                            const lon = pos.coords.longitude.toFixed(6);
 
-                // Tambahkan sedikit delay agar frame terakhir kamera stabil (khusus mobile)
-                await new Promise(r => setTimeout(r, 200));
+                            // Format tanggal & jam
+                            const now = new Date();
+                            const dateTime = now.toLocaleString('id-ID', {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit'
+                            });
 
-                // Mirror horizontal
-                context.save();
-                context.translate(width, 0);
-                context.scale(-1, 1);
-                context.drawImage(video, 0, 0, width, height);
-                context.restore();
+                            // Tambahkan teks koordinat + tanggal di atas foto
+                            context.font = "24px Arial";
+                            context.fillStyle = "yellow";
+                            context.strokeStyle = "black"; // outline biar jelas
+                            context.lineWidth = 3;
 
-                // Ambil lokasi GPS
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(async (pos) => {
-                        const lat = pos.coords.latitude.toFixed(6);
-                        const lon = pos.coords.longitude.toFixed(6);
+                            const coordText = `Lat: ${lat}, Lon: ${lon}`;
+                            const timeText = dateTime;
 
-                        const now = new Date();
-                        const dateTime = now.toLocaleString('id-ID', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
+                            // Koordinat di bawah
+                            const coordX = 20;
+                            const coordY = canvas.height - 20;
+                            context.strokeText(coordText, coordX, coordY);
+                            context.fillText(coordText, coordX, coordY);
+
+                            // Tanggal & jam sedikit di atas koordinat
+                            const timeX = 20;
+                            const timeY = canvas.height - 50;
+                            context.strokeText(timeText, timeX, timeY);
+                            context.fillText(timeText, timeX, timeY);
+
+                            // Convert ke Data URL
+                            const dataURL = canvas.toDataURL('image/jpeg', 0.7);
+                            photoImage.src = dataURL;
+
+                            // Kirim ke Livewire + data
+                            Livewire.dispatch('photoTaken', {
+                                photo: dataURL,
+                                latitude: lat,
+                                longitude: lon,
+                                datetime: dateTime
+                            });
+
+                        }, (err) => {
+                            console.error("Gagal ambil lokasi:", err);
+                            alert("Tidak bisa mengambil lokasi GPS!");
                         });
+                    } else {
+                        alert("Browser tidak support geolocation");
+                    }
 
-                        // Tambahkan teks koordinat + tanggal
-                        context.font = "24px Arial";
-                        context.fillStyle = "yellow";
-                        context.strokeStyle = "black";
-                        context.lineWidth = 3;
-
-                        const coordText = `Lat: ${lat}, Lon: ${lon}`;
-                        const timeText = dateTime;
-
-                        context.strokeText(timeText, 20, height - 50);
-                        context.fillText(timeText, 20, height - 50);
-                        context.strokeText(coordText, 20, height - 20);
-                        context.fillText(coordText, 20, height - 20);
-
-                        // Konversi ke base64
-                        const dataURL = canvas.toDataURL('image/jpeg', 0.7);
-                        photoImage.src = dataURL;
-
-                        // Kirim ke Livewire
-                        Livewire.dispatch('photoTaken', {
-                            photo: dataURL,
-                            latitude: lat,
-                            longitude: lon,
-                            datetime: dateTime
-                        });
-
-                        // Matikan kamera setelah capture (tunda sedikit agar frame tersimpan)
-                        setTimeout(() => {
-                            stream.getTracks().forEach(track => track.stop());
-                            video.style.display = 'none';
-                        }, 500);
-                    }, (err) => {
-                        console.error("Gagal ambil lokasi:", err);
-                        alert("Tidak bisa mengambil lokasi GPS!");
-                    });
-                } else {
-                    alert("Browser tidak support geolocation");
+                    // Matikan kamera setelah capture
+                    const tracks = stream.getTracks();
+                    tracks.forEach(track => track.stop());
+                    video.style.display = 'none';
                 }
             });
         });
-
 
         function updateClock() {
             const now = new Date();
