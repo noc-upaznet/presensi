@@ -303,11 +303,21 @@
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
                 context.restore();
 
+                // navigator.geolocation.getCurrentPosition((pos) => {
+                //     const lat = pos.coords.latitude.toFixed(6);
+                //     const lon = pos.coords.longitude.toFixed(6);
+
+
+                // }, (err) => {
+                //     console.error("Gagal ambil lokasi:", err);
+                //     alert("Tidak bisa mengambil lokasi GPS!");
+                //     clockInBtn.disabled = false;
+                //     clockInBtn.innerHTML = originalText;
+                // });
+                // Format waktu
                 navigator.geolocation.getCurrentPosition((pos) => {
                     const lat = pos.coords.latitude.toFixed(6);
                     const lon = pos.coords.longitude.toFixed(6);
-
-                    // Format waktu
                     const now = new Date();
                     const dateTime = now.toLocaleString('id-ID', {
                         year: 'numeric',
@@ -350,11 +360,6 @@
                     stream.getTracks().forEach(track => track.stop());
                     video.style.display = 'none';
                     clockInBtn.innerHTML = 'Foto Berhasil Diambil ✅';
-                }, (err) => {
-                    console.error("Gagal ambil lokasi:", err);
-                    alert("Tidak bisa mengambil lokasi GPS!");
-                    clockInBtn.disabled = false;
-                    clockInBtn.innerHTML = originalText;
                 });
             });
         });
