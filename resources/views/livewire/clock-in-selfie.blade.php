@@ -254,6 +254,7 @@
             let stream = null;
 
             try {
+                // Aktifkan kamera depan
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: 'user'
@@ -277,80 +278,78 @@
                 const originalText = clockInBtn.innerHTML;
                 clockInBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...`;
 
-                if (video && canvas && photoImage) {
-                    const context = canvas.getContext('2d');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
+                const context = canvas.getContext('2d');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
 
-                    // Balik horizontal (supaya tidak mirror)
-                    context.save();
-                    context.translate(canvas.width, 0);
-                    context.scale(-1, 1);
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    context.restore();
+                // Balik horizontal (supaya tidak mirror)
+                context.save();
+                context.translate(canvas.width, 0);
+                context.scale(-1, 1);
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                context.restore();
 
-                    // Ambil lokasi GPS
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition((pos) => {
-                            const lat = pos.coords.latitude.toFixed(6);
-                            const lon = pos.coords.longitude.toFixed(6);
+                // Ambil lokasi GPS
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition((pos) => {
+                        const lat = pos.coords.latitude.toFixed(6);
+                        const lon = pos.coords.longitude.toFixed(6);
 
-                            // Format tanggal & jam
-                            // const now = new Date();
-                            // const dateTime = now.toLocaleString('id-ID', {
-                            //     year: 'numeric',
-                            //     month: '2-digit',
-                            //     day: '2-digit',
-                            //     hour: '2-digit',
-                            //     minute: '2-digit',
-                            //     second: '2-digit'
-                            // });
-
-                            // // Tambahkan teks koordinat + tanggal di atas foto
-                            // context.font = "24px Arial";
-                            // context.fillStyle = "yellow";
-                            // context.strokeStyle = "black"; // outline biar jelas
-                            // context.lineWidth = 3;
-
-                            // const coordText = `Lat: ${lat}, Lon: ${lon}`;
-                            // const timeText = dateTime;
-
-                            // Koordinat di bawah
-                            // const coordX = 20;
-                            // const coordY = canvas.height - 20;
-                            // context.strokeText(coordText, coordX, coordY);
-                            // context.fillText(coordText, coordX, coordY);
-
-                            // Tanggal & jam sedikit di atas koordinat
-                            // const timeX = 20;
-                            // const timeY = canvas.height - 50;
-                            // context.strokeText(timeText, timeX, timeY);
-                            // context.fillText(timeText, timeX, timeY);
-
-                            // Convert ke Data URL
-                            const dataURL = canvas.toDataURL('image/jpeg', 0.7);
-                            photoImage.src = dataURL;
-
-                            // Kirim ke Livewire + data
-                            Livewire.dispatch('photoTaken', {
-                                photo: dataURL,
-                                // latitude: lat,
-                                // longitude: lon,
-                                // datetime: dateTime
-                            });
-
-                        }, (err) => {
-                            console.error("Gagal ambil lokasi:", err);
-                            alert("Tidak bisa mengambil lokasi GPS!");
+                        // Format waktu
+                        const now = new Date();
+                        const dateTime = now.toLocaleString('id-ID', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
                         });
-                    } else {
-                        alert("Browser tidak support geolocation");
-                    }
 
-                    // Matikan kamera setelah capture
-                    const tracks = stream.getTracks();
-                    tracks.forEach(track => track.stop());
-                    video.style.display = 'none';
+                        // Tambahkan teks overlay (tanggal & koordinat)
+                        context.font = "24px Arial";
+                        context.fillStyle = "yellow";
+                        context.strokeStyle = "black";
+                        context.lineWidth = 4;
+
+                        const coordText = `Lat: ${lat}, Lon: ${lon}`;
+                        const timeText = `${dateTime}`;
+
+                        const coordY = canvas.height - 20;
+                        const timeY = canvas.height - 50;
+
+                        // Outline hitam + isi kuning agar terlihat jelas
+                        context.strokeText(timeText, 20, timeY);
+                        context.fillText(timeText, 20, timeY);
+                        context.strokeText(coordText, 20, coordY);
+                        context.fillText(coordText, 20, coordY);
+
+                        // Convert ke dataURL
+                        const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+                        photoImage.src = dataURL;
+
+                        // Kirim ke Livewire
+                        Livewire.dispatch('photoTaken', {
+                            photo: dataURL,
+                            latitude: lat,
+                            longitude: lon,
+                            datetime: dateTime
+                        });
+
+                        // Matikan kamera setelah ambil foto
+                        stream.getTracks().forEach(track => track.stop());
+                        video.style.display = 'none';
+                        clockInBtn.innerHTML = 'Foto Berhasil Diambil';
+                    }, (err) => {
+                        console.error("Gagal ambil lokasi:", err);
+                        alert("Tidak bisa mengambil lokasi GPS!");
+                        clockInBtn.disabled = false;
+                        clockInBtn.innerHTML = originalText;
+                    });
+                } else {
+                    alert("Browser tidak support geolocation");
+                    clockInBtn.disabled = false;
+                    clockInBtn.innerHTML = originalText;
                 }
             });
         });
