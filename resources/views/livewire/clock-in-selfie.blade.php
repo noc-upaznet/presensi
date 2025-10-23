@@ -296,30 +296,30 @@
                             const lon = pos.coords.longitude.toFixed(6);
 
                             // Format tanggal & jam
-                            const now = new Date();
-                            const dateTime = now.toLocaleString('id-ID', {
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                second: '2-digit'
-                            });
+                            // const now = new Date();
+                            // const dateTime = now.toLocaleString('id-ID', {
+                            //     year: 'numeric',
+                            //     month: '2-digit',
+                            //     day: '2-digit',
+                            //     hour: '2-digit',
+                            //     minute: '2-digit',
+                            //     second: '2-digit'
+                            // });
 
                             // // Tambahkan teks koordinat + tanggal di atas foto
-                            context.font = "24px Arial";
-                            context.fillStyle = "yellow";
-                            context.strokeStyle = "black"; // outline biar jelas
-                            context.lineWidth = 3;
+                            // context.font = "24px Arial";
+                            // context.fillStyle = "yellow";
+                            // context.strokeStyle = "black"; // outline biar jelas
+                            // context.lineWidth = 3;
 
-                            const coordText = `Lat: ${lat}, Lon: ${lon}`;
+                            // const coordText = `Lat: ${lat}, Lon: ${lon}`;
                             // const timeText = dateTime;
 
                             // Koordinat di bawah
-                            const coordX = 20;
-                            const coordY = canvas.height - 20;
-                            context.strokeText(coordText, coordX, coordY);
-                            context.fillText(coordText, coordX, coordY);
+                            // const coordX = 20;
+                            // const coordY = canvas.height - 20;
+                            // context.strokeText(coordText, coordX, coordY);
+                            // context.fillText(coordText, coordX, coordY);
 
                             // Tanggal & jam sedikit di atas koordinat
                             // const timeX = 20;
