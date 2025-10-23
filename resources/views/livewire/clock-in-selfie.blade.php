@@ -312,20 +312,20 @@
                             context.strokeStyle = "black"; // outline biar jelas
                             context.lineWidth = 3;
 
-                            // const coordText = `Lat: ${lat}, Lon: ${lon}`;
-                            const timeText = dateTime;
+                            const coordText = `Lat: ${lat}, Lon: ${lon}`;
+                            // const timeText = dateTime;
 
                             // Koordinat di bawah
-                            // const coordX = 20;
-                            // const coordY = canvas.height - 20;
-                            // context.strokeText(coordText, coordX, coordY);
-                            // context.fillText(coordText, coordX, coordY);
+                            const coordX = 20;
+                            const coordY = canvas.height - 20;
+                            context.strokeText(coordText, coordX, coordY);
+                            context.fillText(coordText, coordX, coordY);
 
                             // Tanggal & jam sedikit di atas koordinat
-                            const timeX = 20;
-                            const timeY = canvas.height - 50;
-                            context.strokeText(timeText, timeX, timeY);
-                            context.fillText(timeText, timeX, timeY);
+                            // const timeX = 20;
+                            // const timeY = canvas.height - 50;
+                            // context.strokeText(timeText, timeX, timeY);
+                            // context.fillText(timeText, timeX, timeY);
 
                             // Convert ke Data URL
                             const dataURL = canvas.toDataURL('image/jpeg', 0.7);
@@ -336,7 +336,7 @@
                                 photo: dataURL,
                                 latitude: lat,
                                 longitude: lon,
-                                datetime: dateTime
+                                // datetime: dateTime
                             });
 
                         }, (err) => {
