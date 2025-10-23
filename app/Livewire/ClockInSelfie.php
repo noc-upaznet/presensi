@@ -32,11 +32,15 @@ class ClockInSelfie extends Component
     public $errorMessage = null;
     public $successMessage = null;
     public bool $canClockIn = false;
+    public $currentTime;
 
     public function mount()
     {
         $this->lokasisTerdekat = collect();
         $this->photo = session('selfie_path');
+        $this->latitude = null;
+        $this->longitude = null;
+        $this->currentTime = now()->toDateTimeString();
     }
 
     #[On('lokasiAwal')]
@@ -167,24 +171,30 @@ class ClockInSelfie extends Component
     }
 
     #[On('photoTaken')]
-    public function handlePhotoTaken($photo)
+    public function handlePhotoTaken($photo, $latitude, $longitude, $datetime = null)
     {
-        // dd($photo);
-        // Bersihkan prefix dan decode
-        $base64Image = preg_replace('#^data:image/\w+;base64,#i', '', $photo);
-        $image = base64_decode($base64Image);
-        // dd($photo);
-        // Buat nama file unik
-        $filename = 'selfie_' . Str::uuid() . '.png';
+        $base64Photo = $photo;
+        $datetime = $datetime ?? now()->toDateTimeString();
 
-        // Simpan ke public disk
+        if (!$base64Photo) {
+            $this->dispatch('lokasiError', ['message' => 'Foto tidak ditemukan.']);
+            return;
+        }
+
+        $base64Image = preg_replace('#^data:image/\w+;base64,#i', '', $base64Photo);
+        $image = base64_decode($base64Image);
+
+        $filename = 'selfie_' . Str::uuid() . '.png';
         Storage::disk('public')->put('selfies/' . $filename, $image);
 
-        // Simpan path ke properti
         $this->photo = 'selfies/' . $filename;
+        $this->latitude = $latitude;
+        $this->longitude = $longitude;
+        $this->currentTime = $datetime;
 
         $this->clockIn();
     }
+
 
     public function clockIn()
     {

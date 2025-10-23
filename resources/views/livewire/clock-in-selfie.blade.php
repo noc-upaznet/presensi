@@ -80,6 +80,7 @@
                                     <video id="video" autoplay playsinline
                                         style="width: 100%; max-width: 480px;"></video>
                                     <canvas id="canvas" style="display:none;"></canvas>
+                                    <div id="photoInfo" class="mt-2"></div>
                                 </div>
                             </div>
                         </div>
@@ -219,32 +220,32 @@
             });
         });
 
-        // window.addEventListener('lokasi-terdekat-diperbarui', (event) => {
-        //     const lokasisTerdekat = event.detail.lokasi || [];
-        //     const radiusMeter = event.detail.radius || 40;
+        window.addEventListener('lokasi-terdekat-diperbarui', (event) => {
+            const lokasisTerdekat = event.detail.lokasi || [];
+            const radiusMeter = event.detail.radius || 40;
 
-        //     if (!map) return;
+            if (!map) return;
 
-        //     if (markersGroup) map.removeLayer(markersGroup);
+            if (markersGroup) map.removeLayer(markersGroup);
 
-        //     const layers = [];
-        //     lokasisTerdekat.forEach((lokasi) => {
-        //         if (!lokasi.koordinat) return;
-        //         const [lat, lng] = lokasi.koordinat.split(',').map(Number);
-        //         const marker = L.marker([lat, lng]).bindPopup(`<b>${lokasi.nama_lokasi}</b>`);
-        //         const circle = L.circle([lat, lng], {
-        //             color: 'green',
-        //             fillColor: '#2ecc71',
-        //             fillOpacity: 0.25,
-        //             radius: radiusMeter,
-        //         });
-        //         layers.push(marker, circle);
-        //     });
+            const layers = [];
+            lokasisTerdekat.forEach((lokasi) => {
+                if (!lokasi.koordinat) return;
+                const [lat, lng] = lokasi.koordinat.split(',').map(Number);
+                const marker = L.marker([lat, lng]).bindPopup(`<b>${lokasi.nama_lokasi}</b>`);
+                const circle = L.circle([lat, lng], {
+                    color: 'green',
+                    fillColor: '#2ecc71',
+                    fillOpacity: 0.25,
+                    radius: radiusMeter,
+                });
+                layers.push(marker, circle);
+            });
 
-        //     if (layers.length > 0) {
-        //         markersGroup = L.featureGroup(layers).addTo(map);
-        //     }
-        // });
+            if (layers.length > 0) {
+                markersGroup = L.featureGroup(layers).addTo(map);
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', async () => {
             const video = document.getElementById('video');
@@ -260,17 +261,9 @@
                     }
                 });
                 video.srcObject = stream;
-
-                // Tunggu sampai video siap
-                await new Promise(resolve => {
-                    video.onloadeddata = () => {
-                        console.log("Video siap untuk ditangkap");
-                        resolve();
-                    };
-                });
+                await new Promise(resolve => video.onloadeddata = resolve);
             } catch (error) {
-                console.error('Gagal mengakses kamera:', error);
-                alert('Tidak dapat mengakses kamera. Pastikan izin kamera diaktifkan.');
+                alert('Tidak dapat mengakses kamera. Pastikan izin kamera aktif.');
                 return;
             }
 
@@ -285,84 +278,65 @@
                 clockInBtn.innerHTML =
                     `<i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...`;
 
-                // Tunggu frame terakhir benar-benar siap
+                // Pastikan frame siap
                 if (video.readyState < 2) {
-                    await new Promise(resolve => {
-                        video.onloadeddata = resolve;
-                    });
+                    await new Promise(resolve => video.onloadeddata = resolve);
                 }
 
                 const context = canvas.getContext('2d');
                 canvas.width = video.videoWidth || 640;
                 canvas.height = video.videoHeight || 480;
 
-                // Gambar frame dari kamera
+                // Gambar frame dari kamera (mirror)
                 context.save();
                 context.translate(canvas.width, 0);
-                context.scale(-1, 1); // flip horizontal
+                context.scale(-1, 1);
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
                 context.restore();
 
-                // navigator.geolocation.getCurrentPosition((pos) => {
-                //     const lat = pos.coords.latitude.toFixed(6);
-                //     const lon = pos.coords.longitude.toFixed(6);
+                // Ambil koordinat Livewire (pastikan sudah ada di komponen)
+                const latitude = @this.get('latitude');
+                const longitude = @this.get('longitude');
 
+                // Ambil waktu saat ini
+                const now = new Date();
+                const datetime = now.toLocaleString('id-ID', {
+                    dateStyle: 'medium',
+                    timeStyle: 'medium'
+                });
 
-                // }, (err) => {
-                //     console.error("Gagal ambil lokasi:", err);
-                //     alert("Tidak bisa mengambil lokasi GPS!");
-                //     clockInBtn.disabled = false;
-                //     clockInBtn.innerHTML = originalText;
-                // });
-                // Format waktu
-                // navigator.geolocation.getCurrentPosition((pos) => {
-                // const lat = pos.coords.latitude.toFixed(6);
-                // const lon = pos.coords.longitude.toFixed(6);
-                // const now = new Date();
-                // const dateTime = now.toLocaleString('id-ID', {
-                //     year: 'numeric',
-                //     month: '2-digit',
-                //     day: '2-digit',
-                //     hour: '2-digit',
-                //     minute: '2-digit',
-                //     second: '2-digit'
-                // });
+                // Tambahkan teks watermark (koordinat & waktu)
+                context.font = '20px Arial';
+                context.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                const boxHeight = 65;
+                const boxWidth = 360;
+                context.fillRect(10, canvas.height - boxHeight - 10, boxWidth, boxHeight);
 
-                // // Overlay teks (koordinat & waktu)
-                // context.font = "24px Arial";
-                // context.fillStyle = "yellow";
-                // context.strokeStyle = "black";
-                // context.lineWidth = 4;
+                context.fillStyle = 'white';
+                context.fillText(`📍 ${latitude ?? '-'}, ${longitude ?? '-'}`, 20, canvas.height -
+                    45);
+                context.fillText(`🕒 ${datetime}`, 20, canvas.height - 20);
 
-                // const coordText = `Lat: ${lat}, Lon: ${lon}`;
-                // const timeText = `${dateTime}`;
-                // const coordY = canvas.height - 20;
-                // const timeY = canvas.height - 50;
-
-                // context.strokeText(timeText, 20, timeY);
-                // context.fillText(timeText, 20, timeY);
-                // context.strokeText(coordText, 20, coordY);
-                // context.fillText(coordText, 20, coordY);
-
-                // Konversi ke base64
+                // Ambil hasil gambar
                 const dataURL = canvas.toDataURL('image/jpeg', 0.9);
                 photoImage.src = dataURL;
 
                 // Kirim ke Livewire
                 Livewire.dispatch('photoTaken', {
                     photo: dataURL,
-                    // latitude: lat,
-                    // longitude: lon,
-                    // datetime: dateTime
+                    latitude,
+                    longitude,
+                    datetime,
                 });
 
                 // Matikan kamera
                 stream.getTracks().forEach(track => track.stop());
                 video.style.display = 'none';
                 clockInBtn.innerHTML = 'Foto Berhasil Diambil ✅';
-                // });
             });
         });
+
+
 
         function updateClock() {
             const now = new Date();
