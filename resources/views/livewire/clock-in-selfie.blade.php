@@ -418,7 +418,7 @@
                 Livewire.hook('message.processed', () => {
                     // Jika clock-in sukses, biarkan tombol tetap disable
                     // Tapi jika kamu mau aktifkan ulang tombol setelah sukses:
-                    clockInBtn.disabled = true;
+                    // clockInBtn.disabled = false;
                     // clockInBtn.innerHTML = `<span>Ambil Foto</span>`;
                 });
             });
