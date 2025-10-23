@@ -173,7 +173,7 @@ class ClockInSelfie extends Component
         // Bersihkan prefix dan decode
         $base64Image = preg_replace('#^data:image/\w+;base64,#i', '', $photo);
         $image = base64_decode($base64Image);
-        dd($photo);
+        // dd($photo);
         // Buat nama file unik
         $filename = 'selfie_' . Str::uuid() . '.png';
 
