@@ -261,7 +261,6 @@
                 });
                 video.srcObject = stream;
 
-                // Tunggu video siap
                 await new Promise(resolve => {
                     video.onloadedmetadata = () => {
                         video.play();
@@ -276,7 +275,7 @@
                 return;
             }
 
-            // 🔹 Fungsi helper untuk pastikan frame valid (tidak hitam)
+            // 🔹 Pastikan frame tidak hitam
             async function ensureValidFrame(video, canvas, context) {
                 const width = video.videoWidth;
                 const height = video.videoHeight;
@@ -286,19 +285,10 @@
                 for (let i = 0; i < 5; i++) {
                     context.drawImage(video, 0, 0, width, height);
                     const pixels = context.getImageData(0, 0, width, height).data;
-
-                    // Jika semua pixel 0 (hitam total), ulangi
                     const allBlack = pixels.every(v => v === 0);
-                    if (!allBlack) {
-                        console.log(`✅ Frame valid pada percobaan ke-${i + 1}`);
-                        return true;
-                    }
-
-                    console.log(`⏳ Frame masih hitam (percobaan ${i + 1}), tunggu 200ms...`);
+                    if (!allBlack) return true;
                     await new Promise(r => setTimeout(r, 200));
                 }
-
-                console.warn('Gagal mendapatkan frame valid setelah 5 percobaan');
                 return false;
             }
 
@@ -308,7 +298,9 @@
                     return;
                 }
 
+                // 🔹 Langsung disable tombol sampai reload halaman
                 clockInBtn.disabled = true;
+                clockInBtn.classList.add('disabled'); // opsional untuk style Bootstrap
                 const originalText = clockInBtn.innerHTML;
                 clockInBtn.innerHTML =
                     `<i class="fas fa-spinner fa-spin me-2"></i> Proses Clock-In...`;
@@ -317,10 +309,8 @@
                 const width = video.videoWidth;
                 const height = video.videoHeight;
 
-                // ✅ Pastikan ukuran video valid
                 if (width === 0 || height === 0) {
                     alert('Kamera belum siap menangkap gambar, coba lagi.');
-                    clockInBtn.disabled = false;
                     clockInBtn.innerHTML = originalText;
                     return;
                 }
@@ -328,13 +318,10 @@
                 canvas.width = width;
                 canvas.height = height;
 
-                // 🔸 Cek apakah frame sudah valid
                 const frameValid = await ensureValidFrame(video, canvas, context);
                 if (!frameValid) {
-                    alert('Gagal menangkap gambar kamera. Silakan coba lagi.');
-                    clockInBtn.disabled = false;
-                    clockInBtn.innerHTML = originalText;
-                    return;
+                    alert('Gagal menangkap gambar kamera. Silakan muat ulang halaman.');
+                    return; // tetap disable sampai user reload
                 }
 
                 // Mirror horizontal
@@ -349,7 +336,6 @@
                     navigator.geolocation.getCurrentPosition(async (pos) => {
                         const lat = pos.coords.latitude.toFixed(6);
                         const lon = pos.coords.longitude.toFixed(6);
-
                         const now = new Date();
                         const dateTime = now.toLocaleString('id-ID', {
                             year: 'numeric',
@@ -360,15 +346,13 @@
                             second: '2-digit'
                         });
 
-                        // Tambahkan teks koordinat + tanggal
+                        // Tambahkan teks ke foto
                         context.font = "24px Arial";
                         context.fillStyle = "yellow";
                         context.strokeStyle = "black";
                         context.lineWidth = 3;
-
                         const coordText = `Lat: ${lat}, Lon: ${lon}`;
                         const timeText = dateTime;
-
                         context.strokeText(timeText, 20, height - 50);
                         context.fillText(timeText, 20, height - 50);
                         context.strokeText(coordText, 20, height - 20);
@@ -377,7 +361,6 @@
                         // Konversi ke base64
                         const dataURL = canvas.toDataURL('image/jpeg', 0.7);
                         photoImage.src = dataURL;
-
                         video.style.display = 'none';
                         canvas.style.display = 'none';
 
@@ -389,18 +372,21 @@
                             datetime: dateTime
                         });
 
-                        // Matikan kamera setelah capture (tunda sedikit agar frame tersimpan)
+                        // 🔹 Matikan kamera setelah capture
                         setTimeout(() => {
                             stream.getTracks().forEach(track => track.stop());
                             video.style.display = 'none';
                         }, 500);
 
+                        // ❗ Jangan aktifkan kembali tombol di sini
+                        // biarkan tetap disabled sampai Livewire redirect / halaman berganti
                     }, (err) => {
                         console.error("Gagal ambil lokasi:", err);
-                        alert("Tidak bisa mengambil lokasi GPS!");
+                        alert(
+                            "Tidak bisa mengambil lokasi GPS! Muat ulang halaman untuk mencoba lagi.");
                     });
                 } else {
-                    alert("Browser tidak support geolocation");
+                    alert("Browser tidak support geolocation. Muat ulang halaman.");
                 }
             });
         });
