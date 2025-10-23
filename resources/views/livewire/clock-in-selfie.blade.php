@@ -298,7 +298,7 @@
                     await new Promise(r => setTimeout(r, 200));
                 }
 
-                console.warn('⚠️ Gagal mendapatkan frame valid setelah 5 percobaan');
+                console.warn('Gagal mendapatkan frame valid setelah 5 percobaan');
                 return false;
             }
 
@@ -308,6 +308,7 @@
                     return;
                 }
 
+                // 🔹 Disable tombol segera setelah diklik
                 clockInBtn.disabled = true;
                 const originalText = clockInBtn.innerHTML;
                 clockInBtn.innerHTML =
@@ -328,7 +329,7 @@
                 canvas.width = width;
                 canvas.height = height;
 
-                // 🔸 Cek apakah frame sudah valid
+                // Cek apakah frame sudah valid
                 const frameValid = await ensureValidFrame(video, canvas, context);
                 if (!frameValid) {
                     alert('Gagal menangkap gambar kamera. Silakan coba lagi.');
@@ -394,14 +395,32 @@
                             stream.getTracks().forEach(track => track.stop());
                             video.style.display = 'none';
                         }, 500);
-
                     }, (err) => {
                         console.error("Gagal ambil lokasi:", err);
                         alert("Tidak bisa mengambil lokasi GPS!");
+                        clockInBtn.disabled = false;
+                        clockInBtn.innerHTML = originalText;
                     });
                 } else {
                     alert("Browser tidak support geolocation");
+                    clockInBtn.disabled = false;
+                    clockInBtn.innerHTML = originalText;
                 }
+            });
+
+            // 🔹 Integrasi dengan Livewire: re-enable tombol jika request gagal
+            document.addEventListener('livewire:load', () => {
+                Livewire.hook('message.failed', () => {
+                    clockInBtn.disabled = false;
+                    clockInBtn.innerHTML = `<span>Ambil Foto</span>`;
+                });
+
+                Livewire.hook('message.processed', () => {
+                    // Jika clock-in sukses, biarkan tombol tetap disable
+                    // Tapi jika kamu mau aktifkan ulang tombol setelah sukses:
+                    clockInBtn.disabled = true;
+                    // clockInBtn.innerHTML = `<span>Ambil Foto</span>`;
+                });
             });
         });
 
