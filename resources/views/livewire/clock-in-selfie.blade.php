@@ -294,7 +294,7 @@
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
                 context.restore();
 
-                // Ambil koordinat Livewire (pastikan sudah ada di komponen)
+                // Ambil koordinat Livewire
                 const latitude = @this.get('latitude');
                 const longitude = @this.get('longitude');
 
@@ -305,17 +305,26 @@
                     timeStyle: 'medium'
                 });
 
-                // Tambahkan teks watermark (koordinat & waktu)
+                // Watermak
                 context.font = '20px Arial';
                 context.fillStyle = 'rgba(0, 0, 0, 0.6)';
-                const boxHeight = 65;
-                const boxWidth = 360;
-                context.fillRect(10, canvas.height - boxHeight - 10, boxWidth, boxHeight);
 
-                context.fillStyle = 'white';
-                context.fillText(`📍 ${latitude ?? '-'}, ${longitude ?? '-'}`, 20, canvas.height -
-                    45);
-                context.fillText(`🕒 ${datetime}`, 20, canvas.height - 20);
+                context.strokeStyle = 'black';
+                context.lineWidth = 3;
+
+                context.fillStyle = 'yellow';
+
+                const textTime = `🕒 ${datetime}`;
+                const textY1 = canvas.height - 45;
+
+                context.strokeText(textTime, 20, textY1);
+                context.fillText(textTime, 20, textY1);
+
+                const textLocation = `📍 Lat: ${latitude ?? '-'}, Lon: ${longitude ?? '-'}`;
+                const textY2 = canvas.height - 20;
+
+                context.strokeText(textLocation, 20, textY2);
+                context.fillText(textLocation, 20, textY2);
 
                 // Ambil hasil gambar
                 const dataURL = canvas.toDataURL('image/jpeg', 0.9);

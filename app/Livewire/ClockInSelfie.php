@@ -38,9 +38,6 @@ class ClockInSelfie extends Component
     {
         $this->lokasisTerdekat = collect();
         $this->photo = session('selfie_path');
-        $this->latitude = null;
-        $this->longitude = null;
-        $this->currentTime = now()->toDateTimeString();
     }
 
     #[On('lokasiAwal')]
@@ -113,7 +110,6 @@ class ClockInSelfie extends Component
 
         $this->dispatch('lokasi-terdekat-diperbarui', lokasi: $lokasiArray, radius: 40);
     }
-
 
     public function reloadLocation()
     {
