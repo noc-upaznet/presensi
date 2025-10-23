@@ -30,6 +30,7 @@ class ClockInSelfie extends Component
     public float|null $longitude = null;
     public $lokasisTerdekat = [];
     public $errorMessage = null;
+    public $successMessage = null;
     public bool $canClockIn = false;
 
     public function mount()
@@ -53,39 +54,56 @@ class ClockInSelfie extends Component
         $this->hitungLokasiTerdekat();
 
         $radiusMaks = 0.04; // 40 meter
-        $sudahDekat = false;
-        $lokasiTerkunci = false;
+        $radiusFix = false;
+        $lokasiLocked = false;
+
+        // Ambil user login
+        $userId = Auth::id();
+        $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
+        // dd($karyawan);
 
         foreach ($this->lokasisTerdekat as $lokasi) {
             if ($lokasi->jarak <= $radiusMaks) {
-                $sudahDekat = true;
+                $radiusFix = true;
             }
 
-            // ✅ Jika lokasi memiliki lock = 1, maka tetap boleh Clock-In
-            if ($lokasi->lock == 0) {
-                $lokasiTerkunci = true;
+            $roleLokasi = RoleLokasiModel::where('karyawan_id', $karyawan->id)
+                ->whereRaw(json_encode($lokasi->id))
+                ->first();
+            // dd($roleLokasi);
+
+            if ($roleLokasi && $roleLokasi->lock == 1) {
+                $lokasiLocked = true;
             }
+
+            $lokasi->lock = $roleLokasi->lock;
         }
 
-        if ($sudahDekat || $lokasiTerkunci) {
-            $this->canClockIn = true;
-            $this->errorMessage = null;
+        $this->errorMessage = null;
+        $this->successMessage = null;
 
-            if ($lokasiTerkunci) {
-                $this->dispatch('lokasiStop', message: 'Lokasi dikunci — Clock-In tetap diizinkan.');
-            } else {
-                $this->dispatch('lokasiStop', message: 'Anda sudah berada di lokasi yang diizinkan.');
-            }
-        } else {
+        if (!$lokasiLocked) {
+            // dd($lokasiLocked);
+            $this->canClockIn = true;
+            $this->successMessage = 'Lokasi tidak terkunci — Clock-In diizinkan di mana saja.';
+            $this->dispatch('lokasiStop', message: 'Lokasi tidak terkunci.');
+        } elseif ($radiusFix && $lokasiLocked) {
+            $this->canClockIn = true;
+            $this->successMessage = 'Anda sudah berada di lokasi yang diizinkan.';
+            $this->dispatch('lokasiStop');
+        } elseif (!$radiusFix && $lokasiLocked) {
+            // dd($lokasiLocked, $radiusFix);
             $this->canClockIn = false;
             $this->errorMessage = 'Anda berada di luar radius lokasi yang diizinkan (maks 40 meter).';
         }
 
+        // Untuk frontend
         $lokasiArray = $this->lokasisTerdekat->map(function ($lokasi) {
             return [
                 'nama_lokasi' => $lokasi->nama_lokasi ?? 'Tidak diketahui',
                 'koordinat'   => $lokasi->koordinat ?? '-',
                 'jarak'       => round($lokasi->jarak * 1000, 2),
+                'lock'        => $lokasi->lock,
             ];
         })->values()->toArray();
 
