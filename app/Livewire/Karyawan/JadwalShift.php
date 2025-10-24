@@ -18,7 +18,7 @@ class JadwalShift extends Component
     use WithPagination, WithoutUrlPagination;
     protected $paginationTheme = 'bootstrap';
     public TambahDataKaryawanForm $form;
-    
+
     public $selectedTemplateId;
     public $bulan_tahun;
     public $filterBulan;
@@ -42,8 +42,7 @@ class JadwalShift extends Component
         //     ->pluck('karyawan_id')
         //     ->toArray();
 
-        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk'))
-        {
+        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             // dd($divisi);
@@ -55,7 +54,7 @@ class JadwalShift extends Component
                 // ->whereNotIn('id', $jadwalId)
                 ->orderBy('nama_karyawan')
                 ->get();
-        }elseif ($user->hasAnyRole('admin|hr')){
+        } elseif ($user->hasAnyRole('admin|hr')) {
             $entitas = session('selected_entitas', 'UHO');
 
             $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
@@ -90,7 +89,7 @@ class JadwalShift extends Component
     public function showEdit($id)
     {
         $jadwal = M_Jadwal::findOrFail(Crypt::decrypt($id));
-        $this->bulan_tahun = substr($jadwal->bulan_tahun, 0, 7); 
+        $this->bulan_tahun = substr($jadwal->bulan_tahun, 0, 7);
         // dd($this->bulan_tahun);
         $this->selectedKaryawan = (string) $jadwal->user_id;
 
@@ -114,7 +113,7 @@ class JadwalShift extends Component
     public function showDetail($id)
     {
         $jadwal = M_Jadwal::findOrFail(Crypt::decrypt($id));
-        $this->bulan_tahun = substr($jadwal->bulan_tahun, 0, 7); 
+        $this->bulan_tahun = substr($jadwal->bulan_tahun, 0, 7);
         $this->selectedKaryawan = (string) $jadwal->karyawan_id;
 
         // Load shift harian
@@ -155,7 +154,7 @@ class JadwalShift extends Component
                 'izin' => $izin,
                 'cuti' => $cuti,
                 'terlambat' => $presensi->where('status', 1)->count(), // bisa dikosongkan jika belum ada
-                'kehadiran' => $presensi->where('status', '!=' ,'')->count(),
+                'kehadiran' => $presensi->where('status', '!=', '')->count(),
             ],
         ]);
 
@@ -208,9 +207,8 @@ class JadwalShift extends Component
 
             $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitas) {
                 $q->where('divisi', $divisi)
-                ->where('entitas', $entitas);
+                    ->where('entitas', $entitas);
             });
-
         } elseif ($user->hasAnyRole('admin|hr')) {
             $entitas = session('selected_entitas', 'UHO');
 
@@ -222,7 +220,14 @@ class JadwalShift extends Component
             $entitas = $karyawan->entitas;
             $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitas) {
                 $q->where('divisi', $divisi)
-                ->where('entitas', $entitas);
+                    ->where('entitas', $entitas);
+            });
+        } elseif ($user->hasRole('user') && $karyawan->entitas == 'UGR') {
+            $divisi = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+            $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitas) {
+                $q->where('divisi', $divisi)
+                    ->where('entitas', $entitas);
             });
         }
         $jadwals = $query->paginate(10);

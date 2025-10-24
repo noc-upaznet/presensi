@@ -58,9 +58,9 @@ class ModalJadwalShift extends Component
         $jadwalId = M_Jadwal::where('bulan_tahun', $this->bulan_tahun)
             ->pluck('karyawan_id')
             ->toArray();
-            // dd($jadwalId);
-        
-        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {    
+        // dd($jadwalId);
+
+        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
@@ -117,7 +117,7 @@ class ModalJadwalShift extends Component
     {
         // Inisialisasi array untuk disimpan ke kolom d1 - d31
         $dataHari = [];
-    
+
         for ($i = 1; $i <= 31; $i++) {
             // Jika user memilih shift untuk tanggal ini, simpan
             if (isset($this->kalender[$i])) {
@@ -126,7 +126,7 @@ class ModalJadwalShift extends Component
                 $dataHari["d$i"] = null;
             }
         }
-   
+
         $dataJadwal = array_merge([
             'bulan_tahun' => $this->bulan_tahun,
             'karyawan_id' => $this->selectedKaryawan,
@@ -135,10 +135,10 @@ class ModalJadwalShift extends Component
         M_Jadwal::Create(
             $dataJadwal
         );
-    
+
         // Reset field
         $this->reset(['bulan_tahun', 'selectedKaryawan', 'kalender', 'selectedTemplateId']);
-    
+
         $this->dispatch('swal', params: [
             'title' => 'Data Saved',
             'icon' => 'success',
@@ -208,7 +208,7 @@ class ModalJadwalShift extends Component
             return;
         }
         $dataHari = [];
-    
+
         for ($i = 1; $i <= 31; $i++) {
             // Jika user memilih shift untuk tanggal ini, simpan
             if (isset($this->kalender[$i])) {
@@ -224,10 +224,10 @@ class ModalJadwalShift extends Component
         ], $dataHari);
         // dd($dataJadwal);
         $jadwal->update($dataJadwal);
-    
+
         // Reset field jika mau
         $this->reset(['bulan_tahun', 'selectedKaryawan', 'kalender']);
-    
+
         $this->dispatch('swal', params: [
             'title' => 'Data Updated',
             'icon' => 'success',
