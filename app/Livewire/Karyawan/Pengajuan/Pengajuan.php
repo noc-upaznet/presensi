@@ -316,7 +316,7 @@ class Pengajuan extends Component
             });
         }
 
-        $pengajuan = $query->latest()->paginate(10);
+        $pengajuan = $query->orderBy('tanggal', 'desc')->paginate(10);
 
         return view('livewire.karyawan.pengajuan.pengajuan', [
             'pengajuans' => $pengajuan,
