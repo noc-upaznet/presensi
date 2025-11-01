@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class M_Lembur extends Model
 {
+    use SoftDeletes;
     protected $table = 'lembur';
     protected $fillable = [
         'karyawan_id',

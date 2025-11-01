@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class M_Jadwal extends Model
 {
+    use SoftDeletes;
     protected $table = 'jadwal';
     protected $fillable = [
         'bulan_tahun',

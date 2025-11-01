@@ -6,10 +6,11 @@ use App\Models\Lokasi;
 use App\Models\M_DataKaryawan;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RoleLokasiModel extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = 'role_lokasi';
     protected $fillable = [
         'karyawan_id',

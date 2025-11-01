@@ -9,6 +9,7 @@ use App\Models\M_Entitas;
 use App\Models\M_Jabatan;
 use App\Models\M_DataKaryawan;
 use App\Livewire\Forms\TambahDataKaryawanForm;
+use Carbon\Carbon;
 
 class TambahDataKaryawan extends Component
 {
@@ -36,6 +37,11 @@ class TambahDataKaryawan extends Component
         $this->entitas = M_Entitas::all();
         $this->divisi = M_Divisi::all();
         $this->jabatan = M_Jabatan::all();
+        $this->generateNip();
+        $entitas = session('selected_entitas', 'UHO');
+
+        $this->form->entitas = $entitas;
+        // dd($entitas);
     }
 
     public function updatedFormGunakanAlamatKTP($value)
@@ -47,7 +53,8 @@ class TambahDataKaryawan extends Component
         }
     }
 
-    public function nextStep() {
+    public function nextStep()
+    {
         // Validasi field yang wajib diisi pada step saat ini
         if ($this->step === 1) {
             if (
@@ -87,7 +94,8 @@ class TambahDataKaryawan extends Component
         // Tambahkan validasi untuk step lain jika diperlukan
     }
 
-    public function prevStep() {
+    public function prevStep()
+    {
         $this->step--;
     }
 
@@ -99,7 +107,8 @@ class TambahDataKaryawan extends Component
         $this->form->tunjangan_jabatan = $value * 0.25;
     }
 
-    public function store() {
+    public function store()
+    {
         $this->validate([
             'password' => 'required',
         ]);
@@ -116,7 +125,7 @@ class TambahDataKaryawan extends Component
         // dd($dataUser);
 
         $user = User::create($dataUser);
-        
+
         $data = [
             'user_id' => $user->id,
             'nama_karyawan' => $this->form->nama_karyawan,
@@ -160,10 +169,10 @@ class TambahDataKaryawan extends Component
         ];
 
         // dd($data);
-            
+
         M_DataKaryawan::create($data);
         // dd($dataKaryawan);
-        
+
         $this->form->reset();
 
         $this->dispatch('swal', params: [
@@ -174,6 +183,31 @@ class TambahDataKaryawan extends Component
 
         redirect()->route('data-karyawan');
     }
+
+    public function generateNip()
+    {
+        $currentBranch = session('selected_entitas', 'UHO');
+        $branch = M_Entitas::where('nama', $currentBranch)->first();
+
+        $year = substr(Carbon::now()->year, -2);
+        $month = str_pad(Carbon::now()->month, 2, '0', STR_PAD_LEFT);
+
+        $kodeEntitas = str_pad($branch->id, 2, '0', STR_PAD_LEFT);
+
+        $prefix = "{$year}{$month}{$kodeEntitas}";
+        $lastKaryawan = M_DataKaryawan::where('entitas', $branch->nama)
+            ->orderBy('nip_karyawan', 'desc')
+            ->first();
+
+        // Ambil 3 digit terakhir dari NIP, tambahkan 1
+        $lastNumber = $lastKaryawan ? (int) substr($lastKaryawan->nip_karyawan, -3) : 0;
+        $noUrutBaru = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
+        // dd($noUrutBaru);
+
+
+        $this->form->nip_karyawan = "{$prefix}{$noUrutBaru}";
+    }
+
     public function render()
     {
         return view('livewire.karyawan.tambah-data-karyawan');
