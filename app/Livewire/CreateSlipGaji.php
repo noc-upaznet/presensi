@@ -611,9 +611,9 @@ class CreateSlipGaji extends Component
                 $cuti++;
             } elseif ($kode == 8) {
                 $izinSetengahHari++;
-            } elseif ($kode == 16) {
+            } elseif ($kode == 22) {
                 $izinSetengahHariPagi++;
-            } elseif ($kode == 17) {
+            } elseif ($kode == 23) {
                 $izinSetengahHariSiang++;
             }
         }
