@@ -24,9 +24,15 @@ class Dispensasi extends Component
     public DispensasiForm $form;
     public $file;
     public $filterPengajuan;
+    public $filterBulan;
     public $search;
     public $editId;
     public $oldFile;
+
+    public function mount()
+    {
+        $this->filterBulan = date('Y-m');
+    }
 
     public function showAdd()
     {
@@ -126,9 +132,9 @@ class Dispensasi extends Component
         $data = [
             'date'        => $this->form->date,
             'description' => $this->form->description,
-            'file'        => $path 
-                                ? str_replace('public/', 'storage/', $path) 
-                                : $this->oldFile,
+            'file'        => $path
+                ? str_replace('public/', 'storage/', $path)
+                : $this->oldFile,
         ];
 
         $pengajuan->update($data);
@@ -200,7 +206,7 @@ class Dispensasi extends Component
 
         $this->dispatch('refresh');
     }
-    
+
     public function render()
     {
         $query = M_Dispensation::with(['getKaryawan']);
@@ -214,11 +220,11 @@ class Dispensasi extends Component
                 $query->where('karyawan_id', $dataKaryawan->id);
             }
 
-        // 🔹 Admin → semua karyawan di entitas
+            // 🔹 Admin → semua karyawan di entitas
         } elseif ($user->hasRole('admin')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
-        // 🔹 HR → semua karyawan semua entitas
+            // 🔹 HR → semua karyawan semua entitas
         } elseif ($user->hasRole('hr')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
@@ -231,10 +237,7 @@ class Dispensasi extends Component
 
         // 🔹 Filter Bulan
         if (!empty($this->filterBulan)) {
-            dd($this->filterBulan);
-            $bulan = date('m', strtotime($this->filterBulan));
-            $tahun = date('Y', strtotime($this->filterBulan));
-            $query->whereMonth('date', $bulan)->whereYear('date', $tahun);
+            $query->where('date', 'like', $this->filterBulan . '%');
         }
 
         // 🔹 Search
@@ -255,11 +258,11 @@ class Dispensasi extends Component
             ->whereIn('tanggal', $tanggalList) // sesuai tanggal pengajuan
             ->whereNotNull('clock_in')
             ->get()
-            ->groupBy(function($item) {
-                return $item->user_id.'-'.$item->tanggal;
+            ->groupBy(function ($item) {
+                return $item->user_id . '-' . $item->tanggal;
             });
 
-        return view('livewire.karyawan.pengajuan.dispensasi',[
+        return view('livewire.karyawan.pengajuan.dispensasi', [
             'pengajuanDispens' => $pengajuanDispens,
             'presensiClockIn' => $presensiClockIn,
         ]);

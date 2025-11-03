@@ -24,7 +24,13 @@ class Sharing extends Component
     protected $paginationTheme = 'bootstrap';
     public $file;
     public $filterPengajuan;
+    public $filterBulan;
     public $search;
+
+    public function mount()
+    {
+        $this->filterBulan = date('Y-m');
+    }
 
     public function showAdd()
     {
@@ -112,7 +118,7 @@ class Sharing extends Component
 
         $this->dispatch('refresh');
     }
-    
+
     public function render()
     {
         $query = M_Sharing::with(['getKaryawan']);
@@ -126,12 +132,12 @@ class Sharing extends Component
                 $query->where('karyawan_id', $dataKaryawan->id);
             }
 
-        // 🔹 Admin → semua karyawan di entitas
+            // 🔹 Admin → semua karyawan di entitas
         } elseif ($user->hasRole('admin')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
 
-        // 🔹 HR → semua karyawan semua entitas
+            // 🔹 HR → semua karyawan semua entitas
         } elseif ($user->hasRole('hr')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
@@ -144,9 +150,7 @@ class Sharing extends Component
 
         // 🔹 Filter Bulan
         if (!empty($this->filterBulan)) {
-            $bulan = date('m', strtotime($this->filterBulan));
-            $tahun = date('Y', strtotime($this->filterBulan));
-            $query->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
+            $query->where('date', 'like', $this->filterBulan . '%');
         }
 
         // 🔹 Search
@@ -159,7 +163,7 @@ class Sharing extends Component
 
         $datas = $query->latest()->paginate(10);
 
-        return view('livewire.karyawan.pengajuan.sharing',[
+        return view('livewire.karyawan.pengajuan.sharing', [
             'datas' => $datas
         ]);
     }

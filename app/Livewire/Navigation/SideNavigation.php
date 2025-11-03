@@ -39,47 +39,47 @@ class SideNavigation extends Component
                         ->pluck('id');
 
                     // pengajuan cuti/izin
-                    if ($divisi == 'NOC'){
-                        $countPengajuan = M_Pengajuan::where('approve_spv', 0)
+                    if ($divisi == 'NOC') {
+                        $countPengajuan = M_Pengajuan::whereNull('approve_spv')
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
                             ->whereHas('getKaryawan', function ($q) use ($divisi) {
-                                $q->where('divisi', $divisi);
+                                $q->where('divisi', $divisi)
+                                    ->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%');
                             })
                             ->count();
-                    }else{
+                    } else {
                         $countPengajuan = M_Pengajuan::whereNull('approve_spv')
                             ->where('status', 0)
                             ->whereIn('karyawan_id', $karyawanIds)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
                             ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
-                            ->whereMonth('tanggal', Carbon::now()->month)
-                            ->whereYear('tanggal', Carbon::now()->year)
+                            ->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%')
                             ->count();
                     }
 
                     // Lembur
-                    if ($divisi == 'NOC'){
+                    if ($divisi == 'NOC') {
                         $countLembur = M_Lembur::where('approve_spv', 0)
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
                             ->whereHas('getKaryawan', function ($q) use ($divisi) {
-                                $q->where('divisi', $divisi);
+                                $q->where('divisi', $divisi)
+                                    ->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%');
                             })
                             ->count();
-                    }else{
+                    } else {
                         $countLembur = M_Lembur::whereNull('approve_spv')
                             ->where('status', 0)
                             ->whereIn('karyawan_id', $karyawanIds)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
                             ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
-                            ->whereMonth('tanggal', Carbon::now()->month)
-                            ->whereYear('tanggal', Carbon::now()->year)
+                            ->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%')
                             ->count();
                     }
-                    
+
                     // Presensi Staff
-                    if ($divisi == 'NOC'){
+                    if ($divisi == 'NOC') {
                         $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
                             ->where('approve', 0)
                             ->where('user_id', '!=', $dataKaryawan->id)
@@ -91,33 +91,35 @@ class SideNavigation extends Component
                         $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
                             ->where('approve', 0)
                             ->where('user_id', '!=', $dataKaryawan->id)
-                            ->whereHas('getKaryawan', fn($q) => 
+                            ->whereHas(
+                                'getKaryawan',
+                                fn($q) =>
                                 $q->where('entitas', $entitasIdSaatIni)
-                                ->where('divisi', $dataKaryawan->divisi)
+                                    ->where('divisi', $dataKaryawan->divisi)
                             )
                             ->whereMonth('tanggal', Carbon::now()->month)
                             ->whereYear('tanggal', Carbon::now()->year)
                             ->count();
                     }
-                        // dd($countPresensiStaff);
+                    // dd($countPresensiStaff);
                 } else {
                     $countPengajuan = 0;
                     $countLembur = 0;
                     $countPresensiStaff = 0;
                 }
 
-            // 🔹 HR
+                // 🔹 HR
             } elseif ($user->hasRole('hr')) {
                 $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
                 $entitas = session('selected_entitas', 'UHO');
-                
+
                 if ($dataKaryawan) {
                     // dd($entitas);
                     // Pengajuan
                     $countPengajuan = M_Pengajuan::where(function ($q) {
-                            $q->where('approve_spv', 1)
+                        $q->where('approve_spv', 1)
                             ->orWhereNull('approve_spv');
-                        })
+                    })
                         ->whereNull('approve_hr')
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
@@ -128,9 +130,9 @@ class SideNavigation extends Component
 
                     // Lembur
                     $countLembur = M_Lembur::where(function ($q) {
-                            $q->where('approve_spv', 1)
+                        $q->where('approve_spv', 1)
                             ->orWhereNull('approve_spv');
-                        })
+                    })
                         ->whereNull('approve_hr')
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
@@ -139,8 +141,7 @@ class SideNavigation extends Component
                         ->whereYear('tanggal', Carbon::now()->year)
                         ->count();
 
-                    $countDispensasi = M_Dispensation::
-                        where('approve_hr', 0)
+                    $countDispensasi = M_Dispensation::where('approve_hr', 0)
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
@@ -148,8 +149,7 @@ class SideNavigation extends Component
                         ->whereYear('date', Carbon::now()->year)
                         ->count();
 
-                    $countFeeSharing = M_Sharing::
-                        where('approve_hr', 0)
+                    $countFeeSharing = M_Sharing::where('approve_hr', 0)
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
@@ -164,7 +164,7 @@ class SideNavigation extends Component
                     $countFeeSharing = 0;
                 }
 
-            // 🔹 Admin
+                // 🔹 Admin
             } elseif ($user->hasRole('admin')) {
                 $entitas = session('selected_entitas', 'UHO');
                 $entitasModel = M_Entitas::where('nama', $entitas)->first();
