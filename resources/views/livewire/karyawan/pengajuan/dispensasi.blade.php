@@ -1,6 +1,7 @@
 @push('styles')
     <style>
         @media (max-width: 425px) {
+
             /* Tombol Tambah dan Filter agar stack ke bawah */
             .lembur-header {
                 flex-direction: column !important;
@@ -47,23 +48,24 @@
             }
         }
     </style>
-    
 @endpush
 <div>
     <div class="app-content-header">
         <!--begin::Container-->
         <div class="container-fluid">
-          <!--begin::Row-->
-          <div class="row">
-            <div class="col-sm-6"><h3 class="mb-0" style="color: var(--bs-body-color);">Daftar Pengajuan Dispensasi</h3></div>
-            <div class="col-sm-6">
-              <ol class="breadcrumb float-sm-end">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Pengajuan Dispensasi</li>
-              </ol>
+            <!--begin::Row-->
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0" style="color: var(--bs-body-color);">Daftar Pengajuan Dispensasi</h3>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Pengajuan Dispensasi</li>
+                    </ol>
+                </div>
             </div>
-          </div>
-          <!--end::Row-->
+            <!--end::Row-->
         </div>
         <!--end::Container-->
     </div>
@@ -82,14 +84,15 @@
                         <option value="2">Ditolak</option>
                     </select>
 
-                    <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan" wire:model.lazy="filterBulan">
+                    <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan"
+                        wire:model.lazy="filterBulan">
                 </div>
             @endhasanyrole
             @role('admin')
                 <div class="d-flex gap-2">
                     {{-- <select class="form-select" wire:model.lazy="selectedKaryawan" style="width: 200px;">
                         <option value="">Pilih Karyawan</option>
-                        @foreach($karyawanList as $karyawan)
+                        @foreach ($karyawanList as $karyawan)
                             <option value="{{ $karyawan->nama_karyawan }}">{{ $karyawan->nama_karyawan }}</option>
                         @endforeach
                     </select> --}}
@@ -100,7 +103,8 @@
                         <option value="2">Ditolak</option>
                     </select>
 
-                    <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan" wire:model.lazy="filterBulan">
+                    <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan"
+                        wire:model.lazy="filterBulan">
                 </div>
             @endrole
         </div>
@@ -119,11 +123,12 @@
                         </label> --}}
                     </div>
                     <div>
-                        <input type="text" class="form-control form-control-sm rounded-end-0" placeholder="Tanggal" wire:model.live="search">
+                        <input type="text" class="form-control form-control-sm rounded-end-0" placeholder="Tanggal"
+                            wire:model.live="search">
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover mb-0" style="background-color: var(--bs-body-bg);">
+                    <table class="table table-hover mb-0" style="background-color: var(--bs-body-bg);">
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
@@ -141,14 +146,16 @@
                         <tbody>
                             @if ($pengajuanDispens->isEmpty())
                                 <tr>
-                                    <td colspan="9" class="text-center" style="color: var(--bs-body-color);">Data tidak ditemukan</td>
+                                    <td colspan="9" class="text-center" style="color: var(--bs-body-color);">Data
+                                        tidak ditemukan</td>
                                 </tr>
                             @else
                                 @foreach ($pengajuanDispens as $key)
                                     <tr>
                                         <td style="color: var(--bs-body-color);">{{ $key->date }}</td>
                                         @hasanyrole('admin|hr')
-                                            <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}</td>
+                                            <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}
+                                            </td>
                                         @endhasanyrole
                                         <td style="color: var(--bs-body-color);">{{ $key->description }}</td>
                                         @php
@@ -158,10 +165,8 @@
                                         <td style="color: var(--bs-body-color);">{{ $clockIn }}</td>
                                         <td style="color: var(--bs-body-color);">
                                             @if ($key->file)
-                                                <img src="{{ asset('storage/' . $key->file) }}"
-                                                    alt="Bukti Lembur"
-                                                    style="max-width: 100px; cursor: pointer;"
-                                                    data-bs-toggle="modal"
+                                                <img src="{{ asset('storage/' . $key->file) }}" alt="Bukti Lembur"
+                                                    style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
                                                     data-bs-target="#modalGambar"
                                                     onclick="setModalImage('{{ asset('storage/' . $key->file) }}')">
                                             @else
@@ -175,7 +180,7 @@
                                                 <span class="badge bg-danger">HRD</span>
                                             @endif
                                         </td>
-                                        
+
                                         <td style="color: var(--bs-body-color);">
                                             @if ($key->status == 0)
                                                 <span class="badge bg-warning">Menunggu</span>
@@ -188,10 +193,12 @@
                                         <td class="text-center" style="color: var(--bs-body-color);">
                                             @role('hr')
                                                 @if ($key->canBeApprovedByHr())
-                                                    <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">
+                                                    <button class="btn btn-sm btn-primary text-white mb-2"
+                                                        wire:click="updateStatus({{ $key->id }}, 1)">
                                                         <i class="bi bi-check-square"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">
+                                                    <button class="btn btn-sm btn-danger text-white mb-2"
+                                                        wire:click="updateStatus({{ $key->id }}, 2)">
                                                         <i class="bi bi-x-square"></i>
                                                     </button>
                                                     {{-- <button class="btn btn-sm btn-danger mb-2" wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
@@ -201,9 +208,12 @@
                                             @endrole
                                             @can('pengajuan-edit')
                                                 @if ($key->approve_spv == 0 && $key->approve_hr == 0)
-                                                    <button class="btn btn-sm btn-warning mb-2" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                    <button class="btn btn-sm btn-warning mb-2"
+                                                        wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i
+                                                            class="fa-solid fa-pen-to-square"></i></button>
                                                 @else
-                                                    <button class="btn btn-sm btn-warning mb-2" disabled><i class="fa-solid fa-pen-to-square"></i></button>
+                                                    <button class="btn btn-sm btn-warning mb-2" disabled><i
+                                                            class="fa-solid fa-pen-to-square"></i></button>
                                                 @endif
                                             @endcan
                                         </td>
@@ -218,34 +228,45 @@
                 {{ $pengajuanDispens->links() }}
             </div>
         </div>
-        
-        <div wire:ignore.self class="modal fade" id="modalTambahPengajuan" tabindex="-1" aria-labelledby="modalTambahPengajuanLabel"
-            aria-hidden="true">
+
+        <div wire:ignore.self class="modal fade" id="modalTambahPengajuan" tabindex="-1"
+            aria-labelledby="modalTambahPengajuanLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header bg-danger">
-                        <h5 class="modal-title text-white" id="modalTambahPengajuanLabel">Pengajuan Dispensasi Keterlambatan</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                        <h5 class="modal-title text-white" id="modalTambahPengajuanLabel">Pengajuan Dispensasi
+                            Keterlambatan</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Tutup"></button>
                     </div>
 
                     <form>
                         <div class="modal-body p-4">
                             <div class="mb-3">
-                                <label for="tanggal" class="form-label fw-semibold">Tanggal <small class="text-danger">*</small></label>
+                                <label for="tanggal" class="form-label fw-semibold">Tanggal <small
+                                        class="text-danger">*</small></label>
                                 <input type="date" class="form-control" id="tanggal" wire:model="form.date">
-                                @error('form.date') <span class="text-danger">{{ $message }}</span> @enderror
+                                @error('form.date')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
 
                             <div class="mb-3">
-                                <label for="keterangan" class="form-label fw-semibold">Keterangan <small class="text-danger">*</small></label>
-                                <input type="text" class="form-control" id="keterangan" placeholder="Contoh: Ban bocor" wire:model="form.description">
-                                @error('form.description') <span class="text-danger">{{ $message }}</span> @enderror
+                                <label for="keterangan" class="form-label fw-semibold">Keterangan <small
+                                        class="text-danger">*</small></label>
+                                <input type="text" class="form-control" id="keterangan"
+                                    placeholder="Contoh: Ban bocor" wire:model="form.description">
+                                @error('form.description')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
 
                             <div class="mb-3">
                                 <label for="file" class="form-label fw-semibold">File</label>
                                 <input type="file" wire:model="file" class="form-control" accept="image/*">
-                                @error('file') <span class="text-danger">{{ $message }}</span> @enderror
+                                @error('file')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                                 <small class="text-danger">
                                     @if (session()->has('error'))
                                         {{ session('error') }}
@@ -257,8 +278,10 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary  w-100 w-md-auto" wire:click='store' wire:loading.attr="disabled" wire:target="store">
-                                <div wire:loading wire:target="store" class="spinner-border spinner-border-sm" role="status">
+                            <button type="button" class="btn btn-primary  w-100 w-md-auto" wire:click='store'
+                                wire:loading.attr="disabled" wire:target="store">
+                                <div wire:loading wire:target="store" class="spinner-border spinner-border-sm"
+                                    role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                                 <span wire:loading.remove wire:target="store"><i class="fa fa-save"></i> Simpan</span>
@@ -272,36 +295,47 @@
             </div>
         </div>
 
-        <div wire:ignore.self class="modal fade" id="modalEditPengajuan" tabindex="-1" aria-labelledby="modalEditPengajuanLabel"
-            aria-hidden="true">
+        <div wire:ignore.self class="modal fade" id="modalEditPengajuan" tabindex="-1"
+            aria-labelledby="modalEditPengajuanLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header bg-danger">
-                        <h5 class="modal-title text-white" id="modalEditPengajuanLabel">Pengajuan Dispensasi Keterlambatan</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                        <h5 class="modal-title text-white" id="modalEditPengajuanLabel">Pengajuan Dispensasi
+                            Keterlambatan</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Tutup"></button>
                     </div>
 
                     <form>
                         <div class="modal-body p-4">
                             <div class="mb-3">
-                                <label for="tanggal" class="form-label fw-semibold">Tanggal <small class="text-danger">*</small></label>
+                                <label for="tanggal" class="form-label fw-semibold">Tanggal <small
+                                        class="text-danger">*</small></label>
                                 <input type="date" class="form-control" id="tanggal" wire:model="form.date">
-                                @error('form.date') <span class="text-danger">{{ $message }}</span> @enderror
+                                @error('form.date')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
 
                             <div class="mb-3">
-                                <label for="keterangan" class="form-label fw-semibold">Keterangan <small class="text-danger">*</small></label>
-                                <input type="text" class="form-control" id="keterangan" placeholder="Contoh: Ban bocor" wire:model="form.description">
-                                @error('form.description') <span class="text-danger">{{ $message }}</span> @enderror
+                                <label for="keterangan" class="form-label fw-semibold">Keterangan <small
+                                        class="text-danger">*</small></label>
+                                <input type="text" class="form-control" id="keterangan"
+                                    placeholder="Contoh: Ban bocor" wire:model="form.description">
+                                @error('form.description')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
 
                             <div class="mb-3">
                                 <label for="file" class="form-label fw-semibold">File</label>
-                                @if($oldFile)
+                                @if ($oldFile)
                                     <div class="mb-2">
                                         <p>File lama:</p>
-                                        <img src="{{ asset('storage/' . $oldFile) }}" class="img-thumbnail" width="150">
-                                        <button type="button" class="btn btn-danger btn-sm mt-2" wire:click="removeOldFile">
+                                        <img src="{{ asset('storage/' . $oldFile) }}" class="img-thumbnail"
+                                            width="150">
+                                        <button type="button" class="btn btn-danger btn-sm mt-2"
+                                            wire:click="removeOldFile">
                                             Hapus File Lama
                                         </button>
                                     </div>
@@ -309,7 +343,8 @@
 
                                 {{-- <input type="file" wire:model="file" class="form-control" accept="image/*">
                                 @error('file') <span class="text-danger">{{ $message }}</span> @enderror --}}
-                                <input type="file" class="form-control" id="file" wire:model="file" accept=".jpg,.jpeg,.png">
+                                <input type="file" class="form-control" id="file" wire:model="file"
+                                    accept=".jpg,.jpeg,.png">
                                 <small class="text-danger">
                                     @if (session()->has('error'))
                                         {{ session('error') }}
@@ -321,11 +356,14 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary  w-100 w-md-auto" wire:click='saveEdit' wire:loading.attr="disabled" wire:target="saveEdit">
-                                <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm" role="status">
+                            <button type="button" class="btn btn-primary  w-100 w-md-auto" wire:click='saveEdit'
+                                wire:loading.attr="disabled" wire:target="saveEdit">
+                                <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm"
+                                    role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
-                                <span wire:loading.remove wire:target="saveEdit"><i class="fa fa-save"></i> Simpan</span>
+                                <span wire:loading.remove wire:target="saveEdit"><i class="fa fa-save"></i>
+                                    Simpan</span>
                                 <span wire:loading wire:target="saveEdit">Loading...</span>
                             </button>
                             <button type="button" class="btn btn-secondary w-100 w-md-auto"
@@ -339,13 +377,13 @@
     <div class="modal fade" id="modalGambar" tabindex="-1" aria-labelledby="modalGambarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalGambarLabel">Bukti Lembur</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="modalImage" src="" alt="Bukti" class="img-fluid">
-            </div>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalGambarLabel">Bukti Lembur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" alt="Bukti" class="img-fluid">
+                </div>
             </div>
         </div>
     </div>
@@ -370,7 +408,7 @@
         function setModalImage(src) {
             document.getElementById('modalImage').src = src;
         }
-        
+
         Livewire.on('modal-confirm-delete', (event) => {
             $('#modal-confirm-delete').modal(event.action);
             $('#btn-confirm-delete').attr('wire:click', 'delete("' + event.id + '")');
@@ -382,4 +420,3 @@
         });
     </script>
 @endpush
-

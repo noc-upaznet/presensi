@@ -33,9 +33,11 @@
                         <option value="2">Dispensasi</option>
                     </select>
 
-                    <input type="month" class="form-control" style="width: 150px;" placeholder="Bulan" wire:model.lazy="filterBulan">
+                    <input type="month" class="form-control" style="width: 150px;" placeholder="Bulan"
+                        wire:model.lazy="filterBulan">
 
-                    <input type="date" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Tanggal" wire:model.lazy="filterTanggal">
+                    <input type="date" class="form-control" style="width: 150px;" id="bulanPicker"
+                        placeholder="Tanggal" wire:model.lazy="filterTanggal">
                 </div>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
@@ -46,7 +48,8 @@
                             </select> entries per page</label>
                     </div>
                     <div>
-                        <input type="search" class="form-control form-control-sm" placeholder="Search..." wire:model.live="search">
+                        <input type="search" class="form-control form-control-sm" placeholder="Search..."
+                            wire:model.live="search">
                     </div>
                 </div>
                 @php
@@ -54,7 +57,7 @@
                 @endphp
 
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
+                    <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
@@ -65,14 +68,12 @@
                                 <th>Old Status</th>
                                 <th>File</th>
                                 <th>Status</th>
-                                @role('spv-sales')
+                                @role('spv-sales|branch-manager')
                                     <th>Approve</th>
                                 @endrole
-                                {{-- @if( (auth()->user()->hasRole('spv') && $divisi === 'Teknisi') 
-                                    || auth()->user()->hasRole('hr')) --}}
-                                @hasrole('hr')
+                                @role('hr')
                                     <th>Action</th>
-                                @endhasrole
+                                @endrole
                             </tr>
                         </thead>
                         <tbody>
@@ -85,49 +86,69 @@
                                     <td>{{ $key->clock_in }}</td>
                                     <td>{{ $key->clock_out }}</td>
                                     <td>
-                                        <span>Clock-In :</span> 
-                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($key->lokasi_final) }}" 
-                                        target="_blank" 
-                                        class="badge bg-primary text-decoration-none">
+                                        <span>Clock-In :</span>
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($key->lokasi_final) }}"
+                                            target="_blank" class="badge bg-primary text-decoration-none">
                                             {{ $key->lokasi_final }}
                                         </a>
                                         <br>
-                                        <span>Clock-Out :</span> 
-                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($key->lokasi_clock_out_final) }}" 
-                                        target="_blank" 
-                                        class="badge bg-danger text-decoration-none">
+                                        <span>Clock-Out :</span>
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($key->lokasi_clock_out_final) }}"
+                                            target="_blank" class="badge bg-danger text-decoration-none">
                                             {{ $key->lokasi_clock_out_final }}
                                         </a>
                                     </td>
                                     <td>
                                         @switch($key->previous_status)
-                                            @case("0") <span class="badge bg-success">Tepat Waktu</span> @break
-                                            @case("1") <span class="badge bg-danger">Terlambat</span> @break
-                                            @case("2") <span class="badge bg-primary">Dispensasi</span> @break
-                                            @default <span class="badge bg-secondary">Unknown</span>
+                                            @case('0')
+                                                <span class="badge bg-success">Tepat Waktu</span>
+                                            @break
+
+                                            @case('1')
+                                                <span class="badge bg-danger">Terlambat</span>
+                                            @break
+
+                                            @case('2')
+                                                <span class="badge bg-primary">Dispensasi</span>
+                                            @break
+
+                                            @default
+                                                <span class="badge bg-secondary">Unknown</span>
                                         @endswitch
                                     </td>
                                     <td>
-                                        <img src="{{ asset('storage/'.$key->file) }}" style="max-width:100px" class="img-fluid" alt="Selfie">
+                                        <img src="{{ asset('storage/' . $key->file) }}" style="max-width:100px"
+                                            class="img-fluid" alt="Selfie">
                                     </td>
                                     <td>
                                         @switch($key->status)
-                                            @case("0") <span class="badge bg-success">Tepat Waktu</span> @break
-                                            @case("1") <span class="badge bg-danger">Terlambat</span> @break
-                                            @case("2") <span class="badge bg-primary">Dispensasi</span> @break
-                                            @default <span class="badge bg-secondary">Unknown</span>
+                                            @case('0')
+                                                <span class="badge bg-success">Tepat Waktu</span>
+                                            @break
+
+                                            @case('1')
+                                                <span class="badge bg-danger">Terlambat</span>
+                                            @break
+
+                                            @case('2')
+                                                <span class="badge bg-primary">Dispensasi</span>
+                                            @break
+
+                                            @default
+                                                <span class="badge bg-secondary">Unknown</span>
                                         @endswitch
                                     </td>
 
-                                    {{-- Approve untuk SPV --}}
-                                    @role('spv-sales')
+                                    @role('spv-sales|branch-manager')
                                         <td>
-                                            @if($key->lokasi_lock == 0)
+                                            @if ($key->lokasi_lock == 0)
                                                 @if ($key->approve == 0)
-                                                    <button class="btn btn-success btn-sm mt-2 mb-2" wire:click="approve({{ $key->id }})">
+                                                    <button class="btn btn-success btn-sm mt-2 mb-2"
+                                                        wire:click="approve({{ $key->id }})">
                                                         <i class="fas fa-check"></i>
                                                     </button>
-                                                    <button class="btn btn-danger btn-sm" wire:click="reject({{ $key->id }})">
+                                                    <button class="btn btn-danger btn-sm"
+                                                        wire:click="reject({{ $key->id }})">
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 @elseif ($key->approve == 1)
@@ -139,108 +160,70 @@
                                         </td>
                                     @endrole
 
-                                    {{-- Dispensasi SPV Teknisi --}}
-                                    {{-- @role('spv-teknisi')
-                                        <td>
-                                            @if ($key->status == "1")
-                                                @if(empty($key->approve_late_spv))
-                                                    <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                @elseif($key->approve_late_spv == 1)
-                                                    <span class="badge bg-success">SPV APPROVED</span>
-                                                @endif
-                                                @if($key->approve_late_hr == 1)
-                                                    <span class="badge bg-success">HR APPROVED</span>
-                                                @endif
-                                            @elseif($key->status == "2")
-                                                <span class="badge bg-primary">Dispensasi Approved</span>
-                                            @endif
-                                        </td>
-                                    @endrole --}}
-
-                                    {{-- Dispensasi HR --}}
                                     @role('hr')
-                                        {{-- <td>
-                                            @can('dispensasi-approve')
-                                                @if ($key->status == "1")
-                                                    @if($key->approve_late_spv == 1)
-                                                        <span class="badge bg-success">SPV APPROVED</span>
-                                                    @endif
-                                                    @if(empty($key->approve_late_hr))
-                                                        <button class="btn btn-primary btn-sm mt-2 mb-2" wire:click="approvePresensi({{ $key->id }})">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                    @elseif($key->approve_late_hr == 1)
-                                                        <span class="badge bg-success">HR APPROVED</span>
-                                                    @endif
-                                                @elseif($key->status == "2")
-                                                    <span class="badge bg-primary">Dispensasi Approved</span>
-                                                @endif
-                                            @endcan
-                                        </td> --}}
                                         <td>
                                             @can('presensi-edit')
-                                                <button class="btn btn-warning btn-sm" wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
+                                                <button class="btn btn-warning btn-sm"
+                                                    wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                             @endcan
                                         </td>
                                     @endrole
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="9" class="text-center text-muted">Data tidak ditemukan</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-3">
-                    {{ $datas->links() }}
-                </div>
-            </div>
-        </div>
-    </div>
-    <div wire:ignore.self class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                    <div class="mb-3 container">
-                        <label for="status" class="form-label">Status</label>
-                        <select class="form-select" id="status" wire:model="status">
-                            @foreach($statusList as $key => $label)
-                                <option value="{{ $key }}">{{ $label }}</option>
-                            @endforeach
-                        </select>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center text-muted">Data tidak ditemukan</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3">
+                        {{ $datas->links() }}
                     </div>
                 </div>
+            </div>
+        </div>
+        <div wire:ignore.self class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Edit</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
 
-                <div class="modal-footer justify-content-center">
-                    <button type="button" wire:click="updateStatus" class="btn btn-primary">Simpan</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <div class="modal-body">
+                        <div class="mb-3 container">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" wire:model="status">
+                                @foreach ($statusList as $key => $label)
+                                    <option value="{{ $key }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" wire:click="updateStatus" class="btn btn-primary">Simpan</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 
 
-@push('scripts')
-<script>
-    Livewire.on('editModal', (event) => {
-        $('#editModal').modal(event.action);
-    });
+    @push('scripts')
+        <script>
+            Livewire.on('editModal', (event) => {
+                $('#editModal').modal(event.action);
+            });
 
-  Livewire.on('swal', (e) => {
-      Swal.fire(e.params);
-  });
-</script>
-    
-@endpush
+            Livewire.on('swal', (e) => {
+                Swal.fire(e.params);
+            });
+        </script>
+    @endpush

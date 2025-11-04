@@ -8,8 +8,8 @@ use Illuminate\Http\RedirectResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // 'tokenauth' => \App\Http\Middleware\TokenAuth::class,
             'password.expired' => \App\Http\Middleware\CheckPasswordExpired::class,
             'session.expired' => \App\Http\Middleware\expiredSession::class,
+            'check.payroll' => \App\Http\Middleware\PermissionPage::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

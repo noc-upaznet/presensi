@@ -91,11 +91,11 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/riwayat-presensi', RiwayatPresensi::class)->name('riwayat-presensi');
     Route::get('/divisi', Divisi::class)->name('divisi');
     Route::get('/entitas', Entitas::class)->name('entitas');
-    Route::get('/payroll', Payroll::class)->name('payroll');
+    Route::get('/payroll', Payroll::class)->name('payroll')->middleware('check.payroll');
     Route::get('/edit-payroll/{id}', EditPayroll::class)->name('edit-payroll');
     Route::get('/create-slip-gaji/{id?}/{month?}/{year?}', CreateSlipGaji::class)->name('create-slip-gaji');
     Route::get('/create-slip-gaji-tambah/{month?}/{year?}', CreateSlipGaji::class)
-    ->name('create-slip-gaji-tambah');
+        ->name('create-slip-gaji-tambah');
     Route::get('/slip-gaji/html/{id}', [PayrollController::class, 'html'])->name('slip.html');
     Route::get('/slip-gaji/download/{id}', [PayrollController::class, 'download'])->name('slip-gaji.download');
     Route::get('/jenis-tunjangan', JenisTunjangan::class)->name('jenis-tunjangan');

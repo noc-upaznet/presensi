@@ -37,7 +37,7 @@
                             class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
                             More info <i class="bi bi-arrow-right-circle"></i>
                         </a>
-                        <livewire:modal-payroll />  
+                        <livewire:modal-payroll />
                     </div>
                     <!--end::Small Box Widget 3-->
                 </div>
@@ -60,7 +60,7 @@
                             class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
                             More info <i class="bi bi-arrow-right-circle"></i>
                         </a>
-                        <livewire:modal-payroll />  
+                        <livewire:modal-payroll />
                     </div>
                     <!--end::Small Box Widget 3-->
                 </div>
@@ -83,7 +83,7 @@
                             class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
                             -
                         </span>
-                        <livewire:modal-payroll />  
+                        <livewire:modal-payroll />
                     </div>
                     <!--end::Small Box Widget 3-->
                 </div>
@@ -106,7 +106,7 @@
                             class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
                             -
                         </span>
-                        <livewire:modal-payroll />  
+                        <livewire:modal-payroll />
                     </div>
                     <!--end::Small Box Widget 3-->
                 </div>
@@ -121,7 +121,8 @@
                     $year = $selectedYear ?? now()->year;
                 @endphp
                 @can('payroll-create')
-                    <a href="{{ route('create-slip-gaji-tambah', ['month' => $month, 'year' => $year]) }}" class="btn btn-sm btn-primary">
+                    <a href="{{ route('create-slip-gaji-tambah', ['month' => $month, 'year' => $year]) }}"
+                        class="btn btn-sm btn-primary">
                         <i class="fa-solid fa-plus"></i>
                         Tambah
                     </a>
@@ -159,7 +160,7 @@
                         <option value="0">Pending</option>
                         <option value="1">Accepted</option>
                     </select>
-                    
+
 
                     <div class="ms-auto">
                         <button type="button" class="btn btn-sm btn-success" wire:click="export">
@@ -169,7 +170,8 @@
                 </div>
 
                 <h5 class="text-secondary mb-3">
-                    Periode: {{ $selectedMonth ? \Carbon\Carbon::createFromFormat('m', $selectedMonth)->locale('id')->translatedFormat('F') . ' ' . $selectedYear : 'Semua Periode' }}
+                    Periode:
+                    {{ $selectedMonth ? \Carbon\Carbon::createFromFormat('m', $selectedMonth)->locale('id')->translatedFormat('F') . ' ' . $selectedYear : 'Semua Periode' }}
                 </h5>
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -219,11 +221,10 @@
                                         <td>Rp. {{ number_format($payroll->total_gaji, 0, ',', '.') }}</td>
                                         <td>
                                             <div class="form-check form-switch d-inline-block">
-                                                <input type="checkbox"
-                                                    class="form-check-input"
+                                                <input type="checkbox" class="form-check-input"
                                                     id="switchTitip{{ $payroll->id }}"
                                                     wire:change="toggleTitip({{ $payroll->id }})"
-                                                    @if($payroll->titip) checked @endif>
+                                                    @if ($payroll->titip) checked @endif>
                                                 <label class="form-check-label" for="switchTitip{{ $payroll->id }}">
                                                     {{ $payroll->titip ? 'Titip' : $currentEntitas }}
                                                 </label>
@@ -231,7 +232,8 @@
                                         </td>
                                         <td>
                                             @if ($payroll->published == 0)
-                                                <button wire:click="publishPayroll({{ $payroll->id }})" class="btn btn-primary btn-sm">Publish</button>
+                                                <button wire:click="publishPayroll({{ $payroll->id }})"
+                                                    class="btn btn-primary btn-sm">Publish</button>
                                             @elseif ($payroll->published == 1)
                                                 <span class="badge bg-success">Published</span>
                                             @endif
@@ -244,18 +246,19 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($payroll->id) }}')"><i class="fa-solid fa-print"></i>
+                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#previewModal"
+                                                onclick="loadSlipPreview('{{ Crypt::encrypt($payroll->id) }}')"><i
+                                                    class="fa-solid fa-print"></i>
                                             </button>
-                                            <button 
-                                                wire:click="editPayroll('{{ encrypt($payroll->id) }}')" 
-                                                class="btn btn-warning btn-sm" 
-                                                data-bs-toggle="tooltip" 
-                                                data-bs-placement="top" 
-                                                title="Edit">
-                                                    <i class="fas fa-edit"></i>
+                                            <button wire:click="editPayroll('{{ encrypt($payroll->id) }}')"
+                                                class="btn btn-warning btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" title="Edit">
+                                                <i class="fas fa-edit"></i>
                                             </button>
                                             <button wire:click="confirmHapusPayroll({{ $payroll->id }})"
-                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
+                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -298,11 +301,10 @@
                                         <td>Rp. {{ number_format($key->total_gaji, 0, ',', '.') }}</td>
                                         <td>
                                             <div class="form-check form-switch d-inline-block">
-                                                <input type="checkbox"
-                                                    class="form-check-input"
+                                                <input type="checkbox" class="form-check-input"
                                                     id="switchTitip{{ $key->id }}"
                                                     wire:change="toggleTitip({{ $key->id }})"
-                                                    @if($key->titip) checked @endif>
+                                                    @if ($key->titip) checked @endif>
                                                 <label class="form-check-label" for="switchTitip{{ $key->id }}">
                                                     {{ $key->titip ? 'Titip' : $currentEntitas }}
                                                 </label>
@@ -310,7 +312,8 @@
                                         </td>
                                         <td>
                                             @if ($key->published == 0)
-                                                <button wire:click="publishPayroll({{ $key->id }})" class="btn btn-primary btn-sm">Publish</button>
+                                                <button wire:click="publishPayroll({{ $key->id }})"
+                                                    class="btn btn-primary btn-sm">Publish</button>
                                             @elseif ($key->published == 1)
                                                 <span class="badge bg-success">Published</span>
                                             @endif
@@ -323,18 +326,19 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal" onclick="loadSlipPreview('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-print"></i>
+                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#previewModal"
+                                                onclick="loadSlipPreview('{{ Crypt::encrypt($key->id) }}')"><i
+                                                    class="fa-solid fa-print"></i>
                                             </button>
-                                            <button 
-                                                wire:click="editPayroll('{{ encrypt($key->id) }}')" 
-                                                class="btn btn-warning btn-sm" 
-                                                data-bs-toggle="tooltip" 
-                                                data-bs-placement="top" 
-                                                title="Edit">
-                                                    <i class="fas fa-edit"></i>
+                                            <button wire:click="editPayroll('{{ encrypt($key->id) }}')"
+                                                class="btn btn-warning btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" title="Edit">
+                                                <i class="fas fa-edit"></i>
                                             </button>
                                             <button wire:click="confirmHapusPayroll({{ $key->id }})"
-                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
+                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -355,30 +359,34 @@
     </div>
 
     <!-- Modal Preview -->
-    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Preview Slip Gaji</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="slipPreviewContent">
-                <div class="text-center text-muted">
-                    <iframe id="slipPreviewIframe" src="" style="width: 100%; height: 90vh; border: none;"></iframe>
+                <div class="modal-header">
+                    <h5 class="modal-title">Preview Slip Gaji</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <a href="#" id="downloadSlipLink" target="_blank" class="btn btn-primary"><i class="fa-solid fa-print"></i> Download PDF</a>
-            </div>
+                <div class="modal-body" id="slipPreviewContent">
+                    <div class="text-center text-muted">
+                        <iframe id="slipPreviewIframe" src=""
+                            style="width: 100%; height: 90vh; border: none;"></iframe>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" id="downloadSlipLink" target="_blank" class="btn btn-primary"><i
+                            class="fa-solid fa-print"></i> Download PDF</a>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Modal Edit Payroll-->
-    <div wire:ignore.self class="modal fade" id="editPayrollModal" tabindex="-1" aria-labelledby="editPayrollModalLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="editPayrollModal" tabindex="-1"
+        aria-labelledby="editPayrollModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
-            <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
+            <div class="modal-content"
+                style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-primary" id="editPayrollModalLabel">Edit Data Payroll</h5>
@@ -388,17 +396,16 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="nip" class="form-label fw-semibold">No. Slip</label>
-                            <input type="text" class="form-control" id="nip" wire:model="no_slip"
-                                disabled>
+                            <input type="text" class="form-control" id="nip" wire:model="no_slip" disabled>
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label for="employee" class="form-label fw-semibold">Karyawan</label>
-                            <input type="text" class="form-control" id="nip" wire:model="nama_karyawan" 
+                            <input type="text" class="form-control" id="nip" wire:model="nama_karyawan"
                                 disabled>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="month" class="form-label fw-semibold">Bulan & Tahun</label>
@@ -406,16 +413,15 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="nip" class="form-label fw-semibold">NPK/NIP</label>
-                            <input type="text" class="form-control" id="nip" wire:model="nip_karyawan" 
+                            <input type="text" class="form-control" id="nip" wire:model="nip_karyawan"
                                 disabled>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="divisi" class="form-label fw-semibold">Divisi</label>
-                            <input type="text" class="form-control" id="divisi" wire:model="divisi" 
-                                disabled>
+                            <input type="text" class="form-control" id="divisi" wire:model="divisi" disabled>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
@@ -423,31 +429,33 @@
                                 disabled>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="tunjangan_jabatan" class="form-label fw-semibold">Tunjangan Jabatan</label>
-                            <input type="number" id="tunjangan_jabatan" class="form-control" wire:model="tunjangan_jabatan"
-                                disabled>
+                            <input type="number" id="tunjangan_jabatan" class="form-control"
+                                wire:model="tunjangan_jabatan" disabled>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="lembur_nominal" class="form-label fw-semibold">Lembur</label>
-                            <input type="number" id="lembur_nominal" class="form-control" wire:model="lembur_nominal"
-                                disabled>
+                            <input type="number" id="lembur_nominal" class="form-control"
+                                wire:model="lembur_nominal" disabled>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="mb-3 col-md-6">
                             <label for="inovation_reward" class="form-label fw-semibold">Uang Transport</label>
-                            <input type="number" name="transport" class="form-control" wire:model.lazy="transport" placeholder="Nominal">
+                            <input type="number" name="transport" class="form-control" wire:model.lazy="transport"
+                                placeholder="Nominal">
                         </div>
                         <div class="mb-3 col-md-6">
                             <label for="potongan" class="form-label fw-semibold">Uang Makan</label>
-                            <input type="number" name="uang_makan" class="form-control" wire:model.lazy="uang_makan" placeholder="Nominal">
+                            <input type="number" name="uang_makan" class="form-control"
+                                wire:model.lazy="uang_makan" placeholder="Nominal">
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="mb-3 col-md-6">
                             <label for="potongan" class="form-label fw-semibold">Tunjangan Kebudayaan</label>
@@ -501,17 +509,19 @@
                             </div>
                         </div>
                     </div> --}}
-                    
+
                     <div class="mb-3">
                         <label for="potongan" class="form-label fw-semibold">Tunjangan</label>
                         @foreach ($tunjangan as $index => $item)
                             <div class="input-group mb-2">
-                                <select name="tunjangan[]" class="form-select" wire:model="tunjangan.{{ $index }}.nama">
+                                <select name="tunjangan[]" class="form-select"
+                                    wire:model="tunjangan.{{ $index }}.nama">
                                     <option value="">-- Pilih Tunjangan --</option>
-                                    @if(!empty($jenis_tunjangan) && $jenis_tunjangan->count())
-                                        @foreach($jenis_tunjangan as $tunjangan)
+                                    @if (!empty($jenis_tunjangan) && $jenis_tunjangan->count())
+                                        @foreach ($jenis_tunjangan as $tunjangan)
                                             @if (!in_array($tunjangan->id, $tunjangan_terpilih ?? []))
-                                                <option value="{{ $tunjangan->nama_tunjangan }}">{{ $tunjangan->nama_tunjangan }}</option>
+                                                <option value="{{ $tunjangan->nama_tunjangan }}">
+                                                    {{ $tunjangan->nama_tunjangan }}</option>
                                             @endif
                                         @endforeach
                                     @else
@@ -519,25 +529,30 @@
                                     @endif
                                 </select>
                                 <span class="input-group-text">Rp</span>
-                                <input type="text" class="form-control" wire:model.lazy="tunjangan.{{ $index }}.nominal">
-                                <button type="button" class="btn btn-danger" wire:click="removeTunjangan({{ $index }})">Hapus</button>
+                                <input type="text" class="form-control"
+                                    wire:model.lazy="tunjangan.{{ $index }}.nominal">
+                                <button type="button" class="btn btn-danger"
+                                    wire:click="removeTunjangan({{ $index }})">Hapus</button>
                             </div>
                         @endforeach
                         <div class="mt-2">
-                            <button type="button" class="btn btn-success mb-2" wire:click="addTunjangan">+ Tambah Tunjangan</button>
+                            <button type="button" class="btn btn-success mb-2" wire:click="addTunjangan">+ Tambah
+                                Tunjangan</button>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="potongan" class="form-label fw-semibold">Potongan</label>
                         @foreach ($potongan as $index => $item)
                             <div class="input-group mb-2">
-                                <select name="potongan[]" class="form-select" wire:model="potongan.{{ $index }}.nama">
+                                <select name="potongan[]" class="form-select"
+                                    wire:model="potongan.{{ $index }}.nama">
                                     <option value="">-- Pilih Potongan --</option>
-                                    @if(!empty($jenis_potongan) && $jenis_potongan->count())
-                                        @foreach($jenis_potongan as $potongan)
+                                    @if (!empty($jenis_potongan) && $jenis_potongan->count())
+                                        @foreach ($jenis_potongan as $potongan)
                                             @if (!in_array($potongan->id, $potongan_terpilih ?? []))
-                                                <option value="{{ $potongan->nama_potongan }}">{{ $potongan->nama_potongan }}</option>
+                                                <option value="{{ $potongan->nama_potongan }}">
+                                                    {{ $potongan->nama_potongan }}</option>
                                             @endif
                                         @endforeach
                                     @else
@@ -545,22 +560,27 @@
                                     @endif
                                 </select>
                                 <span class="input-group-text">Rp</span>
-                                <input type="text" class="form-control" wire:model.lazy="potongan.{{ $index }}.nominal">
-                                <button type="button" class="btn btn-danger" wire:click="removePotongan({{ $index }})">Hapus</button>
+                                <input type="text" class="form-control"
+                                    wire:model.lazy="potongan.{{ $index }}.nominal">
+                                <button type="button" class="btn btn-danger"
+                                    wire:click="removePotongan({{ $index }})">Hapus</button>
                             </div>
                         @endforeach
                         <div class="mt-2">
-                            <button type="button" class="btn btn-success mb-2" wire:click="addPotongan">+ Tambah Potongan</button>
+                            <button type="button" class="btn btn-success mb-2" wire:click="addPotongan">+ Tambah
+                                Potongan</button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="izin_nominal" class="form-label fw-semibold">Potongan Izin</label>
-                            <input type="text" id="izin_nominal" class="form-control" disabled wire:model="izin_nominal">
+                            <input type="text" id="izin_nominal" class="form-control" disabled
+                                wire:model="izin_nominal">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="terlambat_nominal" class="form-label fw-semibold">Potongan Terlambat</label>
-                            <input type="text" id="terlambat_nominal" class="form-control" disabled wire:model="terlambat_nominal">
+                            <input type="text" id="terlambat_nominal" class="form-control" disabled
+                                wire:model="terlambat_nominal">
                         </div>
                     </div>
                     {{-- <div class="row mt-2 mb-2">
@@ -605,7 +625,8 @@
                     <div class="modal-footer">
                         <button type="button" wire:click="saveEdit" class="btn btn-primary"
                             wire:loading.attr="disabled" wire:target="saveEdit">
-                            <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm" role="status">
+                            <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm"
+                                role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                             <span wire:loading.remove wire:target="saveEdit">
@@ -625,7 +646,8 @@
     <div wire:ignore.self class="modal fade" id="hapusPayrollModal" tabindex="-1"
         aria-labelledby="hapusPayrollModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #dc3545; border-left: 1px solid #dee2e6;
+            <div class="modal-content"
+                style="border-radius: 0.375rem; border-top: 4px solid #dc3545; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-danger" id="hapusPayrollModalLabel">Hapus Data Payroll</h5>
@@ -638,8 +660,8 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                         style="border-radius: 8px;">Batal</button>
-                    <button type="button" class="btn btn-danger" wire:click="deletePayroll" style="border-radius: 8px;"
-                        data-bs-dismiss="modal">Hapus</button>
+                    <button type="button" class="btn btn-danger" wire:click="deletePayroll"
+                        style="border-radius: 8px;" data-bs-dismiss="modal">Hapus</button>
                 </div>
             </div>
         </div>

@@ -56,13 +56,16 @@ class RiwayatPresensiStaff extends Component
                     ->select('id', 'nama_karyawan')
                     ->get();
             }
-        }
-        elseif ($divisi === 'NOC') {
+        } elseif ($divisi === 'NOC') {
             $this->karyawanList = M_DataKaryawan::where('divisi', 'NOC')
                 ->select('id', 'nama_karyawan')
                 ->get();
-        }
-        else {
+        } elseif ($user->hasRole('branch-manager')) {
+            $this->karyawanList = M_DataKaryawan::where('entitas', $entitasNama)
+                // ->where('divisi', $divisi)
+                ->select('id', 'nama_karyawan')
+                ->get();
+        } else {
             $this->karyawanList = M_DataKaryawan::where('entitas', $entitasNama)
                 ->where('divisi', $divisi)
                 ->select('id', 'nama_karyawan')
@@ -206,8 +209,7 @@ class RiwayatPresensiStaff extends Component
 
         $entitasNama = $karyawan->entitas;
         // dd($entitasNama);
-        if($user->hasRole('spv'))
-        {
+        if ($user->hasRole('spv')) {
             if ($divisi === 'NOC') {
                 $datas = M_Presensi::with('getUser')
                     ->when($this->filterTanggal, function ($query) {
@@ -243,40 +245,40 @@ class RiwayatPresensiStaff extends Component
                     ->paginate(10);
             } else {
                 $datas = M_Presensi::with('getUser')
-                ->when($this->filterTanggal, function ($query) {
-                    $query->whereDate('created_at', $this->filterTanggal);
-                }, function ($query) {
-                    if ($this->filterBulan) {
-                        [$year, $month] = explode('-', $this->filterBulan);
-                        $query->whereYear('created_at', $year)
-                            ->whereMonth('created_at', $month);
-                    } else {
-                        $query->whereMonth('created_at', Carbon::now()->month)
-                            ->whereYear('created_at', Carbon::now()->year);
-                    }
-                })
-                ->when($this->filterkaryawan, function ($query) {
-                    $query->where('user_id', $this->filterkaryawan);
-                })
-                ->when($this->filterStatus !== null, function ($query) {
-                    // Filter berdasarkan status presensi
-                    if ($this->filterStatus == 0) {
-                        $query->where('status', 0); // Tepat Waktu
-                    } elseif ($this->filterStatus == 1) {
-                        $query->where('status', 1); // Terlambat
-                    } elseif ($this->filterStatus == 2) {
-                        $query->where('status', 2); // Dispensasi
-                    }
-                })
-                ->where('user_id', '!=', $karyawanId)
-                ->whereHas('getUser', function ($query) use ($divisi, $entitasNama) {
-                    $query->where('divisi', $divisi)
-                        ->where('entitas', $entitasNama);
-                })
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
+                    ->when($this->filterTanggal, function ($query) {
+                        $query->whereDate('created_at', $this->filterTanggal);
+                    }, function ($query) {
+                        if ($this->filterBulan) {
+                            [$year, $month] = explode('-', $this->filterBulan);
+                            $query->whereYear('created_at', $year)
+                                ->whereMonth('created_at', $month);
+                        } else {
+                            $query->whereMonth('created_at', Carbon::now()->month)
+                                ->whereYear('created_at', Carbon::now()->year);
+                        }
+                    })
+                    ->when($this->filterkaryawan, function ($query) {
+                        $query->where('user_id', $this->filterkaryawan);
+                    })
+                    ->when($this->filterStatus !== null, function ($query) {
+                        // Filter berdasarkan status presensi
+                        if ($this->filterStatus == 0) {
+                            $query->where('status', 0); // Tepat Waktu
+                        } elseif ($this->filterStatus == 1) {
+                            $query->where('status', 1); // Terlambat
+                        } elseif ($this->filterStatus == 2) {
+                            $query->where('status', 2); // Dispensasi
+                        }
+                    })
+                    ->where('user_id', '!=', $karyawanId)
+                    ->whereHas('getUser', function ($query) use ($divisi, $entitasNama) {
+                        $query->where('divisi', $divisi)
+                            ->where('entitas', $entitasNama);
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(10);
             }
-        }elseif ($user->hasRole('hr')) {
+        } elseif ($user->hasRole('hr')) {
             $entitasNama = session('selected_entitas', 'UHO');
 
             $datas = M_Presensi::with('getUser')
@@ -308,12 +310,45 @@ class RiwayatPresensiStaff extends Component
                 ->where('user_id', '!=', $karyawanId)
                 ->whereHas('getUser', function ($q) use ($entitasNama) {
                     $q
-                    ->where('entitas', $entitasNama); // filter entitas dari session
+                        ->where('entitas', $entitasNama); // filter entitas dari session
+                })
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        } elseif ($user->hasRole('branch-manager')) {
+
+            $datas = M_Presensi::with('getUser')
+                ->when($this->filterTanggal, function ($query) {
+                    $query->whereDate('created_at', $this->filterTanggal);
+                }, function ($query) {
+                    if ($this->filterBulan) {
+                        [$year, $month] = explode('-', $this->filterBulan);
+                        $query->whereYear('created_at', $year)
+                            ->whereMonth('created_at', $month);
+                    } else {
+                        $query->whereMonth('created_at', Carbon::now()->month)
+                            ->whereYear('created_at', Carbon::now()->year);
+                    }
+                })
+                ->when($this->filterkaryawan, function ($query) {
+                    $query->where('user_id', $this->filterkaryawan);
+                })
+                ->when($this->filterStatus !== null, function ($query) {
+                    if ($this->filterStatus == 0) {
+                        $query->where('status', 0);
+                    } elseif ($this->filterStatus == 1) {
+                        $query->where('status', 1);
+                    } elseif ($this->filterStatus == 2) {
+                        $query->where('status', 2);
+                    }
+                })
+                ->where('user_id', '!=', $karyawanId)
+                ->whereHas('getUser', function ($query) {
+                    $query->where('entitas', 'UNB'); // ✅ Hanya karyawan dari entitas UNB
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
         }
-        
+
 
         return view('livewire.riwayat-presensi-staff', [
             'datas' => $datas

@@ -1,6 +1,7 @@
 @push('styles')
     <style>
         @media (max-width: 425px) {
+
             /* Header breadcrumb stack */
             .app-content-header .row {
                 flex-direction: column;
@@ -55,17 +56,19 @@
     <div class="app-content-header">
         <!--begin::Container-->
         <div class="container-fluid">
-          <!--begin::Row-->
-          <div class="row">
-            <div class="col-sm-6"><h3 class="mb-0" style="color: var(--bs-body-color);">Daftar Pengajuan</h3></div>
-            <div class="col-sm-6">
-              <ol class="breadcrumb float-sm-end">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Pengajuan</li>
-              </ol>
+            <!--begin::Row-->
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0" style="color: var(--bs-body-color);">Daftar Pengajuan</h3>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Pengajuan</li>
+                    </ol>
+                </div>
             </div>
-          </div>
-          <!--end::Row-->
+            <!--end::Row-->
         </div>
         <!--end::Container-->
     </div>
@@ -83,9 +86,10 @@
                         <option value="1">Diterima</option>
                         <option value="2">Ditolak</option>
                     </select>
-    
-                    <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan" wire:model.lazy="filterBulan">
-    
+
+                    <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan"
+                        wire:model.lazy="filterBulan">
+
                     {{-- <button class="btn btn-light">Pilih Waktu</button> --}}
                 </div>
             </div>
@@ -95,7 +99,7 @@
                 <div class="d-flex gap-2">
                     <select class="form-select" wire:model.lazy="selectedKaryawan" style="width: 200px;">
                         <option value="">Pilih Karyawan</option>
-                        @foreach($karyawanList as $karyawan)
+                        @foreach ($karyawanList as $karyawan)
                             <option value="{{ $karyawan->nama_karyawan }}">{{ $karyawan->nama_karyawan }}</option>
                         @endforeach
                     </select>
@@ -106,7 +110,8 @@
                         <option value="2">Ditolak</option>
                     </select>
 
-                    <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan" wire:model.lazy="filterBulan">
+                    <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan"
+                        wire:model.lazy="filterBulan">
                 </div>
             </div>
         @endrole
@@ -121,11 +126,12 @@
                             </select> entries per page</label>
                     </div>
                     <div>
-                        <input type="text" class="form-control form-control-sm rounded-end-0" placeholder="Tanggal" wire:model.live="search">
+                        <input type="text" class="form-control form-control-sm rounded-end-0" placeholder="Tanggal"
+                            wire:model.live="search">
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover mb-0" style="background-color: var(--bs-body-bg);">
+                    <table class="table table-hover mb-0" style="background-color: var(--bs-body-bg);">
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
@@ -144,7 +150,8 @@
                         <tbody>
                             @if ($pengajuans->isEmpty())
                                 <tr>
-                                    <td colspan="9" class="text-center" style="color: var(--bs-body-color);">Data tidak ditemukan</td>
+                                    <td colspan="9" class="text-center" style="color: var(--bs-body-color);">Data
+                                        tidak ditemukan</td>
                                 </tr>
                             @else
                                 @foreach ($pengajuans as $key)
@@ -152,16 +159,17 @@
                                         <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
                                         {{-- <td style="color: var(--bs-body-color);">{{ $key->created_at }}</td> --}}
                                         @hasanyrole('admin|hr|spv')
-                                            <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}</td>
+                                            <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}
+                                            </td>
                                         @endhasanyrole
                                         <td style="color: var(--bs-body-color);">{{ $key->getShift->nama_shift }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->keterangan }}</td>
                                         <td>
-                                            @if($key->file && is_string($key->file) && file_exists(public_path('storage/' . $key->file)))
-                                                <img src="{{ asset('storage/' . $key->file) }}" 
-                                                style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
-                                                data-bs-target="#modalGambar"
-                                                onclick="setModalImage('{{ asset('storage/' . $key->file) }}')">
+                                            @if ($key->file && is_string($key->file) && file_exists(public_path('storage/' . $key->file)))
+                                                <img src="{{ asset('storage/' . $key->file) }}"
+                                                    style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
+                                                    data-bs-target="#modalGambar"
+                                                    onclick="setModalImage('{{ asset('storage/' . $key->file) }}')">
                                             @else
                                                 <span style="color: gray;">-</span>
                                             @endif
@@ -196,11 +204,14 @@
                                             @can('pengajuan-edit')
                                                 @if ($key->approve_spv == 0 && $key->approve_hr == 0)
                                                     <td class="text-center" style="color: var(--bs-body-color);">
-                                                        <button class="btn btn-sm btn-warning mb-2" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                        <button class="btn btn-sm btn-warning mb-2"
+                                                            wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i
+                                                                class="fa-solid fa-pen-to-square"></i></button>
                                                     </td>
                                                 @else
                                                     <td class="text-center" style="color: var(--bs-body-color);">
-                                                        <button class="btn btn-sm btn-warning mb-2" disabled><i class="fa-solid fa-pen-to-square"></i></button>
+                                                        <button class="btn btn-sm btn-warning mb-2" disabled><i
+                                                                class="fa-solid fa-pen-to-square"></i></button>
                                                     </td>
                                                 @endif
                                             @endcan
@@ -209,50 +220,62 @@
                                             {{-- Tombol Approve SPV --}}
                                             @role('spv')
                                                 @if ($key->canBeApprovedBySpv())
-                                                    <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">
+                                                    <button class="btn btn-sm btn-primary text-white mb-2"
+                                                        wire:click="updateStatus({{ $key->id }}, 1)">
                                                         <i class="bi bi-check-square"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">
+                                                    <button class="btn btn-sm btn-danger text-white mb-2"
+                                                        wire:click="updateStatus({{ $key->id }}, 2)">
                                                         <i class="bi bi-x-square"></i>
                                                     </button>
                                                 @endif
                                                 @if ($key->approve_hr == 0)
-                                                    <button class="btn btn-sm btn-warning mb-2" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                    <button class="btn btn-sm btn-warning mb-2"
+                                                        wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i
+                                                            class="fa-solid fa-pen-to-square"></i></button>
                                                 @else
-                                                    <button class="btn btn-sm btn-warning mb-2" disabled><i class="fa-solid fa-pen-to-square"></i></button>
+                                                    <button class="btn btn-sm btn-warning mb-2" disabled><i
+                                                            class="fa-solid fa-pen-to-square"></i></button>
                                                 @endif
-                                                <button class="btn btn-sm btn-danger mb-2" wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
+                                                <button class="btn btn-sm btn-danger mb-2"
+                                                    wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             @endrole
                                             {{-- Tombol Approve HR --}}
                                             @role('hr')
                                                 @if ($key->canBeApprovedByHr())
-                                                    <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">
+                                                    <button class="btn btn-sm btn-primary text-white mb-2"
+                                                        wire:click="updateStatus({{ $key->id }}, 1)">
                                                         <i class="bi bi-check-square"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">
+                                                    <button class="btn btn-sm btn-danger text-white mb-2"
+                                                        wire:click="updateStatus({{ $key->id }}, 2)">
                                                         <i class="bi bi-x-square"></i>
                                                     </button>
                                                 @endif
-                                                <button class="btn btn-sm btn-danger mb-2" wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
+                                                <button class="btn btn-sm btn-danger mb-2"
+                                                    wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             @endrole
 
                                             {{-- Tombol Admin --}}
                                             @role('admin')
-                                                @if($key->canBeApprovedByAdmin())
+                                                @if ($key->canBeApprovedByAdmin())
                                                     <div class="table-action-btns">
-                                                        <button class="btn btn-sm btn-primary text-white mb-2" wire:click="updateStatus({{ $key->id }}, 1)">
+                                                        <button class="btn btn-sm btn-primary text-white mb-2"
+                                                            wire:click="updateStatus({{ $key->id }}, 1)">
                                                             <i class="bi bi-check-square"></i>
                                                         </button>
-                                                        <button class="btn btn-sm btn-danger text-white mb-2" wire:click="updateStatus({{ $key->id }}, 2)">
+                                                        <button class="btn btn-sm btn-danger text-white mb-2"
+                                                            wire:click="updateStatus({{ $key->id }}, 2)">
                                                             <i class="bi bi-x-square"></i>
                                                         </button>
                                                     </div>
                                                 @endif
-                                                <button class="btn btn-sm btn-danger mb-2" wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
+                                                <button class="btn btn-sm btn-danger mb-2"
+                                                    wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             @endrole
@@ -273,13 +296,13 @@
     <div class="modal fade" id="modalGambar" tabindex="-1" aria-labelledby="modalGambarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalGambarLabel">Bukti Izin</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="modalImage" src="" alt="Bukti" class="img-fluid">
-            </div>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalGambarLabel">Bukti Izin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" alt="Bukti" class="img-fluid">
+                </div>
             </div>
         </div>
     </div>
