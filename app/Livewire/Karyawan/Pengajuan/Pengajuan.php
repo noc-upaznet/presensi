@@ -296,6 +296,10 @@ class Pengajuan extends Component
             $query->whereIn('karyawan_id', $karyawanIdList);
         }
 
+        $query->when($this->selectedKaryawan, function ($query) {
+            $query->where('karyawan_id', $this->selectedKaryawan);
+        });
+
         // 🔹 Filter Status
         if (in_array($this->filterPengajuan, ['0', '1', '2'], true)) {
             $query->where('status', (int) $this->filterPengajuan);

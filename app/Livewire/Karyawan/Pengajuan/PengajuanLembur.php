@@ -270,6 +270,10 @@ class PengajuanLembur extends Component
             }
         }
 
+        $query->when($this->selectedKaryawan, function ($query) {
+            $query->where('karyawan_id', $this->selectedKaryawan);
+        });
+
         // 🔹 Filter status pengajuan
         if (in_array($this->filterPengajuan, ['0', '1', '2'], true)) {
             $query->where('status', (int) $this->filterPengajuan);
