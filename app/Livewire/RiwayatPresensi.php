@@ -130,7 +130,7 @@ class RiwayatPresensi extends Component
                         $query->where('status', 2); // Dispensasi
                     }
                 })
-                ->when($entitasNama !== 'UNB', function ($query) {
+                ->when($entitasNama === 'UNB', function ($query) {
                     // Hanya terapkan filter approve untuk entitas selain UNB
                     $query->where(function ($q) {
                         $q->whereHas('getKaryawan', function ($sub) {
