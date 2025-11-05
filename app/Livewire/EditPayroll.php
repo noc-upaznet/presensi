@@ -374,10 +374,16 @@ class EditPayroll extends Component
             $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0);
             $potonganIzin = round($perHari * $totalHariIzin);
             $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 25000;
+            $currentBranch = session('selected_entitas');
+            if ($currentBranch === 'MC') {
+                $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 15000;
+            } else {
+                $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 25000;
+            }
             // dd($potonganTerlambat);
         }
-        $this->izin_nominal = $potonganIzin; // misal 50rb per izin
-        $this->terlambat_nominal = $potonganTerlambat; // misal 20rb per terlambat
+        $this->izin_nominal = $potonganIzin;
+        $this->terlambat_nominal = $potonganTerlambat;
 
         $this->hitungTotalGaji();
     }
