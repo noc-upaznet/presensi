@@ -91,7 +91,7 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/riwayat-presensi', RiwayatPresensi::class)->name('riwayat-presensi');
     Route::get('/divisi', Divisi::class)->name('divisi');
     Route::get('/entitas', Entitas::class)->name('entitas');
-    Route::get('/payroll', Payroll::class)->name('payroll');
+    Route::get('/payroll', Payroll::class)->name('payroll')->middleware('check.payroll');
     Route::get('/edit-payroll/{id}', EditPayroll::class)->name('edit-payroll');
     Route::get('/create-slip-gaji/{id?}/{month?}/{year?}', CreateSlipGaji::class)->name('create-slip-gaji');
     Route::get('/create-slip-gaji-tambah/{month?}/{year?}', CreateSlipGaji::class)
@@ -102,7 +102,7 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/jenis-potongan', JenisPotongan::class)->name('jenis-potongan');
     Route::get('/riwayat-presensi-staff', RiwayatPresensiStaff::class)->name('riwayat-presensi-staff');
     Route::get('/slip-gaji', SlipGaji::class)->name('slip-gaji');
-    Route::get('/manage-user', ManageUser::class)->name('manage-user');
+    Route::get('/manage-user', ManageUser::class)->name('manage-user')->middleware('check.manage-user');
     Route::get('/dispensasi', Dispensasi::class)->name('dispensasi');
     Route::get('/sharing', Sharing::class)->name('sharing');
 });

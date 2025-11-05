@@ -16,23 +16,14 @@ class PermissionPage
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::user() || !Auth::user()->can('payroll-view-admin')) {
-            return redirect('/clock-in');
-        }
-
-        if (!Auth::user() || !Auth::user()->can('karyawan-view')) {
-            return redirect('/clock-in');
-        }
-
-        if (!Auth::user() || !Auth::user()->can('jadwal-shift-create')) {
-            return redirect('/clock-in');
-        }
-
-        if (!Auth::user() || !Auth::user()->can('manage-user')) {
-            return redirect('/clock-in');
-        }
-
-        if (!Auth::user() || !Auth::user()->can('dashboard-view')) {
+        $user = Auth::user();
+        if (!$user || !$user->hasAnyPermission([
+            'payroll-view-admin',
+            'karyawan-view',
+            'jadwal-shift-create',
+            'manage-user',
+            'dashboard-view',
+        ])) {
             return redirect('/clock-in');
         }
         return $next($request);
