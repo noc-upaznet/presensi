@@ -71,7 +71,7 @@ class EditPayroll extends Component
     public $jml_psb = 0;
     public $insentif = 0;
     public $tunjangan_kehadiran = 0;
-    
+
     public $kebudayaan = 0;
     public $fee_sharing = 0;
 
@@ -86,7 +86,7 @@ class EditPayroll extends Component
     public $inovation_reward;
     public $inovation_reward_jumlah;
     public $inovation_reward_total = 0;
-    
+
     public $fee_sharing_digunakan = false;
     public $fee_sharing_nominal = 0;
     public $jml_psb_spv = 0;
@@ -184,7 +184,6 @@ class EditPayroll extends Component
         $this->hitungUangMakanTransport();
         // dd($this->entitas, $this->jabatan);
         $this->hitungTotalGaji();
-
     }
 
     public function hitungRekap($userId)
@@ -201,15 +200,15 @@ class EditPayroll extends Component
             ->where(function ($q) {
                 $q->where(function ($q1) {
                     $q1->where('lokasi_lock', 0)
-                    ->where('approve', 1);
+                        ->where('approve', 1);
                 })->orWhere(function ($q2) {
                     $q2->where('lokasi_lock', 1)
-                    ->where('approve', 0);
+                        ->where('approve', 0);
                 });
             })
             ->count();
 
-            // dd($terlambat);
+        // dd($terlambat);
 
         // --- AMBIL DATA JADWAL ---
         $jadwal = M_Jadwal::where('karyawan_id', $userId)
@@ -222,7 +221,7 @@ class EditPayroll extends Component
 
         if ($jadwal) {
             for ($i = 1; $i <= 31; $i++) {
-                $kolom = 'd'.$i;
+                $kolom = 'd' . $i;
                 $val = $jadwal->$kolom ?? null;
 
                 if ($val == 3) {
@@ -434,7 +433,7 @@ class EditPayroll extends Component
         }
 
         // Staff Sales / Collector pakai insentif mapping
-        if ($this->isSalesPosition()){
+        if ($this->isSalesPosition()) {
             $insentifMapping = [
                 1 => [1000000, 50000],
                 2 => [1000000, 100000],
@@ -568,7 +567,7 @@ class EditPayroll extends Component
 
         if ($jadwal) {
             for ($i = 1; $i <= 31; $i++) {
-                $col = 'd'.$i;
+                $col = 'd' . $i;
                 if (isset($jadwal->$col)) {
                     if ($jadwal->$col == 2) {
                         $cuti++;
@@ -596,7 +595,7 @@ class EditPayroll extends Component
         // Convert nilai numeric
         $gaji = $this->numericValue($this->gaji_pokok);
         $tunjangan = $this->numericValue($this->tunjangan_jabatan);
-        
+
         // $this->hitungInovationReward();
 
         if (in_array($propertyName, ['transport', 'transport_jumlah'])) {
@@ -643,7 +642,7 @@ class EditPayroll extends Component
         $kebudayaan        = $this->numericValue($this->kebudayaan ?? 0);
         $feeSharing        = $this->numericValue($this->fee_sharing ?? 0);
         $insentif          = $this->numericValue($this->insentif ?? 0);
-        $lemburLiburNominal= $this->numericValue($this->lembur_libur ?? 0);
+        $lemburLiburNominal = $this->numericValue($this->lembur_libur ?? 0);
         $lemburNominal     = $this->numericValue($this->lembur ?? 0);
         $kasbon            = $this->numericValue($this->kasbon ?? 0);
         $churn            = $this->numericValue($this->churn ?? 0);
@@ -674,7 +673,7 @@ class EditPayroll extends Component
 
         if ($dasarBpjs < $umk) {
             $nilaiDasarBpjs = $umk;
-        } elseif($dasarBpjs > $umk) {
+        } elseif ($dasarBpjs > $umk) {
             $nilaiDasarBpjs = $dasarBpjs;
         }
 
@@ -692,24 +691,24 @@ class EditPayroll extends Component
         // === 8. Hitung total gaji akhir ===
         $totalGaji = round(
             $gajiPokok
-            + $tunjanganJabatan
-            + $totalTunjangan
-            + $lemburNominal
-            + $lemburLiburNominal
-            + $insentif
-            + $tunjanganKehadiran
-            + $kebudayaan
-            + $feeSharing
-            + $transport
-            + $uangMakan
-            + $inovationReward
-            - $totalPotonganManual
-            - $this->izin_nominal
-            - $this->terlambat_nominal
-            - $this->bpjs_nominal
-            - $kasbon
-            - $churn
-            - $this->bpjs_jht_nominal
+                + $tunjanganJabatan
+                + $totalTunjangan
+                + $lemburNominal
+                + $lemburLiburNominal
+                + $insentif
+                + $tunjanganKehadiran
+                + $kebudayaan
+                + $feeSharing
+                + $transport
+                + $uangMakan
+                + $inovationReward
+                - $totalPotonganManual
+                - $this->izin_nominal
+                - $this->terlambat_nominal
+                - $this->bpjs_nominal
+                - $kasbon
+                - $churn
+                - $this->bpjs_jht_nominal
         );
         if (
             isset($this->entitas, $this->jabatan) &&
@@ -769,7 +768,6 @@ class EditPayroll extends Component
     public function addPotongan()
     {
         $this->potongan[] = ['nama' => '', 'nominal' => 0];
-
     }
 
     public function updatedPotongan($value, $key)
