@@ -42,7 +42,7 @@ class JadwalShift extends Component
         //     ->pluck('karyawan_id')
         //     ->toArray();
 
-        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
+        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk|spv-sales')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             // dd($divisi);
@@ -54,6 +54,7 @@ class JadwalShift extends Component
                 // ->whereNotIn('id', $jadwalId)
                 ->orderBy('nama_karyawan')
                 ->get();
+            // dd($this->karyawans);
         } elseif ($user->hasAnyRole('admin|hr')) {
             $entitas = session('selected_entitas', 'UHO');
 
@@ -199,7 +200,7 @@ class JadwalShift extends Component
             $query->where('bulan_tahun', 'like', $this->filterBulan . '%');
         }
 
-        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
+        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk|spv-sales')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;

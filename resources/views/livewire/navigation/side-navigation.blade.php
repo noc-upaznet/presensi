@@ -233,7 +233,7 @@
                     </li>
                 @endhasanyrole
 
-                @hasanyrole('spv-teknisi|spv-helpdesk')
+                @hasanyrole('spv-teknisi|spv-helpdesk|spv-sales')
                     <li class="nav-item">
                         <a href="{{ route('template-mingguan') }}"
                             class="nav-link {{ request()->routeIs('template-mingguan') ? 'active' : '' }}">

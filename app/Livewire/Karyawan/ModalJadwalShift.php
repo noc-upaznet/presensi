@@ -60,7 +60,7 @@ class ModalJadwalShift extends Component
             ->toArray();
         // dd($jadwalId);
 
-        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
+        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk|spv-sales')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
@@ -260,7 +260,7 @@ class ModalJadwalShift extends Component
         $jadwalId = M_Jadwal::where('bulan_tahun', $this->bulan_tahun)
             ->pluck('karyawan_id')
             ->toArray();
-        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
+        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk|spv-sales')) {
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
 
