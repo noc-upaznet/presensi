@@ -173,6 +173,26 @@ class ClockIn extends Component
             return;
         }
 
+        $hari = 'd' . now()->day;
+        $bulanTahun = now()->format('Y-m');
+        $jadwal = M_Jadwal::where('karyawan_id', $karyawanId)
+            ->where('bulan_tahun', $bulanTahun)
+            ->first();
+
+        $shiftId = $jadwal?->{$hari};
+        $shift = M_JadwalShift::find($shiftId);
+        // dd($shift);
+
+        if ($shift && $shift->jam_pulang) {
+            $jamPulangShift = \Carbon\Carbon::parse($shift->jam_pulang);
+            $jamSekarang = \Carbon\Carbon::now();
+
+            if ($jamSekarang->lt($jamPulangShift)) {
+                session()->flash('error', 'Belum waktu pulang. Anda baru bisa clock-out setelah jam ' . $jamPulangShift->format('H:i') . '.');
+                return;
+            }
+        }
+
         // Ambil role lokasi
         // $roleLokasi = RoleLokasiModel::where('karyawan_id', $karyawanId)
         //     ->first();
