@@ -19,6 +19,22 @@ class PermissionPage
         if (!Auth::user() || !Auth::user()->can('payroll-view-admin')) {
             return redirect('/clock-in');
         }
+
+        if (!Auth::user() || !Auth::user()->can('karyawan-view')) {
+            return redirect('/clock-in');
+        }
+
+        if (!Auth::user() || !Auth::user()->can('jadwal-shift-create')) {
+            return redirect('/clock-in');
+        }
+
+        if (!Auth::user() || !Auth::user()->can('manage-user')) {
+            return redirect('/clock-in');
+        }
+
+        if (!Auth::user() || !Auth::user()->can('dashboard-view')) {
+            return redirect('/clock-in');
+        }
         return $next($request);
     }
 }

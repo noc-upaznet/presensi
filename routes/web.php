@@ -71,16 +71,16 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/ganti-password', GantiPassword::class)->middleware('auth')->name('ganti-password');
 Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], function () {
-    Route::get('/', Dashboard::class)->name('dashboard');
+    Route::get('/', Dashboard::class)->name('dashboard')->middleware('check.dashboard-view');
     Route::get('/clock-in', ClockIn::class)->name('clock-in');
     Route::get('/clock-in-selfie', ClockInSelfie::class)->name('clock-in-selfie');
     Route::view('/profile', 'profile')->name('profile');
-    Route::get('/data-karyawan', DataKaryawan::class)->name('data-karyawan');
+    Route::get('/data-karyawan', DataKaryawan::class)->name('data-karyawan')->middleware('check.data-karyawan');
     Route::get('/tambah-data-karyawan', TambahDataKaryawan::class)->name('tambah-data-karyawan');
     Route::get('/detail-data-karyawan/{id}', DetailDataKaryawan::class)->name('karyawan.detail-data-karyawan');
     Route::get('/pembagian-shift', PembagianShift::class)->name('pembagian-shift');
     Route::get('/pembagian-shift/tambah-pembagian-shift', TambahPembagianShift::class)->name('tambah-pembagian-shift');
-    Route::get('/jadwal-shift', JadwalShift::class)->name('jadwal-shift');
+    Route::get('/jadwal-shift', JadwalShift::class)->name('jadwal-shift')->middleware('check.jadwal-shift');
     Route::get('/template-mingguan', TemplateMingguan::class)->name('template-mingguan');
     Route::get('/pengajuan', Pengajuan::class)->name('pengajuan');
     Route::get('/pengajuan-lembur', PengajuanLembur::class)->name('pengajuan-lembur');
@@ -102,7 +102,7 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/jenis-potongan', JenisPotongan::class)->name('jenis-potongan');
     Route::get('/riwayat-presensi-staff', RiwayatPresensiStaff::class)->name('riwayat-presensi-staff');
     Route::get('/slip-gaji', SlipGaji::class)->name('slip-gaji');
-    Route::get('/manage-user', ManageUser::class)->name('manage-user');
+    Route::get('/manage-user', ManageUser::class)->name('manage-user')->middleware('check.manage-user');
     Route::get('/dispensasi', Dispensasi::class)->name('dispensasi');
     Route::get('/sharing', Sharing::class)->name('sharing');
 });

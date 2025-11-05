@@ -18,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'password.expired' => \App\Http\Middleware\CheckPasswordExpired::class,
             'session.expired' => \App\Http\Middleware\expiredSession::class,
             'check.payroll' => \App\Http\Middleware\PermissionPage::class,
+            'check.data-karyawan' => \App\Http\Middleware\PermissionPage::class,
+            'check.jadwal-shift' => \App\Http\Middleware\PermissionPage::class,
+            'check.manage-user' => \App\Http\Middleware\PermissionPage::class,
+            'check.dashboard-view' => \App\Http\Middleware\PermissionPage::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
