@@ -91,7 +91,7 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/riwayat-presensi', RiwayatPresensi::class)->name('riwayat-presensi');
     Route::get('/divisi', Divisi::class)->name('divisi');
     Route::get('/entitas', Entitas::class)->name('entitas');
-    Route::get('/payroll', Payroll::class)->name('payroll')->middleware('check.payroll');
+    Route::get('/payroll', Payroll::class)->name('payroll');
     Route::get('/edit-payroll/{id}', EditPayroll::class)->name('edit-payroll');
     Route::get('/create-slip-gaji/{id?}/{month?}/{year?}', CreateSlipGaji::class)->name('create-slip-gaji');
     Route::get('/create-slip-gaji-tambah/{month?}/{year?}', CreateSlipGaji::class)
