@@ -102,7 +102,7 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/jenis-potongan', JenisPotongan::class)->name('jenis-potongan');
     Route::get('/riwayat-presensi-staff', RiwayatPresensiStaff::class)->name('riwayat-presensi-staff');
     Route::get('/slip-gaji', SlipGaji::class)->name('slip-gaji');
-    Route::get('/manage-user', ManageUser::class)->name('manage-user')->middleware('check.manage-user');
+    Route::get('/manage-user', ManageUser::class)->name('manage-user');
     Route::get('/dispensasi', Dispensasi::class)->name('dispensasi');
     Route::get('/sharing', Sharing::class)->name('sharing');
 });
