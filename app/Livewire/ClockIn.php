@@ -144,43 +144,180 @@ class ClockIn extends Component
         return $earthRadius * $c; // hasil jarak dalam kilometer
     }
 
+    // public function clockOut()
+    // {
+    //     $user = Auth::user()->id;
+    //     $karyawanId = M_DataKaryawan::where('user_id', $user)->value('id');
+    //     $tanggal = now()->toDateString();
+    //     $clockOutTime = now()->toTimeString();
+
+    //     // Validasi koordinat
+    //     if (!$this->latitude || !$this->longitude) {
+    //         session()->flash('error', 'Lokasi tidak tersedia. Aktifkan GPS.');
+    //         return;
+    //     }
+
+    //     // Ambil data presensi hari ini
+    //     $presensi = M_Presensi::where('user_id', $karyawanId)
+    //         ->where('clock_out', '00:00:00')
+    //         ->orderByDesc('tanggal')
+    //         ->first();
+    //     // dd($presensi);
+    //     if (!$presensi) {
+    //         session()->flash('error', 'Data presensi tidak ditemukan.');
+    //         return;
+    //     }
+
+    //     if ($presensi->clock_out !== '00:00:00') {
+    //         session()->flash('error', 'Anda sudah melakukan clock-out.');
+    //         return;
+    //     }
+
+    //     // Ambil role lokasi
+    //     // $roleLokasi = RoleLokasiModel::where('karyawan_id', $karyawanId)
+    //     //     ->first();
+    //     $roleLokasis = RoleLokasiModel::where('karyawan_id', $karyawanId)->get();
+
+    //     $lock = $roleLokasis->first()->lock ?? 1;
+    //     if ($lock == 1) {
+    //         // Ambil lokasi dari data presensi (yang disimpan saat clock-in)
+    //         $lokasiIds = $roleLokasis->pluck('lokasi_presensi')->flatten()->unique()->values()->all();
+
+    //         if (empty($lokasiIds)) {
+    //             session()->flash('error', 'Lokasi presensi tidak ditemukan.');
+    //             return;
+    //         }
+
+    //         // Ambil data lokasi dari database
+    //         $lokasis = Lokasi::whereIn('id', $lokasiIds)->get();
+
+    //         if ($lokasis->isEmpty()) {
+    //             session()->flash('error', 'Data lokasi tidak ditemukan.');
+    //             return;
+    //         }
+
+    //         // Cek apakah user masih dalam radius yang diizinkan
+    //         $radiusMaks = 0.04; // 40 meter
+    //         $dalamRadius = false;
+
+    //         foreach ($lokasis as $lokasi) {
+    //             if (!$lokasi->koordinat) continue;
+
+    //             [$latDb, $lngDb] = explode(',', $lokasi->koordinat);
+    //             $latDb = floatval($latDb);
+    //             $lngDb = floatval($lngDb);
+
+    //             $distance = $this->calculateDistance($this->latitude, $this->longitude, $latDb, $lngDb);
+    //             if ($distance <= $radiusMaks) {
+    //                 $dalamRadius = true;
+    //                 $lokasiIdTerdekat = $lokasi->id;
+    //                 break;
+    //             }
+    //         }
+
+    //         if (!$dalamRadius) {
+    //             session()->flash('error', 'Anda berada di luar radius lokasi yang diizinkan (maks 40 meter).');
+    //             return;
+    //         }
+    //     } else {
+    //         $lokasiIdTerdekat = $this->latitude . ', ' . $this->longitude;
+    //         // dd($lokasiIdTerdekat);
+    //     }
+
+    //     // Update clock-out
+    //     $presensi->update([
+    //         'clock_out' => $clockOutTime,
+    //         'lokasi_clock_out' => $lokasiIdTerdekat
+    //     ]);
+
+    //     session()->flash('success', 'Clock-out berhasil.');
+    //     return redirect()->route('clock-in');
+    // }
+
     public function clockOut()
     {
-        $user = Auth::user()->id;
-        $karyawanId = M_DataKaryawan::where('user_id', $user)->value('id');
-        $tanggal = now()->toDateString();
-        $clockOutTime = now()->toTimeString();
+        $userId = Auth::user()->id;
+        $karyawanId = M_DataKaryawan::where('user_id', $userId)->value('id');
 
-        // Validasi koordinat
+        $now = \Carbon\Carbon::now();
+        $tanggalSekarang = $now->toDateString();
+        $clockOutTime = $now->toTimeString();
+        $yesterday = $now->copy()->subDay()->toDateString();
+
         if (!$this->latitude || !$this->longitude) {
             session()->flash('error', 'Lokasi tidak tersedia. Aktifkan GPS.');
             return;
         }
 
-        // Ambil data presensi hari ini
-        $presensi = M_Presensi::where('user_id', $karyawanId)
-            ->where('clock_out', '00:00:00')
-            ->orderByDesc('tanggal')
+        $presensiToday = M_Presensi::where('user_id', $karyawanId)
+            ->where('tanggal', $tanggalSekarang)
             ->first();
-        // dd($presensi);
-        if (!$presensi) {
-            session()->flash('error', 'Data presensi tidak ditemukan.');
+
+        $presensiToUpdate = null;
+        $isPending = false;
+
+        if ($presensiToday && $presensiToday->clock_in !== '00:00:00' && $presensiToday->clock_out === '00:00:00') {
+            $presensiToUpdate = $presensiToday;
+        } else {
+            $presensiYesterday = M_Presensi::where('user_id', $karyawanId)
+                ->where('tanggal', $yesterday)
+                ->where('clock_in', '!=', '00:00:00')
+                ->where('clock_out', '00:00:00')
+                ->first();
+
+            if ($presensiYesterday) {
+                $presensiToUpdate = $presensiYesterday;
+                $isPending = true;
+            }
+        }
+
+        if (!$presensiToUpdate) {
+            session()->flash('error', 'Tidak ada presensi yang dapat di-clock-out (hari ini atau kemarin).');
             return;
         }
 
-        if ($presensi->clock_out !== '00:00:00') {
-            session()->flash('error', 'Anda sudah melakukan clock-out.');
+        // Pastikan belum di-update oleh proses lain (safety)
+        if ($presensiToUpdate->clock_out !== '00:00:00') {
+            session()->flash('error', 'Presensi sudah di-clock-out sebelumnya.');
             return;
         }
 
-        // Ambil role lokasi
-        // $roleLokasi = RoleLokasiModel::where('karyawan_id', $karyawanId)
-        //     ->first();
+        // CEK JAM PULANG
+        $tanggalPresensi = \Carbon\Carbon::parse($presensiToUpdate->tanggal);
+        $days = 'd' . $tanggalPresensi->day;
+        $bulanTahun = $tanggalPresensi->format('Y-m');
+
+        $jadwal = M_Jadwal::where('karyawan_id', $karyawanId)
+            ->where('bulan_tahun', $bulanTahun)
+            ->first();
+
+        $shiftId = $jadwal?->{$days};
+        $shift = $shiftId ? M_JadwalShift::find($shiftId) : null;
+
+        if (!$isPending) {
+            if ($shift && $shift->jam_pulang) {
+                $jamPulangShift = \Carbon\Carbon::parse($shift->jam_pulang);
+                $jamSekarang = \Carbon\Carbon::now();
+
+                if ($jamSekarang->lt($jamPulangShift)) {
+                    session()->flash('error', 'Belum waktu pulang. Anda baru bisa clock-out setelah jam ' . $jamPulangShift->format('H:i') . '.');
+                    return;
+                }
+            }
+        } else {
+            $selisihHari = $tanggalPresensi->startOfDay()->diffInDays(now()->startOfDay());
+            // dd($selisihHari);
+            if ($selisihHari > 1) {
+                session()->flash('error', 'Clock-out tertunda maksimal 1 hari setelah tanggal presensi.');
+                return;
+            }
+        }
+
+        // Ambil role lokasi dan cek radius
         $roleLokasis = RoleLokasiModel::where('karyawan_id', $karyawanId)->get();
+        $lock = $roleLokasis->first()?->lock ?? 1;
 
-        $lock = $roleLokasis->first()->lock ?? 1;
         if ($lock == 1) {
-            // Ambil lokasi dari data presensi (yang disimpan saat clock-in)
             $lokasiIds = $roleLokasis->pluck('lokasi_presensi')->flatten()->unique()->values()->all();
 
             if (empty($lokasiIds)) {
@@ -188,22 +325,20 @@ class ClockIn extends Component
                 return;
             }
 
-            // Ambil data lokasi dari database
             $lokasis = Lokasi::whereIn('id', $lokasiIds)->get();
-
             if ($lokasis->isEmpty()) {
                 session()->flash('error', 'Data lokasi tidak ditemukan.');
                 return;
             }
 
-            // Cek apakah user masih dalam radius yang diizinkan
             $radiusMaks = 0.04; // 40 meter
             $dalamRadius = false;
+            $lokasiIdTerdekat = null;
 
             foreach ($lokasis as $lokasi) {
                 if (!$lokasi->koordinat) continue;
 
-                [$latDb, $lngDb] = explode(',', $lokasi->koordinat);
+                [$latDb, $lngDb] = array_map('trim', explode(',', $lokasi->koordinat));
                 $latDb = floatval($latDb);
                 $lngDb = floatval($lngDb);
 
@@ -221,18 +356,17 @@ class ClockIn extends Component
             }
         } else {
             $lokasiIdTerdekat = $this->latitude . ', ' . $this->longitude;
-            // dd($lokasiIdTerdekat);
         }
 
-        // Update clock-out
-        $presensi->update([
+        $presensiToUpdate->update([
             'clock_out' => $clockOutTime,
-            'lokasi_clock_out' => $lokasiIdTerdekat
+            'lokasi_clock_out' => $lokasiIdTerdekat,
         ]);
 
-        session()->flash('success', 'Clock-out berhasil.');
+        // session()->flash('success', 'Clock-out berhasil untuk tanggal ' . $presensiToUpdate->tanggal . '.');
         return redirect()->route('clock-in');
     }
+
 
     public function render()
     {
