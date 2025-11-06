@@ -19,7 +19,7 @@ class Dashboard extends Component
     public $tepatWaktu = [];
     public $terlambat = [];
     public $tidakAbsen = [];
-    
+
     public function mount()
     {
         $shifts = M_JadwalShift::whereIn('nama_shift', [
@@ -101,11 +101,15 @@ class Dashboard extends Component
 
         // Filter berdasarkan ID karyawan dari entitas tersebut
         $totalGaji = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-                    ->where('periode', now()->format('Y-m'))
-                    ->sum('total_gaji');
-        $totalGajiLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            ->where('periode', now()->subMonth()->format('Y-m'))
+            // ->where('periode', now()->format('Y-m'))
+            ->where('created_at', 'like', now()->format('Y-m') . '%')
             ->sum('total_gaji');
+        // dd($totalGaji);
+        $totalGajiLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            // ->where('periode', now()->subMonth()->format('Y-m'))
+            ->where('created_at', 'like', now()->subMonth()->format('Y-m') . '%')
+            ->sum('total_gaji');
+        // dd($totalGajiLastMonth);
 
         if ($totalGajiLastMonth > 0) {
             $diff = $totalGaji - $totalGajiLastMonth;
@@ -117,13 +121,15 @@ class Dashboard extends Component
         }
 
         $totalGajiTitip = PayrollModel::whereIn('karyawan_id', $karyawanIdTitip)
-            ->where('periode', now()->format('Y-m'))
+            // ->where('periode', now()->format('Y-m'))
+            ->where('created_at', 'like', now()->format('Y-m') . '%')
             ->where('titip', 1)
             ->sum('total_gaji');
-            // dd($totalGajiTitip);
+        // dd($totalGajiTitip);
         $totalGajiTitipLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIdTitip)
             ->where('titip', 1)
-            ->where('periode', now()->subMonth()->format('Y-m'))
+            // ->where('periode', now()->subMonth()->format('Y-m'))
+            ->where('created_at', 'like', now()->subMonth()->format('Y-m') . '%')
             ->sum('total_gaji');
         if ($totalGajiTitipLastMonth > 0) {
             $diffTitip = $totalGajiTitip - $totalGajiTitipLastMonth;
@@ -133,12 +139,14 @@ class Dashboard extends Component
         } else {
             $noteTotalGajiTitip = 'Data bulan lalu tidak tersedia';
         }
-        
+
         $totalBpjskes = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            ->where('periode', now()->format('Y-m'))
+            // ->where('periode', now()->format('Y-m'))
+            ->where('created_at', 'like', now()->format('Y-m') . '%')
             ->sum('bpjs_perusahaan');
         $totalBpjsKesLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            ->where('periode', now()->subMonth()->format('Y-m'))
+            // ->where('periode', now()->subMonth()->format('Y-m'))
+            ->where('created_at', 'like', now()->subMonth()->format('Y-m') . '%')
             ->sum('bpjs_perusahaan');
         if ($totalBpjsKesLastMonth > 0) {
             $diff = $totalBpjskes - $totalBpjsKesLastMonth;
@@ -150,10 +158,12 @@ class Dashboard extends Component
         }
 
         $totalBpjsJht = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            ->where('periode', now()->format('Y-m'))
+            // ->where('periode', now()->format('Y-m'))
+            ->where('created_at', 'like', now()->format('Y-m') . '%')
             ->sum('bpjs_jht_perusahaan');
         $totalBpjsJhtLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            ->where('periode', now()->subMonth()->format('Y-m'))
+            // ->where('periode', now()->subMonth()->format('Y-m'))
+            ->where('created_at', 'like', now()->subMonth()->format('Y-m') . '%')
             ->sum('bpjs_jht_perusahaan');
         if ($totalBpjsJhtLastMonth > 0) {
             $diffJht = $totalBpjsJht - $totalBpjsJhtLastMonth;
@@ -175,19 +185,19 @@ class Dashboard extends Component
                 $q->whereHas('getKaryawan', function ($sub) {
                     $sub->whereNotIn('level', ['SPV', 'Manajer']);
                 })
-                ->where(function ($q2) {
-                    $q2->where(function ($q3) {
-                        $q3->where('lokasi_lock', 0)
-                            ->where('approve', 1);
+                    ->where(function ($q2) {
+                        $q2->where(function ($q3) {
+                            $q3->where('lokasi_lock', 0)
+                                ->where('approve', 1);
+                        })
+                            ->orWhere(function ($q3) {
+                                $q3->where('lokasi_lock', 1)
+                                    ->where('approve', 0);
+                            });
                     })
-                    ->orWhere(function ($q3) {
-                        $q3->where('lokasi_lock', 1)
-                            ->where('approve', 0);
+                    ->orWhereHas('getKaryawan', function ($sub) {
+                        $sub->whereIn('level', ['SPV', 'Manajer']);
                     });
-                })
-                ->orWhereHas('getKaryawan', function ($sub) {
-                    $sub->whereIn('level', ['SPV', 'Manajer']);
-                });
             })
             ->count();
 
@@ -218,5 +228,4 @@ class Dashboard extends Component
             ],
         ]);
     }
-
 }
