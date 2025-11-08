@@ -55,6 +55,14 @@ class JadwalShift extends Component
                 ->orderBy('nama_karyawan')
                 ->get();
             // dd($this->karyawans);
+        } elseif ($user->hasRole('branch-manager')) {
+            $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+            $entitasUser = M_DataKaryawan::where('user_id', $user->id)->first()->entitas;
+
+            $this->karyawans = M_DataKaryawan::where('entitas', $entitasUser)
+                // ->whereNotIn('id', $jadwalId)
+                ->orderBy('nama_karyawan')
+                ->get();
         } elseif ($user->hasAnyRole('admin|hr')) {
             $entitas = session('selected_entitas', 'UHO');
 
@@ -204,11 +212,18 @@ class JadwalShift extends Component
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
-            // dd($entitas);
 
             $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitas) {
                 $q->where('divisi', $divisi)
                     ->where('entitas', $entitas);
+            });
+        } elseif ($user->hasRole('branch-manager')) {
+            $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+            $entitasUser = M_DataKaryawan::where('user_id', $user->id)->first()->entitas;
+
+            $query->whereHas('getKaryawan', function ($q) use ($entitasUser) {
+                $q
+                    ->where('entitas', $entitasUser);
             });
         } elseif ($user->hasAnyRole('admin|hr')) {
             $entitas = session('selected_entitas', 'UHO');
