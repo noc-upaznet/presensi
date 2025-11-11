@@ -37,8 +37,8 @@ class ModalPengajuan extends Component
                 'Izin',
                 'Cuti',
                 // 'Izin Setengah Hari',
-                'Izin Setengah Hari Pagi (08.00 - 12.00)',
-                'Izin Setengah Hari Siang (12.00 - 16.00)',
+                'Izin Setengah Hari (Masuk Pagi)',
+                'Izin Setengah Hari (Masuk Siang)',
             ]
         )->orderBy('nama_shift')->get();
     }
