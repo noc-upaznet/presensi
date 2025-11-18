@@ -46,7 +46,7 @@ class M_Lembur extends Model
         $auth = auth()->user();
 
         // Hanya untuk SPV
-        if (! $auth || ! $auth->hasRole('spv')) {
+        if (! $auth || ! $auth->hasRole('spv|branch-manager')) {
             return false;
         }
 

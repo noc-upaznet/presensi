@@ -93,6 +93,15 @@ class Pengajuan extends Component
             }
         }
 
+        if (in_array('branch-manager', $userRoles)) {
+            if ($status == 1) {
+                $pengajuan->approve_spv = 1;
+            } elseif ($status == 2) {
+                $pengajuan->approve_spv = 2;
+                $pengajuan->status = 2;
+            }
+        }
+
         // === HR approval ===
         if ($user->hasRole('hr')) {
 
@@ -127,9 +136,7 @@ class Pengajuan extends Component
                         'text'  => 'Berhasil Menolak Pengajuan ini.'
                     ]);
                 }
-            }
-            // Jika user login juga punya role branch-manager → boleh langsung approve HR
-            elseif (in_array('branch-manager', $pengajuRoles)) {
+            } elseif (in_array('branch-manager', $pengajuRoles)) {
                 // hanya HR yang boleh approve
                 if ($status == 1) {
                     $pengajuan->approve_hr = 1;
@@ -259,21 +266,16 @@ class Pengajuan extends Component
     {
         $query = M_Pengajuan::with(['getKaryawan', 'getShift']);
         $user = Auth::user();
-        $entitas = session('selected_entitas', 'UHO'); // default ke 'UHO'
+        $entitas = session('selected_entitas', 'UHO');
 
-        // 🔹 User biasa → hanya lihat datanya sendiri
-        if ($user->hasRole('user|branch-manager')) {
+        if ($user->hasRole('user')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
                 $query->where('karyawan_id', $dataKaryawan->id);
             }
-
-            // 🔹 Admin → semua karyawan di entitas
         } elseif ($user->hasRole('admin')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
-
-            // 🔹 SPV → hanya karyawan di divisinya
         } elseif ($user->hasRole('spv')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
@@ -294,6 +296,12 @@ class Pengajuan extends Component
         } elseif ($user->hasRole('hr')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
+        } elseif ($user->hasRole('branch-manager')) {
+            $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
+            $karyawanIdList = M_DataKaryawan::where('entitas', $dataKaryawan->entitas)
+                ->pluck('id');
+            $query->whereIn('karyawan_id', $karyawanIdList);
+            // dd($entitas);
         }
 
         $query->when($this->selectedKaryawan, function ($query) {

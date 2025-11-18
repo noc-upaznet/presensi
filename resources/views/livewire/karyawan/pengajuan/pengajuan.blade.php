@@ -136,7 +136,7 @@
                             <tr>
                                 <th>Tanggal</th>
                                 {{-- <th>Diajukan Pada</th> --}}
-                                @hasanyrole('admin|hr|spv')
+                                @hasanyrole('admin|hr|spv|branch-manager')
                                     <th>Nama</th>
                                 @endhasanyrole
                                 <th>Pengajuan</th>
@@ -158,7 +158,7 @@
                                     <tr>
                                         <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
                                         {{-- <td style="color: var(--bs-body-color);">{{ $key->created_at }}</td> --}}
-                                        @hasanyrole('admin|hr|spv')
+                                        @hasanyrole('admin|hr|spv|branch-manager')
                                             <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}
                                             </td>
                                         @endhasanyrole
@@ -200,7 +200,7 @@
                                                 <span class="badge bg-danger">Ditolak</span>
                                             @endif
                                         </td>
-                                        @hasanyrole('user|branch-manager')
+                                        @hasanyrole('user')
                                             @can('pengajuan-edit')
                                                 @if ($key->approve_spv == 0 && $key->approve_hr == 0)
                                                     <td class="text-center" style="color: var(--bs-body-color);">
@@ -218,7 +218,7 @@
                                         @endhasanyrole
                                         <td class="text-center" style="color: var(--bs-body-color);">
                                             {{-- Tombol Approve SPV --}}
-                                            @role('spv')
+                                            @role('spv|branch-manager')
                                                 @if ($key->canBeApprovedBySpv())
                                                     <button class="btn btn-sm btn-primary text-white mb-2"
                                                         wire:click="updateStatus({{ $key->id }}, 1)">

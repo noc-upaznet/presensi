@@ -313,7 +313,7 @@
                         </a>
                     </li>
                 @endcan
-                @hasanyrole('user|branch-manager')
+                @hasanyrole('user')
                     <li class="nav-item menu-open">
                         <a href="#" class="nav-link active">
                             <i class="bi bi-clipboard-plus"></i>

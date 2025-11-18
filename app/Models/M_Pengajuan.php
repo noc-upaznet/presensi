@@ -44,7 +44,7 @@ class M_Pengajuan extends Model
         $auth = auth()->user();
 
         // Hanya untuk SPV
-        if (! $auth || ! $auth->hasRole('spv')) {
+        if (! $auth || ! $auth->hasRole('spv|branch-manager')) {
             return false;
         }
 

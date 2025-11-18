@@ -90,6 +90,15 @@ class PengajuanLembur extends Component
             }
         }
 
+        if (in_array('branch-manager', $userRoles)) {
+            if ($status == 1) {
+                $pengajuan->approve_spv = 1;
+            } elseif ($status == 2) {
+                $pengajuan->approve_spv = 2;
+                $pengajuan->status = 2;
+            }
+        }
+
         // === HR approval ===
         if (in_array('hr', $userRoles)) {
             if ($divisi === 'HR') {
@@ -228,7 +237,7 @@ class PengajuanLembur extends Component
         $entitas = session('selected_entitas', 'UHO');
 
         // 🔹 User biasa → hanya lemburnya sendiri
-        if ($user->hasRole('user|branch-manager')) {
+        if ($user->hasRole('user')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
                 $query->where('karyawan_id', $dataKaryawan->id);
@@ -268,6 +277,11 @@ class PengajuanLembur extends Component
                 $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
+        } elseif ($user->hasRole('branch-manager')) {
+            $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
+            $karyawanIdList = M_DataKaryawan::where('entitas', $dataKaryawan->entitas)
+                ->pluck('id');
+            $query->whereIn('karyawan_id', $karyawanIdList);
         }
 
         $query->when($this->selectedKaryawan, function ($query) {
