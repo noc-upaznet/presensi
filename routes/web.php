@@ -34,6 +34,7 @@ use App\Livewire\Karyawan\Shifts\TemplateMingguan;
 use App\Livewire\Karyawan\Pengajuan\PengajuanLembur;
 use App\Livewire\Karyawan\Pengajuan\Sharing;
 use App\Livewire\ManageUser;
+use App\Livewire\QuestionBank\QuestionBank;
 use App\Livewire\SlipGaji;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -105,4 +106,5 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/manage-user', ManageUser::class)->name('manage-user')->middleware('check.manage-user');
     Route::get('/dispensasi', Dispensasi::class)->name('dispensasi');
     Route::get('/sharing', Sharing::class)->name('sharing');
+    Route::get('/question-bank', QuestionBank::class)->name('question-bank');
 });
