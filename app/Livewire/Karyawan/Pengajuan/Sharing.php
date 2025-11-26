@@ -63,7 +63,7 @@ class Sharing extends Component
             'description' => $this->form->description,
             'file'        => $path,
         ];
-        dd($data);
+        // dd($data);
 
         M_Sharing::create($data);
 
