@@ -247,7 +247,7 @@ class EditPayroll extends Component
             ->sum('total_jam');
 
         // ✅ Hitung kehadiran (fix 26 hari kerja)
-        $this->kehadiran = 26 - ($izin + $cuti + (0.5 * $izinSetengahHari)  - (0.5 * $izinSetengahHariPagi) - (0.5 * $izinSetengahHariSiang));
+        $this->kehadiran = 26 - ($izin + $cuti + (0.5 * $izinSetengahHari)  + (0.5 * $izinSetengahHariPagi) + (0.5 * $izinSetengahHariSiang));
         if ($this->kehadiran < 0) $this->kehadiran = 0; // jangan minus
 
         $this->terlambat   = $terlambat ?? 0;
