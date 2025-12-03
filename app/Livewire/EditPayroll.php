@@ -214,10 +214,12 @@ class EditPayroll extends Component
         $jadwal = M_Jadwal::where('karyawan_id', $userId)
             ->where('bulan_tahun', $this->bulanTahun) // bulanTahun sudah di-set di mount
             ->first();
-
+        // dd($jadwal);
         $izin = 0;
         $cuti = 0;
         $izinSetengahHari = 0;
+        $izinSetengahHariPagi = 0;
+        $izinSetengahHariSiang = 0;
 
         if ($jadwal) {
             for ($i = 1; $i <= 31; $i++) {
@@ -230,6 +232,10 @@ class EditPayroll extends Component
                     $cuti++;
                 } elseif ($val == 8) {
                     $izinSetengahHari++;
+                } elseif ($val == 22) {
+                    $izinSetengahHariPagi++;
+                } elseif ($val == 23) {
+                    $izinSetengahHariSiang++;
                 }
             }
         }
@@ -241,11 +247,11 @@ class EditPayroll extends Component
             ->sum('total_jam');
 
         // ✅ Hitung kehadiran (fix 26 hari kerja)
-        $this->kehadiran = 26 - ($izin + $cuti + (0.5 * $izinSetengahHari));
+        $this->kehadiran = 26 - ($izin + $cuti + (0.5 * $izinSetengahHari)  - (0.5 * $izinSetengahHariPagi) - (0.5 * $izinSetengahHariSiang));
         if ($this->kehadiran < 0) $this->kehadiran = 0; // jangan minus
 
         $this->terlambat   = $terlambat ?? 0;
-        $this->izin        = ($izin ?? 0) + (0.5 * ($izinSetengahHari ?? 0));
+        $this->izin        = ($izin ?? 0) + (0.5 * ($izinSetengahHari ?? 0)) + (0.5 * ($izinSetengahHariPagi ?? 0)) + (0.5 * ($izinSetengahHariSiang ?? 0));
         $this->cuti        = $cuti ?? 0;
         $this->lembur_jam  = $lemburJam ?? 0;
 
@@ -371,7 +377,7 @@ class EditPayroll extends Component
 
         if ($this->gaji_pokok > 0 || $this->tunjangan_jabatan > 0) {
             $perHari = ($this->gaji_pokok + $this->tunjangan_jabatan) / 26;
-            $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0);
+            $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari pagi'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari siang'] ?? 0);
             $potonganIzin = round($perHari * $totalHariIzin);
             $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 25000;
             $currentBranch = session('selected_entitas');
@@ -569,6 +575,8 @@ class EditPayroll extends Component
 
         $izin = 0;
         $izin_setengah = 0;
+        $izin_setengah_pagi = 0;
+        $izin_setengah_siang = 0;
         $cuti = 0;
 
         if ($jadwal) {
@@ -581,13 +589,17 @@ class EditPayroll extends Component
                         $izin++;
                     } elseif ($jadwal->$col == 8) { // kode 4 = izin setengah hari
                         $izin_setengah++;
+                    } elseif ($jadwal->$col == 22) { // kode 22 = izin setengah hari pagi
+                        $izin_setengah_pagi++;
+                    } elseif ($jadwal->$col == 23) { // kode 23 = izin setengah hari siang
+                        $izin_setengah_siang++;
                     }
                 }
             }
         }
         // dd($izin_setengah);
         // total kehadiran fix 26 hari - (izin + cuti + 0.5 * izin_setengah)
-        $kehadiran = 26 - ($izin + $cuti + 0.5 * $izin_setengah);
+        $kehadiran = 26 - ($izin + $cuti + 0.5 * $izin_setengah + 0.5 * $izin_setengah_pagi + 0.5 * $izin_setengah_siang);
         $this->rekap['kehadiran'] = $kehadiran;
         // dd($kehadiran);
         // hitung inov reward

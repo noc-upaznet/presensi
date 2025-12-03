@@ -230,7 +230,7 @@ class CreateSlipGaji extends Component
                 $this->izin_nominal = 0;
                 if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
                     $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
-                    $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari pagi'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari pagi'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari siang'] ?? 0);
+                    $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari pagi'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari siang'] ?? 0);
                     $this->izin_nominal = round($perHari * $totalHariIzin);
                 }
                 $this->terlambat_nominal = 0;
@@ -530,6 +530,7 @@ class CreateSlipGaji extends Component
             'izin' => 0,
             'cuti' => 0,
             'lembur' => 0,
+            'izin setengah hari' => 0,
             'izin setengah hari pagi' => 0,
             'izin setengah hari siang' => 0,
             'cutoff_start' => null,
