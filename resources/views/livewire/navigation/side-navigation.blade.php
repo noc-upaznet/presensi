@@ -233,7 +233,7 @@
                     </li>
                 @endhasanyrole
 
-                @hasanyrole('spv-teknisi|spv-helpdesk|spv-sales')
+                {{-- @hasanyrole('spv-teknisi|spv-helpdesk|spv-sales')
                     <li class="nav-item">
                         <a href="{{ route('template-mingguan') }}"
                             class="nav-link {{ request()->routeIs('template-mingguan') ? 'active' : '' }}">
@@ -257,7 +257,7 @@
                             <p>Jadwal Shift</p>
                         </a>
                     </li>
-                @endhasanyrole
+                @endhasanyrole --}}
 
                 @can('jadwal-shift-create')
                     <li class="nav-item">
