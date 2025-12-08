@@ -23,6 +23,15 @@
                         <h5>Form Slip Gaji</h5>
                     </div>
                     <div class="card-body">
+                        @can('cutoff-view')
+                            <div class="mb-3">
+                                <label for="employee" class="form-label fw-semibold">Cut-Off</label>
+                                <select wire:model.live="cutoffType" class="form-select form-select-sm w-auto">
+                                    <option value="cutoff_25">Cutoff 25</option>
+                                    <option value="cutoff_normal">Cutoff Normal</option>
+                                </select>
+                            </div>
+                        @endcan
                         <div class="mb-3">
                             <label for="no_slip" class="form-label fw-semibold">No. Slip</label>
                             <input type="text" id="no_slip"

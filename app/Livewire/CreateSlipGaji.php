@@ -336,6 +336,14 @@ class CreateSlipGaji extends Component
         $this->hitungTotalGaji();
     }
 
+    public function updatedCutoffType()
+    {
+        // setiap ganti mode cutoff:
+        $this->setCutoffPeriode();
+        $this->rekap = $this->hitungRekapPresensi();
+        $this->hitungTotalGaji();
+    }
+
     public function setCutoffPeriode()
     {
         if ($this->cutoffType === 'cutoff_normal') {
@@ -559,17 +567,101 @@ class CreateSlipGaji extends Component
         return $this->rekap;
     }
 
+    // public function rekapKehadiran($id, $cutoffStart, $cutoffEnd)
+    // {
+    //     // dd($id);
+    //     $karyawan = M_DataKaryawan::find($id);
+    //     // dd($karyawan);
+
+    //     $presensiCollection = $karyawan->getPresensi ?? collect();
+    //     $presensi = $presensiCollection->filter(function ($item) use ($cutoffStart, $cutoffEnd) {
+    //         return Carbon::parse($item->tanggal)->between($cutoffStart, $cutoffEnd);
+    //     });
+    //     // dd($presensi);
+    //     $terlambat = M_Presensi::where('user_id', $id)
+    //         ->where('status', 1)
+    //         ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
+    //         ->where(function ($query) {
+    //             $query->where('lokasi_lock', 0)->where('approve', 1)
+    //                 ->orWhere(function ($q) {
+    //                     $q->where('lokasi_lock', 1)->where('approve', 0);
+    //                 });
+    //         })
+    //         ->count();
+    //     // dd($terlambat);
+    //     // Ambil bulan dan tahun dari cutoffEnd (bukan dari input manual)
+    //     $bulan = $cutoffEnd->format('m');
+    //     $tahun = $cutoffEnd->format('Y');
+    //     $bulanTahun = $cutoffEnd->format('Y-m');
+    //     // dd($bulanTahun);
+    //     $jadwal = M_Jadwal::where('karyawan_id', $id)
+    //         ->where('bulan_tahun', $bulanTahun)
+    //         ->first();
+    //     // dd($jadwal);
+    //     $izin = 0;
+    //     $cuti = 0;
+    //     $izinSetengahHari = 0;
+    //     $izinSetengahHariPagi = 0;
+    //     $izinSetengahHariSiang = 0;
+
+    //     foreach (range(1, 31) as $i) {
+    //         $kode = $jadwal->{'d' . $i};
+
+    //         $tanggal = Carbon::createFromFormat('Y-m-d', "{$tahun}-{$bulan}-" . str_pad($i, 2, '0', STR_PAD_LEFT));
+
+    //         if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
+    //             continue;
+    //         }
+
+    //         if ($kode == 3) {
+    //             $izin++;
+    //         } elseif ($kode == 2) {
+    //             $cuti++;
+    //         } elseif ($kode == 8) {
+    //             $izinSetengahHari++;
+    //         } elseif ($kode == 22) {
+    //             $izinSetengahHariPagi++;
+    //         } elseif ($kode == 23) {
+    //             $izinSetengahHariSiang++;
+    //         }
+    //     }
+
+    //     $dataLembur = M_Lembur::where('karyawan_id', $id)
+    //         ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
+    //         ->whereNotNull('total_jam')
+    //         ->where('status', 1)
+    //         ->get(['tanggal', 'total_jam']);
+
+    //     $totalJamLembur = $dataLembur->sum('total_jam');
+
+    //     return [
+    //         'kehadiran' => 26 - $izin - $cuti - (0.5 * $izinSetengahHari) - (0.5 * $izinSetengahHariPagi) - (0.5 * $izinSetengahHariSiang),
+    //         'terlambat' => $terlambat,
+    //         'izin' => $izin,
+    //         'cuti' => $cuti,
+    //         'lembur' => $totalJamLembur,
+    //         'izin setengah hari' => $izinSetengahHari,
+    //         'izin setengah hari pagi' => $izinSetengahHariPagi,
+    //         'izin setengah hari siang' => $izinSetengahHariSiang,
+    //         'cutoff_start' => $cutoffStart->format('Y-m-d'),
+    //         'cutoff_end' => $cutoffEnd->format('Y-m-d'),
+    //     ];
+    // }
+
     public function rekapKehadiran($id, $cutoffStart, $cutoffEnd)
     {
-        // dd($id);
-        $karyawan = M_DataKaryawan::find($id);
-        // dd($karyawan);
+        $cutoffStart = $cutoffStart instanceof Carbon ? $cutoffStart : Carbon::parse($cutoffStart);
+        $cutoffEnd   = $cutoffEnd   instanceof Carbon ? $cutoffEnd   : Carbon::parse($cutoffEnd);
 
+        $karyawan = M_DataKaryawan::find($id);
+
+        // (optional) kalau masih butuh presensiCollection
         $presensiCollection = $karyawan->getPresensi ?? collect();
         $presensi = $presensiCollection->filter(function ($item) use ($cutoffStart, $cutoffEnd) {
             return Carbon::parse($item->tanggal)->between($cutoffStart, $cutoffEnd);
         });
-        // dd($presensi);
+
+        // TERLAMBAT
         $terlambat = M_Presensi::where('user_id', $id)
             ->where('status', 1)
             ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
@@ -580,14 +672,24 @@ class CreateSlipGaji extends Component
                     });
             })
             ->count();
-        // dd($terlambat);
-        // Ambil bulan dan tahun dari cutoffEnd (bukan dari input manual)
-        $bulan = $cutoffEnd->format('m');
-        $tahun = $cutoffEnd->format('Y');
-        $bulanTahun = $cutoffEnd->format('Y-m');
 
-        $jadwal = M_Jadwal::where('karyawan_id', $id)
-            ->where('bulan_tahun', $bulanTahun)
+        // ============ JADWAL ============
+
+        $bulanTahunStart = $cutoffStart->format('Y-m');
+        $bulanTahunEnd   = $cutoffEnd->format('Y-m');
+
+        $tahunStart = (int) $cutoffStart->format('Y');
+        $bulanStart = (int) $cutoffStart->format('m');
+
+        $tahunEnd   = (int) $cutoffEnd->format('Y');
+        $bulanEnd   = (int) $cutoffEnd->format('m');
+
+        $jadwalStart = M_Jadwal::where('karyawan_id', $id)
+            ->where('bulan_tahun', $bulanTahunStart)
+            ->first();
+
+        $jadwalEnd = M_Jadwal::where('karyawan_id', $id)
+            ->where('bulan_tahun', $bulanTahunEnd)
             ->first();
 
         $izin = 0;
@@ -596,27 +698,85 @@ class CreateSlipGaji extends Component
         $izinSetengahHariPagi = 0;
         $izinSetengahHariSiang = 0;
 
-        foreach (range(1, 31) as $i) {
-            $kode = $jadwal->{'d' . $i};
+        // 🔹 CASE 1: periode 1 bulan (mode normal)
+        if ($bulanTahunStart === $bulanTahunEnd) {
+            $jadwal = $jadwalStart ?? $jadwalEnd;
 
-            $tanggal = Carbon::createFromFormat('Y-m-d', "{$tahun}-{$bulan}-" . str_pad($i, 2, '0', STR_PAD_LEFT));
+            if ($jadwal) {
+                $startDay = (int) $cutoffStart->day;   // bisa 1 atau tanggal lain
+                $endDay   = (int) $cutoffEnd->day;     // bisa akhir bulan / hari ini
 
-            if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
-                continue;
-            }
+                foreach (range($startDay, $endDay) as $day) {
+                    $tanggal = Carbon::createFromDate($tahunStart, $bulanStart, $day);
 
-            if ($kode == 3) {
-                $izin++;
-            } elseif ($kode == 2) {
-                $cuti++;
-            } elseif ($kode == 8) {
-                $izinSetengahHari++;
-            } elseif ($kode == 22) {
-                $izinSetengahHariPagi++;
-            } elseif ($kode == 23) {
-                $izinSetengahHariSiang++;
+                    if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
+                        continue;
+                    }
+
+                    $kode = $jadwal->{'d' . $day} ?? null;
+                    $this->tambahHitunganKode(
+                        $kode,
+                        $izin,
+                        $cuti,
+                        $izinSetengahHari,
+                        $izinSetengahHariPagi,
+                        $izinSetengahHariSiang
+                    );
+                }
             }
         }
+        // 🔹 CASE 2: periode lintas bulan (cutoff 26–25)
+        else {
+            // ---- BULAN AWAL (biasanya 26–akhir bulan) ----
+            if ($jadwalStart) {
+                $startDay = (int) $cutoffStart->day;                 // contoh 26
+                $endDay   = $cutoffStart->copy()->endOfMonth()->day; // 30/31
+
+                foreach (range($startDay, $endDay) as $day) {
+                    $tanggal = Carbon::createFromDate($tahunStart, $bulanStart, $day);
+
+                    if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
+                        continue;
+                    }
+
+                    $kode = $jadwalStart->{'d' . $day} ?? null;
+                    $this->tambahHitunganKode(
+                        $kode,
+                        $izin,
+                        $cuti,
+                        $izinSetengahHari,
+                        $izinSetengahHariPagi,
+                        $izinSetengahHariSiang
+                    );
+                }
+            }
+
+            // ---- BULAN AKHIR (biasanya 1–25) ----
+            if ($jadwalEnd) {
+                $startDay = 1;
+                $endDay   = (int) $cutoffEnd->day; // contoh 25
+
+                foreach (range($startDay, $endDay) as $day) {
+                    $tanggal = Carbon::createFromDate($tahunEnd, $bulanEnd, $day);
+
+                    if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
+                        continue;
+                    }
+
+                    $kode = $jadwalEnd->{'d' . $day} ?? null;
+                    $this->tambahHitunganKode(
+                        $kode,
+                        $izin,
+                        $cuti,
+                        $izinSetengahHari,
+                        $izinSetengahHariPagi,
+                        $izinSetengahHariSiang
+                    );
+                }
+            }
+        }
+
+        // ============ LEMBUR ============
 
         $dataLembur = M_Lembur::where('karyawan_id', $id)
             ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
@@ -627,18 +787,37 @@ class CreateSlipGaji extends Component
         $totalJamLembur = $dataLembur->sum('total_jam');
 
         return [
-            'kehadiran' => 26 - $izin - $cuti - (0.5 * $izinSetengahHari) - (0.5 * $izinSetengahHariPagi) - (0.5 * $izinSetengahHariSiang),
+            'kehadiran' => 26
+                - $izin
+                - $cuti
+                - (0.5 * $izinSetengahHari)
+                - (0.5 * $izinSetengahHariPagi)
+                - (0.5 * $izinSetengahHariSiang),
+
             'terlambat' => $terlambat,
             'izin' => $izin,
             'cuti' => $cuti,
             'lembur' => $totalJamLembur,
+
             'izin setengah hari' => $izinSetengahHari,
             'izin setengah hari pagi' => $izinSetengahHariPagi,
             'izin setengah hari siang' => $izinSetengahHariSiang,
+
             'cutoff_start' => $cutoffStart->format('Y-m-d'),
-            'cutoff_end' => $cutoffEnd->format('Y-m-d'),
+            'cutoff_end'   => $cutoffEnd->format('Y-m-d'),
         ];
     }
+
+    private function tambahHitunganKode($kode, &$izin, &$cuti, &$izHalf, &$izHalfPagi, &$izHalfSiang)
+    {
+        if ($kode == 3) $izin++;
+        elseif ($kode == 2) $cuti++;
+        elseif ($kode == 8) $izHalf++;
+        elseif ($kode == 22) $izHalfPagi++;
+        elseif ($kode == 23) $izHalfSiang++;
+    }
+
+
 
     private function numericValue($value)
     {

@@ -93,7 +93,7 @@
                     <select class="form-select" wire:model.lazy="selectedKaryawan" style="width: 200px;">
                         <option value="">Pilih Karyawan</option>
                         @foreach ($karyawanList as $karyawan)
-                            <option value="{{ $karyawan->nama_karyawan }}">{{ $karyawan->nama_karyawan }}</option>
+                            <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
                         @endforeach
                     </select>
                     <select class="form-select" wire:model.lazy="filterPengajuan" style="width: 150px;">
