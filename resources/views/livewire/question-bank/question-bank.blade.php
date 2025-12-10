@@ -54,12 +54,12 @@
 @endpush
 <div>
     <div class="mb-4">
-        <h4 class="mb-4" style="color: var(--bs-body-color);">Entitas</h4>
+        <h4 class="mb-4" style="color: var(--bs-body-color);">Bank Soal</h4>
     </div>
 
     <div class="p-0 table-responsive">
         @role('admin')
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
                 <div class="d-flex gap-2">
                     <button class="btn btn-primary mb-2 me-2 btn-sm" wire:click="showAdd">
                         <i class="bi bi-plus-lg"></i> Tambah
