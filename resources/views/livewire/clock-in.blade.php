@@ -453,5 +453,18 @@
                 alert('Geolocation tidak didukung oleh browser ini.');
             }
         });
+
+        Livewire.on('swal', (event) => {
+            Swal.fire({
+                title: event.title,
+                text: event.text,
+                icon: event.icon,
+                timer: event.timer ?? 3000,
+                showConfirmButton: event.showConfirmButton ?? false,
+            }).then(() => {
+                // redirect setelah alert selesai
+                window.location.href = "{{ route('clock-in') }}";
+            });
+        });
     </script>
 @endpush

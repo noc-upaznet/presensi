@@ -294,6 +294,44 @@ class ClockIn extends Component
     //     return redirect()->route('clock-in');
     // }
 
+    protected function getRandomSwalMessage(): array
+    {
+        $messages = [
+            [
+                'title' => 'Kerja Bagus Hari Ini! 🎉',
+                'text'  => 'Saatnya istirahat. Sampai jumpa besok!',
+                'icon'  => 'success',
+            ],
+            [
+                'title' => 'Clock-Out Berhasil ✔',
+                'text'  => 'Terima kasih atas kontribusi Anda hari ini.',
+                'icon'  => 'success',
+            ],
+            [
+                'title' => 'Good Job! ✨',
+                'text'  => 'Istirahat yang cukup, ya!',
+                'icon'  => 'success',
+            ],
+            [
+                'title' => 'Selesai! 💪',
+                'text'  => 'Satu langkah lebih dekat menuju tujuan Anda.',
+                'icon'  => 'success',
+            ],
+            [
+                'title' => 'Done ✔',
+                'text'  => 'Sampai ketemu besok, tetap semangat!',
+                'icon'  => 'success',
+            ],
+            [
+                'title' => 'Clock-Out! 😎',
+                'text'  => 'Sekarang waktunya rileks sejenak.',
+                'icon'  => 'success',
+            ],
+        ];
+
+        return $messages[array_rand($messages)];
+    }
+
     public function clockOut()
     {
         if ($this->correctCount < $this->requiredCorrect) {
@@ -431,8 +469,16 @@ class ClockIn extends Component
             'lokasi_clock_out' => $lokasiIdTerdekat,
         ]);
 
-        // session()->flash('success', 'Clock-out berhasil untuk tanggal ' . $presensiToUpdate->tanggal . '.');
-        return redirect()->route('clock-in');
+        $swal = $this->getRandomSwalMessage();
+
+        $this->dispatch(
+            'swal',
+            title: $swal['title'],
+            icon: $swal['icon'],
+            text: $swal['text'],
+            timer: 3000,
+            showConfirmButton: false,
+        );
     }
 
 
