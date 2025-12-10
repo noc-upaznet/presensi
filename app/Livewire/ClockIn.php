@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use App\Models\M_JadwalShift;
 use App\Models\M_DataKaryawan;
+use App\Models\M_ListQuestion;
 use App\Models\RoleLokasiModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +30,15 @@ class ClockIn extends Component
     public float|null $longitude = null;
     public $lokasis;
     public $lokasiId;
+
+    public $question;
+    public $options = [];
+    public $correct_answer;
+    public $user_answer = null;
+    public $isCorrect = false;
+
+    public $correctCount = 0;      // jumlah jawaban benar sejauh ini
+    public $requiredCorrect = 3;
 
     public $shouldRedirect = false;
 
@@ -123,9 +133,59 @@ class ClockIn extends Component
         return redirect()->to('/clock-in-selfie')->with('selfie_path', $this->photo);
     }
 
+    public function loadRandomQuestion()
+    {
+        // Ambil 1 pertanyaan random + jawaban2 nya
+        $q = M_ListQuestion::inRandomOrder()
+            ->with('answers')
+            ->first();
+
+        if (!$q) {
+            $this->question = 'Belum ada pertanyaan di database.';
+            $this->options = [];
+            $this->correct_answer = null;
+            $this->user_answer = null;
+            return;
+        }
+
+        $this->question = $q->name;
+
+        // Acak urutan jawaban
+        $shuffledAnswers = $q->answers->shuffle();
+
+        // Simpan jawaban (A, B, C, D) dalam urutan acak
+        $this->options = $shuffledAnswers->pluck('name')->values()->toArray();
+
+        // Simpan jawaban yang benar
+        $correct = $q->answers->firstWhere('is_correct', 1);
+        $this->correct_answer = $correct?->name;
+
+        // Reset jawaban user
+        $this->user_answer = null;
+    }
+
+    public function checkAnswer()
+    {
+        // kalau belum ada jawaban benar di soal ini atau user belum pilih, skip
+        if (!$this->correct_answer || !$this->user_answer) {
+            return;
+        }
+
+        // kalau jawabannya benar → tambah counter
+        if ($this->user_answer === $this->correct_answer) {
+            $this->correctCount++;
+        }
+
+        // kalau belum memenuhi syarat 3 benar → lanjut soal berikutnya
+        if ($this->correctCount < $this->requiredCorrect) {
+            $this->loadRandomQuestion();
+        }
+    }
+
     public function showClockOutModal()
     {
-        // Emit event untuk membuka modal clock-out
+        $this->loadRandomQuestion();
+
         $this->dispatch('clockOutModal', action: 'show');
     }
 

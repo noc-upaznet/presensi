@@ -2,21 +2,23 @@
 
 namespace App\Livewire;
 
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
-class RoleUsers extends Component
+class DataMaster extends Component
 {
-    Public $listeners = ['refreshTable' => '$refresh'];
+    public $listeners = ['refreshTable' => '$refresh'];
 
+    #[Url(as: 'tab')]
     public $tab = 'pills-jabatan';
 
     public function setTab($tab)
     {
         $this->tab = $tab;
     }
-    
+
     public function render()
     {
-        return view('livewire.role-users');
+        return view('livewire.data-master');
     }
 }

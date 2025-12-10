@@ -53,34 +53,18 @@
     </style>
 @endpush
 <div>
-    <div class="app-content-header">
-        <!--begin::Container-->
-        <div class="container-fluid">
-            <!--begin::Row-->
-            <div class="row">
-                <div class="col-sm-6">
-                    <h3 class="mb-0" style="color: var(--bs-body-color);">Bank Soal</h3>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-end">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Bank Soal</li>
-                    </ol>
-                </div>
-            </div>
-            <!--end::Row-->
-        </div>
-        <!--end::Container-->
+    <div class="mb-4">
+        <h4 class="mb-4" style="color: var(--bs-body-color);">Entitas</h4>
     </div>
 
-    <div class="container mt-4">
+    <div class="p-0 table-responsive">
         @role('admin')
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="d-flex gap-2">
-                    <button class="btn btn-primary mb-2 me-2" wire:click="showAdd">
+                    <button class="btn btn-primary mb-2 me-2 btn-sm" wire:click="showAdd">
                         <i class="bi bi-plus-lg"></i> Tambah
                     </button>
-                    <button class="btn btn-danger mb-2 me-2" wire:click="import">
+                    <button class="btn btn-danger mb-2 me-2 btn-sm" wire:click="import">
                         <i class="bi bi-file-earmark-spreadsheet"></i> Import
                     </button>
 
@@ -89,92 +73,62 @@
                 </div>
             </div>
         @endrole
-        <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
-            <div class="mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <label>Show <select class="form-select form-select-sm d-inline-block w-auto">
-                                <option>5</option>
-                                <option>10</option>
-                                <option>20</option>
-                            </select> entries per page</label>
-                    </div>
-                    <div>
-                        {{-- <input type="text" class="form-control form-control-sm rounded-end-0" placeholder="Tanggal"
-                            wire:model.live="search"> --}}
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered mb-0" style="background-color: var(--bs-body-bg);">
-                        <thead>
-                            <tr>
-                                <th>Pertanyaan</th>
-                                <th class="text-center">Jawaban</th>
-                                {{-- <th class="text-center">Action</th> --}}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($datas as $question)
-                                <tr>
-                                    <td>{{ $question->name }}</td>
+        <table class="table table-bordered mb-0" style="background-color: var(--bs-body-bg);">
+            <thead>
+                <tr>
+                    <th>Pertanyaan</th>
+                    <th class="text-center">Jawaban</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($datas as $question)
+                    <tr>
+                        <td>{{ $question->name }}</td>
 
-                                    <td>
-                                        <div class="list-group">
-                                            @foreach ($question->answers as $answer)
-                                                <div class="mb-2">
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="flex">
-                                                            {{ $answer->name }}
-                                                        </div>
-                                                        <div>
-                                                            @if ($answer->is_correct)
-                                                                <span class="badge bg-success">Benar</span>
-                                                            @else
-                                                                <span class="badge bg-secondary">Salah</span>
-                                                            @endif
-                                                        </div>
+                        <td>
+                            <div class="list-group">
+                                @foreach ($question->answers as $answer)
+                                    <div class="mb-2">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="flex">
+                                                <i class="bi bi-caret-right-fill"></i> {{ $answer->name }}
+                                            </div>
+                                            <div>
+                                                @if ($answer->is_correct)
+                                                    <span class="badge bg-success">Benar</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Salah</span>
+                                                @endif
+                                            </div>
 
-                                                    </div>
-                                                </div>
-                                            @endforeach
                                         </div>
-                                    </td>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </td>
 
-                                    {{-- <td class="text-center">
-                                        <button class="btn btn-primary btn-sm"
-                                            wire:click="edit({{ $question->id }})">Edit</button>
-                                        <button class="btn btn-danger btn-sm"
-                                            wire:click="delete({{ $question->id }})">Delete</button>
-                                    </td> --}}
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">Belum ada data</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-3">
-                    {{-- {{ $pengajuans->links() }} --}}
-                </div>
-            </div>
+                        <td class="text-center" style="color: var(--bs-body-color);">
+                            {{-- <button class="btn btn-sm btn-warning"
+                                wire:click="showEdit('{{ Crypt::encrypt($question->id) }}')"><i
+                                    class="fa-solid fa-pen-to-square"></i></button> --}}
+                            <button class="btn btn-sm btn-danger"
+                                wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($question->id) }}',action:'show'})"><i
+                                    class="fa fa-trash"></i></button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">Belum ada data</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+        <div class="mt-3">
+            {{ $datas->links() }}
         </div>
     </div>
     <livewire:question-bank.modal-question />
-    <div class="modal fade" id="modalGambar" tabindex="-1" aria-labelledby="modalGambarLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalGambarLabel">Bukti Izin</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <img id="modalImage" src="" alt="Bukti" class="img-fluid">
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 @push('scripts')
@@ -183,8 +137,12 @@
             $('#modalAddQuestion').modal(event.action);
         });
 
-        Livewire.on('modalEditPengajuan', (event) => {
-            $('#modalEditPengajuan').modal(event.action);
+        Livewire.on('modalImport', (event) => {
+            $('#modalImport').modal(event.action);
+        });
+
+        Livewire.on('modalEditQuestion', (event) => {
+            $('#modalEditQuestion').modal(event.action);
         });
 
         function setModalImage(src) {

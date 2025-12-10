@@ -54,7 +54,6 @@
     <div class="content-wrapper p-4">
         <div class="d-flex justify-content-between align-items-center mb-3" style="color: var(--bs-body-color);">
             <h3>Dashboard</h3>
-            {{-- <div class="text-muted"><i class="fas fa-user"></i> {{ $userName }}</div> --}}
         </div>
 
         <div class="text mb-4" style="color: var(--bs-body-color); justify-content: center; align-items: center;">
@@ -154,6 +153,82 @@
                     </div>
                 @endif
 
+                <div class="modal-body">
+
+                    <div class="text-center mb-3">
+                        <i class="bi bi-exclamation-circle" style="color: orange; font-size: 80px;"></i>
+                        <div><strong>Apakah anda ingin clock out?</strong></div>
+                    </div>
+
+                    <div class="p-3 border rounded bg-light">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong>Pertanyaan !</strong>
+                            <small>
+                                Benar: {{ $correctCount }} / {{ $requiredCorrect }}
+                            </small>
+                        </div>
+
+                        <p class="mt-2 mb-3">{{ $question }}</p>
+
+                        @foreach ($options as $index => $opt)
+                            <div class="form-check text-start">
+                                <input class="form-check-input" type="radio" id="answer{{ $index }}"
+                                    value="{{ $opt }}" wire:model="user_answer" wire:change="checkAnswer">
+
+                                <label class="form-check-label" for="answer{{ $index }}">
+                                    {{ chr(65 + $index) }}. {{ $opt }}
+                                </label>
+                            </div>
+                        @endforeach
+
+                        @if ($correctCount < $requiredCorrect)
+                            <small class="text-muted d-block mt-2">
+                                Jawab {{ $requiredCorrect }} soal dengan benar untuk bisa Clock Out.
+                            </small>
+                        @else
+                            <span class="badge bg-success mt-2">
+                                Syarat terpenuhi, silakan Clock Out.
+                            </span>
+                        @endif
+                    </div>
+
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <input type="hidden" wire:model.live="latitude">
+                    <input type="hidden" wire:model.live="longitude">
+                    <button type="button" id="btnTake" class="btn btn-danger position-relative"
+                        wire:click="clockOut" wire:loading.attr="disabled" wire:target="clockOut"
+                        {{ $correctCount >= $requiredCorrect ? '' : 'disabled' }}>
+
+                        <span wire:loading.remove wire:target="clockOut">
+                            Clock Out
+                        </span>
+
+                        <span wire:loading wire:target="clockOut">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Memproses...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- <div wire:ignore.self class="modal fade" id="clockOutModal" tabindex="-1" aria-labelledby="clockOutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="clockOutModalLabel">Clock Out</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                @if (session('error'))
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
                 <div class="modal-body text-center">
                     <i class="bi bi-exclamation-circle" style="color: orange; font-size: 80px;"></i>
                     <div>
@@ -175,9 +250,7 @@
                 </div>
             </div>
         </div>
-    </div>
-
-
+    </div> --}}
 </div>
 
 @push('scripts')
