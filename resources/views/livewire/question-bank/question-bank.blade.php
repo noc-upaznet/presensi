@@ -64,7 +64,7 @@
                     <button class="btn btn-primary mb-2 me-2 btn-sm" wire:click="showAdd">
                         <i class="bi bi-plus-lg"></i> Tambah
                     </button>
-                    <button class="btn btn-danger mb-2 me-2 btn-sm" wire:click="import">
+                    <button class="btn btn-success mb-2 me-2 btn-sm" wire:click="import">
                         <i class="bi bi-file-earmark-spreadsheet"></i> Import
                     </button>
 
