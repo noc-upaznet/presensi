@@ -138,7 +138,7 @@
     </div>
 
     <!-- Modal Clock-Out -->
-    <div wire:ignore.self class="modal fade" id="clockOutModal" tabindex="-1" aria-labelledby="clockOutModalLabel"
+    {{-- <div wire:ignore.self class="modal fade" id="clockOutModal" tabindex="-1" aria-labelledby="clockOutModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -213,8 +213,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    {{-- <div wire:ignore.self class="modal fade" id="clockOutModal" tabindex="-1" aria-labelledby="clockOutModalLabel"
+    </div> --}}
+    <div wire:ignore.self class="modal fade" id="clockOutModal" tabindex="-1" aria-labelledby="clockOutModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -250,7 +250,7 @@
                 </div>
             </div>
         </div>
-    </div> --}}
+    </div>
 </div>
 
 @push('scripts')
