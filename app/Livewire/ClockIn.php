@@ -296,6 +296,14 @@ class ClockIn extends Component
 
     public function clockOut()
     {
+        if ($this->correctCount < $this->requiredCorrect) {
+
+            if (is_null($this->user_answer)) {
+                session()->flash('error', 'Jawab pertanyaan terlebih dahulu sebelum clock-out.');
+            }
+
+            return;
+        }
         $userId = Auth::user()->id;
         $karyawanId = M_DataKaryawan::where('user_id', $userId)->value('id');
 
