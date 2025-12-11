@@ -171,7 +171,8 @@
                         <p class="mt-2 mb-3">{{ $question }}</p>
 
                         @foreach ($options as $index => $opt)
-                            <div class="form-check text-start">
+                            <div class="form-check text-start"
+                                wire:key="option-{{ $question }}-{{ $index }}">
                                 <input class="form-check-input" type="radio" id="answer{{ $index }}"
                                     value="{{ $opt }}" wire:model="user_answer" wire:change="checkAnswer">
 
