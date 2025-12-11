@@ -37,10 +37,15 @@ class ClockIn extends Component
     public $user_answer = null;
     public $isCorrect = false;
 
-    public $correctCount = 0;      // jumlah jawaban benar sejauh ini
+    public $correctCount = 0;
     public $requiredCorrect = 3;
 
     public $shouldRedirect = false;
+    public $questionKey = null;
+
+    public $usedQuestionIds = [];
+    public $questionId = null;
+
 
     protected $listeners = ['photoTaken' => 'handlePhoto', 'refreshTable' => 'refresh'];
 
@@ -135,51 +140,60 @@ class ClockIn extends Component
 
     public function loadRandomQuestion()
     {
-        // Ambil 1 pertanyaan random + jawaban2 nya
-        $q = M_ListQuestion::inRandomOrder()
-            ->with('answers')
-            ->first();
+        $query = M_ListQuestion::with('answers');
+        if (!empty($this->usedQuestionIds)) {
+            $query->whereNotIn('id', $this->usedQuestionIds);
+        }
+
+        $q = $query->inRandomOrder()->first();
 
         if (!$q) {
+            $this->usedQuestionIds = [];
+            $q = M_ListQuestion::with('answers')->inRandomOrder()->first();
+        }
+
+        if (!$q) {
+            $this->questionId = null;
             $this->question = 'Belum ada pertanyaan di database.';
             $this->options = [];
             $this->correct_answer = null;
             $this->user_answer = null;
+            $this->questionKey = (string) now()->timestamp . '-' . Str::random(5);
             return;
         }
 
+        $this->questionId = $q->id;
         $this->question = $q->name;
 
-        // Acak urutan jawaban
         $shuffledAnswers = $q->answers->shuffle();
-
-        // Simpan jawaban (A, B, C, D) dalam urutan acak
         $this->options = $shuffledAnswers->pluck('name')->values()->toArray();
 
-        // Simpan jawaban yang benar
         $correct = $q->answers->firstWhere('is_correct', 1);
         $this->correct_answer = $correct?->name;
 
-        // Reset jawaban user
         $this->user_answer = null;
+
+        $this->questionKey = $this->questionId . '-' . Str::random(6);
+
+        $this->usedQuestionIds[] = $this->questionId;
     }
 
-    public function checkAnswer()
+    public function nextQuestion()
     {
-        // kalau belum ada jawaban benar di soal ini atau user belum pilih, skip
-        if (!$this->correct_answer || !$this->user_answer) {
+        if (empty($this->user_answer)) {
             return;
         }
 
-        // kalau jawabannya benar → tambah counter
         if ($this->user_answer === $this->correct_answer) {
             $this->correctCount++;
         }
 
-        // kalau belum memenuhi syarat 3 benar → lanjut soal berikutnya
-        if ($this->correctCount < $this->requiredCorrect) {
-            $this->loadRandomQuestion();
+        if ($this->correctCount >= $this->requiredCorrect) {
+            $this->user_answer = null;
+            return;
         }
+
+        $this->loadRandomQuestion();
     }
 
     public function showClockOutModal()
