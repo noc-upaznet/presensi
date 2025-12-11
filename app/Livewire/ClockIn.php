@@ -181,19 +181,19 @@ class ClockIn extends Component
     public function nextQuestion()
     {
         if (empty($this->user_answer)) {
+            session()->flash('error', 'Jawab pertanyaan terlebih dahulu.');
             return;
         }
 
         if ($this->user_answer === $this->correct_answer) {
             $this->correctCount++;
+        } else {
         }
 
-        if ($this->correctCount >= $this->requiredCorrect) {
-            $this->user_answer = null;
-            return;
+        $this->user_answer = null;
+        if ($this->correctCount < $this->requiredCorrect) {
+            $this->loadRandomQuestion();
         }
-
-        $this->loadRandomQuestion();
     }
 
     public function showClockOutModal()

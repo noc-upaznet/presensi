@@ -175,21 +175,20 @@
                                 wire:key="option-{{ $questionKey ?? $questionId }}-{{ $index }}">
                                 <input class="form-check-input" type="radio" name="answer" {{-- penting: group radio --}}
                                     id="answer{{ $index }}" value="{{ $opt }}"
-                                    wire:model.live="user_answer">
+                                    wire:model.defer="user_answer">
 
                                 <label class="form-check-label" for="answer{{ $index }}">
                                     {{ chr(65 + $index) }}. {{ $opt }}
                                 </label>
                             </div>
                         @endforeach
+                        <div class="text-end mt-3">
+                            <button class="btn btn-primary btn-sm" wire:click="nextQuestion"
+                                wire:loading.attr="disabled" wire:target="nextQuestion">
+                                Berikutnya →
+                            </button>
+                        </div>
                         @if ($correctCount < $requiredCorrect)
-                            <div class="text-end mt-3">
-                                <button class="btn btn-primary btn-sm" wire:click="nextQuestion"
-                                    @if (empty($user_answer)) disabled @endif>
-                                    Berikutnya →
-                                </button>
-                            </div>
-
                             <small class="text-muted d-block mt-2">
                                 Jawab {{ $requiredCorrect }} soal dengan benar untuk bisa Clock Out.
                             </small>
