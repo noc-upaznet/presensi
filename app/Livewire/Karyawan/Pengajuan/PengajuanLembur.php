@@ -72,21 +72,37 @@ class PengajuanLembur extends Component
         }
 
         $user = Auth::user();
-        $entitas = optional($pengajuan->getKaryawan)->entitas;
         $userRoles = $user->getRoleNames()->toArray();
         $pengajuRoles = optional(optional($pengajuan->getKaryawan)->user)
             ?->getRoleNames()
             ->toArray() ?? [];
+        $entitasUser = optional($pengajuan->getKaryawan)->entitas;
         $divisi = optional($pengajuan->getKaryawan)->divisi;
-        // dd($pengajuRoles);
+        // data karyawan dari user yang lagi login (approver)
+        $karyawanUser   = M_DataKaryawan::where('user_id', $user->id)->first();
+        $entitasApprover = $karyawanUser->entitas ?? null;
+        $divisiApprover  = $karyawanUser->divisi ?? null;
 
-        // SPV approval
+        // === SPV approval ===
         if (in_array('spv', $userRoles)) {
+
+            // kalau pengaju entitas MC → hanya SPV Finance entitas UNR yang boleh approve
+            if ($entitasUser === 'MC') {
+                if (!($entitasApprover === 'UNR' && $divisiApprover === 'Finance')) {
+                    $this->dispatch('swal', params: [
+                        'title' => 'Tidak Diizinkan',
+                        'icon'  => 'error',
+                        'text'  => 'Harus Mbak Pitra.'
+                    ]);
+                    return;
+                }
+            }
+
             if ($status == 1) {
                 $pengajuan->approve_spv = 1;
             } elseif ($status == 2) {
                 $pengajuan->approve_spv = 2;
-                $pengajuan->status = 2;
+                $pengajuan->status      = 2;
             }
         }
 
@@ -100,17 +116,18 @@ class PengajuanLembur extends Component
         }
 
         // === HR approval ===
-        if (in_array('hr', $userRoles)) {
+        if ($user->hasRole('hr')) {
+
+            // Jika pengaju dari divisi HR → langsung approve HR & SPV
             if ($divisi === 'HR') {
                 if ($status == 1) {
                     $pengajuan->approve_hr  = 1;
-                    $pengajuan->approve_spv = 1; // auto SPV
+                    $pengajuan->approve_spv = 1;
                     $pengajuan->status      = 1;
                 } elseif ($status == 2) {
                     $pengajuan->approve_hr  = 2;
                     $pengajuan->approve_spv = 2;
                     $pengajuan->status      = 2;
-
                     $this->dispatch('swal', params: [
                         'title' => 'Pengajuan Rejected',
                         'icon'  => 'error',
@@ -118,14 +135,14 @@ class PengajuanLembur extends Component
                     ]);
                 }
             }
-            if (in_array('spv', $pengajuRoles)) {
-                // Pengaju SPV, HR boleh langsung approve
+            // Jika pengaju adalah SPV → HR boleh langsung approve
+            elseif (in_array('spv', $pengajuRoles)) {
                 if ($status == 1) {
                     $pengajuan->approve_hr = 1;
-                    $pengajuan->status = 1;
+                    $pengajuan->status     = 1;
                 } elseif ($status == 2) {
                     $pengajuan->approve_hr = 2;
-                    $pengajuan->status = 2;
+                    $pengajuan->status     = 2;
                     $this->dispatch('swal', params: [
                         'title' => 'Pengajuan Rejected',
                         'icon'  => 'error',
@@ -147,50 +164,42 @@ class PengajuanLembur extends Component
                         'text'  => 'Berhasil menolak pengajuan branch-manager.'
                     ]);
                 }
-            } else {
-                if (in_array($entitas, ['MC'])) {
+            }
+            // Jika bukan kasus di atas → ikuti flow SPV dulu
+            else {
+
+                if ($pengajuan->approve_spv == 1) {
                     if ($status == 1) {
                         $pengajuan->approve_hr = 1;
-                        $pengajuan->status = 1;
+                        $pengajuan->status     = 1;
                     } elseif ($status == 2) {
                         $pengajuan->approve_hr = 2;
-                        $pengajuan->status = 2;
+                        $pengajuan->status     = 2;
+                        $this->dispatch('swal', params: [
+                            'title' => 'Pengajuan Rejected',
+                            'icon'  => 'error',
+                            'text'  => 'Berhasil Menolak Pengajuan ini.'
+                        ]);
                     }
+                } elseif ($pengajuan->approve_spv == 2) {
+                    $pengajuan->status = 2;
+                    $this->dispatch('swal', params: [
+                        'title' => 'Gagal Menyimpan',
+                        'icon'  => 'error',
+                        'text'  => 'SPV sudah menolak pengajuan ini.'
+                    ]);
+                    return;
                 } else {
-                    // Jika pengaju bukan SPV, maka perlu approve_spv
-                    if ($pengajuan->approve_spv == 1) {
-                        if ($status == 1) {
-                            $pengajuan->approve_hr = 1;
-                            $pengajuan->status = 1;
-                        } elseif ($status == 2) {
-                            $pengajuan->approve_hr = 2;
-                            $pengajuan->status = 2;
-
-                            $this->dispatch('swal', params: [
-                                'title' => 'Pengajuan Rejected',
-                                'icon' => 'error',
-                                'text' => 'Berhasil Menolak Pengajuan ini.'
-                            ]);
-                        }
-                    } elseif ($pengajuan->approve_spv == 2) {
-                        $pengajuan->status = 2;
-                        $this->dispatch('swal', params: [
-                            'title' => 'Gagal Menyimpan',
-                            'icon' => 'error',
-                            'text' => 'SPV sudah menolak pengajuan ini.'
-                        ]);
-                        return;
-                    } else {
-                        $this->dispatch('swal', params: [
-                            'title' => 'Gagal Menyimpan',
-                            'icon' => 'error',
-                            'text' => 'Pengajuan belum disetujui oleh SPV.'
-                        ]);
-                        return;
-                    }
+                    $this->dispatch('swal', params: [
+                        'title' => 'Gagal Menyimpan',
+                        'icon'  => 'error',
+                        'text'  => 'Pengajuan belum disetujui oleh SPV.'
+                    ]);
+                    return;
                 }
             }
         }
+
 
         // === Admin approval ===
         if (in_array('admin', $userRoles)) {
@@ -219,10 +228,39 @@ class PengajuanLembur extends Component
 
         $pengajuan->save();
 
+        // === Update jadwal kalau status = 1 ===
+        if ($pengajuan->status == 1) {
+            $tanggal    = Carbon::parse($pengajuan->tanggal);
+            $hari       = 'd' . $tanggal->day;
+            $bulanTahun = $tanggal->format('Y-m');
+
+            $jadwal = M_Jadwal::where('karyawan_id', $pengajuan->karyawan_id)
+                ->where('bulan_tahun', $bulanTahun)
+                ->first();
+
+            if ($jadwal) {
+                $pengajuan->jadwal_sebelumnya = $jadwal->$hari;
+                $pengajuan->save();
+
+                $jadwal->$hari = $pengajuan->shift_id;
+                $jadwal->save();
+            } else {
+                $pengajuan->jadwal_sebelumnya = null;
+                $pengajuan->save();
+
+                $jadwalBaru = new M_Jadwal([
+                    'karyawan_id' => $pengajuan->karyawan_id,
+                    'bulan_tahun' => $bulanTahun,
+                    $hari         => $pengajuan->shift_id,
+                ]);
+                $jadwalBaru->save();
+            }
+        }
+
         $this->dispatch('swal', params: [
             'title' => 'Status Diperbarui',
-            'icon' => 'success',
-            'text' => 'Status dan jadwal berhasil diperbarui.'
+            'icon'  => 'success',
+            'text'  => 'Status dan jadwal berhasil diperbarui.'
         ]);
 
         $this->dispatch('refresh');
@@ -254,19 +292,26 @@ class PengajuanLembur extends Component
             // 🔹 SPV → hanya karyawan dengan divisi + entitas sama
         } elseif ($user->hasRole('spv')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
-            if ($dataKaryawan && $dataKaryawan->divisi) {
-                if (strtolower($dataKaryawan->divisi) === 'noc') {
-                    // Divisi NOC → tanpa filter entitas
+            if ($dataKaryawan) {
+
+                $divisi  = strtolower($dataKaryawan->divisi);
+                $entitas = strtoupper($dataKaryawan->entitas);
+
+                if ($divisi === 'noc') {
+                    // Divisi NOC → tidak pakai entitas
                     $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
                         ->pluck('id');
-                } elseif ($dataKaryawan->entitas) {
-                    // Divisi lain → filter divisi + entitas
+                } elseif ($divisi === 'finance' && $entitas === 'UNR') {
+                    // Rule 2 — Finance UNR → bisa lihat semua karyawan entitas MC
+                    $karyawanIdList = M_DataKaryawan::whereRaw('UPPER(entitas) = ?', ['MC'])
+                        ->pluck('id');
+                } else {
+                    // Divisi lain → filter divisi + entitas (kondisi lama, tetap dipakai)
                     $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
                         ->where('entitas', $dataKaryawan->entitas)
                         ->pluck('id');
-                } else {
-                    $karyawanIdList = collect();
                 }
+
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
 

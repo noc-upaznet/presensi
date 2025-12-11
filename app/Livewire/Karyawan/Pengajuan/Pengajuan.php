@@ -83,13 +83,31 @@ class Pengajuan extends Component
             ->toArray() ?? [];
         $entitasUser = optional($pengajuan->getKaryawan)->entitas;
         $divisi = optional($pengajuan->getKaryawan)->divisi;
+        // data karyawan dari user yang lagi login (approver)
+        $karyawanUser   = M_DataKaryawan::where('user_id', $user->id)->first();
+        $entitasApprover = $karyawanUser->entitas ?? null;
+        $divisiApprover  = $karyawanUser->divisi ?? null;
+
         // === SPV approval ===
         if (in_array('spv', $userRoles)) {
+
+            // kalau pengaju entitas MC → hanya SPV Finance entitas UNR yang boleh approve
+            if ($entitasUser === 'MC') {
+                if (!($entitasApprover === 'UNR' && $divisiApprover === 'Finance')) {
+                    $this->dispatch('swal', params: [
+                        'title' => 'Tidak Diizinkan',
+                        'icon'  => 'error',
+                        'text'  => 'Harus Mbak Pitra.'
+                    ]);
+                    return;
+                }
+            }
+
             if ($status == 1) {
                 $pengajuan->approve_spv = 1;
             } elseif ($status == 2) {
                 $pengajuan->approve_spv = 2;
-                $pengajuan->status = 2;
+                $pengajuan->status      = 2;
             }
         }
 
@@ -154,44 +172,35 @@ class Pengajuan extends Component
             }
             // Jika bukan kasus di atas → ikuti flow SPV dulu
             else {
-                if (in_array($entitasUser, ['MC'])) {
+
+                if ($pengajuan->approve_spv == 1) {
                     if ($status == 1) {
                         $pengajuan->approve_hr = 1;
                         $pengajuan->status     = 1;
                     } elseif ($status == 2) {
                         $pengajuan->approve_hr = 2;
                         $pengajuan->status     = 2;
+                        $this->dispatch('swal', params: [
+                            'title' => 'Pengajuan Rejected',
+                            'icon'  => 'error',
+                            'text'  => 'Berhasil Menolak Pengajuan ini.'
+                        ]);
                     }
+                } elseif ($pengajuan->approve_spv == 2) {
+                    $pengajuan->status = 2;
+                    $this->dispatch('swal', params: [
+                        'title' => 'Gagal Menyimpan',
+                        'icon'  => 'error',
+                        'text'  => 'SPV sudah menolak pengajuan ini.'
+                    ]);
+                    return;
                 } else {
-                    if ($pengajuan->approve_spv == 1) {
-                        if ($status == 1) {
-                            $pengajuan->approve_hr = 1;
-                            $pengajuan->status     = 1;
-                        } elseif ($status == 2) {
-                            $pengajuan->approve_hr = 2;
-                            $pengajuan->status     = 2;
-                            $this->dispatch('swal', params: [
-                                'title' => 'Pengajuan Rejected',
-                                'icon'  => 'error',
-                                'text'  => 'Berhasil Menolak Pengajuan ini.'
-                            ]);
-                        }
-                    } elseif ($pengajuan->approve_spv == 2) {
-                        $pengajuan->status = 2;
-                        $this->dispatch('swal', params: [
-                            'title' => 'Gagal Menyimpan',
-                            'icon'  => 'error',
-                            'text'  => 'SPV sudah menolak pengajuan ini.'
-                        ]);
-                        return;
-                    } else {
-                        $this->dispatch('swal', params: [
-                            'title' => 'Gagal Menyimpan',
-                            'icon'  => 'error',
-                            'text'  => 'Pengajuan belum disetujui oleh SPV.'
-                        ]);
-                        return;
-                    }
+                    $this->dispatch('swal', params: [
+                        'title' => 'Gagal Menyimpan',
+                        'icon'  => 'error',
+                        'text'  => 'Pengajuan belum disetujui oleh SPV.'
+                    ]);
+                    return;
                 }
             }
         }
@@ -278,17 +287,40 @@ class Pengajuan extends Component
             $query->whereIn('karyawan_id', $karyawanIdList);
         } elseif ($user->hasRole('spv')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
+            // if ($dataKaryawan) {
+            //     if (strtolower($dataKaryawan->divisi) === 'noc') {
+            //         // Divisi NOC → tidak pakai entitas
+            //         $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
+            //             ->pluck('id');
+            //     } else {
+            //         // Divisi lain → filter divisi + entitas
+            //         $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
+            //             ->where('entitas', $dataKaryawan->entitas)
+            //             ->pluck('id');
+            //     }
+            //     $query->whereIn('karyawan_id', $karyawanIdList);
+            // }
+
             if ($dataKaryawan) {
-                if (strtolower($dataKaryawan->divisi) === 'noc') {
+
+                $divisi  = strtolower($dataKaryawan->divisi);
+                $entitas = strtoupper($dataKaryawan->entitas);
+
+                if ($divisi === 'noc') {
                     // Divisi NOC → tidak pakai entitas
                     $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
                         ->pluck('id');
+                } elseif ($divisi === 'finance' && $entitas === 'UNR') {
+                    // Rule 2 — Finance UNR → bisa lihat semua karyawan entitas MC
+                    $karyawanIdList = M_DataKaryawan::whereRaw('UPPER(entitas) = ?', ['MC'])
+                        ->pluck('id');
                 } else {
-                    // Divisi lain → filter divisi + entitas
+                    // Divisi lain → filter divisi + entitas (kondisi lama, tetap dipakai)
                     $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
                         ->where('entitas', $dataKaryawan->entitas)
                         ->pluck('id');
                 }
+
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
 
