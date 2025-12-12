@@ -10,5 +10,5 @@ Artisan::command('inspire', function () {
 
 
 Schedule::command('presensi:replace-files --months=3 --delete-files')
-    ->dailyAt('02:30')
+    ->dailyAt('00:00')
     ->withoutOverlapping();
