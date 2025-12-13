@@ -85,53 +85,43 @@ class ReplacePresensiFiles extends Command
                 foreach ($rows as $r) {
                     $currentFile = $r->file;
 
-                    // skip jika kosong atau sudah dummy
+                    // Skip jika kosong atau sudah dummy
                     if (empty($currentFile) || $currentFile === $dummyPath) {
                         continue;
                     }
 
-                    // Jika DB menyimpan absolute windows path, coba hapus langsung hanya jika mengandung 'selfies'
-                    if (strpos($currentFile, 'selfies') !== false && (strpos($currentFile, DIRECTORY_SEPARATOR . 'selfies') !== false || strpos($currentFile, 'selfies' . DIRECTORY_SEPARATOR) !== false || strpos($currentFile, 'selfies/') !== false)) {
-                        // jika currentFile terlihat seperti absolute path (mengandung disk letter atau root), cek langsung
-                        if (preg_match('/^[A-Za-z]:\\\\|^\\\\|^\//', $currentFile)) {
-                            // absolute path style (Windows or Unix)
-                            $absPath = $currentFile;
-                            if (File::exists($absPath) && File::isFile($absPath)) {
-                                try {
-                                    File::delete($absPath);
-                                    Log::info("ReplacePresensiFiles: deleted absolute selfie file -> {$absPath} (presensi_id: {$r->id})");
-                                } catch (\Throwable $e) {
-                                    Log::warning("ReplacePresensiFiles: gagal menghapus absolute {$absPath}: " . $e->getMessage());
-                                }
-                            }
-                            // don't proceed to other checks for this row
-                            continue;
-                        }
-
-                        // Jika bukan absolute, kita ambil substring mulai dari 'selfies' untuk membentuk relative path yang benar
-                        $pos = strpos($currentFile, 'selfies');
-                        $relativeFromSelfies = substr($currentFile, $pos); // e.g. selfies/xxx.jpg
-
-                        // Lokasi fisik di storage/app/public/selfies/...
-                        $realPath = storage_path('app/public/' . ltrim($relativeFromSelfies, '/\\'));
-
-                        if (File::exists($realPath) && File::isFile($realPath)) {
-                            try {
-                                File::delete($realPath);
-                                Log::info("ReplacePresensiFiles: deleted selfie file -> {$realPath} (presensi_id: {$r->id})");
-                            } catch (\Throwable $e) {
-                                Log::warning("ReplacePresensiFiles: gagal menghapus {$realPath}: " . $e->getMessage());
-                            }
-                        } else {
-                            Log::info("ReplacePresensiFiles: selfie file not found at expected path -> {$realPath} (presensi_id: {$r->id})");
-                        }
-
-                        // lanjut ke row berikutnya
+                    // Pastikan hanya file selfie
+                    // Contoh valid:
+                    // selfie_123.jpg
+                    // selfies/selfie_123.jpg
+                    if (
+                        !str_contains($currentFile, 'selfie_') ||
+                        !str_contains($currentFile, 'selfies')
+                    ) {
                         continue;
                     }
 
-                    // Jika tidak mengandung 'selfies', kita sengaja tidak menghapus apa pun (aman)
-                    continue;
+                    // Pastikan path relatif ke folder selfies
+                    // Jika DB menyimpan: selfie_xxx.jpg → jadikan selfies/selfie_xxx.jpg
+                    if (!str_contains($currentFile, '/')) {
+                        $relativePath = 'selfies/' . $currentFile;
+                    } else {
+                        $relativePath = ltrim($currentFile, '/');
+                    }
+
+                    // Lokasi fisik file
+                    $realPath = storage_path('app/public/' . $relativePath);
+
+                    if (File::exists($realPath) && File::isFile($realPath)) {
+                        try {
+                            File::delete($realPath);
+                            Log::info("ReplacePresensiFiles: deleted selfie file -> {$realPath} (presensi_id: {$r->id})");
+                        } catch (\Throwable $e) {
+                            Log::warning("ReplacePresensiFiles: gagal menghapus {$realPath}: " . $e->getMessage());
+                        }
+                    } else {
+                        Log::info("ReplacePresensiFiles: selfie file not found -> {$realPath} (presensi_id: {$r->id})");
+                    }
                 }
             }
 
