@@ -9,10 +9,10 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 
-Schedule::command('presensi:replace-files --months=3 --delete-files')
+Schedule::command('presensi:replace-files --months=3')
     ->monthlyOn(1, '00:00')
     ->withoutOverlapping();
 
-Schedule::command('presensi:cleanup-old-selfies --months=3')
+Schedule::command('presensi:cleanup-selfies --months=3')
     ->monthlyOn(1, '00:30')
     ->withoutOverlapping();
