@@ -228,35 +228,6 @@ class PengajuanLembur extends Component
 
         $pengajuan->save();
 
-        // === Update jadwal kalau status = 1 ===
-        if ($pengajuan->status == 1) {
-            $tanggal    = Carbon::parse($pengajuan->tanggal);
-            $hari       = 'd' . $tanggal->day;
-            $bulanTahun = $tanggal->format('Y-m');
-
-            $jadwal = M_Jadwal::where('karyawan_id', $pengajuan->karyawan_id)
-                ->where('bulan_tahun', $bulanTahun)
-                ->first();
-
-            if ($jadwal) {
-                $pengajuan->jadwal_sebelumnya = $jadwal->$hari;
-                $pengajuan->save();
-
-                $jadwal->$hari = $pengajuan->shift_id;
-                $jadwal->save();
-            } else {
-                $pengajuan->jadwal_sebelumnya = null;
-                $pengajuan->save();
-
-                $jadwalBaru = new M_Jadwal([
-                    'karyawan_id' => $pengajuan->karyawan_id,
-                    'bulan_tahun' => $bulanTahun,
-                    $hari         => $pengajuan->shift_id,
-                ]);
-                $jadwalBaru->save();
-            }
-        }
-
         $this->dispatch('swal', params: [
             'title' => 'Status Diperbarui',
             'icon'  => 'success',
