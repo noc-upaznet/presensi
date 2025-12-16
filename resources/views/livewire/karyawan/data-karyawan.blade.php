@@ -85,6 +85,9 @@
                                     <th>Status</th>
                                     <th>Email</th>
                                     <th>Action</th>
+                                    @hasrole('admin')
+                                        <th>Action Admin</th>
+                                    @endhasrole
                                 </tr>
                             </thead>
                             <tbody>
@@ -125,6 +128,15 @@
                                                         class="fa-solid fa-trash"></i></button>
                                             @endcan
                                         </td>
+                                        @hasrole('admin')
+                                            <td>
+                                                <button type="button"
+                                                    wire:click="confirmDeletePermanent('{{ Crypt::encrypt($key->id) }}')"
+                                                    class="btn btn-danger btn-sm" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" title="Hapus"><i
+                                                        class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        @endhasrole
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -137,6 +149,32 @@
             </div>
         </div>
         <!-- Modal Hapus Payroll -->
+        <div wire:ignore.self class="modal fade" id="deletePermanentModal" tabindex="-1"
+            aria-labelledby="deletePermanentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content"
+                    style="border-radius: 0.375rem; border-top: 4px solid #dc3545; border-left: 1px solid #dee2e6;
+                        border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold text-danger" id="deletePermanentModalLabel">Hapus Permanen Data
+                            Karyawan
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Apakah Anda yakin ingin menghapus permanen data karyawan ini?</p>
+                        <p class="text-danger">Data yang dihapus tidak dapat dikembalikan.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            style="border-radius: 8px;">Batal</button>
+                        <button type="button" class="btn btn-danger" wire:click="deletePermanent1"
+                            style="border-radius: 8px;" data-bs-dismiss="modal">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div wire:ignore.self class="modal fade" id="hapusKaryawanModal" tabindex="-1"
             aria-labelledby="hapusKaryawanModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -146,7 +184,8 @@
                     <div class="modal-header">
                         <h5 class="modal-title fw-bold text-danger" id="hapusKaryawanModalLabel">Hapus Data Karyawan
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <p>Apakah Anda yakin ingin menghapus data karyawan ini?</p>
@@ -178,6 +217,10 @@
 
             Livewire.on('hapusKaryawanModal', (event) => {
                 $('#hapusKaryawanModal').modal(event.action);
+            });
+
+            Livewire.on('deletePermanentModal', (event) => {
+                $('#deletePermanentModal').modal(event.action);
             });
 
             Livewire.on('refresh', () => {

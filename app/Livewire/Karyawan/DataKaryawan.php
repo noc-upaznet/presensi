@@ -20,6 +20,7 @@ use App\Models\M_Presensi;
 use App\Models\M_WorkExperience;
 use App\Models\PayrollModel;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Livewire\WithoutUrlPagination;
 
 class DataKaryawan extends Component
@@ -30,6 +31,7 @@ class DataKaryawan extends Component
     public int $perPage = 10;
     public TambahDataKaryawanForm $form;
     public $deleteKaryawan;
+    public $deletePermanent;
 
     protected $listeners = [
         'entitasUpdated' => '$refresh',
@@ -83,6 +85,14 @@ class DataKaryawan extends Component
         $this->dispatch('hapusKaryawanModal', action: 'show');
     }
 
+    public function confirmDeletePermanent($id)
+    {
+        // dd($id);
+        $this->deletePermanent = decrypt($id);
+        // dd($this->deletePermanent);
+        $this->dispatch('deletePermanentModal', action: 'show');
+    }
+
     public function delete()
     {
         if ($this->deleteKaryawan) {
@@ -125,6 +135,55 @@ class DataKaryawan extends Component
             );
             $this->deleteKaryawan = null;
         }
+    }
+
+    public function deletePermanent1()
+    {
+        if (!$this->deletePermanent) {
+            return;
+        }
+
+
+        $karyawan = M_DataKaryawan::withTrashed()
+            ->find($this->deletePermanent);
+
+        if (!$karyawan) {
+            return;
+        }
+
+        $karyawanId = $karyawan->id;
+        $userId     = $karyawan->user_id;
+
+        M_Jadwal::withTrashed()->where('karyawan_id', $karyawanId)->forceDelete();
+        M_Pengajuan::withTrashed()->where('karyawan_id', $karyawanId)->forceDelete();
+        PayrollModel::withTrashed()->where('karyawan_id', $karyawanId)->forceDelete();
+        M_Lembur::withTrashed()->where('karyawan_id', $karyawanId)->forceDelete();
+        M_Presensi::withTrashed()->where('user_id', $karyawanId)->forceDelete();
+        M_Dispensation::where('karyawan_id', $karyawanId)->delete();
+        M_Dependents::where('karyawan_id', $karyawanId)->delete();
+        M_AdditionalDataEmployee::where('karyawan_id', $karyawanId)->delete();
+        M_Education::where('karyawan_id', $karyawanId)->delete();
+        M_Family::withTrashed()->where('karyawan_id', $karyawanId)->forceDelete();
+        M_WorkExperience::where('karyawan_id', $karyawanId)->delete();
+
+        if ($userId) {
+            User::withTrashed()->where('id', $userId)->forceDelete();
+        }
+
+        $karyawan->forceDelete();
+
+        $this->dispatch(
+            'swal',
+            params: [
+                'title' => 'Data Deleted',
+                'icon' => 'success',
+                'text' => 'Data berhasil dihapus secara permanen',
+                'showConfirmButton' => false,
+                'timer' => 1500
+            ]
+        );
+
+        $this->deletePermanent = null;
     }
 
 
