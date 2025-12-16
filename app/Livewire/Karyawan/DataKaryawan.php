@@ -9,9 +9,15 @@ use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Crypt;
 use App\Livewire\Forms\TambahDataKaryawanForm;
+use App\Models\M_AdditionalDataEmployee;
+use App\Models\M_Dependents;
+use App\Models\M_Dispensation;
+use App\Models\M_Education;
+use App\Models\M_Family;
 use App\Models\M_Lembur;
 use App\Models\M_Pengajuan;
 use App\Models\M_Presensi;
+use App\Models\M_WorkExperience;
 use App\Models\PayrollModel;
 use App\Models\User;
 use Livewire\WithoutUrlPagination;
@@ -91,6 +97,12 @@ class DataKaryawan extends Component
                 M_Lembur::where('karyawan_id', $karyawan->id)->delete();
                 M_Presensi::where('user_id', $karyawan->id)->delete();
                 User::where('id', $karyawan->user_id)->delete();
+                M_Dispensation::where('karyawan_id', $karyawan->id)->delete();
+                M_Dependents::where('karyawan_id', $karyawan->id)->delete();
+                M_AdditionalDataEmployee::where('karyawan_id', $karyawan->id)->delete();
+                M_Education::where('karyawan_id', $karyawan->id)->delete();
+                M_Family::where('karyawan_id', $karyawan->id)->delete();
+                M_WorkExperience::where('karyawan_id', $karyawan->id)->delete();
 
                 // 🔹 Hapus user terkait (jika ada)
                 if ($karyawan->user_id) {
