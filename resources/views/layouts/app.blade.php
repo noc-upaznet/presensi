@@ -11,8 +11,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Absensi">
-    <link rel="apple-touch-icon" sizes="192x192" href="{{ asset('assets/img/logo.png') }}">
-    <link rel="apple-touch-icon" sizes="512x512" href="{{ asset('assets/img/logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
