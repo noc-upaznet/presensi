@@ -23,6 +23,13 @@
                             <p>Dashboard</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('data-karyawan') }}"
+                            class="nav-link {{ request()->routeIs('data-karyawan') ? 'active' : '' }}">
+                            <i class="bi bi-person-add"></i>
+                            <p>Data Karyawan</p>
+                        </a>
+                    </li>
                 @endrole
                 @role('hr')
                     <li class="nav-item menu-open">
@@ -60,7 +67,7 @@
                 @endhasanyrole
 
                 {{-- Data Master khusus Admin --}}
-                @can('karyawan-edit')
+                @can('karyawan-view')
                     <li class="nav-item">
                         <a href="{{ route('data-karyawan') }}"
                             class="nav-link {{ request()->routeIs('data-karyawan') ? 'active' : '' }}">

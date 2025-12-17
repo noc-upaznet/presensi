@@ -118,11 +118,13 @@
                                             <button type="button"
                                                 wire:click="DetailDataKaryawan('{{ Crypt::encrypt($key->id) }}')"
                                                 class="btn btn-info btn-sm"><i class="fa fa-eye"></i></button>
-                                            <button type="button"
-                                                wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"
-                                                class="btn btn-warning btn-sm" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" title="Edit"><i
-                                                    class="fa-solid fa-pen-to-square"></i></button>
+                                            @can('karyawan-edit')
+                                                <button type="button"
+                                                    wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"
+                                                    class="btn btn-warning btn-sm" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" title="Edit"><i
+                                                        class="fa-solid fa-pen-to-square"></i></button>
+                                            @endcan
                                             @can('karyawan-delete')
                                                 <button type="button"
                                                     wire:click="confirmHapusKaryawan('{{ Crypt::encrypt($key->id) }}')"
