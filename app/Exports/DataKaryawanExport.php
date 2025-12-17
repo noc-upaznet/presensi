@@ -6,8 +6,14 @@ use App\Models\M_DataKaryawan;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class DataKaryawanExport implements FromCollection, WithHeadings, WithMapping
+class DataKaryawanExport implements
+    FromCollection,
+    WithHeadings,
+    WithMapping,
+    WithColumnFormatting
 {
     protected $entitas;
 
@@ -59,7 +65,7 @@ class DataKaryawanExport implements FromCollection, WithHeadings, WithMapping
             $row->status_perkawinan,
             $row->agama,
             $row->jenis_identitas,
-            $row->nik,
+            "'" . $row->nik,
             $row->alamat_ktp,
             $row->alamat_domisili,
             $row->nip_karyawan,
@@ -70,6 +76,13 @@ class DataKaryawanExport implements FromCollection, WithHeadings, WithMapping
             $row->divisi,
             $row->jabatan,
             $row->level,
+        ];
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'J' => NumberFormat::FORMAT_TEXT, // NIK
         ];
     }
 }
