@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Karyawan;
 
-use Carbon\Carbon;
+use App\Exports\DataKaryawanExport;
 use Livewire\Component;
 use App\Models\M_Jadwal;
 use Livewire\WithPagination;
@@ -20,8 +20,8 @@ use App\Models\M_Presensi;
 use App\Models\M_WorkExperience;
 use App\Models\PayrollModel;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Livewire\WithoutUrlPagination;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DataKaryawan extends Component
 {
@@ -49,11 +49,8 @@ class DataKaryawan extends Component
             return;
         }
 
-        // Kirim data ke komponen ModalKunjungan
         $this->dispatch('edit-ticket', data: $dataKaryawan->toArray());
-        // dd($this->dispatch('edit-ticket', data: $dataKaryawan->toArray()));
 
-        // Dispatch event ke modal
         $this->dispatch('modal-edit-data-karyawan', action: 'show');
     }
 
@@ -184,6 +181,16 @@ class DataKaryawan extends Component
         );
 
         $this->deletePermanent = null;
+    }
+
+    public function exportDataKaryawan()
+    {
+        $selectedEntitas = session('selected_entitas', 'UHO');
+
+        return Excel::download(
+            new DataKaryawanExport($selectedEntitas),
+            'data_karyawan_' . $selectedEntitas . '.xlsx'
+        );
     }
 
 

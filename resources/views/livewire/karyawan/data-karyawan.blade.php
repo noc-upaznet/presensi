@@ -41,6 +41,9 @@
                                             class="fa-solid fa-plus"></i> Tambah</button></a>
                                 <button wire:click="showModalImport" class="btn btn-success"><i
                                         class="fa-solid fa-file-excel"></i> Import</button>
+                                <button wire:click="exportDataKaryawan" class="btn btn-danger"><i
+                                        class="fa-solid fa-file-excel"></i>
+                                    Export</button>
                             @endcan
                             <select class="form-select" wire:model.lazy="filterStatus" style="width: 150px;">
                                 <option value="">Pilih Status</option>
@@ -159,7 +162,8 @@
                         <h5 class="modal-title fw-bold text-danger" id="deletePermanentModalLabel">Hapus Permanen Data
                             Karyawan
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <p>Apakah Anda yakin ingin menghapus permanen data karyawan ini?</p>
