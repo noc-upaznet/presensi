@@ -768,7 +768,8 @@ class EditPayroll extends Component
         $gajiPokok         = $this->numericValue($this->gaji_pokok);
         $tunjanganJabatan  = $this->numericValue($this->tunjangan_jabatan);
 
-        $hariHadir = $this->rekap['kehadiran'] ?? 0;
+        $hariHadir = 21;
+        // dd($hariHadir);
         $gajiPerHari = ($gajiPokok + $tunjanganJabatan) / 26;
         $gajiProrata = round($gajiPerHari * $hariHadir);
 
@@ -825,6 +826,20 @@ class EditPayroll extends Component
         $this->bpjs_nominal = round($bpjsNominal);
         $this->bpjs_jht_nominal = round($bpjsJhtNominal);
 
+        $potonganIzin = 0;
+
+        if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
+            $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
+
+            $totalHariIzin =
+                ($this->rekap['izin'] ?? 0)
+                + 0.5 * ($this->rekap['izin setengah hari'] ?? 0)
+                + 0.5 * ($this->rekap['izin setengah hari pagi'] ?? 0)
+                + 0.5 * ($this->rekap['izin setengah hari siang'] ?? 0);
+
+            $potonganIzin = round($perHari * $totalHariIzin);
+        }
+
         // === 8. Hitung total gaji akhir ===
         $totalGaji = round(
             $gajiProrata
@@ -839,6 +854,7 @@ class EditPayroll extends Component
                 + $uangMakan
                 + $inovationReward
                 - $totalPotonganManual
+                - $potonganIzin
                 - $this->terlambat_nominal
                 - $this->bpjs_nominal
                 - $kasbon
