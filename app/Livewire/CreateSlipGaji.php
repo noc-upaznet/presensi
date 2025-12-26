@@ -675,103 +675,132 @@ class CreateSlipGaji extends Component
 
         // ============ JADWAL ============
 
-        $bulanTahunStart = $cutoffStart->format('Y-m');
-        $bulanTahunEnd   = $cutoffEnd->format('Y-m');
+        // $bulanTahunStart = $cutoffStart->format('Y-m');
+        // $bulanTahunEnd   = $cutoffEnd->format('Y-m');
 
-        $tahunStart = (int) $cutoffStart->format('Y');
-        $bulanStart = (int) $cutoffStart->format('m');
+        // $tahunStart = (int) $cutoffStart->format('Y');
+        // $bulanStart = (int) $cutoffStart->format('m');
 
-        $tahunEnd   = (int) $cutoffEnd->format('Y');
-        $bulanEnd   = (int) $cutoffEnd->format('m');
+        // $tahunEnd   = (int) $cutoffEnd->format('Y');
+        // $bulanEnd   = (int) $cutoffEnd->format('m');
 
-        $jadwalStart = M_Jadwal::where('karyawan_id', $id)
-            ->where('bulan_tahun', $bulanTahunStart)
+        // $jadwalStart = M_Jadwal::where('karyawan_id', $id)
+        //     ->where('bulan_tahun', $bulanTahunStart)
+        //     ->first();
+
+        // $jadwalEnd = M_Jadwal::where('karyawan_id', $id)
+        //     ->where('bulan_tahun', $bulanTahunEnd)
+        //     ->first();
+
+        // $izin = 0;
+        // $cuti = 0;
+        // $izinSetengahHari = 0;
+        // $izinSetengahHariPagi = 0;
+        // $izinSetengahHariSiang = 0;
+
+        // // 🔹 CASE 1: periode 1 bulan (mode normal)
+        // if ($bulanTahunStart === $bulanTahunEnd) {
+        //     $jadwal = $jadwalStart ?? $jadwalEnd;
+
+        //     if ($jadwal) {
+        //         $startDay = (int) $cutoffStart->day;   // bisa 1 atau tanggal lain
+        //         $endDay   = (int) $cutoffEnd->day;     // bisa akhir bulan / hari ini
+
+        //         foreach (range($startDay, $endDay) as $day) {
+        //             $tanggal = Carbon::createFromDate($tahunStart, $bulanStart, $day);
+
+        //             if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
+        //                 continue;
+        //             }
+
+        //             $kode = $jadwal->{'d' . $day} ?? null;
+        //             $this->tambahHitunganKode(
+        //                 $kode,
+        //                 $izin,
+        //                 $cuti,
+        //                 $izinSetengahHari,
+        //                 $izinSetengahHariPagi,
+        //                 $izinSetengahHariSiang
+        //             );
+        //         }
+        //     }
+        // }
+        // // 🔹 CASE 2: periode lintas bulan (cutoff 26–25)
+        // else {
+        //     // ---- BULAN AWAL (biasanya 26–akhir bulan) ----
+        //     if ($jadwalStart) {
+        //         $startDay = (int) $cutoffStart->day;                 // contoh 26
+        //         $endDay   = $cutoffStart->copy()->endOfMonth()->day; // 30/31
+
+        //         foreach (range($startDay, $endDay) as $day) {
+        //             $tanggal = Carbon::createFromDate($tahunStart, $bulanStart, $day);
+
+        //             if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
+        //                 continue;
+        //             }
+
+        //             $kode = $jadwalStart->{'d' . $day} ?? null;
+        //             $this->tambahHitunganKode(
+        //                 $kode,
+        //                 $izin,
+        //                 $cuti,
+        //                 $izinSetengahHari,
+        //                 $izinSetengahHariPagi,
+        //                 $izinSetengahHariSiang
+        //             );
+        //         }
+        //     }
+
+        //     // ---- BULAN AKHIR (biasanya 1–25) ----
+        //     if ($jadwalEnd) {
+        //         $startDay = 1;
+        //         $endDay   = (int) $cutoffEnd->day; // contoh 25
+
+        //         foreach (range($startDay, $endDay) as $day) {
+        //             $tanggal = Carbon::createFromDate($tahunEnd, $bulanEnd, $day);
+
+        //             if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
+        //                 continue;
+        //             }
+
+        //             $kode = $jadwalEnd->{'d' . $day} ?? null;
+        //             $this->tambahHitunganKode(
+        //                 $kode,
+        //                 $izin,
+        //                 $cuti,
+        //                 $izinSetengahHari,
+        //                 $izinSetengahHariPagi,
+        //                 $izinSetengahHariSiang
+        //             );
+        //         }
+        //     }
+        // }
+
+        $jadwal = M_Jadwal::where('karyawan_id', $id)
+            ->where('bulan_tahun', $this->bulanTahun) // bulanTahun sudah di-set di mount
             ->first();
-
-        $jadwalEnd = M_Jadwal::where('karyawan_id', $id)
-            ->where('bulan_tahun', $bulanTahunEnd)
-            ->first();
-
+        // dd($jadwal);
         $izin = 0;
         $cuti = 0;
         $izinSetengahHari = 0;
         $izinSetengahHariPagi = 0;
         $izinSetengahHariSiang = 0;
 
-        // 🔹 CASE 1: periode 1 bulan (mode normal)
-        if ($bulanTahunStart === $bulanTahunEnd) {
-            $jadwal = $jadwalStart ?? $jadwalEnd;
+        if ($jadwal) {
+            for ($i = 1; $i <= 31; $i++) {
+                $kolom = 'd' . $i;
+                $val = $jadwal->$kolom ?? null;
 
-            if ($jadwal) {
-                $startDay = (int) $cutoffStart->day;   // bisa 1 atau tanggal lain
-                $endDay   = (int) $cutoffEnd->day;     // bisa akhir bulan / hari ini
-
-                foreach (range($startDay, $endDay) as $day) {
-                    $tanggal = Carbon::createFromDate($tahunStart, $bulanStart, $day);
-
-                    if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
-                        continue;
-                    }
-
-                    $kode = $jadwal->{'d' . $day} ?? null;
-                    $this->tambahHitunganKode(
-                        $kode,
-                        $izin,
-                        $cuti,
-                        $izinSetengahHari,
-                        $izinSetengahHariPagi,
-                        $izinSetengahHariSiang
-                    );
-                }
-            }
-        }
-        // 🔹 CASE 2: periode lintas bulan (cutoff 26–25)
-        else {
-            // ---- BULAN AWAL (biasanya 26–akhir bulan) ----
-            if ($jadwalStart) {
-                $startDay = (int) $cutoffStart->day;                 // contoh 26
-                $endDay   = $cutoffStart->copy()->endOfMonth()->day; // 30/31
-
-                foreach (range($startDay, $endDay) as $day) {
-                    $tanggal = Carbon::createFromDate($tahunStart, $bulanStart, $day);
-
-                    if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
-                        continue;
-                    }
-
-                    $kode = $jadwalStart->{'d' . $day} ?? null;
-                    $this->tambahHitunganKode(
-                        $kode,
-                        $izin,
-                        $cuti,
-                        $izinSetengahHari,
-                        $izinSetengahHariPagi,
-                        $izinSetengahHariSiang
-                    );
-                }
-            }
-
-            // ---- BULAN AKHIR (biasanya 1–25) ----
-            if ($jadwalEnd) {
-                $startDay = 1;
-                $endDay   = (int) $cutoffEnd->day; // contoh 25
-
-                foreach (range($startDay, $endDay) as $day) {
-                    $tanggal = Carbon::createFromDate($tahunEnd, $bulanEnd, $day);
-
-                    if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
-                        continue;
-                    }
-
-                    $kode = $jadwalEnd->{'d' . $day} ?? null;
-                    $this->tambahHitunganKode(
-                        $kode,
-                        $izin,
-                        $cuti,
-                        $izinSetengahHari,
-                        $izinSetengahHariPagi,
-                        $izinSetengahHariSiang
-                    );
+                if ($val == 3) {
+                    $izin++;
+                } elseif ($val == 2) {
+                    $cuti++;
+                } elseif ($val == 8) {
+                    $izinSetengahHari++;
+                } elseif ($val == 22) {
+                    $izinSetengahHariPagi++;
+                } elseif ($val == 23) {
+                    $izinSetengahHariSiang++;
                 }
             }
         }
