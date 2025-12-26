@@ -260,24 +260,38 @@
                     $data->inov_reward;
             @endphp
             @php
+                use Carbon\Carbon;
+
                 $rekap = json_decode($data->rekap, true);
 
-                // hari efektif kerja
-                $hariEfektif = 26;
-
-                // data kehadiran
-                $hariHadir = $rekap['kehadiran'] ?? 0;
-                $hariIzin = $rekap['izin'] ?? 0;
-                $hariCuti = $rekap['cuti'] ?? 0;
-
-                // gaji dasar
+                // ===============================
+                // SETTING DASAR
+                // ===============================
                 $gajiDasarFull = $data->gaji_pokok + $data->tunjangan_jabatan;
-                $gajiPerHari = $gajiDasarFull / $hariEfektif;
+                $hariEfektifPayroll = 26; // patokan payroll
+                $gajiPerHari = $gajiDasarFull / $hariEfektifPayroll;
 
-                // hitung hari migrasi cut-off (SAJA)
-                $hariMigrasi = max(0, $hariEfektif - ($hariHadir + $hariIzin + $hariCuti));
+                // ===============================
+                // HITUNG HARI MIGRASI CUT-OFF
+                // Periode: tgl 26 - akhir bulan
+                // Minggu TIDAK dihitung
+                // ===============================
+                $periode = Carbon::parse($data->periode); // ambil bulan slip
+                $start = $periode->copy()->day(26);
+                $end = $periode->copy()->endOfMonth();
 
-                // potongan migrasi cut-off
+                $hariMigrasi = 0;
+
+                while ($start <= $end) {
+                    if (!$start->isSunday()) {
+                        $hariMigrasi++;
+                    }
+                    $start->addDay();
+                }
+
+                // ===============================
+                // POTONGAN MIGRASI CUT-OFF
+                // ===============================
                 $selisihProrata = round($hariMigrasi * $gajiPerHari);
             @endphp
 
@@ -353,7 +367,7 @@
                     $totalPotongan =
                         $data->bpjs_jht +
                         $data->bpjs +
-                        // $data->izin +
+                        $data->izin +
                         $data->terlambat +
                         $data->kasbon +
                         $data->bpjs_jht_perusahaan +
@@ -362,12 +376,7 @@
             @else
                 @php
                     $totalPotongan =
-                        $data->bpjs_jht +
-                        $data->bpjs +
-                        // $data->izin +
-                        $data->terlambat +
-                        $data->kasbon +
-                        $data->churn;
+                        $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->churn;
                 @endphp
             @endif
 
@@ -380,7 +389,7 @@
                     </tr>
                 @endif
                 <tr>
-                    <td>Potongan Izin</td>
+                    <td>Potongan Izin </td>
                     <td class="text-right">Rp. {{ number_format($data->izin) }}</td>
                 </tr>
                 <tr>
@@ -432,7 +441,7 @@
                 @endif
                 <tr style="border-bottom: 1px solid red;">
                     <th>Total Potongan</th>
-                    <th class="text-right">Rp. {{ number_format($totalPotongan + $selisihProrata + $data->izin) }}</th>
+                    <th class="text-right">Rp. {{ number_format($totalPotongan + $selisihProrata) }}</th>
                 </tr>
             </tbody>
         </table>
