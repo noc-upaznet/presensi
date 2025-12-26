@@ -1061,7 +1061,7 @@ class CreateSlipGaji extends Component
         $gajiPokok         = $this->numericValue($this->gaji_pokok);
         $tunjanganJabatan  = $this->numericValue($this->tunjangan_jabatan);
 
-        $hariHadir = $this->rekap['kehadiran'] ?? 0;
+        $hariHadir = 21;
         $gajiPerHari = ($gajiPokok + $tunjanganJabatan) / 26;
         $gajiProrata = round($gajiPerHari * $hariHadir);
 
@@ -1150,6 +1150,7 @@ class CreateSlipGaji extends Component
                 + $uangMakan
                 + $inovationReward
                 - $totalPotonganManual
+                - $potonganIzin
                 - $kasbon
                 - $churn
                 - $potonganTerlambat
