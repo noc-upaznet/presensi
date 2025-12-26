@@ -262,17 +262,23 @@
             @php
                 $rekap = json_decode($data->rekap, true);
 
-                // hari kerja & hadir
+                // hari efektif kerja
                 $hariEfektif = 26;
+
+                // data kehadiran
                 $hariHadir = $rekap['kehadiran'] ?? 0;
+                $hariIzin = $rekap['izin'] ?? 0;
+                $hariCuti = $rekap['cuti'] ?? 0;
 
                 // gaji dasar
                 $gajiDasarFull = $data->gaji_pokok + $data->tunjangan_jabatan;
                 $gajiPerHari = $gajiDasarFull / $hariEfektif;
-                $gajiProrata = round($gajiPerHari * $hariHadir);
 
-                // selisih untuk PREVIEW SAJA
-                $selisihProrata = $gajiDasarFull - $gajiProrata;
+                // hitung hari migrasi cut-off (SAJA)
+                $hariMigrasi = max(0, $hariEfektif - ($hariHadir + $hariIzin + $hariCuti));
+
+                // potongan migrasi cut-off
+                $selisihProrata = round($hariMigrasi * $gajiPerHari);
             @endphp
 
             <tbody>
