@@ -432,7 +432,7 @@
                 @endif
                 <tr style="border-bottom: 1px solid red;">
                     <th>Total Potongan</th>
-                    <th class="text-right">Rp. {{ number_format($totalPotongan + $selisihProrata) }}</th>
+                    <th class="text-right">Rp. {{ number_format($totalPotongan + $selisihProrata + $data->izin) }}</th>
                 </tr>
             </tbody>
         </table>
