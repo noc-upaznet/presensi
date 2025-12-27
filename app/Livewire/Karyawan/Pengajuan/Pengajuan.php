@@ -91,7 +91,8 @@ class Pengajuan extends Component
         // === SPV approval ===
         if (in_array('spv', $userRoles)) {
 
-            // kalau pengaju entitas MC → hanya SPV Finance entitas UNR yang boleh approve
+            // kalau pengaju entitas MC
+
             if ($entitasUser === 'MC') {
                 if (!($entitasApprover === 'UNR' && $divisiApprover === 'Finance')) {
                     $this->dispatch('swal', params: [
@@ -311,9 +312,16 @@ class Pengajuan extends Component
                     $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
                         ->pluck('id');
                 } elseif ($divisi === 'finance' && $entitas === 'UNR') {
-                    // Rule 2 — Finance UNR → bisa lihat semua karyawan entitas MC
-                    $karyawanIdList = M_DataKaryawan::whereRaw('UPPER(entitas) = ?', ['MC'])
-                        ->pluck('id');
+                    $karyawanIdList = M_DataKaryawan::where(function ($q) use ($dataKaryawan) {
+                        // 1. Semua karyawan entitas MC
+                        $q->whereRaw('UPPER(entitas) = ?', ['MC'])
+
+                            // 2. Divisi & entitas sendiri
+                            ->orWhere(function ($sub) use ($dataKaryawan) {
+                                $sub->where('divisi', $dataKaryawan->divisi)
+                                    ->where('entitas', $dataKaryawan->entitas);
+                            });
+                    })->pluck('id');
                 } else {
                     // Divisi lain → filter divisi + entitas (kondisi lama, tetap dipakai)
                     $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
