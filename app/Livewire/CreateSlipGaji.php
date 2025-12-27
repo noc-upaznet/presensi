@@ -655,8 +655,17 @@ class CreateSlipGaji extends Component
 
     public function rekapKehadiran($id, $cutoffStart, $cutoffEnd)
     {
-        $cutoffStart = $cutoffStart instanceof Carbon ? $cutoffStart : Carbon::parse($cutoffStart);
-        $cutoffEnd   = $cutoffEnd   instanceof Carbon ? $cutoffEnd   : Carbon::parse($cutoffEnd);
+        $cutoffStart = Carbon::createFromDate(
+            $cutoffStart->year,
+            $cutoffStart->month,
+            1
+        );
+
+        $cutoffEnd = Carbon::createFromDate(
+            $cutoffStart->year,
+            $cutoffStart->month,
+            25
+        );
 
         $karyawan = M_DataKaryawan::find($id);
 
@@ -670,12 +679,12 @@ class CreateSlipGaji extends Component
         $terlambat = M_Presensi::where('user_id', $id)
             ->where('status', 1)
             ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
-            ->where(function ($query) {
-                $query->where('lokasi_lock', 0)->where('approve', 1)
-                    ->orWhere(function ($q) {
-                        $q->where('lokasi_lock', 1)->where('approve', 0);
-                    });
-            })
+            // ->where(function ($query) {
+            //     $query->where('lokasi_lock', 0)->where('approve', 1)
+            //         ->orWhere(function ($q) {
+            //             $q->where('lokasi_lock', 1)->where('approve', 0);
+            //         });
+            // })
             ->count();
 
         // ============ JADWAL ============

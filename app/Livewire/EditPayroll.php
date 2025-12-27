@@ -188,6 +188,96 @@ class EditPayroll extends Component
 
 
 
+    // public function hitungRekap($userId)
+    // {
+    //     if (!$this->cutoffStart || !$this->cutoffEnd) {
+    //         $this->rekap = [];
+    //         return $this->rekap;
+    //     }
+
+    //     // --- TERLAMBAT ---
+    //     $terlambat = M_Presensi::where('user_id', $userId)
+    //         ->where('status', 1)
+    //         ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
+    //         // ->where(function ($q) {
+    //         //     $q->where(function ($q1) {
+    //         //         $q1->where('lokasi_lock', 0)
+    //         //             ->where('approve', 1);
+    //         //     })->orWhere(function ($q2) {
+    //         //         $q2->where('lokasi_lock', 1)
+    //         //             ->where('approve', 0);
+    //         //     });
+    //         // })
+    //         ->count();
+
+    //     // dd($terlambat);
+
+    //     // --- AMBIL DATA JADWAL ---
+    //     $jadwal = M_Jadwal::where('karyawan_id', $userId)
+    //         ->where('bulan_tahun', $this->bulanTahun) // bulanTahun sudah di-set di mount
+    //         ->first();
+    //     // dd($jadwal);
+    //     $izin = 0;
+    //     $cuti = 0;
+    //     $izinSetengahHari = 0;
+    //     $izinSetengahHariPagi = 0;
+    //     $izinSetengahHariSiang = 0;
+
+    //     if ($jadwal) {
+    //         for ($i = 1; $i <= 31; $i++) {
+    //             $kolom = 'd' . $i;
+    //             $val = $jadwal->$kolom ?? null;
+
+    //             if ($val == 3) {
+    //                 $izin++;
+    //             } elseif ($val == 2) {
+    //                 $cuti++;
+    //             } elseif ($val == 8) {
+    //                 $izinSetengahHari++;
+    //             } elseif ($val == 22) {
+    //                 $izinSetengahHariPagi++;
+    //             } elseif ($val == 23) {
+    //                 $izinSetengahHariSiang++;
+    //             }
+    //         }
+    //     }
+
+    //     // --- LEMBUR JAM ---
+    //     $lemburJam = M_Lembur::where('karyawan_id', $userId)
+    //         ->where('status', 1)
+    //         ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
+    //         ->sum('total_jam');
+
+    //     $maxHadir = 21;
+
+    //     $this->kehadiran = max(
+    //         0,
+    //         $maxHadir
+    //             - $izin
+    //             - $cuti
+    //             - (0.5 * $izinSetengahHari)
+    //             - (0.5 * $izinSetengahHariPagi)
+    //             - (0.5 * $izinSetengahHariSiang)
+    //     );
+
+    //     if ($this->kehadiran < 0) $this->kehadiran = 0; // jangan minus
+
+    //     $this->terlambat   = $terlambat ?? 0;
+    //     $this->izin        = ($izin ?? 0) + (0.5 * ($izinSetengahHari ?? 0)) + (0.5 * ($izinSetengahHariPagi ?? 0)) + (0.5 * ($izinSetengahHariSiang ?? 0));
+    //     $this->cuti        = $cuti ?? 0;
+    //     $this->lembur_jam  = $lemburJam ?? 0;
+
+    //     $this->rekap = [
+    //         'kehadiran' => $this->kehadiran,
+    //         'terlambat' => $this->terlambat,
+    //         'izin'      => $this->izin,
+    //         'cuti'      => $this->cuti,
+    //         'lembur'    => $this->lembur_jam,
+    //     ];
+
+    //     return $this->rekap;
+    // }
+
     public function hitungRekap($userId)
     {
         if (!$this->cutoffStart || !$this->cutoffEnd) {
@@ -195,28 +285,46 @@ class EditPayroll extends Component
             return $this->rekap;
         }
 
-        // --- TERLAMBAT ---
+        // =========================
+        // KHUSUS BULAN INI → 1–25
+        // =========================
+        $isBulanIni =
+            $this->cutoffStart->year == now()->year &&
+            $this->cutoffStart->month == now()->month;
+
+        if ($isBulanIni) {
+            // 🔥 MODE DADAKAN BULAN INI
+            $startDay = 1;
+            $endDay   = 25;
+
+            $cutoffStart = Carbon::create(now()->year, now()->month, 1);
+            $cutoffEnd   = Carbon::create(now()->year, now()->month, 25);
+        } else {
+            // ✅ MODE NORMAL
+            $startDay = (int) $this->cutoffStart->day;
+            $endDay   = (int) $this->cutoffEnd->day;
+
+            $cutoffStart = $this->cutoffStart;
+            $cutoffEnd   = $this->cutoffEnd;
+        }
+
+        // =========================
+        // TERLAMBAT (PRESENSI)
+        // =========================
         $terlambat = M_Presensi::where('user_id', $userId)
             ->where('status', 1)
-            ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
-            ->where(function ($q) {
-                $q->where(function ($q1) {
-                    $q1->where('lokasi_lock', 0)
-                        ->where('approve', 1);
-                })->orWhere(function ($q2) {
-                    $q2->where('lokasi_lock', 1)
-                        ->where('approve', 0);
-                });
-            })
+            ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
             ->count();
 
-        // dd($terlambat);
+        // =========================
+        // IZIN / CUTI (JADWAL)
+        // =========================
+        $bulanTahun = $cutoffStart->format('Y-m');
 
-        // --- AMBIL DATA JADWAL ---
         $jadwal = M_Jadwal::where('karyawan_id', $userId)
-            ->where('bulan_tahun', $this->bulanTahun) // bulanTahun sudah di-set di mount
+            ->where('bulan_tahun', $bulanTahun)
             ->first();
-        // dd($jadwal);
+
         $izin = 0;
         $cuti = 0;
         $izinSetengahHari = 0;
@@ -224,33 +332,37 @@ class EditPayroll extends Component
         $izinSetengahHariSiang = 0;
 
         if ($jadwal) {
-            for ($i = 1; $i <= 31; $i++) {
-                $kolom = 'd' . $i;
-                $val = $jadwal->$kolom ?? null;
+            foreach (range($startDay, $endDay) as $day) {
+                $kode = $jadwal->{'d' . $day} ?? null;
 
-                if ($val == 3) {
+                if ($kode == 3) {
                     $izin++;
-                } elseif ($val == 2) {
+                } elseif ($kode == 2) {
                     $cuti++;
-                } elseif ($val == 8) {
+                } elseif ($kode == 8) {
                     $izinSetengahHari++;
-                } elseif ($val == 22) {
+                } elseif ($kode == 22) {
                     $izinSetengahHariPagi++;
-                } elseif ($val == 23) {
+                } elseif ($kode == 23) {
                     $izinSetengahHariSiang++;
                 }
             }
         }
 
-        // --- LEMBUR JAM ---
+        // =========================
+        // LEMBUR
+        // =========================
         $lemburJam = M_Lembur::where('karyawan_id', $userId)
             ->where('status', 1)
-            ->whereBetween('tanggal', [$this->cutoffStart, $this->cutoffEnd])
+            ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
             ->sum('total_jam');
 
+        // =========================
+        // KEHADIRAN
+        // =========================
         $maxHadir = 21;
 
-        $this->kehadiran = max(
+        $kehadiran = max(
             0,
             $maxHadir
                 - $izin
@@ -260,12 +372,17 @@ class EditPayroll extends Component
                 - (0.5 * $izinSetengahHariSiang)
         );
 
-        if ($this->kehadiran < 0) $this->kehadiran = 0; // jangan minus
-
-        $this->terlambat   = $terlambat ?? 0;
-        $this->izin        = ($izin ?? 0) + (0.5 * ($izinSetengahHari ?? 0)) + (0.5 * ($izinSetengahHariPagi ?? 0)) + (0.5 * ($izinSetengahHariSiang ?? 0));
-        $this->cuti        = $cuti ?? 0;
-        $this->lembur_jam  = $lemburJam ?? 0;
+        // ==================================================
+        // 🔥 INI YANG SEBELUMNYA KURANG (WAJIB ADA)
+        // ==================================================
+        $this->kehadiran  = $kehadiran;
+        $this->terlambat  = $terlambat;
+        $this->izin       = $izin
+            + (0.5 * $izinSetengahHari)
+            + (0.5 * $izinSetengahHariPagi)
+            + (0.5 * $izinSetengahHariSiang);
+        $this->cuti       = $cuti;
+        $this->lembur_jam = $lemburJam;
 
         $this->rekap = [
             'kehadiran' => $this->kehadiran,
@@ -277,6 +394,9 @@ class EditPayroll extends Component
 
         return $this->rekap;
     }
+
+
+
 
     public function loadData($id)
     {
@@ -299,7 +419,7 @@ class EditPayroll extends Component
         $this->tunjangan_jabatan = $payroll->tunjangan_jabatan;
         $this->lembur = $payroll->lembur;
         $this->lembur_libur = $payroll->lembur_libur;
-        $this->kehadiran = $rekap['kehadiran'] ?? 0;
+        // $this->kehadiran = $rekap['kehadiran'] ?? 0;
         // $this->inovation_reward = $payroll->inov_reward;
         $this->jml_psb = $payroll->jml_psb;
         $this->insentif = $payroll->insentif;
