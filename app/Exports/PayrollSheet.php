@@ -177,8 +177,9 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 + $potonganMigrasi;
 
             // tambah potongan dinamis
+            $excludePotongan = ['voucher', 'pph 21', 'pph21'];
             foreach ($this->uniquePotongan as $nama) {
-                if (strtolower($nama) === 'voucher') {
+                if (in_array(strtolower($nama), $excludePotongan)) {
                     continue;
                 }
                 $potongan += $potonganArray->firstWhere('nama', $nama)['nominal'] ?? 0;
