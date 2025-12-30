@@ -153,7 +153,7 @@ class DataKaryawan extends Component
 
         M_Jadwal::withTrashed()->where('karyawan_id', $karyawanId)->forceDelete();
         M_Pengajuan::withTrashed()->where('karyawan_id', $karyawanId)->forceDelete();
-        PayrollModel::withTrashed()->where('karyawan_id', $karyawanId)->forceDelete();
+        // PayrollModel::withTrashed()->where('karyawan_id', $karyawanId)->forceDelete();
         M_Lembur::withTrashed()->where('karyawan_id', $karyawanId)->forceDelete();
         M_Presensi::withTrashed()->where('user_id', $karyawanId)->forceDelete();
         M_Dispensation::where('karyawan_id', $karyawanId)->delete();
