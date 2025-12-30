@@ -148,7 +148,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             }
 
             $row[] = $item->kasbon ?? 0;
-            $row[] = $potonganMigrasi; // 🔥 MIGRASI
+            $row[] = $potonganMigrasi;
 
             $pendapatan =
                 ($item->gaji_pokok ?? 0)
@@ -174,11 +174,13 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 + ($item->terlambat ?? 0)
                 + ($item->bpjs ?? 0)
                 + ($item->bpjs_jht ?? 0)
-                + ($item->kasbon ?? 0)
                 + $potonganMigrasi;
 
             // tambah potongan dinamis
             foreach ($this->uniquePotongan as $nama) {
+                if (strtolower($nama) === 'voucher') {
+                    continue;
+                }
                 $potongan += $potonganArray->firstWhere('nama', $nama)['nominal'] ?? 0;
             }
 
