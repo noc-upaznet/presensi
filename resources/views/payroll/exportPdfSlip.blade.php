@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="id">
 
@@ -50,7 +48,8 @@
         }
 
         .company-info h2 {
-            color: #1E3A8A; /* biru tua */
+            color: #1E3A8A;
+            /* biru tua */
             font-size: 18px;
             margin: 0;
             padding: 0;
@@ -78,7 +77,8 @@
         }
 
         th {
-            background-color: #D1D5DB; /* abu silver */
+            background-color: #D1D5DB;
+            /* abu silver */
             padding: 6px;
             text-align: left;
             font-size: 12px;
@@ -93,12 +93,14 @@
         }
 
         th.green {
-            background-color: #10B981; /* hijau emerald */
+            background-color: #10B981;
+            /* hijau emerald */
             color: white;
         }
 
         th.blue {
-            background-color: #1E3A8A; /* biru tua */
+            background-color: #1E3A8A;
+            /* biru tua */
             color: white;
         }
 
@@ -114,7 +116,8 @@
 
         .summary-box {
             border: 2px solid #10B981;
-            background-color: #ECFDF5; /* hijau muda */
+            background-color: #ECFDF5;
+            /* hijau muda */
             color: #065F46;
             padding: 12px;
             margin: 15px auto;
@@ -130,7 +133,8 @@
         .footer {
             font-size: 10px;
             margin-top: 20px;
-            color: #6B7280; /* abu gelap */
+            color: #6B7280;
+            /* abu gelap */
             position: fixed;
             left: 0;
             bottom: 0;
@@ -157,6 +161,7 @@
             z-index: 0;
             pointer-events: none;
         }
+
         .content-wrapper {
             position: relative;
             z-index: 1;
@@ -183,7 +188,8 @@
                 </td>
                 <td class="slip-info">
                     SLIP GAJI<br>
-                    <span style="font-weight: normal;">{{ \Carbon\Carbon::parse($data->periode)->locale('id')->translatedFormat('F Y') }}</span>
+                    <span
+                        style="font-weight: normal;">{{ \Carbon\Carbon::parse($data->periode)->locale('id')->translatedFormat('F Y') }}</span>
                 </td>
             </tr>
         </table>
@@ -194,14 +200,17 @@
                     {{ $data->nip_karyawan }}</td>
             </tr>
             <tr>
-                <td style="padding: 2px 2px 2px 20px; border: none;"><strong>Nama:</strong> {{ $data->getKaryawan->nama_karyawan }}</td>
+                <td style="padding: 2px 2px 2px 20px; border: none;"><strong>Nama:</strong>
+                    {{ $data->getKaryawan->nama_karyawan }}</td>
             </tr>
             <tr>
-                <td style="padding: 2px 2px 2px 20px; border: none;"><strong>Departemen:</strong> {{ $data->divisi }}</td>
+                <td style="padding: 2px 2px 2px 20px; border: none;"><strong>Departemen:</strong> {{ $data->divisi }}
+                </td>
             </tr>
         </table>
 
-        <table style="width: calc(100% - 40px); margin: 15px 20px 0 20px; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 12px;">
+        <table
+            style="width: calc(100% - 40px); margin: 15px 20px 0 20px; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 12px;">
             <thead>
                 <tr>
                     <th colspan="2" style="text-align: left;">KEHADIRAN</th>
@@ -238,6 +247,41 @@
             $tunjangan = json_decode($data->tunjangan, true);
             $potongan = json_decode($data->potongan, true);
         @endphp
+        @php
+            use Carbon\Carbon;
+
+            $rekap = json_decode($data->rekap, true);
+
+            // ===============================
+            // SETTING DASAR
+            // ===============================
+            $gajiDasarFull = $data->gaji_pokok + $data->tunjangan_jabatan;
+            $hariEfektifPayroll = 26; // patokan payroll
+            $gajiPerHari = $gajiDasarFull / $hariEfektifPayroll;
+
+            // ===============================
+            // HITUNG HARI MIGRASI CUT-OFF
+            // Periode: tgl 26 - akhir bulan
+            // Minggu TIDAK dihitung
+            // ===============================
+            $periode = Carbon::parse($data->periode); // ambil bulan slip
+            $start = $periode->copy()->day(26);
+            $end = $periode->copy()->endOfMonth();
+
+            $hariMigrasi = 0;
+
+            while ($start <= $end) {
+                if (!$start->isSunday()) {
+                    $hariMigrasi++;
+                }
+                $start->addDay();
+            }
+
+            // ===============================
+            // POTONGAN MIGRASI CUT-OFF
+            // ===============================
+            $selisihProrata = round($hariMigrasi * $gajiPerHari);
+        @endphp
 
         <table style="width: calc(100% - 40px); margin: 10px 20px 0 20px; border-collapse: collapse;">
             <thead>
@@ -247,15 +291,16 @@
             </thead>
             @php
                 $lembur = $data->lembur + $data->lembur_libur;
-                $totalPendapatan = $data->gaji_pokok
-                    + $data->tunjangan_jabatan
-                    + $data->tunjangan_kebudayaan
-                    + $lembur
-                    + $data->uang_makan
-                    + $data->transport
-                    + $data->fee_sharing
-                    + $data->insentif
-                    + $data->inov_reward;
+                $totalPendapatan =
+                    $data->gaji_pokok +
+                    $data->tunjangan_jabatan +
+                    $data->tunjangan_kebudayaan +
+                    $lembur +
+                    $data->uang_makan +
+                    $data->transport +
+                    $data->fee_sharing +
+                    $data->insentif +
+                    $data->inov_reward;
             @endphp
 
             <tbody>
@@ -328,11 +373,18 @@
             </thead>
             @if ($data->getKaryawan->jabatan == 'Branch Manager' || $data->getkaryawan->entitas == 'UNB')
                 @php
-                    $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->bpjs_jht_perusahaan;
+                    $totalPotongan =
+                        $data->bpjs_jht +
+                        $data->bpjs +
+                        $data->izin +
+                        $data->terlambat +
+                        $data->kasbon +
+                        $data->bpjs_jht_perusahaan;
                 @endphp
             @else
                 @php
-                    $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->churn;
+                    $totalPotongan =
+                        $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->churn;
                 @endphp
             @endif
 
@@ -376,9 +428,19 @@
                         <td class="text-right">Rp. {{ number_format($data->bpjs_jht_perusahaan) }}</td>
                     </tr>
                 @endif
+                @if ($selisihProrata > 0)
+                    <tr style="background-color: rgba(255, 235, 59, 0.5);">
+                        <td>
+                            Potongan Migrasi Cut-Off
+                        </td>
+                        <td class="text-right">
+                            (Rp. {{ number_format($selisihProrata) }})
+                        </td>
+                    </tr>
+                @endif
                 <tr style="border-bottom: 1px solid red;">
                     <th>Total Potongan</th>
-                    <th class="text-right">Rp. {{ number_format($totalPotongan) }}</th>
+                    <th class="text-right">Rp. {{ number_format($totalPotongan + $selisihProrata) }}</th>
                 </tr>
             </tbody>
         </table>
@@ -389,7 +451,8 @@
                     <table style="width: 100%; font-weight: bold;">
                         <tr>
                             <td style="padding: 8px; border-bottom: 1px solid #4bf43b;">Upah Diterima</td>
-                            <td style="text-align: right; padding: 8px; border-bottom: 1px solid #4bf43b;">Rp. {{ number_format($data->total_gaji) }}</td>
+                            <td style="text-align: right; padding: 8px; border-bottom: 1px solid #4bf43b;">Rp.
+                                {{ number_format($data->total_gaji) }}</td>
                         </tr>
                     </table>
                 </td>
@@ -398,12 +461,13 @@
         <table style="width: calc(100% - 40px); margin: -10px 20px 0 20px; border-collapse: collapse; font-size: 14px;">
             <tr>
                 <td colspan="2" style="padding: 0;">
-                <table style="width: 100%;">
-                    <tr>
-                    <td style="padding: 8px;">Terbilang</td>
-                    <td style="text-align: right; padding: 8px;"><i>{{ terbilang($data->total_gaji) }} Rupiah</i></td>
-                    </tr>
-                </table>
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="padding: 8px;">Terbilang</td>
+                            <td style="text-align: right; padding: 8px;"><i>{{ terbilang($data->total_gaji) }}
+                                    Rupiah</i></td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
         </table>
@@ -414,24 +478,29 @@
                     Dibuat oleh:
                 </td>
                 <td style="border: none">
-                    Tulungagung, {{ \Carbon\Carbon::parse($data->tanggal)->locale('id')->translatedFormat('d F Y') }}<br>
+                    Tulungagung,
+                    {{ \Carbon\Carbon::parse($data->tanggal)->locale('id')->translatedFormat('d F Y') }}<br>
                     Diterima oleh:
                 </td>
             </tr>
             <tr>
                 <td style="vertical-align: bottom; height: 50px; border: none;">
-                    <img src="./assets/img/ttd_hrd.jpg" alt="Tanda Tangan HRD" style="width: 120px; margin-top: -30px;"><br>
+                    <img src="./assets/img/ttd_hrd.jpg" alt="Tanda Tangan HRD"
+                        style="width: 120px; margin-top: -30px;"><br>
                     <strong>M. Amin Syukron</strong><br>HRD
                 </td>
                 <td style="vertical-align: bottom; height: 50px; border: none;">
                     <br><br>
                     <strong>{{ $data->getKaryawan->nama_karyawan }}</strong><br>Karyawan
                 </td>
-            </tr>    </table>
+            </tr>
+        </table>
 
 
-        <div class="footer" style="width: calc(100% - 40px); margin: 20px 20px 0 20px; border-top: 1px solid #bebebe; font-size: 12px;">
-            <div style="text-align: left;">Generated on: {{ \Carbon\Carbon::parse($data->tanggal)->format('d-m-Y H:i:s') }}</div>
+        <div class="footer"
+            style="width: calc(100% - 40px); margin: 20px 20px 0 20px; border-top: 1px solid #bebebe; font-size: 12px;">
+            <div style="text-align: left;">Generated on:
+                {{ \Carbon\Carbon::parse($data->tanggal)->format('d-m-Y H:i:s') }}</div>
         </div>
     </div>
 </body>
