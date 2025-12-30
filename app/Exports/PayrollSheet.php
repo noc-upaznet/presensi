@@ -171,7 +171,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             // =====================
             $potongan =
                 ($item->izin ?? 0)
-                + ($item->terlambat ?? 0)
+                // + ($item->terlambat ?? 0)
                 // + ($item->bpjs ?? 0)
                 // + ($item->bpjs_jht ?? 0)
                 + $potonganMigrasi;
