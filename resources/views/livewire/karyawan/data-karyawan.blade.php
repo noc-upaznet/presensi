@@ -109,8 +109,12 @@
                                         </td>
                                         <td style="color: var(--bs-body-color);">{{ $key->entitas }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->divisi }}</td>
-                                        <td style="color: var(--bs-body-color);">{{ $key->tgl_masuk }}</td>
-                                        <td style="color: var(--bs-body-color);">{{ $key->tgl_keluar }}</td>
+                                        <td style="color: var(--bs-body-color);">
+                                            {{ \Carbon\Carbon::parse($key->tgl_masuk)->locale('id')->isoFormat('D MMMM YYYY') }}
+                                        </td>
+                                        <td style="color: var(--bs-body-color);">
+                                            {{ \Carbon\Carbon::parse($key->tgl_keluar)->locale('id')->isoFormat('D MMMM YYYY') }}
+                                        </td>
                                         <td style="color: var(--bs-body-color);"><span
                                                 class="badge-success">{{ $key->status_karyawan }}</span></td>
                                         <td style="color: var(--bs-body-color);">{{ $key->email }}</td>
