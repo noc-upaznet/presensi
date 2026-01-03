@@ -39,6 +39,7 @@ class ModalPengajuan extends Component
                 // 'Izin Setengah Hari',
                 'Izin Setengah Hari (Masuk Pagi)',
                 'Izin Setengah Hari (Masuk Siang)',
+                '(Konter) Izin Setengah Hari Masuk Pagi',
             ]
         )->orderBy('nama_shift')->get();
     }
