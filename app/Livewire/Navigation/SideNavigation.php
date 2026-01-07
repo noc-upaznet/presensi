@@ -32,6 +32,7 @@ class SideNavigation extends Component
                 $entitasModel = M_Entitas::where('nama', $entitas)->first();
                 $entitasIdSaatIni = $entitasModel?->nama;
                 $divisi = $dataKaryawan->divisi;
+                // dd($entitasIdSaatIni, $divisi);
 
                 if ($dataKaryawan) {
                     $karyawanIds = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
@@ -46,6 +47,18 @@ class SideNavigation extends Component
                             ->whereHas('getKaryawan', function ($q) use ($divisi) {
                                 $q->where('divisi', $divisi)
                                     ->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%');
+                            })
+                            ->count();
+                    } else if ($divisi == 'Finance' && $entitasIdSaatIni == 'UNR') {
+                        $countPengajuan = M_Pengajuan::whereNull('approve_spv')
+                            ->where('status', 0)
+                            ->where('karyawan_id', '!=', $dataKaryawan->id)
+                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
+                                $q->where(function ($subQ) use ($divisi) {
+                                    $subQ->where('divisi', $divisi)
+                                        ->where('entitas', 'UNR');
+                                })->orWhere('entitas', 'MC');
+                                $q->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%');
                             })
                             ->count();
                     } else {
@@ -68,6 +81,19 @@ class SideNavigation extends Component
                                     ->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%');
                             })
                             ->count();
+                    } else if ($divisi == 'Finance' && $entitasIdSaatIni == 'UNR') {
+                        $countLembur = M_Lembur::whereNull('approve_spv')
+                            ->where('status', 0)
+                            ->where('karyawan_id', '!=', $dataKaryawan->id)
+                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
+                                $q->where(function ($subQ) use ($divisi) {
+                                    $subQ->where('divisi', $divisi)
+                                        ->where('entitas', 'UNR');
+                                })->orWhere('entitas', 'MC');
+                                $q->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%');
+                            })
+                            ->count();
+                        // dd($countLembur);
                     } else {
                         $countLembur = M_Lembur::whereNull('approve_spv')
                             ->where('status', 0)
