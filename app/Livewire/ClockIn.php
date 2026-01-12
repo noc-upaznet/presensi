@@ -30,6 +30,10 @@ class ClockIn extends Component
     public float|null $longitude = null;
     public $lokasis;
     public $lokasiId;
+    public $divisi;
+    public $level;
+    public $entitas;
+    public $poin;
 
     public $question;
     public $options = [];
@@ -40,11 +44,14 @@ class ClockIn extends Component
     public $correctCount = 0;
     public $requiredCorrect = 3;
 
+    public $showPoin = false;
+
     public $shouldRedirect = false;
     public $questionKey = null;
 
     public $usedQuestionIds = [];
     public $questionId = null;
+    public array $questionSlots = [];
 
 
     protected $listeners = ['photoTaken' => 'handlePhoto', 'refreshTable' => 'refresh'];
@@ -60,6 +67,16 @@ class ClockIn extends Component
 
         $userId = Auth::user()->id;
         $karyawanId = M_DataKaryawan::where('user_id', $userId)->value('id');
+        $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
+        $this->divisi = $karyawan?->divisi;
+        $this->level = $karyawan?->level;
+        $this->poin = $karyawan?->poin;
+        $this->entitas = $karyawan?->entitas;
+        // dd($this->level);
+        $this->showPoin =
+            in_array(strtolower($this->divisi), ['teknisi'], true)
+            && in_array(strtolower($this->level), ['staff'], true)
+            && in_array(strtolower($this->entitas), ['unr'], true);
 
         $tanggal = Carbon::now();
         $hari = 'd' . $tanggal->day;
@@ -138,9 +155,33 @@ class ClockIn extends Component
         return redirect()->to('/clock-in-selfie')->with('selfie_path', $this->photo);
     }
 
+    protected function resetQuestionSlots()
+    {
+        $this->questionSlots = ['umum', 'umum', 'divisi'];
+    }
+
     public function loadRandomQuestion()
     {
+        if (empty($this->questionSlots)) {
+            $this->resetQuestionSlots();
+        }
+
+        $slotIndex = array_rand($this->questionSlots);
+        $slotType = $this->questionSlots[$slotIndex];
+        unset($this->questionSlots[$slotIndex]);
+        $this->questionSlots = array_values($this->questionSlots);
+
+        $karyawan = M_DataKaryawan::where('user_id', auth()->id())->first();
+        $divisi = $karyawan?->divisi;
+
         $query = M_ListQuestion::with('answers');
+
+        if ($slotType === 'divisi' && !empty($divisi)) {
+            $query->where('divisi', $divisi);
+        } else {
+            $query->whereNull('divisi');
+        }
+
         if (!empty($this->usedQuestionIds)) {
             $query->whereNotIn('id', $this->usedQuestionIds);
         }
@@ -148,25 +189,32 @@ class ClockIn extends Component
         $q = $query->inRandomOrder()->first();
 
         if (!$q) {
-            $this->usedQuestionIds = [];
-            $q = M_ListQuestion::with('answers')->inRandomOrder()->first();
+            $fallbackQuery = M_ListQuestion::with('answers');
+
+            if ($slotType === 'divisi' && !empty($divisi)) {
+                $fallbackQuery->whereNull('divisi');
+            } else {
+                $fallbackQuery->where('divisi', $divisi);
+            }
+
+            if (!empty($this->usedQuestionIds)) {
+                $fallbackQuery->whereNotIn('id', $this->usedQuestionIds);
+            }
+
+            $q = $fallbackQuery->inRandomOrder()->first();
         }
 
         if (!$q) {
-            $this->questionId = null;
-            $this->question = 'Belum ada pertanyaan di database.';
-            $this->options = [];
-            $this->correct_answer = null;
-            $this->user_answer = null;
-            $this->questionKey = (string) now()->timestamp . '-' . Str::random(5);
-            return;
+            $this->usedQuestionIds = [];
+            $this->resetQuestionSlots();
+            return $this->loadRandomQuestion();
         }
 
         $this->questionId = $q->id;
         $this->question = $q->name;
 
-        $shuffledAnswers = $q->answers->shuffle();
-        $this->options = $shuffledAnswers->pluck('name')->values()->toArray();
+        $shuffled = $q->answers->shuffle();
+        $this->options = $shuffled->pluck('name')->values()->toArray();
 
         $correct = $q->answers->firstWhere('is_correct', 1);
         $this->correct_answer = $correct?->name;
@@ -415,15 +463,15 @@ class ClockIn extends Component
         $shift = $shiftId ? M_JadwalShift::find($shiftId) : null;
 
         if (!$isPending) {
-            if ($shift && $shift->jam_pulang) {
-                $jamPulangShift = \Carbon\Carbon::parse($shift->jam_pulang);
-                $jamSekarang = \Carbon\Carbon::now();
+            // if ($shift && $shift->jam_pulang) {
+            //     $jamPulangShift = \Carbon\Carbon::parse($shift->jam_pulang);
+            //     $jamSekarang = \Carbon\Carbon::now();
 
-                if ($jamSekarang->lt($jamPulangShift)) {
-                    session()->flash('error', 'Belum waktu pulang. Anda baru bisa clock-out setelah jam ' . $jamPulangShift->format('H:i') . '.');
-                    return;
-                }
-            }
+            //     if ($jamSekarang->lt($jamPulangShift)) {
+            //         session()->flash('error', 'Belum waktu pulang. Anda baru bisa clock-out setelah jam ' . $jamPulangShift->format('H:i') . '.');
+            //         return;
+            //     }
+            // }
         } else {
             $selisihHari = $tanggalPresensi->startOfDay()->diffInDays(now()->startOfDay());
             // dd($selisihHari);

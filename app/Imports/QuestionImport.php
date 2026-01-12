@@ -17,6 +17,7 @@ class QuestionImport implements ToModel, WithHeadingRow
         // Jika kolom pertanyaan TIDAK kosong → buat pertanyaan baru
         if (!empty($row['pertanyaan'])) {
             $this->currentQuestion = M_ListQuestion::create([
+                'divisi' => $row['divisi'] ?? null,
                 'name' => $row['pertanyaan']
             ]);
         }

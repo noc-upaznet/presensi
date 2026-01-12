@@ -291,11 +291,27 @@ class ClockInSelfie extends Component
 
         $status = 0;
         if ($shift && $shift->jam_masuk) {
-            $jamMasukShift = Carbon::parse($shift->jam_masuk)->addSeconds(60);
-            $jamSekarang = Carbon::parse($clockInTime);
-            if ($jamSekarang->gt($jamMasukShift)) {
+            $workHourShift = Carbon::parse($shift->jam_masuk)->addSeconds(60);
+            $currentTime = Carbon::parse($clockInTime);
+            if ($currentTime->gt($workHourShift)) {
                 $status = 1;
             }
+
+            $getPoints = false;
+            $limitTime = $workHourShift->copy()->subMinutes(15);
+
+            if ($currentTime->lte($limitTime)) {
+                $getPoints = true;
+            }
+        }
+
+        $sudahPresensi = M_Presensi::where('user_id', $karyawanId)
+            ->where('tanggal', $tanggal)
+            ->exists();
+
+        if ($sudahPresensi) {
+            session()->flash('error', 'Anda sudah clock-in hari ini.');
+            return;
         }
 
         $data = [
@@ -310,11 +326,14 @@ class ClockInSelfie extends Component
         ];
         // dd($data);
 
-        // Simpan presensi
         M_Presensi::create($data);
 
+        if ($getPoints) {
+            M_DataKaryawan::where('id', $karyawanId)
+                ->increment('poin', 1);
+        }
+
         $this->reset(['photo']);
-        // session()->flash('success', 'Clock-in berhasil.');
         return redirect()->route('clock-in');
     }
 
