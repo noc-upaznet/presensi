@@ -76,6 +76,7 @@
         <table class="table table-bordered mb-0" style="background-color: var(--bs-body-bg);">
             <thead>
                 <tr>
+                    <th>Divisi</th>
                     <th>Pertanyaan</th>
                     <th class="text-center">Jawaban</th>
                     <th class="text-center">Action</th>
@@ -84,6 +85,7 @@
             <tbody>
                 @forelse ($datas as $question)
                     <tr>
+                        <td>{{ $question->divisi }}</td>
                         <td>{{ $question->name }}</td>
 
                         <td>

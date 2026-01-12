@@ -35,6 +35,46 @@
             transform: scaleX(-1);
         }
 
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--bs-body-color);
+        }
+
+        /* point container */
+        .dashboard-point {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 999px;
+
+            padding: 6px 14px;
+            font-weight: 600;
+            line-height: 1;
+            user-select: none;
+        }
+
+        /* star icon */
+        .dashboard-point .point-icon {
+            font-size: 18px;
+        }
+
+        /* number */
+        .dashboard-point .point-value {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* label */
+        .dashboard-point .point-label {
+            font-size: 13px;
+            opacity: 0.75;
+        }
+
         @media (max-width: 576px) {
             .content-wrapper {
                 padding: 2rem 1rem;
@@ -48,12 +88,29 @@
             .modal-dialog {
                 max-width: 90%;
             }
+
+            .dashboard-point {
+                padding: 5px 12px;
+            }
+
+            .dashboard-point .point-value {
+                font-size: 14px;
+            }
         }
     </style>
 
     <div class="content-wrapper p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3" style="color: var(--bs-body-color);">
-            <h3>Dashboard</h3>
+        <div class="dashboard-header mb-3">
+            <h3 class="mb-0">Dashboard</h3>
+
+            {{-- GAMIFICATION POINT --}}
+            {{-- @if ($showPoin)
+                <div class="dashboard-point">
+                    <span class="point-icon">⭐</span>
+                    <span class="point-value">{{ $poin }}</span>
+                    <span class="point-label">Poin</span>
+                </div>
+            @endif --}}
         </div>
 
         <div class="text mb-4" style="color: var(--bs-body-color); justify-content: center; align-items: center;">
@@ -106,7 +163,6 @@
             </div>
         </div>
     </div>
-
     <!-- Modal Kamera -->
     <div wire:ignore.self class="modal fade" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel"
         aria-hidden="true">
@@ -258,13 +314,14 @@
             </div>
         </div>
     </div> --}}
+    <livewire:reminder-kontrak-popup />
+
 </div>
 
 @push('scripts')
-    <script>
+    {{-- <script>
         let stream = null;
         let video, canvas, context, btnTake, btnRetake;
-        let coords = "";
         let animationId = null;
         let logoImg;
 
@@ -315,14 +372,6 @@
             video.removeAttribute("src");
             video.load();
             cancelAnimationFrame(animationId);
-        }
-
-        function getCoords() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((pos) => {
-                    coords = `Lat: ${pos.coords.latitude.toFixed(6)}, Lon: ${pos.coords.longitude.toFixed(6)}`;
-                }, (err) => console.warn("Gagal ambil lokasi:", err));
-            }
         }
 
         function drawOverlay() {
@@ -377,6 +426,25 @@
             $('#cameraModal').modal(event.action);
         });
 
+        // Event untuk buka modal
+        const cameraModal = document.getElementById('cameraModal');
+        cameraModal.addEventListener('shown.bs.modal', startCamera);
+
+        // Event untuk tutup modal
+        cameraModal.addEventListener('hidden.bs.modal', stopCamera);
+
+        function submitPhoto() {
+            const canvas = document.getElementById('canvas');
+            const photo = canvas.toDataURL('image/png');
+
+            Livewire.dispatch('photoTaken', {
+                photo: photo
+            });
+        }
+    </script> --}}
+    <script>
+        let coords = "";
+
         Livewire.on('clockOutModal', (event) => {
             $('#clockOutModal').modal(event.action);
         });
@@ -385,12 +453,9 @@
             window.location.reload();
         });
 
-        // Event untuk buka modal
-        const cameraModal = document.getElementById('cameraModal');
-        cameraModal.addEventListener('shown.bs.modal', startCamera);
-
-        // Event untuk tutup modal
-        cameraModal.addEventListener('hidden.bs.modal', stopCamera);
+        Livewire.on('swal', (e) => {
+            Swal.fire(e.params);
+        });
 
         function updateClock() {
             const now = new Date();
@@ -425,18 +490,13 @@
 
         updateDate();
 
-        function submitPhoto() {
-            const canvas = document.getElementById('canvas');
-            const photo = canvas.toDataURL('image/png');
-
-            Livewire.dispatch('photoTaken', {
-                photo: photo
-            });
+        function getCoords() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    coords = `Lat: ${pos.coords.latitude.toFixed(6)}, Lon: ${pos.coords.longitude.toFixed(6)}`;
+                }, (err) => console.warn("Gagal ambil lokasi:", err));
+            }
         }
-
-        Livewire.on('swal', (e) => {
-            Swal.fire(e.params);
-        });
 
         document.addEventListener('DOMContentLoaded', function() {
             if (navigator.geolocation) {
@@ -471,6 +531,39 @@
             }).then(() => {
                 // redirect setelah alert selesai
                 window.location.href = "{{ route('clock-in') }}";
+            });
+        });
+    </script>
+
+    <script>
+        //hrd
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('kontrak-reminder-hr', () => {
+
+                // tunggu Livewire selesai render DOM
+                setTimeout(() => {
+                    const container = document.getElementById('kontrak-reminder-html');
+                    const html = container ? container.innerHTML : '';
+
+                    Swal.fire({
+                        title: '🔔 Reminder Kontrak Karyawan',
+                        icon: 'info',
+                        html: html || '<p>Tidak ada data kontrak.</p>',
+                        confirmButtonText: 'OK'
+                    });
+                }, 0);
+
+            });
+        });
+        //end
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('kontrak-reminder', () => {
+                Swal.fire({
+                    title: '🔔 Notifikasi Kontrak',
+                    text: 'Kontrak Anda akan segera berakhir. Silakan lapor ke HRD.',
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                });
             });
         });
     </script>

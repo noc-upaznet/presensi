@@ -268,6 +268,8 @@
 
 
     </div>
+
+    <livewire:reminder-kontrak-popup />
 </div>
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -306,6 +308,27 @@
                     padding: 10
                 }
             }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('kontrak-reminder-hr', () => {
+
+                setTimeout(() => {
+                    const container = document.getElementById('kontrak-reminder-html');
+                    const html = container ? container.innerHTML : '';
+
+                    Swal.fire({
+                        title: '🔔 Reminder Kontrak Karyawan',
+                        icon: 'info',
+                        html: html || '<p>Tidak ada data kontrak.</p>',
+                        // width: 500,
+                        confirmButtonText: 'OK'
+                    });
+                }, 0);
+
+            });
         });
     </script>
 @endpush

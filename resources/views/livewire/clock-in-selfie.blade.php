@@ -8,6 +8,12 @@
         }
     </style>
     <div class="content-wrapper p-4">
+        @if (session('error'))
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
         <div class="d-flex justify-content-between align-items-center mb-3" style="color: var(--bs-body-color);">
             <h3>Dashboard</h3>
         </div>

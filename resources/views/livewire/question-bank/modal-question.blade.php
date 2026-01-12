@@ -11,6 +11,18 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
+                        <label for="divisi" class="form-label">Divisi</label>
+                        <select type="text" class="form-select" id="divisi" wire:model="divisi">
+                            <option value="">Pilih Divisi</option>
+                            @foreach ($divisies as $item)
+                                <option value="{{ $item->nama }}">{{ $item->nama }}</option>
+                            @endforeach
+                        </select>
+                        @error('divisi')
+                            <div class="alert alert-danger mt-2">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
                         <label for="name" class="form-label">Pertanyaan</label>
                         <input type="text" class="form-control" id="name" wire:model="name">
                         @error('name')
@@ -97,6 +109,18 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="divisi" class="form-label">Divisi</label>
+                        <select type="text" class="form-select" id="divisi" wire:model="divisi">
+                            <option value="">Pilih Divisi</option>
+                            @foreach ($divisies as $item)
+                                <option value="{{ $item->nama }}">{{ $item->nama }}</option>
+                            @endforeach
+                        </select>
+                        @error('divisi')
+                            <div class="alert alert-danger mt-2">{{ $message }}</div>
+                        @enderror
+                    </div>
                     <div class="mb-3">
                         <label for="name" class="form-label">Pertanyaan</label>
                         <input type="text" class="form-control" id="name" wire:model="name">

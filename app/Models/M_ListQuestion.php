@@ -8,6 +8,7 @@ class M_ListQuestion extends Model
 {
     protected $table = 'list_question';
     protected $fillable = [
+        'divisi',
         'name',
     ];
 

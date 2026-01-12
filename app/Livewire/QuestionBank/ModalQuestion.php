@@ -3,6 +3,7 @@
 namespace App\Livewire\QuestionBank;
 
 use App\Imports\QuestionImport;
+use App\Models\M_Divisi;
 use App\Models\M_ListAnswer;
 use App\Models\M_ListQuestion;
 use Illuminate\Support\Facades\Crypt;
@@ -20,11 +21,18 @@ class ModalQuestion extends Component
     public $answer4;
     public $correct_answer;
     public $file;
+    public $divisies;
+    public $divisi;
     use WithFileUploads;
 
     protected $rules = [
         'file' => 'required|mimes:xlsx,xls',
     ];
+
+    public function mount()
+    {
+        $this->divisies = M_Divisi::all();
+    }
 
     public function store()
     {
@@ -39,6 +47,7 @@ class ModalQuestion extends Component
 
         $question = M_ListQuestion::create([
             'name' => $this->name,
+            'divisi' => $this->divisi,
         ]);
 
         M_ListAnswer::insert([
