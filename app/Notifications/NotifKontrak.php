@@ -19,6 +19,7 @@ class NotifKontrak extends Notification
             'type'        => 'kontrak_reminder',
             'karyawan_id' => $this->payload['karyawan_id'],
             'nama'        => $this->payload['nama'],
+            'entitas'     => $this->payload['entitas'],
             'status'      => $this->payload['status'],
             'tgl_keluar'  => $this->payload['tgl_keluar'],
             'sisa_hari'   => $this->payload['sisa_hari'],

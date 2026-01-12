@@ -79,6 +79,7 @@ class ReminderKontrakPopup extends Component
                 'type'        => 'kontrak_reminder',
                 'karyawan_id' => $k->id,
                 'nama'        => $k->nama_karyawan,
+                'entitas'     => $k->entitas,
                 'status'      => $k->status_karyawan,
                 'tgl_keluar'  => $k->tgl_keluar,
                 'sisa_hari'   => today()->diffInDays($k->tgl_keluar),
@@ -88,15 +89,16 @@ class ReminderKontrakPopup extends Component
         $html  = '<div style="text-align:left;font-size:14px">';
         $html .= '<table style="width:100%;border-collapse:collapse">';
         $html .= '
-        <thead>
-            <tr>
-                <th style="border-bottom:1px solid #ddd;padding:6px">Nama</th>
-                <th style="border-bottom:1px solid #ddd;padding:6px">Status</th>
-                <th style="border-bottom:1px solid #ddd;padding:6px">Habis Kontrak</th>
-            </tr>
-        </thead>
-        <tbody>
-    ';
+            <thead>
+                <tr>
+                    <th style="border-bottom:1px solid #ddd;padding:6px">Nama</th>
+                    <th style="border-bottom:1px solid #ddd;padding:6px">Entitas</th>
+                    <th style="border-bottom:1px solid #ddd;padding:6px">Status</th>
+                    <th style="border-bottom:1px solid #ddd;padding:6px">Habis Kontrak</th>
+                </tr>
+            </thead>
+            <tbody>
+        ';
 
         foreach ($karyawans as $k) {
             $color = strtolower($k->status_karyawan) === 'probation'
@@ -106,6 +108,7 @@ class ReminderKontrakPopup extends Component
             $html .= '
             <tr>
                 <td style="padding:6px 0">' . e($k->nama_karyawan) . '</td>
+                <td>' . e($k->entitas) . '</td>
                 <td>
                     <span style="
                         background:' . $color . ';

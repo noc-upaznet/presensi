@@ -35,6 +35,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Nama</th>
+                                <th>Entitas</th>
                                 <th>Status</th>
                                 <th>Tgl Berakhir</th>
                                 <th>Sisa</th>
@@ -50,6 +51,10 @@
 
                                         <td>
                                             {{ $notif->data['nama'] }}
+                                        </td>
+
+                                        <td>
+                                            {{ $notif->data['entitas'] }}
                                         </td>
 
                                         <td>
