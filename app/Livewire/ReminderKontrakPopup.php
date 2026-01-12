@@ -169,6 +169,7 @@ class ReminderKontrakPopup extends Component
             auth()->user()->notify(new NotifKontrak([
                 'karyawan_id' => $karyawan->id,
                 'nama'        => $karyawan->nama_karyawan,
+                'entitas'     => $karyawan->entitas,
                 'status'      => $karyawan->status_karyawan,
                 'tgl_keluar'  => $karyawan->tgl_keluar,
                 'sisa_hari'   => today()->diffInDays($karyawan->tgl_keluar),
