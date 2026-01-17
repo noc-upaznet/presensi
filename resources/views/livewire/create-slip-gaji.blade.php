@@ -471,7 +471,11 @@
                             <div class="col-md-2 mb-3">
                                 <label for="izin" class="form-label fw-semibold">Izin (Hari)</label>
                                 <input type="text" class="form-control"
-                                    value="{{ ($rekap['izin'] ?? 0) + 0.5 * ($rekap['izin setengah hari'] ?? 0) + 0.5 * ($rekap['izin setengah hari pagi'] ?? 0) + 0.5 * ($rekap['izin setengah hari siang'] ?? 0) }}"
+                                    value="{{ ($rekap['izin'] ?? 0) +
+                                        0.5 * ($rekap['izin setengah hari'] ?? 0) +
+                                        0.5 * ($rekap['izin setengah hari pagi'] ?? 0) +
+                                        0.5 * ($rekap['izin setengah hari siang'] ?? 0) +
+                                        0.5 * ($rekap['konter izin setengah hari masuk pagi'] ?? 0) }}"
                                     readonly>
                             </div>
                             <div class="col-md-2 mb-3">

@@ -259,7 +259,7 @@
                     $data->insentif +
                     $data->inov_reward;
             @endphp
-            @php
+            {{-- @php
                 use Carbon\Carbon;
 
                 $rekap = json_decode($data->rekap, true);
@@ -293,7 +293,7 @@
                 // POTONGAN MIGRASI CUT-OFF
                 // ===============================
                 $selisihProrata = round($hariMigrasi * $gajiPerHari);
-            @endphp
+            @endphp --}}
 
             <tbody>
                 <tr>
@@ -429,7 +429,7 @@
                         <td class="text-right">Rp. {{ number_format($data->bpjs_perusahaan) }}</td>
                     </tr>
                 @endif
-                @if ($selisihProrata > 0)
+                {{-- @if ($selisihProrata > 0)
                     <tr style="background-color: rgba(255, 235, 59, 0.5);">
                         <td>
                             Potongan Migrasi Cut-Off
@@ -438,10 +438,10 @@
                             (Rp. {{ number_format($selisihProrata) }})
                         </td>
                     </tr>
-                @endif
+                @endif --}}
                 <tr style="border-bottom: 1px solid red;">
                     <th>Total Potongan</th>
-                    <th class="text-right">Rp. {{ number_format($totalPotongan + $selisihProrata) }}</th>
+                    <th class="text-right">Rp. {{ number_format($totalPotongan) }}</th>
                 </tr>
             </tbody>
         </table>
