@@ -9,6 +9,7 @@ use App\Models\M_Presensi;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -204,6 +205,24 @@ class Dispensasi extends Component
                 ]);
         }
 
+        $this->dispatch('refresh');
+    }
+
+    public function delete($id)
+    {
+        $pengajuan = M_Dispensation::findOrFail(Crypt::decrypt($id));
+        // dd($pengajuan);
+        if (!$pengajuan) return;
+
+        $pengajuan->delete();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Pengajuan Dihapus',
+            'icon' => 'success',
+            'text' => 'Data pengajuan dihapus.'
+        ]);
+
+        $this->dispatch('modal-confirm-delete', action: 'hide');
         $this->dispatch('refresh');
     }
 

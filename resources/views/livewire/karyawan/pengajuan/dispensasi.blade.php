@@ -216,6 +216,10 @@
                                                             class="fa-solid fa-pen-to-square"></i></button>
                                                 @endif
                                             @endcan
+                                            <button class="btn btn-sm btn-danger mb-2"
+                                                wire:click="$dispatch('modal-confirm-delete', { id: '{{ Crypt::encrypt($key->id) }}', action: 'show' })">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -228,149 +232,146 @@
                 {{ $pengajuanDispens->links() }}
             </div>
         </div>
+    </div>
+    <div wire:ignore.self class="modal fade" id="modalTambahPengajuan" tabindex="-1"
+        aria-labelledby="modalTambahPengajuanLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title text-white" id="modalTambahPengajuanLabel">Pengajuan Dispensasi
+                        Keterlambatan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
 
-        <div wire:ignore.self class="modal fade" id="modalTambahPengajuan" tabindex="-1"
-            aria-labelledby="modalTambahPengajuanLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header bg-danger">
-                        <h5 class="modal-title text-white" id="modalTambahPengajuanLabel">Pengajuan Dispensasi
-                            Keterlambatan</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Tutup"></button>
+                <form>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label for="tanggal" class="form-label fw-semibold">Tanggal <small
+                                    class="text-danger">*</small></label>
+                            <input type="date" class="form-control" id="tanggal" wire:model="form.date">
+                            @error('form.date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="keterangan" class="form-label fw-semibold">Keterangan <small
+                                    class="text-danger">*</small></label>
+                            <input type="text" class="form-control" id="keterangan"
+                                placeholder="Contoh: Ban bocor" wire:model="form.description">
+                            @error('form.description')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="file" class="form-label fw-semibold">File</label>
+                            <input type="file" wire:model="file" class="form-control" accept="image/*">
+                            @error('file')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                            <small class="text-danger">
+                                @if (session()->has('error'))
+                                    {{ session('error') }}
+                                @else
+                                    Ukuran maksimal file: 2MB
+                                @endif
+                            </small>
+                        </div>
                     </div>
 
-                    <form>
-                        <div class="modal-body p-4">
-                            <div class="mb-3">
-                                <label for="tanggal" class="form-label fw-semibold">Tanggal <small
-                                        class="text-danger">*</small></label>
-                                <input type="date" class="form-control" id="tanggal" wire:model="form.date">
-                                @error('form.date')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary  w-100 w-md-auto" wire:click='store'
+                            wire:loading.attr="disabled" wire:target="store">
+                            <div wire:loading wire:target="store" class="spinner-border spinner-border-sm"
+                                role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-
-                            <div class="mb-3">
-                                <label for="keterangan" class="form-label fw-semibold">Keterangan <small
-                                        class="text-danger">*</small></label>
-                                <input type="text" class="form-control" id="keterangan"
-                                    placeholder="Contoh: Ban bocor" wire:model="form.description">
-                                @error('form.description')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="file" class="form-label fw-semibold">File</label>
-                                <input type="file" wire:model="file" class="form-control" accept="image/*">
-                                @error('file')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                                <small class="text-danger">
-                                    @if (session()->has('error'))
-                                        {{ session('error') }}
-                                    @else
-                                        Ukuran maksimal file: 2MB
-                                    @endif
-                                </small>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary  w-100 w-md-auto" wire:click='store'
-                                wire:loading.attr="disabled" wire:target="store">
-                                <div wire:loading wire:target="store" class="spinner-border spinner-border-sm"
-                                    role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                                <span wire:loading.remove wire:target="store"><i class="fa fa-save"></i> Simpan</span>
-                                <span wire:loading wire:target="store">Loading...</span>
-                            </button>
-                            <button type="button" class="btn btn-secondary w-100 w-md-auto"
-                                data-bs-dismiss="modal">Cancel</button>
-                        </div>
-                    </form>
-                </div>
+                            <span wire:loading.remove wire:target="store"><i class="fa fa-save"></i> Simpan</span>
+                            <span wire:loading wire:target="store">Loading...</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary w-100 w-md-auto"
+                            data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        <div wire:ignore.self class="modal fade" id="modalEditPengajuan" tabindex="-1"
-            aria-labelledby="modalEditPengajuanLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header bg-danger">
-                        <h5 class="modal-title text-white" id="modalEditPengajuanLabel">Pengajuan Dispensasi
-                            Keterlambatan</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Tutup"></button>
+    <div wire:ignore.self class="modal fade" id="modalEditPengajuan" tabindex="-1"
+        aria-labelledby="modalEditPengajuanLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title text-white" id="modalEditPengajuanLabel">Pengajuan Dispensasi
+                        Keterlambatan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+
+                <form>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label for="tanggal" class="form-label fw-semibold">Tanggal <small
+                                    class="text-danger">*</small></label>
+                            <input type="date" class="form-control" id="tanggal" wire:model="form.date">
+                            @error('form.date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="keterangan" class="form-label fw-semibold">Keterangan <small
+                                    class="text-danger">*</small></label>
+                            <input type="text" class="form-control" id="keterangan"
+                                placeholder="Contoh: Ban bocor" wire:model="form.description">
+                            @error('form.description')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="file" class="form-label fw-semibold">File</label>
+                            @if ($oldFile)
+                                <div class="mb-2">
+                                    <p>File lama:</p>
+                                    <img src="{{ asset('storage/' . $oldFile) }}" class="img-thumbnail"
+                                        width="150">
+                                    <button type="button" class="btn btn-danger btn-sm mt-2"
+                                        wire:click="removeOldFile">
+                                        Hapus File Lama
+                                    </button>
+                                </div>
+                            @endif
+
+                            {{-- <input type="file" wire:model="file" class="form-control" accept="image/*">
+                                @error('file') <span class="text-danger">{{ $message }}</span> @enderror --}}
+                            <input type="file" class="form-control" id="file" wire:model="file"
+                                accept=".jpg,.jpeg,.png">
+                            <small class="text-danger">
+                                @if (session()->has('error'))
+                                    {{ session('error') }}
+                                @else
+                                    Ukuran maksimal file: 2MB
+                                @endif
+                            </small>
+                        </div>
                     </div>
 
-                    <form>
-                        <div class="modal-body p-4">
-                            <div class="mb-3">
-                                <label for="tanggal" class="form-label fw-semibold">Tanggal <small
-                                        class="text-danger">*</small></label>
-                                <input type="date" class="form-control" id="tanggal" wire:model="form.date">
-                                @error('form.date')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary  w-100 w-md-auto" wire:click='saveEdit'
+                            wire:loading.attr="disabled" wire:target="saveEdit">
+                            <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm"
+                                role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-
-                            <div class="mb-3">
-                                <label for="keterangan" class="form-label fw-semibold">Keterangan <small
-                                        class="text-danger">*</small></label>
-                                <input type="text" class="form-control" id="keterangan"
-                                    placeholder="Contoh: Ban bocor" wire:model="form.description">
-                                @error('form.description')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="file" class="form-label fw-semibold">File</label>
-                                @if ($oldFile)
-                                    <div class="mb-2">
-                                        <p>File lama:</p>
-                                        <img src="{{ asset('storage/' . $oldFile) }}" class="img-thumbnail"
-                                            width="150">
-                                        <button type="button" class="btn btn-danger btn-sm mt-2"
-                                            wire:click="removeOldFile">
-                                            Hapus File Lama
-                                        </button>
-                                    </div>
-                                @endif
-
-                                {{-- <input type="file" wire:model="file" class="form-control" accept="image/*">
-                                @error('file') <span class="text-danger">{{ $message }}</span> @enderror --}}
-                                <input type="file" class="form-control" id="file" wire:model="file"
-                                    accept=".jpg,.jpeg,.png">
-                                <small class="text-danger">
-                                    @if (session()->has('error'))
-                                        {{ session('error') }}
-                                    @else
-                                        Ukuran maksimal file: 2MB
-                                    @endif
-                                </small>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary  w-100 w-md-auto" wire:click='saveEdit'
-                                wire:loading.attr="disabled" wire:target="saveEdit">
-                                <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm"
-                                    role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                                <span wire:loading.remove wire:target="saveEdit"><i class="fa fa-save"></i>
-                                    Simpan</span>
-                                <span wire:loading wire:target="saveEdit">Loading...</span>
-                            </button>
-                            <button type="button" class="btn btn-secondary w-100 w-md-auto"
-                                data-bs-dismiss="modal">Cancel</button>
-                        </div>
-                    </form>
-                </div>
+                            <span wire:loading.remove wire:target="saveEdit"><i class="fa fa-save"></i>
+                                Simpan</span>
+                            <span wire:loading wire:target="saveEdit">Loading...</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary w-100 w-md-auto"
+                            data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -383,6 +384,31 @@
                 </div>
                 <div class="modal-body text-center">
                     <img id="modalImage" src="" alt="Bukti" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-confirm-delete" tabindex="-1" wire:ignore.self data-bs-backdrop="static"
+        data-bs-keyboard="false" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Perhatian!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Anda yakin ingin menghapus data ini?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-danger" wire:ignore.self id="btn-confirm-delete"
+                        wire:loading.attr="disabled">
+                        <div wire:loading class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        Ya, Hapus
+                    </button>
                 </div>
             </div>
         </div>
