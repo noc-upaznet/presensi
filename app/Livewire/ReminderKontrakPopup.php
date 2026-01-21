@@ -134,10 +134,10 @@ class ReminderKontrakPopup extends Component
 
     public function showReminderKaryawan()
     {
-        // if (session()->has('kontrak_reminder_shown')) {
-        //     return;
-        // }
-        // session()->put('kontrak_reminder_shown', true);
+        if (session()->has('kontrak_reminder_shown')) {
+            return;
+        }
+        session()->put('kontrak_reminder_shown', true);
 
         $userId = Auth::id();
 
