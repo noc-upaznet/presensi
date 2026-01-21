@@ -22,7 +22,7 @@ class ModalKaryawan extends Component
 
     public $file;
 
-    public $ticketId;
+    public $karyawanId;
     public $entitas;
     public $divisi;
     public $jabatan;
@@ -46,24 +46,24 @@ class ModalKaryawan extends Component
     public function loadTicketData($data)
     {
         // dd($data);
-        $this->ticketId = $data['id'];
+        $this->karyawanId = $data['id'];
         $this->form->fill($data);
         // dd($data);
         $this->form->alamatKTP = $data['alamat_ktp'] ?? '';
         $this->form->alamatDomisili = $data['alamat_domisili'] ?? '';
         $this->form->nomorKTP = $data['nik'] ?? '';
         $this->form->nomorVISA = $data['visa'] ?? null;
-
     }
 
-    public function saveEdit() {
-        $ticket = M_DataKaryawan::find($this->ticketId);
+    public function saveEdit()
+    {
+        $ticket = M_DataKaryawan::find($this->karyawanId);
         // dd($ticket);
         if (!$ticket) {
             session()->flash('error', 'Data karyawan tidak ditemukan!');
             return;
         }
-    
+
         $data = [
             'nama_karyawan' => $this->form->nama_karyawan,
             'email' => $this->form->email,
@@ -95,6 +95,9 @@ class ModalKaryawan extends Component
             'bonus' => $this->form->bonus,
             'inov_reward' => $this->form->inov_reward,
             'kasbon' => $this->form->kasbon,
+            'voucher' => $this->form->voucher,
+            'kebudayaan' => $this->form->kebudayaan,
+            'transport' => $this->form->transport,
             'jenis_penggajian' => $this->form->jenis_penggajian,
             'nama_bank' => $this->form->nama_bank,
             'no_rek' => $this->form->no_rek,
@@ -131,10 +134,10 @@ class ModalKaryawan extends Component
         $this->validate([
             'file' => 'required|mimes:xlsx,csv,xls',
         ]);
-    
+
         // Ambil file dari temporary path
         $filePath = $this->file->getRealPath();
-    
+
         // Import langsung dari file temporary
         Excel::import(new KaryawanImport, $filePath);
         // Kirim notifikasi sukses

@@ -39,6 +39,8 @@ class PayrollModel extends Model
         'jml_psb',
         'churn',
         'kasbon',
+        'kebudayaan',
+        'voucher',
         'rekap',
         'total_gaji',
         'periode',

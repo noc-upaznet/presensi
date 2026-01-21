@@ -228,28 +228,6 @@
                         </div>
                         <div class="row">
                             <div class="mb-3 col-md-6">
-                                <label for="inovation_reward" class="form-label fw-semibold">Uang Transport</label>
-                                <div class="input-group mb-2">
-                                    {{-- <input type="number" name="transport" class="form-control" wire:model.lazy="transport" placeholder="Nominal"> --}}
-                                    <select name="transport" id="transport" class="form-select"
-                                        wire:model.lazy="transport">
-                                        <option value="">Nominal</option>
-                                        <option value="5000">5.000</option>
-                                        <option value="10000">10.000</option>
-                                        <option value="15000">15.000</option>
-                                        <option value="25000">25.000</option>
-                                    </select>
-                                    <span class="input-group-text">X</span>
-                                    <input type="number" class="form-control" wire:model.lazy="transport_jumlah"
-                                        placeholder="Jumlah">
-                                </div>
-
-                                {{-- Menampilkan total hasil perkalian --}}
-                                <div class="fw-bold">
-                                    Total: {{ number_format($transport_total, 0, ',', '.') }}
-                                </div>
-                            </div>
-                            <div class="mb-3 col-md-6">
                                 <label for="potongan" class="form-label fw-semibold">Uang Makan</label>
                                 <div class="input-group mb-2">
                                     <input type="number" name="uang_makan" class="form-control"
@@ -264,17 +242,29 @@
                                     Total: {{ number_format($uang_makan_total, 0, ',', '.') }}
                                 </div>
                             </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="inovation_reward" class="form-label fw-semibold">Uang Transport</label>
+                                <div class="input-group mb-2">
+                                    {{-- <input type="number" name="transport" class="form-control" wire:model.lazy="transport" placeholder="Nominal"> --}}
+                                    <input name="transport" id="transport" class="form-control"
+                                        wire:model.lazy="transport">
+                                    <span class="input-group-text">X</span>
+                                    <input type="number" class="form-control" wire:model.lazy="transport_jumlah"
+                                        placeholder="Jumlah">
+                                </div>
+
+                                {{-- Menampilkan total hasil perkalian --}}
+                                <div class="fw-bold">
+                                    Total: {{ number_format($transport_total, 0, ',', '.') }}
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="mb-3 col-md-6">
                                 <label for="potongan" class="form-label fw-semibold">Tunjangan Kebudayaan</label>
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
-                                    <select name="kebudayaan" class="form-select" wire:model.lazy="kebudayaan">
-                                        <option value="">-- Pilih Nominal --</option>
-                                        <option value="100000">100000</option>
-                                        <option value="200000">200000</option>
-                                    </select>
+                                    <input name="kebudayaan" class="form-control" wire:model.lazy="kebudayaan">
                                 </div>
                             </div>
                             <div class="mb-3 col-md-6">
@@ -347,11 +337,22 @@
                             <button type="button" class="btn btn-success mb-2" wire:click="addPotongan">+ Tambah
                                 Potongan</button>
                         </div>
-                        <div class="mb-3">
-                            <label for="kasbon" class="form-label fw-semibold">Kasbon</label>
-                            <div class="input-group mb-2">
-                                <span class="input-group-text">Rp</span>
-                                <input type="text" id="kasbon" class="form-control" wire:model.lazy="kasbon">
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="kasbon" class="form-label fw-semibold">Kasbon</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="kasbon" class="form-control"
+                                        wire:model.lazy="kasbon">
+                                </div>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="voucher" class="form-label fw-semibold">Voucher</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="voucher" class="form-control"
+                                        wire:model.lazy="voucher">
+                                </div>
                             </div>
                         </div>
                         <div class="row">

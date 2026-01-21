@@ -384,7 +384,13 @@
             @else
                 @php
                     $totalPotongan =
-                        $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->churn;
+                        $data->bpjs_jht +
+                        $data->bpjs +
+                        $data->izin +
+                        $data->terlambat +
+                        $data->kasbon +
+                        $data->churn +
+                        $data->voucher;
                 @endphp
             @endif
 
@@ -414,6 +420,10 @@
                         </tr>
                     @endif
                 @endforeach
+                <tr>
+                    <td>Voucher</td>
+                    <td class="text-right">Rp. {{ number_format($data->voucher) }}</td>
+                </tr>
                 <tr>
                     <td>JHT</td>
                     <td class="text-right">Rp. {{ number_format($data->bpjs_jht) }}</td>

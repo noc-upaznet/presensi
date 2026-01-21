@@ -376,7 +376,13 @@
             @else
                 @php
                     $totalPotongan =
-                        $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon + $data->churn;
+                        $data->bpjs_jht +
+                        $data->bpjs +
+                        $data->izin +
+                        $data->terlambat +
+                        $data->kasbon +
+                        $data->churn +
+                        $data->voucher;
                 @endphp
             @endif
 
@@ -412,6 +418,10 @@
                     @endif
                 @endforeach
                 <tr>
+                    <td>Voucher</td>
+                    <td class="text-right">Rp. {{ number_format($data->voucher) }}</td>
+                </tr>
+                <tr>
                     <td>JHT</td>
                     <td class="text-right">Rp. {{ number_format($data->bpjs_jht) }}</td>
                 </tr>
@@ -429,16 +439,6 @@
                         <td class="text-right">Rp. {{ number_format($data->bpjs_perusahaan) }}</td>
                     </tr>
                 @endif
-                {{-- @if ($selisihProrata > 0)
-                    <tr style="background-color: rgba(255, 235, 59, 0.5);">
-                        <td>
-                            Potongan Migrasi Cut-Off
-                        </td>
-                        <td class="text-right">
-                            (Rp. {{ number_format($selisihProrata) }})
-                        </td>
-                    </tr>
-                @endif --}}
                 <tr style="border-bottom: 1px solid red;">
                     <th>Total Potongan</th>
                     <th class="text-right">Rp. {{ number_format($totalPotongan) }}</th>

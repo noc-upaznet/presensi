@@ -38,8 +38,8 @@ class JenisPotongan extends Component
             'icon' => 'success',
             'text' => 'Data has been saved successfully'
         ]);
-        
-        $this->dispatch('tambahJenisPotonganModal', action: 'hide');   
+
+        $this->dispatch('tambahJenisPotonganModal', action: 'hide');
     }
 
     public function editPotongan($id)
@@ -79,6 +79,32 @@ class JenisPotongan extends Component
         ]);
 
         $this->dispatch('editPotonganModal', action: 'hide');
+    }
+
+    public function delete($id)
+    {
+        if ($id) {
+            // Ambil data karyawan
+            $potongan = JenisPotonganModel::find($id);
+
+            if ($potongan) {
+
+                $potongan->delete();
+            }
+
+            $this->jenisPotongan = JenisPotonganModel::all();
+
+            $this->dispatch(
+                'swal',
+                params: [
+                    'title' => 'Data Deleted',
+                    'icon' => 'success',
+                    'text' => 'Data has been deleted successfully',
+                    'showConfirmButton' => false,
+                    'timer' => 1500
+                ]
+            );
+        }
     }
 
     public function render()

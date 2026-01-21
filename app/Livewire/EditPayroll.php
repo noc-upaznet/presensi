@@ -74,7 +74,7 @@ class EditPayroll extends Component
     public $insentif = 0;
     public $tunjangan_kehadiran = 0;
 
-    public $kebudayaan = 0;
+    public $kebudayaan;
     public $fee_sharing = 0;
 
     public $transport;
@@ -119,6 +119,7 @@ class EditPayroll extends Component
     public $kasbon = 0;
     public $churn = 0;
     public $entitas;
+    public $voucher;
 
 
     public function mount($id)
@@ -151,7 +152,6 @@ class EditPayroll extends Component
         $this->selectedYear  = (int) $year;
         $this->selectedMonth = (int) $month;
 
-        // 🔥 SET CUTOFF DARI TRAIT
         $this->setCutoffPeriode();
 
         // Default set cutoff normal
@@ -303,20 +303,22 @@ class EditPayroll extends Component
         // Komponen gaji
         $this->gaji_pokok = $payroll->gaji_pokok;
         $this->tunjangan_jabatan = $payroll->tunjangan_jabatan;
+        $this->kebudayaan = $this->karyawan->kebudayaan;
         $this->lembur = $payroll->lembur;
         $this->lembur_libur = $payroll->lembur_libur;
         // $this->kehadiran = $rekap['kehadiran'] ?? 0;
         // $this->inovation_reward = $payroll->inov_reward;
         $this->jml_psb = $payroll->jml_psb;
         $this->insentif = $payroll->insentif;
-        $this->transport = $payroll->transport;
+        $this->transport = $this->karyawan->transport;
         $this->uang_makan = 15000;
         $this->uang_makan_jumlah = $payroll->jml_uang_makan;
         $this->transport_jumlah = $payroll->jml_transport;
-        $this->kebudayaan = $payroll->tunjangan_kebudayaan;
         $this->fee_sharing = $payroll->fee_sharing;
         $this->kasbon = $payroll->kasbon;
         $this->churn = $payroll->churn;
+
+        $this->voucher = $this->karyawan->voucher;
 
         // Data JSON tunjangan & potongan
         $this->tunjangan = json_decode($payroll->tunjangan ?? '[]', true);
@@ -712,6 +714,7 @@ class EditPayroll extends Component
         $lemburLiburNominal = $this->numericValue($this->lembur_libur ?? 0);
         $lemburNominal     = $this->numericValue($this->lembur ?? 0);
         $kasbon            = $this->numericValue($this->kasbon ?? 0);
+        $voucher            = $this->numericValue($this->voucher ?? 0);
         $churn            = $this->numericValue($this->churn ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
@@ -774,6 +777,7 @@ class EditPayroll extends Component
                 - $this->terlambat_nominal
                 - $this->bpjs_nominal
                 - $kasbon
+                - $voucher
                 - $churn
                 - $this->bpjs_jht_nominal
         );
@@ -787,117 +791,6 @@ class EditPayroll extends Component
         $this->total_gaji = $totalGaji;
         // dd($this->total_gaji);
     }
-
-    // public function hitungTotalGaji()
-    // {
-    //     // === 1. Ambil dan normalisasi input ===
-    //     $gajiPokok         = $this->numericValue($this->gaji_pokok);
-    //     $tunjanganJabatan  = $this->numericValue($this->tunjangan_jabatan);
-
-    //     $hariHadir = 21;
-    //     // dd($hariHadir);
-    //     $gajiPerHari = ($gajiPokok + $tunjanganJabatan) / 26;
-    //     $gajiProrata = round($gajiPerHari * $hariHadir);
-
-
-    //     $transport         = $this->numericValue($this->transport_total ?? 0);
-    //     $uangMakan         = $this->numericValue($this->uang_makan_total ?? 0);
-    //     $inovationReward   = $this->numericValue($this->inovation_reward ?? 0);
-    //     $kebudayaan        = $this->numericValue($this->kebudayaan ?? 0);
-    //     $feeSharing        = $this->numericValue($this->fee_sharing ?? 0);
-    //     $insentif          = $this->numericValue($this->insentif ?? 0);
-    //     $lemburLiburNominal = $this->numericValue($this->lembur_libur ?? 0);
-    //     $lemburNominal     = $this->numericValue($this->lembur ?? 0);
-    //     $kasbon            = $this->numericValue($this->kasbon ?? 0);
-    //     $churn            = $this->numericValue($this->churn ?? 0);
-
-    //     // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
-    //     $tunjanganKehadiran = 0;
-    //     if (($this->rekap['terlambat'] ?? 0) == 0) {
-    //         $tunjanganKehadiran = $this->numericValue($this->tunjangan_kehadiran);
-    //     }
-
-    //     // === 3. Hitung total tunjangan tambahan (manual input) ===
-    //     $totalTunjangan = 0;
-    //     foreach ($this->tunjangan as $item) {
-    //         $totalTunjangan += $this->numericValue($item['nominal']);
-    //     }
-
-    //     // === 4. Hitung potongan manual ===
-    //     $totalPotonganManual = 0;
-    //     foreach ($this->potongan as $item) {
-    //         $totalPotonganManual += $this->numericValue($item['nominal']);
-    //     }
-
-    //     // === 6. Hitung lembur ===
-
-    //     // === 7. Hitung BPJS ===
-    //     $dasarBpjs = $gajiPokok + $tunjanganJabatan;
-    //     $umk = 2470800;
-
-    //     if ($dasarBpjs < $umk) {
-    //         $nilaiDasarBpjs = $umk;
-    //     } elseif ($dasarBpjs > $umk) {
-    //         $nilaiDasarBpjs = $dasarBpjs;
-    //     }
-
-    //     $bpjsNominal = $this->bpjs_digunakan
-    //         ? ($nilaiDasarBpjs * $this->persentase_bpjs / 100)
-    //         : 0;
-
-    //     $bpjsJhtNominal = $this->bpjs_jht_digunakan
-    //         ? ($nilaiDasarBpjs * $this->persentase_bpjs_jht / 100)
-    //         : 0;
-
-    //     $this->bpjs_nominal = round($bpjsNominal);
-    //     $this->bpjs_jht_nominal = round($bpjsJhtNominal);
-
-    //     $potonganIzin = 0;
-
-    //     if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
-    //         $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
-
-    //         $totalHariIzin =
-    //             ($this->rekap['izin'] ?? 0)
-    //             + 0.5 * ($this->rekap['izin setengah hari'] ?? 0)
-    //             + 0.5 * ($this->rekap['izin setengah hari pagi'] ?? 0)
-    //             + 0.5 * ($this->rekap['izin setengah hari siang'] ?? 0)
-    //             + 0.5 * ($this->rekap['konter izin setengah hari masuk pagi'] ?? 0);
-
-    //         $potonganIzin = round($perHari * $totalHariIzin);
-    //     }
-
-    //     // === 8. Hitung total gaji akhir ===
-    //     $totalGaji = round(
-    //         $gajiProrata
-    //             + $totalTunjangan
-    //             + $lemburNominal
-    //             + $lemburLiburNominal
-    //             + $insentif
-    //             + $tunjanganKehadiran
-    //             + $kebudayaan
-    //             + $feeSharing
-    //             + $transport
-    //             + $uangMakan
-    //             + $inovationReward
-    //             - $totalPotonganManual
-    //             - $potonganIzin
-    //             - $this->terlambat_nominal
-    //             - $this->bpjs_nominal
-    //             - $kasbon
-    //             - $churn
-    //             - $this->bpjs_jht_nominal
-    //     );
-    //     if (
-    //         isset($this->entitas, $this->jabatan) &&
-    //         strtoupper(trim($this->entitas)) === 'UNB' &&
-    //         strtolower(trim($this->jabatan)) === 'branch manager'
-    //     ) {
-    //         $totalGaji -= ($this->bpjs_perusahaan + $this->bpjs_jht_perusahaan);
-    //     }
-    //     $this->total_gaji = $totalGaji;
-    //     // dd($this->total_gaji);
-    // }
 
     public function addTunjangan()
     {
@@ -1019,6 +912,7 @@ class EditPayroll extends Component
             'potongan' => json_encode($this->potongan),
             'churn' => $this->churn,
             'kasbon' => $this->kasbon,
+            'voucher' => $this->voucher,
             'bpjs' => $this->bpjs_nominal,
             'bpjs_perusahaan' => $this->bpjs_perusahaan_nominal,
             'bpjs_jht' => $this->bpjs_jht_nominal,

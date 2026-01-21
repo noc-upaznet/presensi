@@ -160,6 +160,13 @@
                                     <p>Slip Gaji</p>
                                 </a>
                             </li>
+                            {{-- <li class="nav-item">
+                                <a href="{{ route('kasbon') }}"
+                                    class="nav-link {{ request()->routeIs('kasbon') ? 'active' : '' }}">
+                                    <i class="nav-icon bi bi-circle"></i>
+                                    <p>Kasbon</p>
+                                </a>
+                            </li> --}}
                             <li class="nav-item">
                                 <a href="{{ route('jenis-tunjangan') }}"
                                     class="nav-link {{ request()->routeIs('jenis-tunjangan') ? 'active' : '' }}">
@@ -176,28 +183,37 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ route('template-mingguan') }}"
-                            class="nav-link {{ request()->routeIs('template-mingguan') ? 'active' : '' }}">
-                            <i class="bi bi-calendar2-plus"></i>
-                            <p>Template Mingguan</p>
-                        </a>
-                    </li>
 
-                    <li class="nav-item">
-                        <a href="{{ route('pembagian-shift') }}"
-                            class="nav-link {{ request()->routeIs('pembagian-shift') ? 'active' : '' }}">
-                            <i class="bi bi-calendar2-plus"></i>
-                            <p>Pembagian Shift</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="{{ route('jadwal-shift') }}"
-                            class="nav-link {{ request()->routeIs('jadwal-shift') ? 'active' : '' }}">
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link active">
                             <i class="bi bi-calendar-range"></i>
-                            <p>Jadwal Shift</p>
+                            <p>Mange Jadwal<i class="nav-arrow bi bi-chevron-right"></i></p>
                         </a>
+                        <ul class="nav nav-treeview" style="margin-left: 20px;">
+                            <li class="nav-item">
+                                <a href="{{ route('template-mingguan') }}"
+                                    class="nav-link {{ request()->routeIs('template-mingguan') ? 'active' : '' }}">
+                                    <i class="bi bi-calendar2-plus"></i>
+                                    <p>Template Mingguan</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('pembagian-shift') }}"
+                                    class="nav-link {{ request()->routeIs('pembagian-shift') ? 'active' : '' }}">
+                                    <i class="bi bi-calendar2-plus"></i>
+                                    <p>Pembagian Shift</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('jadwal-shift') }}"
+                                    class="nav-link {{ request()->routeIs('jadwal-shift') ? 'active' : '' }}">
+                                    <i class="bi bi-calendar-range"></i>
+                                    <p>Jadwal Shift</p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
 
                     <li class="nav-item menu-open">
@@ -223,13 +239,13 @@
                         </ul>
                     </li>
 
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ route('data-user') }}"
                             class="nav-link {{ request()->routeIs('data-user') ? 'active' : '' }}">
                             <i class="bi bi-person"></i>
                             <p>Data User</p>
                         </a>
-                    </li>
+                    </li> --}}
 
                     <li class="nav-item">
                         <a href="{{ route('data-masters') }}"
@@ -266,31 +282,40 @@
                     </li>
                 @endhasanyrole --}}
 
+                {{-- Manage Jadwal untuk selain admin/hr --}}
                 @can('jadwal-shift-create')
-                    <li class="nav-item">
-                        <a href="{{ route('template-mingguan') }}"
-                            class="nav-link {{ request()->routeIs('template-mingguan') ? 'active' : '' }}">
-                            <i class="bi bi-calendar2-plus"></i>
-                            <p>Template Mingguan</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="{{ route('pembagian-shift') }}"
-                            class="nav-link {{ request()->routeIs('pembagian-shift') ? 'active' : '' }}">
-                            <i class="bi bi-calendar2-plus"></i>
-                            <p>Pembagian Shift</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('jadwal-shift') }}"
-                            class="nav-link {{ request()->routeIs('jadwal-shift') ? 'active' : '' }}">
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link active">
                             <i class="bi bi-calendar-range"></i>
-                            <p>Jadwal Shift</p>
+                            <p>Mange Jadwal<i class="nav-arrow bi bi-chevron-right"></i></p>
                         </a>
+                        <ul class="nav nav-treeview" style="margin-left: 20px;">
+                            <li class="nav-item">
+                                <a href="{{ route('template-mingguan') }}"
+                                    class="nav-link {{ request()->routeIs('template-mingguan') ? 'active' : '' }}">
+                                    <i class="bi bi-calendar2-plus"></i>
+                                    <p>Template Mingguan</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('pembagian-shift') }}"
+                                    class="nav-link {{ request()->routeIs('pembagian-shift') ? 'active' : '' }}">
+                                    <i class="bi bi-calendar2-plus"></i>
+                                    <p>Pembagian Shift</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('jadwal-shift') }}"
+                                    class="nav-link {{ request()->routeIs('jadwal-shift') ? 'active' : '' }}">
+                                    <i class="bi bi-calendar-range"></i>
+                                    <p>Jadwal Shift</p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 @endcan
-
                 @hasanyrole('spv|hr')
                     <li class="nav-item">
                         <a href="{{ route('slip-gaji') }}"

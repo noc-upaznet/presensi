@@ -49,9 +49,6 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             'data_karyawan.nip_karyawan'
         )->get();
 
-        // =====================
-        // AMBIL HEADER DINAMIS
-        // =====================
         foreach ($data as $item) {
             foreach (json_decode($item->tunjangan, true) ?? [] as $t) {
                 if (!empty($t['nama']) && !in_array($t['nama'], $this->uniqueTunjangan)) {
@@ -65,7 +62,6 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             }
         }
 
-        // =====================
         // HEADER
         // =====================
         $header = [
@@ -84,6 +80,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             'Terlambat',
             'BPJS Kesehatan KA',
             'BPJS JHT KA',
+            'Voucher',
             'BPJS Kesehatan PT',
             'BPJS JHT PT',
             'Fee Sharing',
@@ -96,7 +93,6 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $this->uniqueTunjangan,
             $this->uniquePotongan,
             ['Kasbon'],
-            ['Potongan Migrasi (26–31)'], // 🔥 MIGRASI
             ['Total Gaji']
         );
 
@@ -104,17 +100,11 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
         $rows = [];
         $totals = [];
 
-        // =====================
         // ROW DATA
         // =====================
         foreach ($data as $item) {
             $tunjanganArray = collect(json_decode($item->tunjangan, true) ?? []);
             $potonganArray  = collect(json_decode($item->potongan, true) ?? []);
-
-            // 🔥 MIGRASI
-            $potonganMigrasi = round(
-                (($item->gaji_pokok + $item->tunjangan_jabatan) / 26) * 5
-            );
 
             $row = [
                 $item->no_slip,
@@ -132,6 +122,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 $item->terlambat,
                 $item->bpjs,
                 $item->bpjs_jht,
+                $item->voucher,
                 $item->bpjs_perusahaan,
                 $item->bpjs_jht_perusahaan,
                 $item->fee_sharing,
@@ -148,7 +139,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             }
 
             $row[] = $item->kasbon ?? 0;
-            $row[] = $potonganMigrasi;
+            // $row[] = $potonganMigrasi;
 
             $pendapatan =
                 ($item->gaji_pokok ?? 0)
@@ -159,25 +150,20 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 + ($item->uang_makan ?? 0)
                 + ($item->fee_sharing ?? 0)
                 + ($item->insentif ?? 0)
+                + ($item->voucher ?? 0)
                 + ($item->inov_reward ?? 0);
+            // dd($pendapatan);
 
             // tambah tunjangan dinamis
             foreach ($this->uniqueTunjangan as $nama) {
                 $pendapatan += $tunjanganArray->firstWhere('nama', $nama)['nominal'] ?? 0;
             }
 
-            // =====================
-            // HITUNG POTONGAN
-            // =====================
             $potongan =
-                ($item->izin ?? 0)
-                // + ($item->terlambat ?? 0)
-                // + ($item->bpjs ?? 0)
-                // + ($item->bpjs_jht ?? 0)
-                + $potonganMigrasi;
+                ($item->izin ?? 0);
 
             // tambah potongan dinamis
-            $excludePotongan = ['voucher', 'pph 21', 'pph21'];
+            $excludePotongan = ['pph 21', 'pph21'];
             foreach ($this->uniquePotongan as $nama) {
                 if (in_array(strtolower($nama), $excludePotongan)) {
                     continue;
@@ -241,13 +227,11 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
         foreach ($headers as $i => $header) {
             $col = Coordinate::stringFromColumnIndex($i + 1);
 
-            if ($header === 'Potongan Migrasi (26–31)') {
-                $color = 'FFD9D9D9'; // 🔥 ABU-ABU
-            } elseif ($header === 'Izin') {
+            if ($header === 'Izin') {
                 $color = 'FFFF0000';
             } elseif (in_array($header, ['Terlambat', 'BPJS Kesehatan KA', 'BPJS JHT KA', 'Voucher', 'Kasbon', 'PPH 21'])) {
                 $color = 'FF0070C0';
-            } elseif (in_array($header, ['BPJS Kesehatan PT', 'BPJS JHT PT', 'Total Gaji'])) {
+            } elseif (in_array($header, ['Voucher', 'BPJS Kesehatan PT', 'BPJS JHT PT', 'Total Gaji'])) {
                 $color = 'FFFFFF00';
             } else {
                 $color = 'FF00B050';

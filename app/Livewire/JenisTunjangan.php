@@ -76,6 +76,32 @@ class JenisTunjangan extends Component
         $this->dispatch('editTunjanganModal', action: 'hide');
     }
 
+    public function delete($id)
+    {
+        if ($id) {
+            // Ambil data karyawan
+            $tunjangan = JenisTunjanganModel::find($id);
+
+            if ($tunjangan) {
+
+                $tunjangan->delete();
+            }
+
+            $this->jenisTunjangan = JenisTunjanganModel::all();
+
+            $this->dispatch(
+                'swal',
+                params: [
+                    'title' => 'Data Deleted',
+                    'icon' => 'success',
+                    'text' => 'Data has been deleted successfully',
+                    'showConfirmButton' => false,
+                    'timer' => 1500
+                ]
+            );
+        }
+    }
+
     public function render()
     {
         return view('livewire.jenis-tunjangan', [

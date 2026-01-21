@@ -52,6 +52,8 @@ class Payroll extends Component
     public $JumlahKaryawanInternal;
     public $cutoffStart;
     public $cutoffEnd;
+    public $bpjs_kes;
+    public $bpjs_jht;
 
     public function mount()
     {
@@ -88,6 +90,33 @@ class Payroll extends Component
         // Hitung jumlah karyawan yang belum punya slip gaji di periode tersebut
         // $karyawanQuery = M_DataKaryawan::where('entitas', $selectedEntitas);
         $this->hitungSlip();
+        $this->countGaji();
+    }
+
+    public function countGaji()
+    {
+        $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
+        $this->periode = $this->selectedYear . '-' . $bulanFormatted;
+
+        $entitas = session('selected_entitas', 'UHO');
+
+        $karyawanIds = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
+        $totalGaji = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', $this->periode)
+            ->sum('total_gaji');
+
+        $this->total_gaji = $totalGaji;
+
+        $totalBpjskes = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', $this->periode)
+            ->sum('bpjs');
+
+        $this->bpjs_kes = $totalBpjskes;
+
+        $totalBpjsJht = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', $this->periode)
+            ->sum('bpjs_jht');
+        $this->bpjs_jht = $totalBpjsJht;
     }
 
     public function createSlipGaji($month, $year)
@@ -101,11 +130,13 @@ class Payroll extends Component
     public function updatedSelectedMonth()
     {
         $this->hitungSlip();
+        $this->countGaji();
     }
 
     public function updatedSelectedYear()
     {
         $this->hitungSlip();
+        $this->countGaji();
     }
 
     private function hitungSlip()
@@ -177,8 +208,8 @@ class Payroll extends Component
         $periode = $this->selectedYear . '-' . $bulanFormatted;
 
         $periodeLokal = Carbon::createFromFormat('Y-m', $periode)
-        ->locale('id')
-        ->translatedFormat('F Y');
+            ->locale('id')
+            ->translatedFormat('F Y');
         $filename = 'slip_gaji_' . $periodeLokal . '.xlsx';
         // dd($periode, $periodeLokal, $entitasIdAktif);
 
@@ -206,40 +237,6 @@ class Payroll extends Component
             ->with(['periode' => $this->periode]);
     }
 
-    // public function saveEdit()
-    // {
-    //     $payroll = PayrollModel::findOrFail($this->payroll_id);
-
-    //     $data = [
-    //         'no_slip' => $this->no_slip,
-    //         'karyawan_id' => $this->karyawan_id,
-    //         'periode' => $this->bulan_tahun,
-    //         'nip_karyawan' => $this->nip_karyawan,
-    //         'divisi' => $this->divisi,
-    //         'gaji_pokok' => $this->gaji_pokok,
-    //         'tunjangan_jabatan' => $this->tunjangan_jabatan,
-    //         'lembur' => $this->lembur_nominal,
-    //         'insentif' => $this->insentif,
-    //         'izin' => $this->izin_nominal,
-    //         'terlambat' => $this->terlambat_nominal,
-    //         'tunjangan' => json_encode($this->tunjangan),
-    //         'potongan' => json_encode($this->potongan),
-    //         'bpjs' => $this->bpjs_nominal,
-    //         'bpjs_jht' => $this->bpjs_jht_nominal,
-    //         'total_gaji' => $this->total_gaji,
-    //     ];
-    //     // dd($data);
-    //     $payroll->update($data);
-
-    //     $this->dispatch('swal', params: [
-    //         'title' => 'Data Updated',
-    //         'icon' => 'success',
-    //         'text' => 'Data has been updated successfully'
-    //     ]);
-
-    //     $this->dispatch('editPayrollModal', action: 'hide');
-    // }
-
     public function confirmHapusPayroll($id)
     {
         $this->payrollIdToDelete = $id;
@@ -252,18 +249,16 @@ class Payroll extends Component
         if ($this->payrollIdToDelete) {
             PayrollModel::find($this->payrollIdToDelete)?->delete();
 
-            // Bisa tambahkan refresh/pagination data di sini kalau perlu
-            // $this->data = Payroll::latest()->paginate($this->perPage);
-
-            // $this->dispatch('dataPayrollTerhapus');
             $this->dispatch(
-                'swal', params: [
-                'title' => 'Data Saved',
-                'icon' => 'success',
-                'text' => 'Data has been saved successfully',
-                'showConfirmButton' => false,
-                'timer' => 1500
-            ]);
+                'swal',
+                params: [
+                    'title' => 'Data Saved',
+                    'icon' => 'success',
+                    'text' => 'Data has been saved successfully',
+                    'showConfirmButton' => false,
+                    'timer' => 1500
+                ]
+            );
             $this->payrollIdToDelete = null;
         }
     }
@@ -386,5 +381,4 @@ class Payroll extends Component
             'data2' => $data2
         ]);
     }
-  
 }

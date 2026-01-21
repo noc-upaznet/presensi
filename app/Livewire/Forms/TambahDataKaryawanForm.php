@@ -14,7 +14,7 @@ class TambahDataKaryawanForm extends Form
 
     #[Validate('required', 'Email')]
     public $email = '';
-    
+
     #[Validate('required', 'No HP')]
     public $no_hp = '';
 
@@ -81,6 +81,9 @@ class TambahDataKaryawanForm extends Form
     public $bonus = '';
     public $inov_reward = '';
     public $kasbon = '';
+    public $voucher = '';
+    public $kebudayaan = '';
+    public $transport = '';
 
     #[Validate('required', 'Nama Bank')]
     public $nama_bank = '';
@@ -116,7 +119,7 @@ class TambahDataKaryawanForm extends Form
 
     #[Validate('required', 'Agama')]
     public $agama = '';
-    
+
     public $nomorKTP;
     public $nomorVISA;
 
@@ -154,5 +157,4 @@ class TambahDataKaryawanForm extends Form
             'nama_pemilik_rekening.required' => 'Nama pemilik rekening harus diisi.',
         ];
     }
-
 }

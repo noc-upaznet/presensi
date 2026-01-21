@@ -121,6 +121,8 @@ class CreateSlipGaji extends Component
     public $kasbon;
     public $churn = 0;
     public $bpjsKaryawan;
+    public $voucher;
+    public $countLemburLibur = 0;
 
     public function mount($id = null, $month = null, $year = null)
     {
@@ -140,9 +142,6 @@ class CreateSlipGaji extends Component
         $this->selectedMonth = $month ?? now()->format('n');
         $this->selectedYear  = $year ?? now()->year;
 
-        // ===============================
-        // 🔥 SET CUTOFF (WAJIB DI AWAL)
-        // ===============================
         $cutoff = $this->resolveCutoff(
             $this->selectedYear,
             $this->selectedMonth,
@@ -153,9 +152,6 @@ class CreateSlipGaji extends Component
         $this->cutoffEnd   = $cutoff['end'];
         $this->bulanTahun  = $cutoff['bulanTahun'];
 
-        // ===============================
-        // 🔥 BARU LOAD KARYAWAN
-        // ===============================
         $this->karyawan = $this->loadAvailableKaryawanByPeriode();
 
         if ($id) {
@@ -210,6 +206,28 @@ class CreateSlipGaji extends Component
                         ];
                     }
                 }
+                $this->transport_jumlah = $lembur->where('jenis', 2)->where('status', 1)->count();
+                $this->uang_makan_jumlah = 0;
+
+                foreach ($lembur as $l) {
+
+                    if ($l->status != 1) {
+                        continue;
+                    }
+
+                    if (
+                        $l->waktu_akhir >= '18:00:00'
+                        || $l->waktu_akhir < $l->waktu_mulai
+                    ) {
+                        $this->uang_makan_jumlah++;
+                    }
+                }
+                // dd($this->uang_makan_jumlah);
+                $this->uang_makan_total = (float)$this->uang_makan * (float)$this->uang_makan_jumlah;
+
+
+                $this->transport = $dataKaryawan->transport ?? 0;
+                $this->transport_total = (float)$this->transport * (float)$this->transport_jumlah;
 
                 $this->kasbon = $dataKaryawan->kasbon ?? 0;
                 $this->fee_sharing = M_Sharing::where('karyawan_id', $dataKaryawanId)
@@ -262,14 +280,14 @@ class CreateSlipGaji extends Component
             $terlambat  = $this->rekap['terlambat'] ?? 0;
 
             $tunjanganKehadiran = JenisTunjanganModel::where('nama_tunjangan', 'Tunjangan Kehadiran')->first();
-            $voucher = JenisPotonganModel::where('nama_potongan', 'Voucher')->first();
 
             if (is_array($currentBranch)) {
                 $currentBranch = $currentBranch[0] ?? null;
             }
 
             if ($currentBranch === 'UGR') {
-                $this->kebudayaan = 0;
+                $this->kebudayaan = $dataKaryawan->kebudayaan;
+                $this->voucher = $dataKaryawan->voucher;
 
                 if ($tunjanganKehadiran) {
                     $nominal = 0;
@@ -288,7 +306,8 @@ class CreateSlipGaji extends Component
                     'nominal' => 0,
                 ];
             } elseif (in_array($currentBranch, ['UHO', 'UNR'])) {
-                $this->kebudayaan = 100000;
+                $this->kebudayaan = $dataKaryawan->kebudayaan;
+                $this->voucher = $dataKaryawan->voucher;
 
                 if ($tunjanganKehadiran) {
                     $nominal = 0;
@@ -302,17 +321,7 @@ class CreateSlipGaji extends Component
                     ];
                 }
 
-                if ($voucher) {
-                    $this->potongan[] = [
-                        'nama' => 'Voucher',
-                        'nominal' => (int) $voucher->deskripsi,
-                    ];
-                } else {
-                    $this->potongan[] = [
-                        'nama' => 'Voucher',
-                        'nominal' => 0,
-                    ];
-                }
+                $this->potongan[] = ['nama' => '', 'nominal' => 0];
             } else {
                 $this->kebudayaan = 0;
                 $this->tunjangan[] = [
@@ -658,190 +667,6 @@ class CreateSlipGaji extends Component
         ];
     }
 
-    // public function rekapKehadiran($id, $cutoffStart, $cutoffEnd)
-    // {
-    //     $cutoffStart = Carbon::createFromDate(
-    //         $cutoffStart->year,
-    //         $cutoffStart->month,
-    //         1
-    //     );
-
-    //     $cutoffEnd = Carbon::createFromDate(
-    //         $cutoffStart->year,
-    //         $cutoffStart->month,
-    //         25
-    //     );
-
-    //     $karyawan = M_DataKaryawan::find($id);
-
-    //     // (optional) kalau masih butuh presensiCollection
-    //     $presensiCollection = $karyawan->getPresensi ?? collect();
-    //     $presensi = $presensiCollection->filter(function ($item) use ($cutoffStart, $cutoffEnd) {
-    //         return Carbon::parse($item->tanggal)->between($cutoffStart, $cutoffEnd);
-    //     });
-
-    //     // TERLAMBAT
-    //     $terlambat = M_Presensi::where('user_id', $id)
-    //         ->where('status', 1)
-    //         ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
-    //         // ->where(function ($query) {
-    //         //     $query->where('lokasi_lock', 0)->where('approve', 1)
-    //         //         ->orWhere(function ($q) {
-    //         //             $q->where('lokasi_lock', 1)->where('approve', 0);
-    //         //         });
-    //         // })
-    //         ->count();
-
-    //     // ============ JADWAL ============
-
-    //     $bulanTahunStart = $cutoffStart->format('Y-m');
-    //     $bulanTahunEnd   = $cutoffEnd->format('Y-m');
-
-    //     $tahunStart = (int) $cutoffStart->format('Y');
-    //     $bulanStart = (int) $cutoffStart->format('m');
-
-    //     $tahunEnd   = (int) $cutoffEnd->format('Y');
-    //     $bulanEnd   = (int) $cutoffEnd->format('m');
-
-    //     $jadwalStart = M_Jadwal::where('karyawan_id', $id)
-    //         ->where('bulan_tahun', $bulanTahunStart)
-    //         ->first();
-
-    //     $jadwalEnd = M_Jadwal::where('karyawan_id', $id)
-    //         ->where('bulan_tahun', $bulanTahunEnd)
-    //         ->first();
-
-    //     $izin = 0;
-    //     $cuti = 0;
-    //     $izinSetengahHari = 0;
-    //     $izinSetengahHariPagi = 0;
-    //     $izinSetengahHariSiang = 0;
-
-    //     // 🔹 CASE 1: periode 1 bulan (mode normal)
-    //     if ($bulanTahunStart === $bulanTahunEnd) {
-    //         $jadwal = $jadwalStart ?? $jadwalEnd;
-
-    //         if ($jadwal) {
-    //             $startDay = (int) $cutoffStart->day;   // bisa 1 atau tanggal lain
-    //             $endDay   = (int) $cutoffEnd->day;     // bisa akhir bulan / hari ini
-
-    //             foreach (range($startDay, $endDay) as $day) {
-    //                 $tanggal = Carbon::createFromDate($tahunStart, $bulanStart, $day);
-
-    //                 if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
-    //                     continue;
-    //                 }
-
-    //                 $kode = $jadwal->{'d' . $day} ?? null;
-    //                 $this->tambahHitunganKode(
-    //                     $kode,
-    //                     $izin,
-    //                     $cuti,
-    //                     $izinSetengahHari,
-    //                     $izinSetengahHariPagi,
-    //                     $izinSetengahHariSiang
-    //                 );
-    //             }
-    //         }
-    //     }
-    //     // 🔹 CASE 2: periode lintas bulan (cutoff 26–25)
-    //     else {
-    //         // ---- BULAN AWAL (biasanya 26–akhir bulan) ----
-    //         if ($jadwalStart) {
-    //             $startDay = (int) $cutoffStart->day;                 // contoh 26
-    //             $endDay   = $cutoffStart->copy()->endOfMonth()->day; // 30/31
-
-    //             foreach (range($startDay, $endDay) as $day) {
-    //                 $tanggal = Carbon::createFromDate($tahunStart, $bulanStart, $day);
-
-    //                 if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
-    //                     continue;
-    //                 }
-
-    //                 $kode = $jadwalStart->{'d' . $day} ?? null;
-    //                 $this->tambahHitunganKode(
-    //                     $kode,
-    //                     $izin,
-    //                     $cuti,
-    //                     $izinSetengahHari,
-    //                     $izinSetengahHariPagi,
-    //                     $izinSetengahHariSiang
-    //                 );
-    //             }
-    //         }
-
-    //         // ---- BULAN AKHIR (biasanya 1–25) ----
-    //         if ($jadwalEnd) {
-    //             $startDay = 1;
-    //             $endDay   = (int) $cutoffEnd->day; // contoh 25
-
-    //             foreach (range($startDay, $endDay) as $day) {
-    //                 $tanggal = Carbon::createFromDate($tahunEnd, $bulanEnd, $day);
-
-    //                 if (!$tanggal->between($cutoffStart, $cutoffEnd)) {
-    //                     continue;
-    //                 }
-
-    //                 $kode = $jadwalEnd->{'d' . $day} ?? null;
-    //                 $this->tambahHitunganKode(
-    //                     $kode,
-    //                     $izin,
-    //                     $cuti,
-    //                     $izinSetengahHari,
-    //                     $izinSetengahHariPagi,
-    //                     $izinSetengahHariSiang
-    //                 );
-    //             }
-    //         }
-    //     }
-
-    //     // ============ LEMBUR ============
-
-    //     $dataLembur = M_Lembur::where('karyawan_id', $id)
-    //         ->whereBetween('tanggal', [$cutoffStart, $cutoffEnd])
-    //         ->whereNotNull('total_jam')
-    //         ->where('status', 1)
-    //         ->get(['tanggal', 'total_jam']);
-
-    //     $totalJamLembur = $dataLembur->sum('total_jam');
-    //     $maxHadir = $this->maxHariHadir();
-    //     return [
-
-    //         'kehadiran' => max(
-    //             0,
-    //             $maxHadir
-    //                 - $izin
-    //                 - $cuti
-    //                 - (0.5 * $izinSetengahHari)
-    //                 - (0.5 * $izinSetengahHariPagi)
-    //                 - (0.5 * $izinSetengahHariSiang)
-    //         ),
-
-    //         'terlambat' => $terlambat,
-    //         'izin' => $izin,
-    //         'cuti' => $cuti,
-    //         'lembur' => $totalJamLembur,
-
-    //         'izin setengah hari' => $izinSetengahHari,
-    //         'izin setengah hari pagi' => $izinSetengahHariPagi,
-    //         'izin setengah hari siang' => $izinSetengahHariSiang,
-
-    //         'cutoff_start' => $cutoffStart->format('Y-m-d'),
-    //         'cutoff_end'   => $cutoffEnd->format('Y-m-d'),
-    //     ];
-    // }
-
-    // private function tambahHitunganKode($kode, &$izin, &$cuti, &$izHalf, &$izHalfPagi, &$izHalfSiang)
-    // {
-    //     if ($kode == 3) $izin++;
-    //     elseif ($kode == 2) $cuti++;
-    //     elseif ($kode == 8) $izHalf++;
-    //     elseif ($kode == 22) $izHalfPagi++;
-    //     elseif ($kode == 23) $izHalfSiang++;
-    // }
-
-
-
     private function numericValue($value)
     {
         return is_numeric($value) ? (int) $value : (int) str_replace(['.', ','], '', $value);
@@ -880,13 +705,13 @@ class CreateSlipGaji extends Component
 
         $this->hitungInovationReward();
 
-        if (in_array($propertyName, ['transport', 'transport_jumlah'])) {
-            $this->transport_total = (float)$this->transport * (float)$this->transport_jumlah;
-        }
+        // if (in_array($propertyName, ['transport', 'transport_jumlah'])) {
+        //     $this->transport_total = (float)$this->transport * (float)$this->transport_jumlah;
+        // }
 
-        if (in_array($propertyName, ['uang_makan', 'uang_makan_jumlah'])) {
-            $this->uang_makan_total = (float)$this->uang_makan * (float)$this->uang_makan_jumlah;
-        }
+        // if (in_array($propertyName, ['uang_makan', 'uang_makan_jumlah'])) {
+        //     $this->uang_makan_total = (float)$this->uang_makan * (float)$this->uang_makan_jumlah;
+        // }
 
         // Hitung otomatis kalau dua komponen utama sudah > 0
         if ($gaji > 0 || $tunjangan > 0) {
@@ -957,236 +782,6 @@ class CreateSlipGaji extends Component
         }
         $this->hitungTotalGaji();
     }
-
-    public function hitungTotalGaji()
-    {
-        // === 1. Ambil dan normalisasi input ===
-        $gajiPokok         = $this->numericValue($this->gaji_pokok);
-        $tunjanganJabatan  = $this->numericValue($this->tunjangan_jabatan);
-        $transport         = $this->numericValue($this->transport_total ?? 0);
-        $uangMakan         = $this->numericValue($this->uang_makan_total ?? 0);
-        $inovationReward   = $this->numericValue($this->inovation_reward ?? 0);
-        $kebudayaan        = $this->numericValue($this->kebudayaan ?? 0);
-        $feeSharing        = $this->numericValue($this->fee_sharing_nominal ?? 0);
-        $insentif          = $this->numericValue($this->insentif ?? 0);
-        // $insentifSpv       = $this->numericValue($this->insentif ?? 0);
-        // $insentifSpvUgr    = $this->numericValue($this->insentif ?? 0);
-        $lemburNominal     = $this->numericValue($this->lembur_nominal ?? 0);
-        $lemburLiburNominal = $this->numericValue($this->lemburLibur_nominal ?? 0);
-        $kasbon            = $this->numericValue($this->kasbon ?? 0);
-        $churn             = $this->numericValue($this->churn ?? 0);
-        $bpjsJhtPT         = $this->numericValue($this->bpjs_jht_perusahaan_nominal ?? 0);
-        $bpjsPT            = $this->numericValue($this->bpjs_perusahaan_nominal ?? 0);
-
-        // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
-        $tunjanganKehadiran = 0;
-        if (($this->rekap['terlambat'] ?? 0) == 0) {
-            $tunjanganKehadiran = $this->numericValue($this->tunjangan_kehadiran);
-        }
-
-        // === 3. Hitung total tunjangan tambahan (manual input) ===
-        $totalTunjangan = 0;
-        foreach ($this->tunjangan as $item) {
-            $totalTunjangan += $this->numericValue($item['nominal']);
-        }
-
-        // === 4. Hitung potongan manual ===
-        $totalPotonganManual = 0;
-        foreach ($this->potongan as $item) {
-            $totalPotonganManual += $this->numericValue($item['nominal']);
-        }
-
-        // === 5. Potongan otomatis ===
-        $potonganIzin = 0;
-        $potonganTerlambat = 0;
-
-        if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
-            $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
-            $totalHariIzin = ($this->rekap['izin'] ?? 0)
-                + 0.5 * ($this->rekap['izin setengah hari'] ?? 0)
-                + 0.5 * ($this->rekap['izin setengah hari pagi'] ?? 0)
-                + 0.5 * ($this->rekap['izin setengah hari siang'] ?? 0)
-                + 0.5 * ($this->rekap['konter izin setengah hari masuk pagi'] ?? 0);
-            // dd($totalHariIzin);
-            $potonganIzin = round($perHari * $totalHariIzin);
-            $currentBranch = session('selected_entitas');
-            if ($currentBranch === 'MC') {
-                $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 15000;
-            } else {
-                $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 25000;
-            }
-            // dd($potonganTerlambat);
-        }
-
-        // === 7. Hitung BPJS ===
-        $dasarBpjs = $gajiPokok + $tunjanganJabatan;
-        $umk = 2470800;
-
-        if ($dasarBpjs < $umk) {
-            $nilaiDasarBpjs = $umk;
-        } elseif ($dasarBpjs > $umk) {
-            $nilaiDasarBpjs = $dasarBpjs;
-        }
-
-        $bpjsNominal = $this->bpjs_digunakan
-            ? ($nilaiDasarBpjs * $this->persentase_bpjs / 100)
-            : 0;
-
-        $bpjsJhtNominal = $this->bpjs_jht_digunakan
-            ? ($nilaiDasarBpjs * $this->persentase_bpjs_jht / 100)
-            : 0;
-
-        $this->bpjs_nominal = round($bpjsNominal);
-        $this->bpjs_jht_nominal = round($bpjsJhtNominal);
-
-        // === 8. Hitung total gaji akhir ===
-        $totalGaji = round(
-            $gajiPokok
-                + $tunjanganJabatan
-                + $totalTunjangan
-                + $lemburNominal
-                + $lemburLiburNominal
-                + $insentif
-                // + $insentifSpv
-                // + $insentifSpvUgr
-                + $tunjanganKehadiran
-                + $kebudayaan
-                + $feeSharing
-                + $transport
-                + $uangMakan
-                + $inovationReward
-                - $totalPotonganManual
-                - $kasbon
-                - $churn
-                - $potonganIzin
-                - $potonganTerlambat
-                - $this->bpjs_nominal
-                - $this->bpjs_jht_nominal
-        );
-        // dd(strtoupper($this->entitas), strtolower($this->jabatan));
-        if (
-            isset($this->entitas, $this->jabatan) &&
-            strtoupper(trim($this->entitas)) === 'UNB' &&
-            strtolower(trim($this->jabatan)) === 'branch manager'
-        ) {
-            $totalGaji -= ($bpjsJhtPT + $bpjsPT);
-        }
-        $this->total_gaji = $totalGaji;
-    }
-
-    // public function hitungTotalGaji()
-    // {
-    //     // === 1. Ambil dan normalisasi input ===
-    //     $gajiPokok         = $this->numericValue($this->gaji_pokok);
-    //     $tunjanganJabatan  = $this->numericValue($this->tunjangan_jabatan);
-
-    //     $hariHadir = 21;
-    //     $gajiPerHari = ($gajiPokok + $tunjanganJabatan) / 26;
-    //     $gajiProrata = round($gajiPerHari * $hariHadir);
-
-    //     $transport         = $this->numericValue($this->transport_total ?? 0);
-    //     $uangMakan         = $this->numericValue($this->uang_makan_total ?? 0);
-    //     $inovationReward   = $this->numericValue($this->inovation_reward ?? 0);
-    //     $kebudayaan        = $this->numericValue($this->kebudayaan ?? 0);
-    //     $feeSharing        = $this->numericValue($this->fee_sharing_nominal ?? 0);
-    //     $insentif          = $this->numericValue($this->insentif ?? 0);
-    //     // $insentifSpv       = $this->numericValue($this->insentif ?? 0);
-    //     // $insentifSpvUgr    = $this->numericValue($this->insentif ?? 0);
-    //     $lemburNominal     = $this->numericValue($this->lembur_nominal ?? 0);
-    //     $lemburLiburNominal = $this->numericValue($this->lemburLibur_nominal ?? 0);
-    //     $kasbon            = $this->numericValue($this->kasbon ?? 0);
-    //     $churn             = $this->numericValue($this->churn ?? 0);
-    //     $bpjsJhtPT         = $this->numericValue($this->bpjs_jht_perusahaan_nominal ?? 0);
-    //     $bpjsPT            = $this->numericValue($this->bpjs_perusahaan_nominal ?? 0);
-
-    //     // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
-    //     $tunjanganKehadiran = 0;
-    //     if (($this->rekap['terlambat'] ?? 0) == 0) {
-    //         $tunjanganKehadiran = $this->numericValue($this->tunjangan_kehadiran);
-    //     }
-
-    //     // === 3. Hitung total tunjangan tambahan (manual input) ===
-    //     $totalTunjangan = 0;
-    //     foreach ($this->tunjangan as $item) {
-    //         $totalTunjangan += $this->numericValue($item['nominal']);
-    //     }
-
-    //     // === 4. Hitung potongan manual ===
-    //     $totalPotonganManual = 0;
-    //     foreach ($this->potongan as $item) {
-    //         $totalPotonganManual += $this->numericValue($item['nominal']);
-    //     }
-
-    //     // === 5. Potongan otomatis ===
-    //     $potonganIzin = 0;
-    //     $potonganTerlambat = 0;
-
-    //     if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
-    //         $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
-    //         $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari pagi'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari siang'] ?? 0);
-    //         $potonganIzin = round($perHari * $totalHariIzin);
-    //         $currentBranch = session('selected_entitas');
-    //         if ($currentBranch === 'MC') {
-    //             $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 15000;
-    //         } else {
-    //             $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 25000;
-    //         }
-    //         // dd($potonganTerlambat);
-    //     }
-
-    //     // === 7. Hitung BPJS ===
-    //     $dasarBpjs = $gajiPokok + $tunjanganJabatan;
-    //     $umk = 2470800;
-
-    //     if ($dasarBpjs < $umk) {
-    //         $nilaiDasarBpjs = $umk;
-    //     } elseif ($dasarBpjs > $umk) {
-    //         $nilaiDasarBpjs = $dasarBpjs;
-    //     }
-
-    //     $bpjsNominal = $this->bpjs_digunakan
-    //         ? ($nilaiDasarBpjs * $this->persentase_bpjs / 100)
-    //         : 0;
-
-    //     $bpjsJhtNominal = $this->bpjs_jht_digunakan
-    //         ? ($nilaiDasarBpjs * $this->persentase_bpjs_jht / 100)
-    //         : 0;
-
-    //     $this->bpjs_nominal = round($bpjsNominal);
-    //     $this->bpjs_jht_nominal = round($bpjsJhtNominal);
-
-    //     // === 8. Hitung total gaji akhir ===
-    //     $totalGaji = round(
-    //         $gajiProrata
-    //             + $totalTunjangan
-    //             + $lemburNominal
-    //             + $lemburLiburNominal
-    //             + $insentif
-    //             + $tunjanganKehadiran
-    //             + $kebudayaan
-    //             + $feeSharing
-    //             + $transport
-    //             + $uangMakan
-    //             + $inovationReward
-    //             - $totalPotonganManual
-    //             - $potonganIzin
-    //             - $kasbon
-    //             - $churn
-    //             - $potonganTerlambat
-    //             - $this->bpjs_nominal
-    //             - $this->bpjs_jht_nominal
-    //     );
-    //     // dd(strtoupper($this->entitas), strtolower($this->jabatan));
-    //     if (
-    //         isset($this->entitas, $this->jabatan) &&
-    //         strtoupper(trim($this->entitas)) === 'UNB' &&
-    //         strtolower(trim($this->jabatan)) === 'branch manager'
-    //     ) {
-    //         $totalGaji -= ($bpjsJhtPT + $bpjsPT);
-    //     }
-    //     $this->total_gaji = $totalGaji;
-    // }
-
 
     public function addTunjangan()
     {
@@ -1351,6 +946,124 @@ class CreateSlipGaji extends Component
         return $romawi[$month] ?? $month;
     }
 
+    public function hitungTotalGaji()
+    {
+        // === 1. Ambil dan normalisasi input ===
+        $gajiPokok         = $this->numericValue($this->gaji_pokok);
+        $tunjanganJabatan  = $this->numericValue($this->tunjangan_jabatan);
+        $transport         = $this->numericValue($this->transport_total ?? 0);
+        $uangMakan         = $this->numericValue($this->uang_makan_total ?? 0);
+        $inovationReward   = $this->numericValue($this->inovation_reward ?? 0);
+        $kebudayaan        = $this->numericValue($this->kebudayaan ?? 0);
+        $feeSharing        = $this->numericValue($this->fee_sharing_nominal ?? 0);
+        $insentif          = $this->numericValue($this->insentif ?? 0);
+        // $insentifSpv       = $this->numericValue($this->insentif ?? 0);
+        // $insentifSpvUgr    = $this->numericValue($this->insentif ?? 0);
+        $lemburNominal     = $this->numericValue($this->lembur_nominal ?? 0);
+        $lemburLiburNominal = $this->numericValue($this->lemburLibur_nominal ?? 0);
+        $kasbon            = $this->numericValue($this->kasbon ?? 0);
+        $voucher            = $this->numericValue($this->voucher ?? 0);
+        $churn             = $this->numericValue($this->churn ?? 0);
+        $bpjsJhtPT         = $this->numericValue($this->bpjs_jht_perusahaan_nominal ?? 0);
+        $bpjsPT            = $this->numericValue($this->bpjs_perusahaan_nominal ?? 0);
+
+        // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
+        $tunjanganKehadiran = 0;
+        if (($this->rekap['terlambat'] ?? 0) == 0) {
+            $tunjanganKehadiran = $this->numericValue($this->tunjangan_kehadiran);
+        }
+
+        // === 3. Hitung total tunjangan tambahan (manual input) ===
+        $totalTunjangan = 0;
+        foreach ($this->tunjangan as $item) {
+            $totalTunjangan += $this->numericValue($item['nominal']);
+        }
+
+        // === 4. Hitung potongan manual ===
+        $totalPotonganManual = 0;
+        foreach ($this->potongan as $item) {
+            $totalPotonganManual += $this->numericValue($item['nominal']);
+        }
+
+        // === 5. Potongan otomatis ===
+        $potonganIzin = 0;
+        $potonganTerlambat = 0;
+
+        if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
+            $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
+            $totalHariIzin = ($this->rekap['izin'] ?? 0)
+                + 0.5 * ($this->rekap['izin setengah hari'] ?? 0)
+                + 0.5 * ($this->rekap['izin setengah hari pagi'] ?? 0)
+                + 0.5 * ($this->rekap['izin setengah hari siang'] ?? 0)
+                + 0.5 * ($this->rekap['konter izin setengah hari masuk pagi'] ?? 0);
+            // dd($totalHariIzin);
+            $potonganIzin = round($perHari * $totalHariIzin);
+            $currentBranch = session('selected_entitas');
+            if ($currentBranch === 'MC') {
+                $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 15000;
+            } else {
+                $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 25000;
+            }
+            // dd($potonganTerlambat);
+        }
+
+        // === 7. Hitung BPJS ===
+        $dasarBpjs = $gajiPokok + $tunjanganJabatan;
+        $umk = 2470800;
+
+        if ($dasarBpjs < $umk) {
+            $nilaiDasarBpjs = $umk;
+        } elseif ($dasarBpjs > $umk) {
+            $nilaiDasarBpjs = $dasarBpjs;
+        }
+
+        $bpjsNominal = $this->bpjs_digunakan
+            ? ($nilaiDasarBpjs * $this->persentase_bpjs / 100)
+            : 0;
+
+        $bpjsJhtNominal = $this->bpjs_jht_digunakan
+            ? ($nilaiDasarBpjs * $this->persentase_bpjs_jht / 100)
+            : 0;
+
+        $this->bpjs_nominal = round($bpjsNominal);
+        $this->bpjs_jht_nominal = round($bpjsJhtNominal);
+
+        // === 8. Hitung total gaji akhir ===
+        $totalGaji = round(
+            $gajiPokok
+                + $tunjanganJabatan
+                + $totalTunjangan
+                + $lemburNominal
+                + $lemburLiburNominal
+                + $insentif
+                // + $insentifSpv
+                // + $insentifSpvUgr
+                + $tunjanganKehadiran
+                + $kebudayaan
+                + $feeSharing
+                + $transport
+                + $uangMakan
+                + $inovationReward
+                - $totalPotonganManual
+                - $kasbon
+                - $voucher
+                - $churn
+                - $potonganIzin
+                - $potonganTerlambat
+                - $this->bpjs_nominal
+                - $this->bpjs_jht_nominal
+        );
+        // dd(strtoupper($this->entitas), strtolower($this->jabatan));
+        if (
+            isset($this->entitas, $this->jabatan) &&
+            strtoupper(trim($this->entitas)) === 'UNB' &&
+            strtolower(trim($this->jabatan)) === 'branch manager'
+        ) {
+            $totalGaji -= ($bpjsJhtPT + $bpjsPT);
+        }
+        $this->total_gaji = $totalGaji;
+    }
+
     public function store()
     {
         $entitasNama = session('selected_entitas', 'UHO');
@@ -1389,6 +1102,8 @@ class CreateSlipGaji extends Component
             'jml_psb' => $this->jml_psb,
             'churn' => $this->churn,
             'kasbon' => $this->kasbon,
+            'tunjangan_kebudayaan' => $this->kebudayaan,
+            'voucher' => $this->voucher,
             'rekap' => json_encode($this->rekap),
             'total_gaji' => (int) $this->total_gaji,
             'periode' => $this->bulanTahun,

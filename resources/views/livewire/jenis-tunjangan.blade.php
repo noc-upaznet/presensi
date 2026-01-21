@@ -48,23 +48,23 @@
                             </thead>
                             <tbody>
                                 @foreach ($jenisTunjangan as $item)
-                                <tr>
-                                    <td>{{ $item->nama_tunjangan }}</td>
-                                    <td>{{ $item->deskripsi }}</td>
-                                    <td>
-                                        <button wire:click.prevent="editTunjangan({{ $item->id }})"
-                                            class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#editTunjanganModal">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
+                                    <tr>
+                                        <td>{{ $item->nama_tunjangan }}</td>
+                                        <td>{{ $item->deskripsi }}</td>
+                                        <td>
+                                            <button wire:click.prevent="editTunjangan({{ $item->id }})"
+                                                class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#editTunjanganModal">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
 
-                                        <button wire:click.prevent="confirmHapusTunjangan({{ $item->id }})"
-                                            class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#hapusTunjanganModal">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                            <button wire:click.prevent="delete({{ $item->id }})"
+                                                class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#hapusTunjanganModal">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
                                 @endforeach
                             </tbody>
                         </table>
@@ -77,7 +77,8 @@
     <div wire:ignore.self class="modal fade" id="tambahJenisTunjanganModal" tabindex="-1"
         aria-labelledby="tambahJenisTunjanganModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
+            <div class="modal-content"
+                style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold" id="tambahJenisTunjanganModalLabel">Tambah Jenis Tunjangan</h5>
@@ -99,7 +100,8 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                         style="border-radius: 8px;">Batal</button>
-                    <button wire:click="store" wire:loading.attr="disabled" class="btn btn-primary" style="border-radius: 8px;">
+                    <button wire:click="store" wire:loading.attr="disabled" class="btn btn-primary"
+                        style="border-radius: 8px;">
                         <span wire:loading wire:target="store" class="spinner-border spinner-border-sm me-1"></span>
                         <i class="fa-solid fa-save"></i>
                         Simpan
@@ -113,7 +115,8 @@
     <div wire:ignore.self class="modal fade" id="editTunjanganModal" tabindex="-1"
         aria-labelledby="editTunjanganModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #ffc107; border-left: 1px solid #dee2e6;
+            <div class="modal-content"
+                style="border-radius: 0.375rem; border-top: 4px solid #ffc107; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold" id="editTunjanganModalLabel">Edit Jenis Tunjangan</h5>
@@ -122,19 +125,19 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="nama_tunjangan_edit" class="form-label">Nama Tunjangan</label>
-                        <input type="text" class="form-control" id="nama_tunjangan_edit" wire:model="nama_tunjangan"
-                            required>
+                        <input type="text" class="form-control" id="nama_tunjangan_edit"
+                            wire:model="nama_tunjangan" required>
                     </div>
                     <div class="mb-3">
                         <label for="nominal" class="form-label">Nominal</label>
-                        <input type="number" class="form-control" id="nominal"
-                            wire:model="deskripsi" required>
+                        <input type="number" class="form-control" id="nominal" wire:model="deskripsi" required>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                         style="border-radius: 8px;">Batal</button>
-                    <button wire:click="update" wire:loading.attr="disabled" class="btn btn-primary" style="border-radius: 8px;">
+                    <button wire:click="update" wire:loading.attr="disabled" class="btn btn-primary"
+                        style="border-radius: 8px;">
                         <span wire:loading wire:target="update" class="spinner-border spinner-border-sm me-1"></span>
                         <i class="fa-solid fa-save"></i>
                         Update
@@ -148,10 +151,12 @@
     <div wire:ignore.self class="modal fade" id="hapusTunjanganModal" tabindex="-1"
         aria-labelledby="hapusTunjanganModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #d51a1a; border-left: 1px solid #dee2e6;
+            <div class="modal-content"
+                style="border-radius: 0.375rem; border-top: 4px solid #d51a1a; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-danger" id="hapusTunjanganModalLabel">Hapus Jenis Tunjangan</h5>
+                    <h5 class="modal-title fw-bold text-danger" id="hapusTunjanganModalLabel">Hapus Jenis Tunjangan
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -186,5 +191,5 @@
         Livewire.on('swal', (e) => {
             Swal.fire(e.params);
         });
-    </script>    
+    </script>
 @endpush
