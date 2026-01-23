@@ -1009,7 +1009,8 @@ class CreateSlipGaji extends Component
 
         // === 7. Hitung BPJS ===
         $dasarBpjs = $gajiPokok + $tunjanganJabatan;
-        $umk = 2470800;
+        // $umk = 2470800;
+        $umk = 2628190;
 
         if ($dasarBpjs < $umk) {
             $nilaiDasarBpjs = $umk;
