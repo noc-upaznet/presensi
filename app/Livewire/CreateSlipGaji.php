@@ -746,7 +746,7 @@ class CreateSlipGaji extends Component
     public function updatedBpjsPerusahaanDigunakan()
     {
         $gajiPokok = $this->gaji_pokok + $this->tunjangan_jabatan;
-        $umk = 2470800;
+        $umk = 2628190;
 
         if ($this->bpjs_perusahaan_digunakan) {
             // $gajiPokok = $this->gaji_pokok ?? 0;
@@ -765,7 +765,7 @@ class CreateSlipGaji extends Component
     public function updatedBpjsJhtPerusahaanDigunakan()
     {
         $gajiPokok = $this->gaji_pokok + $this->tunjangan_jabatan;
-        $umk = 2470800;
+        $umk = 2628190;
 
         if ($this->bpjs_jht_perusahaan_digunakan) {
             // $gajiPokok = $this->gaji_pokok ?? 0;
