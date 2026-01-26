@@ -356,6 +356,7 @@ class Payroll extends Component
             });
 
         $data2Query = PayrollModel::with('getKaryawan')
+            ->whereHas('getKaryawan')
             ->where('entitas_id', $entitasIdAktif)
             ->where('titip', 1)
             ->whereHas('getKaryawan', function ($q) use ($entitasNama) {
