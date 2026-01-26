@@ -17,8 +17,12 @@ trait CutoffPayrollTrait
     {
         $cutoffEnd = Carbon::create($year, $month, 25)->endOfDay();
 
-        // Jika bulan berjalan & hari ini < 25 → pakai hari ini
-        if ($year == now()->year && $month == now()->month && now()->day < 25) {
+        // Jika bulan berjalan & hari ini <= 25 → pakai hari ini
+        if (
+            $year == now()->year &&
+            $month == now()->month &&
+            now()->day <= 25
+        ) {
             $cutoffEnd = now();
         }
 

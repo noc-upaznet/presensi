@@ -598,14 +598,14 @@ class CreateSlipGaji extends Component
             ->count();
         // dd($terlambat);
         // Ambil bulan dan tahun dari cutoffEnd (bukan dari input manual)
-        $bulan = $cutoffEnd->format('m');
-        $tahun = $cutoffEnd->format('Y');
-        $bulanTahun = $cutoffEnd->format('Y-m');
-        // dd($bulanTahun);
-        $jadwal = M_Jadwal::where('karyawan_id', $id)
-            ->where('bulan_tahun', $bulanTahun)
-            ->first();
-        // dd($jadwal);
+        $bulanAwal  = $cutoffStart->format('Y-m');
+        $bulanAkhir = $cutoffEnd->format('Y-m');
+
+        $jadwalList = M_Jadwal::where('karyawan_id', $id)
+            ->whereIn('bulan_tahun', [$bulanAwal, $bulanAkhir])
+            ->get()
+            ->keyBy('bulan_tahun');
+
         $izin = 0;
         $cuti = 0;
         $izinSetengahHari = 0;
@@ -613,14 +613,20 @@ class CreateSlipGaji extends Component
         $izinSetengahHariSiang = 0;
         $KonterizinSetengahHariPagi = 0;
 
-        foreach (range(1, 31) as $i) {
-            $kode = $jadwal->{'d' . $i};
+        $tanggal = $cutoffStart->copy();
 
-            $tanggal = Carbon::createFromFormat('Y-m-d', "{$tahun}-{$bulan}-" . str_pad($i, 2, '0', STR_PAD_LEFT));
+        while ($tanggal->lte($cutoffEnd)) {
 
-            if (!$tanggal->between($cutoffStart->toDateString(), $cutoffEnd->toDateString())) {
+            $bulanTahun = $tanggal->format('Y-m');
+            $hari       = $tanggal->day;
+
+            $jadwal = $jadwalList[$bulanTahun] ?? null;
+            if (!$jadwal) {
+                $tanggal->addDay();
                 continue;
             }
+
+            $kode = $jadwal->{'d' . $hari} ?? null;
 
             if ($kode == 3) {
                 $izin++;
@@ -635,6 +641,8 @@ class CreateSlipGaji extends Component
             } elseif ($kode == 29) {
                 $KonterizinSetengahHariPagi++;
             }
+
+            $tanggal->addDay();
         }
 
         $dataLembur = M_Lembur::where('karyawan_id', $id)

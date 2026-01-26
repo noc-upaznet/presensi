@@ -131,43 +131,42 @@ class EditPayroll extends Component
             abort(404, 'Data tidak ditemukan atau ID tidak valid.');
         }
 
-        $selectedEntitas = session('selected_entitas', 'UHO');
-        $this->entitas = $selectedEntitas;
+        $this->entitas = session('selected_entitas', 'UHO');
 
-        $jabatan = M_DataKaryawan::where('id', $this->payroll->karyawan_id)->value('jabatan');
-        $this->jabatan = $jabatan;
+        $this->jabatan = M_DataKaryawan::where(
+            'id',
+            $this->payroll->karyawan_id
+        )->value('jabatan');
 
-        $this->selectedYear = now()->year;
-        $this->selectedMonth = now()->format('n');
-
-        $this->periode = session('periode', $this->payroll->periode);
-
-        // Misal $this->periode formatnya "2025-08" (Y-m)
-        $this->bulanTahun = $this->periode;
-
-        $this->periode = session('periode', $this->payroll->periode);
+        // ===== PERIODE =====
+        $this->periode = session('periode', $this->payroll->periode); // contoh: 2025-08
         $this->bulanTahun = $this->periode;
 
         [$year, $month] = explode('-', $this->bulanTahun);
         $this->selectedYear  = (int) $year;
         $this->selectedMonth = (int) $month;
 
-        $this->setCutoffPeriode();
+        // ===== CUT OFF 26–25 =====
+        $cutoff = $this->resolveCutoff(
+            $this->selectedYear,
+            $this->selectedMonth,
+            'cutoff_25'
+        );
 
-        // Default set cutoff normal
-        // $this->cutoffStart = $this->filterCutOffNormal['start'];
-        // $this->cutoffEnd = $this->filterCutOffNormal['end'];
-        // $this->bulanTahun = $this->cutoffEnd->format('Y-m');
+        $this->cutoffStart = $cutoff['start'];
+        $this->cutoffEnd   = $cutoff['end'];
+        $this->bulanTahun  = $cutoff['bulanTahun'];
 
+        // ===== LOAD DATA =====
         $this->jenis_tunjangan = JenisTunjanganModel::all();
-        $this->jenis_potongan = JenisPotonganModel::all();
+        $this->jenis_potongan  = JenisPotonganModel::all();
+
         $this->loadData($id);
-        // $this->loadDataKaryawan();
-        // dd($id);
         $this->hitungUangMakanTransport();
-        // dd($this->entitas, $this->jabatan);
+        $this->hitungRekap($this->payroll->karyawan_id);
         $this->hitungTotalGaji();
     }
+
 
 
 
@@ -199,10 +198,14 @@ class EditPayroll extends Component
         // dd($terlambat);
 
         // --- AMBIL DATA JADWAL ---
-        $jadwal = M_Jadwal::where('karyawan_id', $userId)
-            ->where('bulan_tahun', $this->cutoffEnd->format('Y-m'))
-            ->first();
-        // dd($jadwal);
+        $bulanAwal  = $this->cutoffStart->format('Y-m');
+        $bulanAkhir = $this->cutoffEnd->format('Y-m');
+
+        $jadwalList = M_Jadwal::where('karyawan_id', $userId)
+            ->whereIn('bulan_tahun', [$bulanAwal, $bulanAkhir])
+            ->get()
+            ->keyBy('bulan_tahun');
+
         $izin = 0;
         $cuti = 0;
         $izinSetengahHari = 0;
@@ -210,18 +213,22 @@ class EditPayroll extends Component
         $izinSetengahHariSiang = 0;
         $KonterizinSetengahHariPagi = 0;
 
-        if ($jadwal) {
-            for ($i = 1; $i <= 31; $i++) {
-                $tanggal = Carbon::createFromDate(
-                    $this->cutoffEnd->year,
-                    $this->cutoffEnd->month,
-                    $i
-                );
+        if ($jadwalList->isNotEmpty()) {
 
-                if (!$tanggal->between($this->cutoffStart, $this->cutoffEnd)) {
+            $tanggal = $this->cutoffStart->copy();
+
+            while ($tanggal->lte($this->cutoffEnd)) {
+
+                $bulanTahun = $tanggal->format('Y-m');
+                $hari       = $tanggal->day;
+
+                $jadwal = $jadwalList[$bulanTahun] ?? null;
+                if (!$jadwal) {
+                    $tanggal->addDay();
                     continue;
                 }
-                $kode = $jadwal->{'d' . $i} ?? null;
+
+                $kode = $jadwal->{'d' . $hari} ?? null;
 
                 if ($kode == 3) {
                     $izin++;
@@ -236,8 +243,11 @@ class EditPayroll extends Component
                 } elseif ($kode == 29) {
                     $KonterizinSetengahHariPagi++;
                 }
+
+                $tanggal->addDay();
             }
         }
+
 
         // --- LEMBUR JAM ---
         $lemburJam = M_Lembur::where('karyawan_id', $userId)
