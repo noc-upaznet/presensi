@@ -10,12 +10,14 @@ use App\Models\M_Jadwal;
 use App\Models\M_Pengajuan;
 use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
+use App\Traits\CutoffPayrollTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Livewire\WithoutUrlPagination;
 
 class Pengajuan extends Component
 {
+    use CutoffPayrollTrait;
     public PengajuanForm $form;
     use WithPagination, WithoutUrlPagination;
     protected $paginationTheme = 'bootstrap';
@@ -353,12 +355,25 @@ class Pengajuan extends Component
             $query->where('status', (int) $this->filterPengajuan);
         }
 
-        // 🔹 Filter Bulan
         if (!empty($this->filterBulan)) {
-            $bulan = date('m', strtotime($this->filterBulan));
-            $tahun = date('Y', strtotime($this->filterBulan));
-            $query->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
+            $year  = Carbon::parse($this->filterBulan)->year;
+            $month = Carbon::parse($this->filterBulan)->month;
+        } else {
+            $year  = now()->year;
+            $month = now()->month;
         }
+
+        // resolve cutoff 26–25
+        $cutoff = $this->resolveCutoff($year, $month, 'cutoff_25');
+
+        $cutoffStart = $cutoff['start'];
+        $cutoffEnd   = $cutoff['end'];
+
+        // 🔹 Filter Bulan
+        $query->whereBetween('tanggal', [
+            $cutoffStart->toDateTimeString(),
+            $cutoffEnd->toDateTimeString(),
+        ]);
 
         // 🔹 Search
         if ($this->search) {

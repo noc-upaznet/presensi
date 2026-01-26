@@ -6,6 +6,7 @@ use App\Livewire\Forms\DispensasiForm;
 use App\Models\M_DataKaryawan;
 use App\Models\M_Dispensation;
 use App\Models\M_Presensi;
+use App\Traits\CutoffPayrollTrait;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +20,7 @@ use Livewire\WithPagination;
 
 class Dispensasi extends Component
 {
+    use CutoffPayrollTrait;
     use WithFileUploads;
     use WithPagination, WithoutUrlPagination;
     protected $paginationTheme = 'bootstrap';
@@ -254,10 +256,25 @@ class Dispensasi extends Component
             $query->where('status', (int) $this->filterPengajuan);
         }
 
-        // 🔹 Filter Bulan
         if (!empty($this->filterBulan)) {
-            $query->where('date', 'like', $this->filterBulan . '%');
+            $year  = Carbon::parse($this->filterBulan)->year;
+            $month = Carbon::parse($this->filterBulan)->month;
+        } else {
+            $year  = now()->year;
+            $month = now()->month;
         }
+
+        // resolve cutoff 26–25
+        $cutoff = $this->resolveCutoff($year, $month, 'cutoff_25');
+
+        $cutoffStart = $cutoff['start'];
+        $cutoffEnd   = $cutoff['end'];
+
+        // 🔹 Filter Bulan
+        $query->whereBetween('date', [
+            $cutoffStart->toDateTimeString(),
+            $cutoffEnd->toDateTimeString(),
+        ]);
 
         // 🔹 Search
         if ($this->search) {
