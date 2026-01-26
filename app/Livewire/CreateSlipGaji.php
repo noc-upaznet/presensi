@@ -709,13 +709,13 @@ class CreateSlipGaji extends Component
 
         $this->hitungInovationReward();
 
-        // if (in_array($propertyName, ['transport', 'transport_jumlah'])) {
-        //     $this->transport_total = (float)$this->transport * (float)$this->transport_jumlah;
-        // }
+        if (in_array($propertyName, ['transport', 'transport_jumlah'])) {
+            $this->transport_total = (float)$this->transport * (float)$this->transport_jumlah;
+        }
 
-        // if (in_array($propertyName, ['uang_makan', 'uang_makan_jumlah'])) {
-        //     $this->uang_makan_total = (float)$this->uang_makan * (float)$this->uang_makan_jumlah;
-        // }
+        if (in_array($propertyName, ['uang_makan', 'uang_makan_jumlah'])) {
+            $this->uang_makan_total = (float)$this->uang_makan * (float)$this->uang_makan_jumlah;
+        }
 
         // Hitung otomatis kalau dua komponen utama sudah > 0
         if ($gaji > 0 || $tunjangan > 0) {
