@@ -352,11 +352,6 @@ class CreateSlipGaji extends Component
         $this->hitungTotalGaji();
     }
 
-    // private function maxHariHadir()
-    // {
-    //     return 21;
-    // }
-
     public function setCutoffPeriode()
     {
         $cutoff = $this->resolveCutoff(
@@ -525,7 +520,8 @@ class CreateSlipGaji extends Component
         }
         // SPV UNR
         elseif ($this->isSalesPositionSpv()) {
-            $this->insentif = 10000 * ((int) ($this->jml_psb ?? 0));
+            $nominalPerPsb = ((int) ($this->jml_psb ?? 0)) >= 100 ? 15000 : 10000;
+            $this->insentif = $nominalPerPsb * ((int) ($this->jml_psb ?? 0));
         }
         // SPV UGR
         elseif ($this->isSalesPositionSpvUGR()) {
