@@ -183,17 +183,7 @@ class EditPayroll extends Component
             ->whereBetween('tanggal', [
                 $this->cutoffStart->toDateString(),
                 $this->cutoffEnd->toDateString(),
-            ])
-            // ->where(function ($q) {
-            //     $q->where(function ($q1) {
-            //         $q1->where('lokasi_lock', 0)
-            //             ->where('approve', 1);
-            //     })->orWhere(function ($q2) {
-            //         $q2->where('lokasi_lock', 1)
-            //             ->where('approve', 0);
-            //     });
-            // })
-            ->count();
+            ])->count();
 
         // dd($terlambat);
 
@@ -267,7 +257,6 @@ class EditPayroll extends Component
                 - $cuti
                 - (0.5 * $izinSetengahHari)
                 - (0.5 * $izinSetengahHariPagi)
-                - (0.5 * $izinSetengahHariSiang)
                 - (0.5 * $izinSetengahHariSiang)
                 - (0.5 * $KonterizinSetengahHariPagi)
         );
