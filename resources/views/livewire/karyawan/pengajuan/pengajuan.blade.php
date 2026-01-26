@@ -119,10 +119,11 @@
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        <label>Show <select class="form-select form-select-sm d-inline-block w-auto">
-                                <option>5</option>
-                                <option>10</option>
-                                <option>20</option>
+                        <label>Show <select class="form-select form-select-sm d-inline-block w-auto"
+                                wire:model.live="perPage">
+                                <option selected>25</option>
+                                <option>50</option>
+                                <option>100</option>
                             </select> entries per page</label>
                     </div>
                     <div>

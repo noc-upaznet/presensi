@@ -33,6 +33,7 @@ class Pengajuan extends Component
     public $search;
     public $tanggal;
     public $keterangan;
+    public int $perPage = 25;
 
     public function mount()
     {
@@ -383,7 +384,7 @@ class Pengajuan extends Component
             });
         }
 
-        $pengajuan = $query->orderBy('tanggal', 'desc')->paginate(10);
+        $pengajuan = $query->orderBy('tanggal', 'desc')->paginate($this->perPage);
 
         return view('livewire.karyawan.pengajuan.pengajuan', [
             'pengajuans' => $pengajuan,

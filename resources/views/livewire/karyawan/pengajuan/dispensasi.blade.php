@@ -90,12 +90,6 @@
             @endhasanyrole
             @role('admin')
                 <div class="d-flex gap-2">
-                    {{-- <select class="form-select" wire:model.lazy="selectedKaryawan" style="width: 200px;">
-                        <option value="">Pilih Karyawan</option>
-                        @foreach ($karyawanList as $karyawan)
-                            <option value="{{ $karyawan->nama_karyawan }}">{{ $karyawan->nama_karyawan }}</option>
-                        @endforeach
-                    </select> --}}
                     <select class="form-select" wire:model.lazy="filterPengajuan" style="width: 150px;">
                         <option value="">Pilih Status</option>
                         <option value="0">Menunggu</option>
@@ -112,15 +106,16 @@
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        {{-- <label>
-                            Show 
-                            <select wire:model="perPage" class="form-select form-select-sm d-inline-block w-auto">
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                            </select> 
+                        <label>
+                            Show
+                            <select wire:model="perPage" class="form-select form-select-sm d-inline-block w-auto"
+                                wire:model.live="perPage">
+                                <option>25</option>
+                                <option>50</option>
+                                <option>100</option>
+                            </select>
                             entries per page
-                        </label> --}}
+                        </label>
                     </div>
                     <div>
                         <input type="text" class="form-control form-control-sm rounded-end-0" placeholder="Tanggal"

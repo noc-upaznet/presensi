@@ -29,6 +29,7 @@ class PengajuanLembur extends Component
     public $selectedKaryawan = '';
     public $status = [];
     public $search;
+    public int $perPage = 25;
 
     public function mount()
     {
@@ -346,7 +347,7 @@ class PengajuanLembur extends Component
             });
         }
 
-        $pengajuanLembur = $query->orderBy('tanggal', 'desc')->paginate(10);
+        $pengajuanLembur = $query->orderBy('tanggal', 'desc')->paginate($this->perPage);
 
         return view('livewire.karyawan.pengajuan.pengajuan-lembur', [
             'pengajuanLembur' => $pengajuanLembur,

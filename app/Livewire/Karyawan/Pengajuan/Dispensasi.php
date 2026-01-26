@@ -31,6 +31,7 @@ class Dispensasi extends Component
     public $search;
     public $editId;
     public $oldFile;
+    public int $perPage = 25;
 
     public function mount()
     {
@@ -284,7 +285,7 @@ class Dispensasi extends Component
             });
         }
 
-        $pengajuanDispens = $query->latest()->paginate(25);
+        $pengajuanDispens = $query->latest()->paginate($this->perPage);
 
         $tanggalList = $pengajuanDispens->pluck('date')->unique();
 
