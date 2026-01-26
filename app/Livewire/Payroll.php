@@ -345,6 +345,7 @@ class Payroll extends Component
         }
 
         $dataQuery = PayrollModel::with('getKaryawan')
+            ->whereHas('getKaryawan')
             ->where('entitas_id', $entitasIdAktif)
             ->where('titip', 0)
             ->when($this->selectedStatus !== null && $this->selectedStatus !== '', function ($q) {
