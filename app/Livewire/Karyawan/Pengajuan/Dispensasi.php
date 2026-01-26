@@ -35,7 +35,13 @@ class Dispensasi extends Component
 
     public function mount()
     {
-        $this->filterBulan = date('Y-m');
+        $today = Carbon::today();
+
+        if ($today->day >= 26) {
+            $this->filterBulan = $today->addMonth()->format('Y-m');
+        } else {
+            $this->filterBulan = $today->format('Y-m');
+        }
     }
 
     public function showAdd()

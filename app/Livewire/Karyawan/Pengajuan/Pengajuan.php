@@ -43,7 +43,13 @@ class Pengajuan extends Component
         }
         // Ambil semua status unik dari database
         $this->status = M_Pengajuan::select('status')->distinct()->get();
-        $this->filterBulan = now()->format('Y-m');
+        $today = Carbon::today();
+
+        if ($today->day >= 26) {
+            $this->filterBulan = $today->addMonth()->format('Y-m');
+        } else {
+            $this->filterBulan = $today->format('Y-m');
+        }
         $entitas = session('selected_entitas', 'UHO');
         $this->karyawanList = M_DataKaryawan::where('entitas', $entitas)
             ->orderBy('nama_karyawan')
