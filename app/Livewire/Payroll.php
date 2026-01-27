@@ -121,6 +121,7 @@ class Payroll extends Component
                     $item->voucher +
                     $item->tunjangan_kebudayaan +
                     $item->terlambat +
+                    $item->kasbon +
                     $totalPotongan;
             });
 
