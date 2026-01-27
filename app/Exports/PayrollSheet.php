@@ -150,7 +150,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 + ($item->uang_makan ?? 0)
                 + ($item->fee_sharing ?? 0)
                 + ($item->insentif ?? 0)
-                + ($item->voucher ?? 0)
+                // + ($item->voucher ?? 0)
                 + ($item->inov_reward ?? 0);
             // dd($pendapatan);
 
