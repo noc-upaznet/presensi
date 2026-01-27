@@ -107,18 +107,23 @@ class Payroll extends Component
             ->where('periode', $this->periode)
             ->get()
             ->sum(function ($item) {
-                $totalPotongan = collect($item->potongan ?? [])
-                    ->sum(fn($p) => (int) ($p['nominal'] ?? 0));
 
+                $potongan = is_string($item->potongan)
+                    ? json_decode($item->potongan, true)
+                    : $item->potongan;
+
+                $totalPotongan = collect($potongan ?? [])
+                    ->sum(fn($p) => (int) ($p['nominal'] ?? 0));
                 return
                     $item->total_gaji +
                     $item->bpjs +
                     $item->bpjs_jht +
                     $item->voucher +
                     $item->tunjangan_kebudayaan +
-                    $item->terlambat -
+                    $item->terlambat +
                     $totalPotongan;
             });
+
 
         $this->total_gaji = $totalGaji;
 
