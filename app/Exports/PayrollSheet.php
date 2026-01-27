@@ -179,7 +179,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $row[] = $totalGaji;
 
             foreach ($row as $i => $val) {
-                if (is_numeric($val)) {
+                if (is_numeric($val) && $i !== 2) {
                     $totals[$i] = ($totals[$i] ?? 0) + $val;
                 }
             }
