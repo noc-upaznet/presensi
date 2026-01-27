@@ -105,8 +105,20 @@ class Payroll extends Component
         $karyawanIds = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
         $totalGaji = PayrollModel::whereIn('karyawan_id', $karyawanIds)
             ->where('periode', $this->periode)
-            ->selectRaw('SUM(total_gaji + bpjs + bpjs_jht + voucher + tunjangan_kebudayaan + terlambat) as total')
-            ->value('total') ?? 0;
+            ->get()
+            ->sum(function ($item) {
+                $totalPotongan = collect($item->potongan ?? [])
+                    ->sum(fn($p) => (int) ($p['nominal'] ?? 0));
+
+                return
+                    $item->total_gaji +
+                    $item->bpjs +
+                    $item->bpjs_jht +
+                    $item->voucher +
+                    $item->tunjangan_kebudayaan +
+                    $item->terlambat -
+                    $totalPotongan;
+            });
 
         $this->total_gaji = $totalGaji;
 
