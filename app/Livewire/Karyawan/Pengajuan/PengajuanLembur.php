@@ -41,11 +41,18 @@ class PengajuanLembur extends Component
         $this->status = M_Lembur::select('status')->distinct()->get();
         $today = Carbon::today();
 
+        $year  = $today->year;
+        $month = $today->month;
+
         if ($today->day >= 26) {
-            $this->filterBulan = $today->addMonth()->format('Y-m');
-        } else {
-            $this->filterBulan = $today->format('Y-m');
+            $month++;
+            if ($month > 12) {
+                $month = 1;
+                $year++;
+            }
         }
+
+        $this->filterBulan = sprintf('%04d-%02d', $year, $month);
 
         $entitas = session('selected_entitas', 'UHO');
         $this->karyawanList = M_DataKaryawan::where('entitas', $entitas)
@@ -254,14 +261,14 @@ class PengajuanLembur extends Component
         // Ambil nama entitas dari session
         $entitas = session('selected_entitas', 'UHO');
 
-        // 🔹 User biasa → hanya lemburnya sendiri
+        // User biasa → hanya lemburnya sendiri
         if ($user->hasRole('user')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
                 $query->where('karyawan_id', $dataKaryawan->id);
             }
 
-            // 🔹 Admin → semua karyawan dalam entitas terpilih
+            // Admin → semua karyawan dalam entitas terpilih
         } elseif ($user->hasRole('admin')) {
             $entitasModel = \App\Models\M_Entitas::where('nama', $entitas)->first();
             if ($entitasModel) {
@@ -269,7 +276,7 @@ class PengajuanLembur extends Component
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
 
-            // 🔹 SPV → hanya karyawan dengan divisi + entitas sama
+            // SPV → hanya karyawan dengan divisi + entitas sama
         } elseif ($user->hasRole('spv')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
@@ -302,7 +309,7 @@ class PengajuanLembur extends Component
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
 
-            // 🔹 HR → semua karyawan dari semua entitas
+            // HR → semua karyawan dari semua entitas
         } elseif ($user->hasRole('hr')) {
             $entitasModel = \App\Models\M_Entitas::where('nama', $entitas)->first();
             if ($entitasModel) {
@@ -320,7 +327,7 @@ class PengajuanLembur extends Component
             $query->where('karyawan_id', $this->selectedKaryawan);
         });
 
-        // 🔹 Filter status pengajuan
+        // Filter status pengajuan
         if (in_array($this->filterPengajuan, ['0', '1', '2'], true)) {
             $query->where('status', (int) $this->filterPengajuan);
         }
@@ -339,13 +346,13 @@ class PengajuanLembur extends Component
         $cutoffStart = $cutoff['start'];
         $cutoffEnd   = $cutoff['end'];
 
-        // 🔹 Filter Bulan
+        // Filter Bulan
         $query->whereBetween('tanggal', [
             $cutoffStart->toDateTimeString(),
             $cutoffEnd->toDateTimeString(),
         ]);
 
-        // 🔹 Search
+        // Search
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('tanggal', 'like', '%' . $this->search . '%')

@@ -45,11 +45,19 @@ class Pengajuan extends Component
         $this->status = M_Pengajuan::select('status')->distinct()->get();
         $today = Carbon::today();
 
+        $year  = $today->year;
+        $month = $today->month;
+
         if ($today->day >= 26) {
-            $this->filterBulan = $today->addMonth()->format('Y-m');
-        } else {
-            $this->filterBulan = $today->format('Y-m');
+            $month++;
+            if ($month > 12) {
+                $month = 1;
+                $year++;
+            }
         }
+
+        $this->filterBulan = sprintf('%04d-%02d', $year, $month);
+
         $entitas = session('selected_entitas', 'UHO');
         $this->karyawanList = M_DataKaryawan::where('entitas', $entitas)
             ->orderBy('nama_karyawan')
@@ -357,7 +365,7 @@ class Pengajuan extends Component
             $query->where('karyawan_id', $this->selectedKaryawan);
         });
 
-        // 🔹 Filter Status
+        // Filter Status
         if (in_array($this->filterPengajuan, ['0', '1', '2'], true)) {
             $query->where('status', (int) $this->filterPengajuan);
         }
@@ -376,13 +384,13 @@ class Pengajuan extends Component
         $cutoffStart = $cutoff['start'];
         $cutoffEnd   = $cutoff['end'];
 
-        // 🔹 Filter Bulan
+        // Filter Bulan
         $query->whereBetween('tanggal', [
             $cutoffStart->toDateTimeString(),
             $cutoffEnd->toDateTimeString(),
         ]);
 
-        // 🔹 Search
+        // Search
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('id', 'like', '%' . $this->search . '%')

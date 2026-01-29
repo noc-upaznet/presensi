@@ -35,13 +35,20 @@ class Dispensasi extends Component
 
     public function mount()
     {
-        $today = Carbon::today();
+        $today = now();
+
+        $year  = $today->year;
+        $month = $today->month;
 
         if ($today->day >= 26) {
-            $this->filterBulan = $today->addMonth()->format('Y-m');
-        } else {
-            $this->filterBulan = $today->format('Y-m');
+            $month++;
+            if ($month > 12) {
+                $month = 1;
+                $year++;
+            }
         }
+
+        $this->filterBulan = sprintf('%04d-%02d', $year, $month);
     }
 
     public function showAdd()
@@ -241,24 +248,24 @@ class Dispensasi extends Component
         $user = Auth::user();
         $entitas = session('selected_entitas', 'UHO'); // default ke 'UHO'
 
-        // 🔹 User biasa → hanya lihat datanya sendiri
+        // User biasa → hanya lihat datanya sendiri
         if ($user->hasRole('user|branch-manager|spv')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
             if ($dataKaryawan) {
                 $query->where('karyawan_id', $dataKaryawan->id);
             }
 
-            // 🔹 Admin → semua karyawan di entitas
+            // Admin → semua karyawan di entitas
         } elseif ($user->hasRole('admin')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
-            // 🔹 HR → semua karyawan semua entitas
+            // HR → semua karyawan semua entitas
         } elseif ($user->hasRole('hr')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
         }
 
-        // 🔹 Filter Status
+        // Filter Status
         if (in_array($this->filterPengajuan, ['0', '1', '2'], true)) {
             $query->where('status', (int) $this->filterPengajuan);
         }
@@ -277,13 +284,13 @@ class Dispensasi extends Component
         $cutoffStart = $cutoff['start'];
         $cutoffEnd   = $cutoff['end'];
 
-        // 🔹 Filter Bulan
+        // Filter Bulan
         $query->whereBetween('date', [
             $cutoffStart->toDateTimeString(),
             $cutoffEnd->toDateTimeString(),
         ]);
 
-        // 🔹 Search
+        // Search
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('id', 'like', '%' . $this->search . '%')
