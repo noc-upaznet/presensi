@@ -49,7 +49,7 @@ class SideNavigation extends Component
                         $countPengajuan = M_Pengajuan::whereNull('approve_spv')
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
-                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
+                            ->whereHas('getKaryawan', function ($q) use ($divisi, $cutoff) {
                                 $q->where('divisi', $divisi)
                                     ->whereBetween('tanggal', [
                                         $cutoff['start'],
@@ -61,7 +61,7 @@ class SideNavigation extends Component
                         $countPengajuan = M_Pengajuan::whereNull('approve_spv')
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
-                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
+                            ->whereHas('getKaryawan', function ($q) use ($divisi, $cutoff) {
                                 $q->where(function ($subQ) use ($divisi) {
                                     $subQ->where('divisi', $divisi)
                                         ->where('entitas', 'UNR');
@@ -90,7 +90,7 @@ class SideNavigation extends Component
                         $countLembur = M_Lembur::where('approve_spv', 0)
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
-                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
+                            ->whereHas('getKaryawan', function ($q) use ($divisi, $cutoff) {
                                 $q->where('divisi', $divisi)
                                     ->whereBetween('tanggal', [
                                         $cutoff['start'],
@@ -102,8 +102,8 @@ class SideNavigation extends Component
                         $countLembur = M_Lembur::whereNull('approve_spv')
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
-                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
-                                $q->where(function ($subQ) use ($divisi) {
+                            ->whereHas('getKaryawan', function ($q) use ($divisi, $cutoff) {
+                                $q->where(function ($subQ) use ($divisi, $cutoff) {
                                     $subQ->where('divisi', $divisi)
                                         ->where('entitas', 'UNR');
                                 })->orWhere('entitas', 'MC');
