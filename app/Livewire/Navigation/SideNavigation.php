@@ -10,11 +10,14 @@ use App\Models\M_Pengajuan;
 use App\Models\M_DataKaryawan;
 use App\Models\M_Dispensation;
 use App\Models\M_Sharing;
+use App\Traits\CutoffPayrollTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class SideNavigation extends Component
 {
+    use CutoffPayrollTrait;
+
     public function render()
     {
         $user = Auth::user();
@@ -23,6 +26,8 @@ class SideNavigation extends Component
         $countPresensiStaff = 0;
         $countDispensasi = 0;
         $countFeeSharing = 0;
+
+        $cutoff = $this->resolveCutoff(now()->year, now()->month, 'cutoff_25');
 
         if ($user) {
             // 🔹 SPV
@@ -46,7 +51,10 @@ class SideNavigation extends Component
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
                             ->whereHas('getKaryawan', function ($q) use ($divisi) {
                                 $q->where('divisi', $divisi)
-                                    ->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%');
+                                    ->whereBetween('tanggal', [
+                                        $cutoff['start'],
+                                        $cutoff['end'],
+                                    ]);
                             })
                             ->count();
                     } else if ($divisi == 'Finance' && $entitasIdSaatIni == 'UNR') {
@@ -58,7 +66,10 @@ class SideNavigation extends Component
                                     $subQ->where('divisi', $divisi)
                                         ->where('entitas', 'UNR');
                                 })->orWhere('entitas', 'MC');
-                                $q->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%');
+                                $q->whereBetween('tanggal', [
+                                    $cutoff['start'],
+                                    $cutoff['end'],
+                                ]);
                             })
                             ->count();
                     } else {
@@ -67,7 +78,10 @@ class SideNavigation extends Component
                             ->whereIn('karyawan_id', $karyawanIds)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
                             ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
-                            ->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%')
+                            ->whereBetween('tanggal', [
+                                $cutoff['start'],
+                                $cutoff['end'],
+                            ])
                             ->count();
                     }
 
@@ -78,7 +92,10 @@ class SideNavigation extends Component
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
                             ->whereHas('getKaryawan', function ($q) use ($divisi) {
                                 $q->where('divisi', $divisi)
-                                    ->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%');
+                                    ->whereBetween('tanggal', [
+                                        $cutoff['start'],
+                                        $cutoff['end'],
+                                    ]);
                             })
                             ->count();
                     } else if ($divisi == 'Finance' && $entitasIdSaatIni == 'UNR') {
@@ -90,7 +107,10 @@ class SideNavigation extends Component
                                     $subQ->where('divisi', $divisi)
                                         ->where('entitas', 'UNR');
                                 })->orWhere('entitas', 'MC');
-                                $q->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%');
+                                $q->whereBetween('tanggal', [
+                                    $cutoff['start'],
+                                    $cutoff['end'],
+                                ]);
                             })
                             ->count();
                         // dd($countLembur);
@@ -100,7 +120,10 @@ class SideNavigation extends Component
                             ->whereIn('karyawan_id', $karyawanIds)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
                             ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
-                            ->where('tanggal', 'like', Carbon::now()->format('Y-m') . '%')
+                            ->whereBetween('tanggal', [
+                                $cutoff['start'],
+                                $cutoff['end'],
+                            ])
                             ->count();
                     }
 
@@ -123,8 +146,10 @@ class SideNavigation extends Component
                                 $q->where('entitas', $entitasIdSaatIni)
                                     ->where('divisi', $dataKaryawan->divisi)
                             )
-                            ->whereMonth('tanggal', Carbon::now()->month)
-                            ->whereYear('tanggal', Carbon::now()->year)
+                            ->whereBetween('tanggal', [
+                                $cutoff['start'],
+                                $cutoff['end'],
+                            ])
                             ->count();
                     }
                     // dd($countPresensiStaff);
@@ -142,6 +167,7 @@ class SideNavigation extends Component
                 if ($dataKaryawan) {
                     // dd($entitas);
                     // Pengajuan
+
                     $countPengajuan = M_Pengajuan::where(function ($q) {
                         $q->where('approve_spv', 1)
                             ->orWhereNull('approve_spv');
@@ -150,9 +176,12 @@ class SideNavigation extends Component
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
-                        ->whereMonth('tanggal', Carbon::now()->month)
-                        ->whereYear('tanggal', Carbon::now()->year)
+                        ->whereBetween('tanggal', [
+                            $cutoff['start'],
+                            $cutoff['end'],
+                        ])
                         ->count();
+                    // dd($countPengajuan);
 
                     // Lembur
                     $countLembur = M_Lembur::where(function ($q) {
@@ -163,24 +192,30 @@ class SideNavigation extends Component
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
-                        ->whereMonth('tanggal', Carbon::now()->month)
-                        ->whereYear('tanggal', Carbon::now()->year)
+                        ->whereBetween('tanggal', [
+                            $cutoff['start'],
+                            $cutoff['end'],
+                        ])
                         ->count();
 
                     $countDispensasi = M_Dispensation::where('approve_hr', 0)
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
-                        ->whereMonth('date', Carbon::now()->month)
-                        ->whereYear('date', Carbon::now()->year)
+                        ->whereBetween('date', [
+                            $cutoff['start'],
+                            $cutoff['end'],
+                        ])
                         ->count();
 
                     $countFeeSharing = M_Sharing::where('approve_hr', 0)
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
-                        ->whereMonth('date', Carbon::now()->month)
-                        ->whereYear('date', Carbon::now()->year)
+                        ->whereBetween('date', [
+                            $cutoff['start'],
+                            $cutoff['end'],
+                        ])
                         ->count();
                     // dd($countDispensasi);
                 } else {
@@ -198,24 +233,25 @@ class SideNavigation extends Component
 
                 $countPengajuan = M_Pengajuan::whereNull('approve_admin')
                     ->where('status', 0)
-                    ->whereMonth('tanggal', now()->month)
-                    ->whereYear('tanggal', now()->year)
+                    ->whereBetween('tanggal', [
+                        $cutoff['start'],
+                        $cutoff['end'],
+                    ])
                     ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
                         $q->where('entitas', $entitasIdSaatIni);
                     })
-                    ->whereMonth('tanggal', Carbon::now()->month)
-                    ->whereYear('tanggal', Carbon::now()->year)
                     ->count();
+                // dd($countPengajuan);
 
                 $countLembur = M_Lembur::whereNull('approve_admin')
                     ->where('status', 0)
-                    ->whereMonth('tanggal', now()->month)
-                    ->whereYear('tanggal', now()->year)
+                    ->whereBetween('tanggal', [
+                        $cutoff['start'],
+                        $cutoff['end'],
+                    ])
                     ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
                         $q->where('entitas', $entitasIdSaatIni);
                     })
-                    ->whereMonth('tanggal', Carbon::now()->month)
-                    ->whereYear('tanggal', Carbon::now()->year)
                     ->count();
             }
         }

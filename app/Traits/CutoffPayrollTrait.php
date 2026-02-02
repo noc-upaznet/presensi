@@ -22,14 +22,12 @@ trait CutoffPayrollTrait
             $year == now()->year &&
             $month == now()->month &&
             now()->day <= 25
-        ) {
-            $cutoffEnd = now();
-        }
+        )
 
-        $cutoffStart = $cutoffEnd->copy()
-            ->subMonthNoOverflow()
-            ->setDay(26)
-            ->startOfDay();
+            $cutoffStart = $cutoffEnd->copy()
+                ->subMonthNoOverflow()
+                ->setDay(26)
+                ->startOfDay();
 
         return [
             'start'      => $cutoffStart,
