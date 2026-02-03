@@ -50,6 +50,7 @@
                                 <option value="PKWT Kontrak">PKWT Kontrak</option>
                                 <option value="Probation">Probation</option>
                                 <option value="OJT">OJT</option>
+                                <option value="NONAKTIF">NONAKTIF</option>
                             </select>
                         </div>
                     </div>

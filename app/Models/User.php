@@ -27,6 +27,7 @@ class User extends Authenticatable
         'current_role',
         'password_expired',
         'branch_id',
+        'status',
     ];
 
     /**

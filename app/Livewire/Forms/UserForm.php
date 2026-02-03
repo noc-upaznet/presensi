@@ -30,4 +30,6 @@ class UserForm extends Form
 
     #[Validate('required', 'Branches')]
     public $user_branches;
+
+    public $status;
 }

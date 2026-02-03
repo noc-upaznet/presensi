@@ -207,6 +207,7 @@
                                     <option value="PKWT Kontrak">PKWT Kontrak</option>
                                     <option value="Probation">Probation</option>
                                     <option value="OJT">OJT</option>
+                                    <option value="NONAKTIF">NONAKTIF</option>
                                 </select>
                                 @error('form.status_karyawan')
                                     <span class="text-danger">{{ $message }}</span>

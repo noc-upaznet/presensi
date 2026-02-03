@@ -193,43 +193,6 @@ class DataKaryawan extends Component
         );
     }
 
-
-    // public function render()
-    // {
-    //     $query = M_DataKaryawan::query();
-
-    //     // Ambil entitas yang dipilih dari session, default ke 'UHO'
-    //     $selectedEntitas = session('selected_entitas', 'UHO');
-
-    //     // Filter berdasarkan entitas jika bukan 'All'
-    //     if ($selectedEntitas !== 'All') {
-    //         $query->where('entitas', $selectedEntitas);
-    //     }
-
-    //     if (in_array($this->filterStatus, ['PKWT Kontrak', 'Probation', 'OJT'], true)) {
-    //         $query->where('status_karyawan', $this->filterStatus);
-    //     }
-
-    //     if ($this->search) {
-    //         $datas = $query
-    //             ->where(function ($q) {
-    //                 $q->where('nama_karyawan', 'like', '%' . $this->search . '%')
-    //                     ->orWhere('status_karyawan', 'like', '%' . $this->search . '%')
-    //                     ->orWhere('entitas', 'like', '%' . $this->search . '%')
-    //                     ->orWhere('divisi', 'like', '%' . $this->search . '%');
-    //             })
-    //             ->latest()
-    //             ->paginate($this->perPage);
-    //     } else {
-    //         $datas = $query
-    //             ->orderBy('nip_karyawan', 'asc')
-    //             ->paginate($this->perPage);
-    //     }
-    //     return view('livewire.karyawan.data-karyawan', [
-    //         'datas' => $datas,
-    //     ]);
-    // }
-
     public function render()
     {
         $query = M_DataKaryawan::query();
@@ -255,7 +218,7 @@ class DataKaryawan extends Component
             }
         }
 
-        if (in_array($this->filterStatus, ['PKWT Kontrak', 'Probation', 'OJT'], true)) {
+        if (in_array($this->filterStatus, ['PKWT Kontrak', 'Probation', 'OJT', 'NONAKTIF'], true)) {
             $query->where('status_karyawan', $this->filterStatus);
         }
 

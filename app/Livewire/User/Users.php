@@ -42,7 +42,8 @@ class Users extends Component
             'name' => $this->form->name,
             'email' => $this->form->email,
             'password' => bcrypt($this->form->password),
-            'branch_id' => M_Entitas::where('nama', session('selected_entitas', 'UHO'))->value('id')
+            'branch_id' => M_Entitas::where('nama', session('selected_entitas', 'UHO'))->value('id'),
+            'status' => $this->form->status
         ];
         // dd($data);
         // dd([
@@ -83,13 +84,15 @@ class Users extends Component
             'name' => 'required',
             'email' => 'required|email',
             'user_roles' => 'required',
-            'user_branches' => 'required'
+            'user_branches' => 'required',
+            'status' => 'required'
         ]);
 
         $user = User::find($this->form->id);
         $user->update([
             'name' => $this->form->name,
             'email' => $this->form->email,
+            'status' => $this->form->status
         ]);
 
         $user->syncRoles($this->form->user_roles);
