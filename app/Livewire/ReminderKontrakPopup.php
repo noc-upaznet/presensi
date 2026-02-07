@@ -150,33 +150,33 @@ class ReminderKontrakPopup extends Component
             return;
         }
 
-        $lastNotif = DatabaseNotification::where('notifiable_id', $userId)
-            ->where('type', NotifKontrak::class)
-            ->whereJsonContains('data->karyawan_id', $karyawan->id)
-            ->whereNull('read_at')
-            ->latest('created_at')
-            ->first();
+        $sisaHari = today()->diffInDays($karyawan->tgl_keluar, false);
 
-        if ($lastNotif && Carbon::parse($lastNotif->created_at)->diffInDays(now()) < 7) {
+        if (!in_array($sisaHari, [30, 7])) {
             return;
         }
 
-        $exists = DatabaseNotification::where('notifiable_id', $userId)
+        // cek notif BELUM dibaca untuk fase hari ini
+        $existsUnread = DatabaseNotification::where('notifiable_id', $userId)
             ->where('type', NotifKontrak::class)
             ->whereJsonContains('data->karyawan_id', $karyawan->id)
+            ->whereJsonContains('data->sisa_hari', $sisaHari)
             ->whereNull('read_at')
             ->exists();
 
-        if (!$exists) {
-            auth()->user()->notify(new NotifKontrak([
-                'karyawan_id' => $karyawan->id,
-                'nama'        => $karyawan->nama_karyawan,
-                'entitas'     => $karyawan->entitas,
-                'status'      => $karyawan->status_karyawan,
-                'tgl_keluar'  => $karyawan->tgl_keluar,
-                'sisa_hari'   => today()->diffInDays($karyawan->tgl_keluar),
-            ]));
+        if ($existsUnread) {
+            return;
         }
+
+        // kirim notif baru
+        auth()->user()->notify(new NotifKontrak([
+            'karyawan_id' => $karyawan->id,
+            'nama'        => $karyawan->nama_karyawan,
+            'entitas'     => $karyawan->entitas,
+            'status'      => $karyawan->status_karyawan,
+            'tgl_keluar'  => $karyawan->tgl_keluar,
+            'sisa_hari'   => $sisaHari,
+        ]));
 
         $this->dispatch('kontrak-reminder');
     }
