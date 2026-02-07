@@ -153,6 +153,7 @@ class ReminderKontrakPopup extends Component
         $lastNotif = DatabaseNotification::where('notifiable_id', $userId)
             ->where('type', NotifKontrak::class)
             ->whereJsonContains('data->karyawan_id', $karyawan->id)
+            ->whereNull('read_at')
             ->latest('created_at')
             ->first();
 
@@ -163,6 +164,7 @@ class ReminderKontrakPopup extends Component
         $exists = DatabaseNotification::where('notifiable_id', $userId)
             ->where('type', NotifKontrak::class)
             ->whereJsonContains('data->karyawan_id', $karyawan->id)
+            ->whereNull('read_at')
             ->exists();
 
         if (!$exists) {
