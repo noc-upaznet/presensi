@@ -89,9 +89,13 @@ class M_Pengajuan extends Model
         }
 
         // Hanya kalau pengaju punya role HR
-        // if (! $this->pengajuRole('hr')) {
-        //     return false;
-        // }
+        if (! $this->pengajuRole('hr')) {
+            return false;
+        }
+
+        if ($this->status != 0) {
+            return false;
+        }
 
         // Hanya kalau belum diapprove admin
         return is_null($this->approve_admin);
