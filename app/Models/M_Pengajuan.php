@@ -93,7 +93,7 @@ class M_Pengajuan extends Model
             return false;
         }
 
-        if ($this->status != 0) {
+        if ($this->status == 0) {
             return false;
         }
 
