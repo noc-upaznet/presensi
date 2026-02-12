@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.jadwal-shift' => \App\Http\Middleware\PermissionPage::class,
             'check.manage-user' => \App\Http\Middleware\PermissionPage::class,
             'check.dashboard-view' => \App\Http\Middleware\PermissionPage::class,
+            'check.kasbon-view' => \App\Http\Middleware\PermissionPage::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

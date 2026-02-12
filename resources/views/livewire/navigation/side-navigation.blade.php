@@ -287,7 +287,7 @@
                     <li class="nav-item menu-open">
                         <a href="#" class="nav-link active">
                             <i class="bi bi-calendar-range"></i>
-                            <p>Mange Jadwal<i class="nav-arrow bi bi-chevron-right"></i></p>
+                            <p>Manage Jadwal<i class="nav-arrow bi bi-chevron-right"></i></p>
                         </a>
                         <ul class="nav nav-treeview" style="margin-left: 20px;">
                             <li class="nav-item">
@@ -397,7 +397,7 @@
                         </a>
                     </li>
                 @endhasanyrole
-                @role('admin')
+                @role('admin|hr')
                     @can('manage-user')
                         <li class="nav-item">
                             <a href="{{ route('manage-user') }}"
