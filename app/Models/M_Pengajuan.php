@@ -93,21 +93,11 @@ class M_Pengajuan extends Model
         //     return false;
         // }
 
-        if ($this->status == 0) {
-            return true;
+        elseif ($this->status != 0) {
+            return false;
         }
 
         // Hanya kalau belum diapprove admin
         return is_null($this->approve_admin);
-    }
-
-    public function canBeDeletedByAdmin()
-    {
-        return Auth::user()->current_role === 'admin';
-    }
-
-    public function canBeDeletedBySPV()
-    {
-        return Auth::user()->current_role === 'spv';
     }
 }
