@@ -110,5 +110,5 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/sharing', Sharing::class)->name('sharing');
     Route::get('/question-bank', QuestionBank::class)->name('question-bank');
     Route::get('/notifikasi', ListNotifikations::class)->name('notifikasi');
-    Route::get('/kasbon', Kasbon::class)->name('kasbon');
+    Route::get('/kasbon', Kasbon::class)->name('kasbon')->middleware('check.kasbon-view');
 });

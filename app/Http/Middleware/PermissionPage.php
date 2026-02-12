@@ -23,6 +23,7 @@ class PermissionPage
             'jadwal-shift-create',
             'manage-user',
             'dashboard-view',
+            'kasbon-view'
         ])) {
             return redirect('/clock-in');
         }
