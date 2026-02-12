@@ -226,7 +226,7 @@ class Pengajuan extends Component
 
         // === Admin approval ===
         if (in_array('admin', $userRoles)) {
-            if (!array_intersect(['hr', 'admin'], $pengajuRoles)) {
+            if (!array_intersect(['hr', 'admin', 'user'], $pengajuRoles)) {
                 $this->dispatch('swal', params: [
                     'title' => 'Tidak Diizinkan',
                     'icon'  => 'error',
