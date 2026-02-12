@@ -160,13 +160,13 @@
                                     <p>Slip Gaji</p>
                                 </a>
                             </li>
-                            {{-- <li class="nav-item">
+                            <li class="nav-item">
                                 <a href="{{ route('kasbon') }}"
                                     class="nav-link {{ request()->routeIs('kasbon') ? 'active' : '' }}">
                                     <i class="nav-icon bi bi-circle"></i>
                                     <p>Kasbon</p>
                                 </a>
-                            </li> --}}
+                            </li>
                             <li class="nav-item">
                                 <a href="{{ route('jenis-tunjangan') }}"
                                     class="nav-link {{ request()->routeIs('jenis-tunjangan') ? 'active' : '' }}">

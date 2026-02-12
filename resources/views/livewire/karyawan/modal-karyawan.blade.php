@@ -309,8 +309,11 @@
                         <div class="mb-3">
                             <label for="total-upah" class="form-label">Total Upah <small
                                     class="text-danger">*</small></label>
-                            <input class="form-control" type="text" id="total-upah"
-                                wire:model.lazy="form.total_upah">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="voucher">Rp.</span>
+                                <input class="form-control" type="text" id="total-upah"
+                                    wire:model.lazy="form.total_upah">
+                            </div>
                             @error('form.total_upah')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -509,7 +512,8 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="tgl-aktif-bpjs" class="form-label">Tanggal Aktif BPJS Kesehatan</label>
+                                <label for="tgl-aktif-bpjs" class="form-label">Tanggal Aktif BPJS
+                                    Kesehatan</label>
                                 <input type="date" class="form-control" id="tgl-aktif-bpjs"
                                     wire:model="form.tgl_aktif_bpjs">
                                 @error('form.tgl_aktif_bpjs')

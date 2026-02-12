@@ -33,6 +33,7 @@ use App\Livewire\Karyawan\TambahPembagianShift;
 use App\Livewire\Karyawan\Shifts\TemplateMingguan;
 use App\Livewire\Karyawan\Pengajuan\PengajuanLembur;
 use App\Livewire\Karyawan\Pengajuan\Sharing;
+use App\Livewire\Kasbon\Kasbon;
 use App\Livewire\ListNotifikations;
 use App\Livewire\ManageUser;
 use App\Livewire\QuestionBank\QuestionBank;
@@ -109,4 +110,5 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/sharing', Sharing::class)->name('sharing');
     Route::get('/question-bank', QuestionBank::class)->name('question-bank');
     Route::get('/notifikasi', ListNotifikations::class)->name('notifikasi');
+    Route::get('/kasbon', Kasbon::class)->name('kasbon');
 });
