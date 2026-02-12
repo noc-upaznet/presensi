@@ -94,7 +94,7 @@ class M_Pengajuan extends Model
         }
 
         if ($this->status == 0) {
-            return false;
+            return true;
         }
 
         // Hanya kalau belum diapprove admin
