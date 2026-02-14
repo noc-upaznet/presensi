@@ -18,6 +18,11 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
 use App\Traits\CutoffPayrollTrait;
 
+use App\Models\Kasbon as KasbonModel;
+use App\Models\KasbonDetail;
+use App\Models\KasbonDetails;
+use App\Models\KasbonModel as ModelsKasbonModel;
+
 class CreateSlipGaji extends Component
 {
     use CutoffPayrollTrait;
@@ -123,6 +128,9 @@ class CreateSlipGaji extends Component
     public $bpjsKaryawan;
     public $voucher;
     public $countLemburLibur = 0;
+
+    public $kasbonAktif = null;
+    public $kasbonPotong = 0;
 
     public function mount($id = null, $month = null, $year = null)
     {
@@ -336,6 +344,15 @@ class CreateSlipGaji extends Component
 
             $this->tunjangan_terpilih = array_column($this->tunjangan, 'nama');
             $this->potongan_terpilih = array_column($this->potongan, 'nama');
+
+            $this->kasbonAktif = ModelsKasbonModel::where('karyawan_id', $dataKaryawanId)
+                ->where('status', 'aktif')
+                ->where('sisa_kasbon', '>', 0)
+                ->orderBy('tanggal_kasbon')
+                ->first();
+
+            $this->kasbonPotong = $this->kasbonAktif?->kasbon_perbulan ?? 0;
+            $this->kasbon = $this->kasbonPotong;
         }
 
         $this->hitungInovationReward();
@@ -1130,6 +1147,30 @@ class CreateSlipGaji extends Component
                 'timer' => 1500
             ]
         );
+
+        // === POTONG KASBON SETELAH SLIP DISIMPAN ===
+        if ($this->kasbonAktif && $this->kasbonPotong > 0) {
+
+            // simpan riwayat potongan
+            KasbonDetails::create([
+                'kasbon_id'       => $this->kasbonAktif->id,
+                'periode'         => $this->bulanTahun . '-01',
+                'nominal_potong'  => $this->kasbonPotong,
+            ]);
+
+            // kurangi sisa kasbon
+            $this->kasbonAktif->sisa_kasbon -= $this->kasbonPotong;
+            $this->kasbonAktif->angsuran_ke += 1;
+
+            // cek lunas
+            if ($this->kasbonAktif->sisa_kasbon <= 0) {
+                $this->kasbonAktif->sisa_kasbon = 0;
+                $this->kasbonAktif->status = 'lunas';
+                $this->kasbonAktif->tanggal_lunas = now();
+            }
+
+            $this->kasbonAktif->save();
+        }
         return redirect()->route('payroll');
     }
 
