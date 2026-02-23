@@ -150,19 +150,16 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 + ($item->uang_makan ?? 0)
                 + ($item->fee_sharing ?? 0)
                 + ($item->insentif ?? 0)
-                // + ($item->voucher ?? 0)
                 + ($item->inov_reward ?? 0);
             // dd($pendapatan);
 
-            // tambah tunjangan dinamis
             foreach ($this->uniqueTunjangan as $nama) {
                 $pendapatan += $tunjanganArray->firstWhere('nama', $nama)['nominal'] ?? 0;
             }
 
             $potongan =
-                ($item->izin ?? 0);
+                ($item->izin ?? 0) + ($item->terlambat ?? 0);
 
-            // tambah potongan dinamis
             $excludePotongan = ['pph 21', 'pph21'];
             foreach ($this->uniquePotongan as $nama) {
                 if (in_array(strtolower($nama), $excludePotongan)) {
@@ -171,9 +168,6 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 $potongan += $potonganArray->firstWhere('nama', $nama)['nominal'] ?? 0;
             }
 
-            // =====================
-            // TOTAL GAJI BERSIH
-            // =====================
             $totalGaji = $pendapatan - $potongan;
 
             $row[] = $totalGaji;
@@ -187,7 +181,6 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $rows[] = $row;
         }
 
-        // =====================
         // FOOTER
         // =====================
         if (!empty($rows)) {
@@ -217,40 +210,55 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
 
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A1:' . $sheet->getHighestColumn() . '1')
+        $highestColumn = $sheet->getHighestColumn();
+        $highestColIndex = Coordinate::columnIndexFromString($highestColumn);
+        $highestRow = $sheet->getHighestRow();
+
+        // Bold header
+        $sheet->getStyle("A1:{$highestColumn}1")
             ->getFont()->setBold(true);
 
-        $highestRow = $sheet->getHighestRow();
-        $highestCol = $sheet->getHighestColumn();
-        $headers = $sheet->rangeToArray("A1:{$highestCol}1")[0];
+        for ($col = 1; $col <= $highestColIndex; $col++) {
 
-        foreach ($headers as $i => $header) {
-            $col = Coordinate::stringFromColumnIndex($i + 1);
+            $cellValue = $sheet->getCellByColumnAndRow($col, 1)->getValue();
+            $header = strtolower(trim((string)$cellValue));
 
-            if ($header === 'Izin') {
+            $colLetter = Coordinate::stringFromColumnIndex($col);
+
+            if (in_array($header, ['terlambat', 'izin'])) {
                 $color = 'FFFF0000';
-            } elseif (in_array($header, ['Terlambat', 'BPJS Kesehatan KA', 'BPJS JHT KA', 'Voucher', 'Kasbon', 'PPH 21'])) {
+            } elseif (in_array($header, [
+                'bpjs kesehatan ka',
+                'bpjs jht ka',
+                'kasbon',
+                'pph 21'
+            ])) {
                 $color = 'FF0070C0';
-            } elseif (in_array($header, ['Voucher', 'BPJS Kesehatan PT', 'BPJS JHT PT', 'Total Gaji'])) {
+            } elseif (in_array($header, [
+                'voucher',
+                'bpjs kesehatan pt',
+                'bpjs jht pt',
+                'total gaji'
+            ])) {
                 $color = 'FFFFFF00';
             } else {
                 $color = 'FF00B050';
             }
 
-            $sheet->getStyle("{$col}1")->applyFromArray([
-                'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'color' => ['argb' => $color],
-                ],
-            ]);
+            $sheet->getStyle("{$colLetter}1")->getFill()->setFillType(
+                \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID
+            )->getStartColor()->setARGB($color);
         }
 
-        $sheet->getStyle("A{$highestRow}:{$highestCol}{$highestRow}")->applyFromArray([
-            'font' => ['bold' => true],
-            'fill' => [
-                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'color' => ['argb' => 'FFEFEFEF'],
-            ],
-        ]);
+        // Footer
+        if ($highestRow > 1) {
+            $sheet->getStyle("A{$highestRow}:{$highestColumn}{$highestRow}")
+                ->getFont()->setBold(true);
+
+            $sheet->getStyle("A{$highestRow}:{$highestColumn}{$highestRow}")
+                ->getFill()->setFillType(
+                    \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID
+                )->getStartColor()->setARGB('FFEFEFEF');
+        }
     }
 }
