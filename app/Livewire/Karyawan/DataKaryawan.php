@@ -213,7 +213,7 @@ class DataKaryawan extends Component
             $query->where('divisi', 'Teknisi')
                 ->where('entitas', 'UNR');
         } else {
-            if ($selectedEntitas !== 'All') {
+            if ($selectedEntitas !== 'All Branch') {
                 $query->where('entitas', $selectedEntitas);
             }
         }

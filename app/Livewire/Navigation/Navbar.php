@@ -19,20 +19,22 @@ class Navbar extends Component
 
     public function mount()
     {
-        $this->selectedEntitas = session('selected_entitas', 'UHO');
+        $this->selectedEntitas = session('selected_entitas', 'ALL');
 
         $user = Auth::user();
 
         if ($user) {
             $this->roles = $user->roles->pluck('name')->toArray();
 
-            // Ambil hanya branch yang dimiliki user
-            $this->entitasList = $user->branches()
+            // Ambil branch milik user
+            $branches = $user->branches()
                 ->pluck('nama', 'id')
                 ->toArray();
+
+            // Tambahkan opsi ALL di paling atas
+            $this->entitasList = ['ALL' => 'All Branch'] + $branches;
         }
     }
-
     public function switchRole($role)
     {
         $user = User::find(Auth::id());
