@@ -13,25 +13,26 @@ trait CutoffPayrollTrait
      * @param int $month
      * @return array
      */
-    protected function getCutoff2625(int $year, int $month): array
+    public function getCutoff2625($year, $month)
     {
-        $cutoffEnd = Carbon::create($year, $month, 25)->endOfDay();
+        $baseDate = \Carbon\Carbon::create($year, $month, 1);
 
-        // Jika bulan berjalan & hari ini <= 25 → pakai hari ini
-        if (
-            $year == now()->year &&
-            $month == now()->month &&
-            now()->day <= 25
-        )
+        // 26 bulan sebelumnya
+        $cutoffStart = $baseDate
+            ->copy()
+            ->subMonthNoOverflow()
+            ->setDay(26)
+            ->startOfDay();
 
-            $cutoffStart = $cutoffEnd->copy()
-                ->subMonthNoOverflow()
-                ->setDay(26)
-                ->startOfDay();
+        // 25 bulan ini
+        $cutoffEnd = $baseDate
+            ->copy()
+            ->setDay(25)
+            ->endOfDay();
 
         return [
-            'start'      => $cutoffStart,
-            'end'        => $cutoffEnd,
+            'start' => $cutoffStart,
+            'end' => $cutoffEnd,
             'bulanTahun' => $cutoffEnd->format('Y-m'),
         ];
     }
