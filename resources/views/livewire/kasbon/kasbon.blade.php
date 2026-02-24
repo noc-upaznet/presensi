@@ -42,7 +42,7 @@
             <table class="table table-striped table-hover" style="background-color: var(--bs-body-bg);">
                 <thead>
                     <tr>
-                        <th>Tanggal</th>
+                        <th>Mulai Potong</th>
                         <th>Nama</th>
                         <th>Total & Sisa</th>
                         <th>Progress Angsuran</th>
@@ -195,7 +195,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" class="form-control" oninput="formatRupiah(this)"
-                                        wire:model.lazy="form.total_kasbon">
+                                        wire:model="form.total_kasbon">
                                 </div>
                             </div>
 
@@ -203,15 +203,15 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Jumlah Angsuran (bulan)</label>
                                     <input type="number" class="form-control" min="1"
-                                        wire:model.lazy="form.jml_angsuran">
+                                        wire:model="form.jml_angsuran">
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Kasbon Perbulan</label>
                                     <div class="input-group">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" class="form-control" wire:model="form.kasbon_perbulan"
-                                            readonly>
+                                        <input type="text" class="form-control"
+                                            wire:model.lazy="form.kasbon_perbulan">
                                     </div>
                                 </div>
                             </div>
@@ -253,7 +253,7 @@
 
                 <!-- FOOTER -->
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" wire:click="closeForm">Batal</button>
+                    {{-- <button class="btn btn-secondary" wire:click="closeForm">Batal</button> --}}
                     <button class="btn btn-primary" wire:click="save">
                         {{ $isEdit ? 'Update' : 'Simpan' }}
                     </button>
@@ -378,9 +378,9 @@
                 </div>
 
                 <!-- FOOTER -->
-                <div class="modal-footer">
+                {{-- <div class="modal-footer">
                     <button class="btn btn-secondary" wire:click="closeDetail">Tutup</button>
-                </div>
+                </div> --}}
 
             </div>
         </div>

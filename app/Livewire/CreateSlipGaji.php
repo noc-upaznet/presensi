@@ -345,13 +345,16 @@ class CreateSlipGaji extends Component
             $this->tunjangan_terpilih = array_column($this->tunjangan, 'nama');
             $this->potongan_terpilih = array_column($this->potongan, 'nama');
 
-            $this->kasbonAktif = ModelsKasbonModel::where('karyawan_id', $dataKaryawanId)
+            $kasbons = ModelsKasbonModel::where('karyawan_id', $dataKaryawanId)
                 ->where('status', 'aktif')
                 ->where('sisa_kasbon', '>', 0)
-                ->orderBy('tanggal_kasbon')
-                ->first();
+                ->whereDate('mulai_potong', '<=', $cutoff['end'])
+                ->get();
 
-            $this->kasbonPotong = $this->kasbonAktif?->kasbon_perbulan ?? 0;
+            $this->kasbonPotong = $kasbons->sum(function ($kasbon) {
+                return min($kasbon->kasbon_perbulan, $kasbon->sisa_kasbon);
+            });
+
             $this->kasbon = $this->kasbonPotong;
         }
 
@@ -1134,6 +1137,7 @@ class CreateSlipGaji extends Component
             'tunjangan_kebudayaan' => $this->numericValue($this->kebudayaan),
         ];
         // dd($data);
+        // dd($this->kasbonAktif);
 
         PayrollModel::create($data);
 
@@ -1149,27 +1153,41 @@ class CreateSlipGaji extends Component
         );
 
         // === POTONG KASBON SETELAH SLIP DISIMPAN ===
-        if ($this->kasbonAktif && $this->kasbonPotong > 0) {
 
-            // simpan riwayat potongan
+        $cutoff = $this->resolveCutoff(
+            $this->selectedYear,
+            $this->selectedMonth,
+            $this->cutoffType
+        );
+        $this->cutoffEnd   = $cutoff['end'];
+        $kasbons = ModelsKasbonModel::where('karyawan_id', $this->user_id)
+            ->where('status', 'aktif')
+            ->where('sisa_kasbon', '>', 0)
+            ->whereDate('mulai_potong', '<=', $cutoff['end'])
+            ->get();
+
+        foreach ($kasbons as $kasbon) {
+
+            $potong = min($kasbon->kasbon_perbulan, $kasbon->sisa_kasbon);
+
+            // simpan detail
             KasbonDetails::create([
-                'kasbon_id'       => $this->kasbonAktif->id,
-                'periode'         => $this->bulanTahun . '-01',
-                'nominal_potong'  => $this->kasbonPotong,
+                'kasbon_id'      => $kasbon->id,
+                'periode'        => $this->bulanTahun . '-01',
+                'nominal_potong' => $potong,
             ]);
 
-            // kurangi sisa kasbon
-            $this->kasbonAktif->sisa_kasbon -= $this->kasbonPotong;
-            $this->kasbonAktif->angsuran_ke += 1;
+            // update kasbon
+            $kasbon->sisa_kasbon -= $potong;
+            $kasbon->angsuran_ke += 1;
 
-            // cek lunas
-            if ($this->kasbonAktif->sisa_kasbon <= 0) {
-                $this->kasbonAktif->sisa_kasbon = 0;
-                $this->kasbonAktif->status = 'lunas';
-                $this->kasbonAktif->tanggal_lunas = now();
+            if ($kasbon->sisa_kasbon <= 0) {
+                $kasbon->sisa_kasbon = 0;
+                $kasbon->status = 'lunas';
+                $kasbon->tanggal_lunas = now();
             }
 
-            $this->kasbonAktif->save();
+            $kasbon->save();
         }
         return redirect()->route('payroll');
     }

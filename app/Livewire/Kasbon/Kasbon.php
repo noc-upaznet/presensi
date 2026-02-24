@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Kasbon;
 
+use App\Models\KasbonDetails;
 use App\Models\M_DataKaryawan;
 use App\Models\KasbonModel;
 use Illuminate\Support\Facades\Auth;
@@ -117,28 +118,28 @@ class Kasbon extends Component
         $this->selectedKaryawan = M_DataKaryawan::find($id);
     }
 
-    public function updatedFormTotalKasbon()
-    {
-        $this->hitungKasbon();
-    }
+    // public function updatedFormTotalKasbon()
+    // {
+    //     $this->hitungKasbon();
+    // }
 
-    public function updatedFormJmlAngsuran()
-    {
-        $this->hitungKasbon();
-    }
+    // public function updatedFormJmlAngsuran()
+    // {
+    //     $this->hitungKasbon();
+    // }
 
-    private function hitungKasbon()
-    {
-        $total = (float) preg_replace('/[^0-9]/', '', $this->form['total_kasbon']);
-        $bulan = (int) $this->form['jml_angsuran'];
+    // private function hitungKasbon()
+    // {
+    //     $total = (float) preg_replace('/[^0-9]/', '', $this->form['total_kasbon']);
+    //     $bulan = (int) $this->form['jml_angsuran'];
 
-        if ($total > 0 && $bulan > 0) {
-            $perBulan = round($total / $bulan, 2);
-            $this->form['kasbon_perbulan'] = number_format($perBulan, 2, ',', '.');
-        } else {
-            $this->form['kasbon_perbulan'] = 0;
-        }
-    }
+    //     if ($total > 0 && $bulan > 0) {
+    //         $perBulan = round($total / $bulan, 2);
+    //         $this->form['kasbon_perbulan'] = number_format($perBulan, 2, ',', '.');
+    //     } else {
+    //         $this->form['kasbon_perbulan'] = 0;
+    //     }
+    // }
 
     public function save()
     {
@@ -207,6 +208,7 @@ class Kasbon extends Component
     public function delete($id)
     {
         KasbonModel::findOrFail($id)->delete();
+        KasbonDetails::where('kasbon_id', $id)->delete();
 
         $this->dispatch(
             'swal',
