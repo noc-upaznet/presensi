@@ -19,7 +19,7 @@ class Navbar extends Component
 
     public function mount()
     {
-        $this->selectedEntitas = session('selected_entitas', 'ALL');
+        $this->selectedEntitas = session('selected_entitas', 'UHO');
 
         $user = Auth::user();
 
