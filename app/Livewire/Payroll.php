@@ -56,6 +56,7 @@ class Payroll extends Component
     public $bpjs_kes;
     public $bpjs_jht_pt;
     public $bpjs_jht;
+    public $total_gaji_titip;
 
     public function mount()
     {
@@ -103,8 +104,9 @@ class Payroll extends Component
         $entitas = session('selected_entitas', 'UHO');
 
         $karyawanIds = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
-        $totalGaji = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+        $this->total_gaji = PayrollModel::whereIn('karyawan_id', $karyawanIds)
             ->where('periode', $this->periode)
+            ->where('titip', 0)
             ->get()
             ->sum(function ($item) {
 
@@ -126,29 +128,37 @@ class Payroll extends Component
             });
 
 
-        $this->total_gaji = $totalGaji;
+        $this->total_gaji_titip = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', $this->periode)
+            ->where('titip', 1)
+            ->get()
+            ->sum(function ($item) {
 
-        $totalBpjskesPT = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+                $potongan = is_string($item->potongan)
+                    ? json_decode($item->potongan, true)
+                    : $item->potongan;
+
+                $totalPotongan = collect($potongan ?? [])
+                    ->sum(fn($p) => (int) ($p['nominal'] ?? 0));
+                return
+                    $item->total_gaji +
+                    $item->bpjs +
+                    $item->bpjs_jht +
+                    $item->voucher +
+                    $item->tunjangan_kebudayaan +
+                    $item->terlambat +
+                    $item->kasbon +
+                    $totalPotongan;
+            });
+
+        $this->bpjs_kes_pt = PayrollModel::whereIn('karyawan_id', $karyawanIds)
             ->where('periode', $this->periode)
             ->sum('bpjs_perusahaan');
 
-        $this->bpjs_kes_pt = $totalBpjskesPT;
 
-        $totalBpjsJhtPT = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+        $this->bpjs_jht_pt = PayrollModel::whereIn('karyawan_id', $karyawanIds)
             ->where('periode', $this->periode)
             ->sum('bpjs_jht_perusahaan');
-        $this->bpjs_jht_pt = $totalBpjsJhtPT;
-
-        // $totalBpjskes = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-        //     ->where('periode', $this->periode)
-        //     ->sum('bpjs');
-
-        // $this->bpjs_kes = $totalBpjskes;
-
-        // $totalBpjsJht = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-        //     ->where('periode', $this->periode)
-        //     ->sum('bpjs_jht');
-        // $this->bpjs_jht = $totalBpjsJht;
     }
 
     public function createSlipGaji($month, $year)
