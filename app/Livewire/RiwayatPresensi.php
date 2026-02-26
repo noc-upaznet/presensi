@@ -7,6 +7,7 @@ use Livewire\Component;
 use App\Models\M_Presensi;
 use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
+use App\Traits\CutoffPayrollTrait;
 use Livewire\WithoutUrlPagination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Crypt;
 class RiwayatPresensi extends Component
 {
     use WithPagination, WithoutUrlPagination;
+    use CutoffPayrollTrait;
+
     protected $paginationTheme = 'bootstrap';
 
     public $editId;
@@ -28,10 +31,24 @@ class RiwayatPresensi extends Component
     public $filterkaryawan;
     public $filterStatus;
     public $karyawanList;
+    public $perPage = 25;
 
     public function mount()
     {
-        $this->filterBulan = Carbon::now()->format('Y-m');
+        $today = Carbon::today();
+
+        $year  = $today->year;
+        $month = $today->month;
+
+        if ($today->day >= 26) {
+            $month++;
+            if ($month > 12) {
+                $month = 1;
+                $year++;
+            }
+        }
+
+        $this->filterBulan = sprintf('%04d-%02d', $year, $month);
         // $this->statusList = M_Presensi::select('status')->distinct()->pluck('status')->toArray();
         $entitasNama = session('selected_entitas', 'UHO');
         $this->karyawanList = M_DataKaryawan::where('entitas', $entitasNama)
@@ -99,84 +116,81 @@ class RiwayatPresensi extends Component
 
     public function render()
     {
+        $user        = Auth::user();
         $entitasNama = session('selected_entitas', 'UHO');
 
-        if (Auth::user()->hasRole(['admin'])) {
-            $datas = M_Presensi::with('getUser')
-                ->when($this->filterTanggal, function ($query) {
-                    $query->whereDate('created_at', $this->filterTanggal);
-                }, function ($query) {
-                    if ($this->filterBulan) {
-                        [$year, $month] = explode('-', $this->filterBulan);
-                        $query->whereYear('created_at', $year)
-                            ->whereMonth('created_at', $month);
-                    } else {
-                        $query->whereDate('created_at', now()->toDateString());
-                    }
-                })
-                ->when($this->filterkaryawan, function ($query) {
-                    $query->where('user_id', $this->filterkaryawan);
-                })
-                ->whereHas('getUser', function ($query) use ($entitasNama) {
-                    $query->where('entitas', $entitasNama);
-                })
-                ->when($this->filterStatus !== null, function ($query) {
-                    // Filter berdasarkan status presensi
-                    if ($this->filterStatus == 0) {
-                        $query->where('status', 0); // Tepat Waktu
-                    } elseif ($this->filterStatus == 1) {
-                        $query->where('status', 1); // Terlambat
-                    } elseif ($this->filterStatus == 2) {
-                        $query->where('status', 2); // Dispensasi
-                    }
-                })
-                ->when($entitasNama === 'UNB', function ($query) {
-                    // Hanya terapkan filter approve untuk entitas selain UNB
-                    $query->where(function ($q) {
-                        $q->whereHas('getKaryawan', function ($sub) {
-                            $sub->whereNotIn('level', ['SPV', 'Manajer, Branch Manager']);
-                        })
-                            ->where(function ($q2) {
-                                $q2->where(function ($q3) {
-                                    $q3->where('lokasi_lock', 0)
-                                        ->where('approve', 1);
-                                })
-                                    ->orWhere(function ($q3) {
-                                        $q3->where('lokasi_lock', 1)
-                                            ->where('approve', 0);
-                                    });
-                            })
-                            ->orWhereHas('getKaryawan', function ($sub) {
-                                $sub->whereIn('level', ['SPV', 'Manajer', 'Branch Manager']);
-                            });
-                    });
-                })
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
-        } elseif (Auth::user()->hasAnyRole(['user', 'spv', 'hr', 'branch-manager'])) {
-            $userId = Auth::id();
-            $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
-            $karyawanId = $karyawan ? $karyawan->id : null;
-
-            $datas = M_Presensi::where('user_id', $karyawanId)
-                ->when($this->filterTanggal, function ($query) {
-                    $query->whereDate('created_at', $this->filterTanggal);
-                }, function ($query) {
-                    if ($this->filterBulan) {
-                        [$year, $month] = explode('-', $this->filterBulan);
-                        $query->whereYear('created_at', $year)
-                            ->whereMonth('created_at', $month);
-                    } else {
-                        $query->whereMonth('created_at', Carbon::now()->month)
-                            ->whereYear('created_at', Carbon::now()->year);
-                    }
-                })
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
+        // =========================
+        // Resolve Tahun & Bulan
+        // =========================
+        if (!empty($this->filterBulan)) {
+            [$year, $month] = explode('-', $this->filterBulan);
         } else {
-            // fallback supaya tidak error
-            $datas = collect();
+            $year  = now()->year;
+            $month = now()->month;
         }
+
+        // =========================
+        // Resolve Cutoff 26–25
+        // =========================
+        $cutoff      = $this->resolveCutoff($year, $month, 'cutoff_25');
+        $cutoffStart = $cutoff['start'];
+        $cutoffEnd   = $cutoff['end'];
+
+        $query = M_Presensi::with('getUser')
+            ->whereBetween('tanggal', [
+                $cutoffStart->toDateTimeString(),
+                $cutoffEnd->toDateTimeString(),
+            ]);
+
+        $query->when($this->filterTanggal, function ($q) {
+            $q->whereDate('created_at', $this->filterTanggal);
+        });
+
+        if ($user->hasRole('admin')) {
+
+            $query->whereHas('getUser', function ($q) use ($entitasNama) {
+                $q->where('entitas', $entitasNama);
+            });
+
+            $query->when($this->filterkaryawan, function ($q) {
+                $q->where('user_id', $this->filterkaryawan);
+            });
+
+            $query->when($this->filterStatus !== null, function ($q) {
+                $q->where('status', $this->filterStatus);
+            });
+
+            // Khusus UNB
+            if ($entitasNama === 'UNB') {
+                $query->where(function ($q) {
+                    $q->whereHas('getKaryawan', function ($sub) {
+                        $sub->whereNotIn('level', ['SPV', 'Manajer', 'Branch Manager']);
+                    })
+                        ->where(function ($q2) {
+                            $q2->where(function ($q3) {
+                                $q3->where('lokasi_lock', 0)
+                                    ->where('approve', 1);
+                            })
+                                ->orWhere(function ($q3) {
+                                    $q3->where('lokasi_lock', 1)
+                                        ->where('approve', 0);
+                                });
+                        })
+                        ->orWhereHas('getKaryawan', function ($sub) {
+                            $sub->whereIn('level', ['SPV', 'Manajer', 'Branch Manager']);
+                        });
+                });
+            }
+        } elseif ($user->hasAnyRole(['user', 'spv', 'hr', 'branch-manager'])) {
+
+            $karyawanId = optional(
+                M_DataKaryawan::where('user_id', $user->id)->first()
+            )->id;
+
+            $query->where('user_id', $karyawanId);
+        }
+
+        $datas = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
 
         return view('livewire.riwayat-presensi', [
             'datas' => $datas
