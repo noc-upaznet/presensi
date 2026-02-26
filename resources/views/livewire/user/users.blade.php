@@ -32,6 +32,7 @@
                 <th scope="col">Cabang</th>
                 <th scope="col">Role</th>
                 <th scope="col">Permission</th>
+                <th scope="col">Status</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -62,6 +63,13 @@
                         @foreach ($user->getPermissionNames() as $permission)
                             <label class="badge text-bg-primary">{{ $permission }}</label>
                         @endforeach
+                    @endif
+                </td>
+                <td>
+                    @if ($user->status == 1)
+                        Aktif
+                    @else
+                        Nonaktif
                     @endif
                 </td>
                 <td>
