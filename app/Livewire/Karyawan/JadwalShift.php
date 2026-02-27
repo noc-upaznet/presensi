@@ -10,11 +10,13 @@ use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use App\Livewire\Forms\TambahDataKaryawanForm;
+use App\Traits\CutoffPayrollTrait;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
 
 class JadwalShift extends Component
 {
+    use CutoffPayrollTrait;
     use WithPagination, WithoutUrlPagination;
     protected $paginationTheme = 'bootstrap';
     public TambahDataKaryawanForm $form;
@@ -35,7 +37,21 @@ class JadwalShift extends Component
     public function mount()
     {
         $this->bulan_tahun = now()->format('Y-m');
-        $this->filterBulan = now()->format('Y-m');
+        $today = Carbon::today();
+
+        $year  = $today->year;
+        $month = $today->month;
+
+        if ($today->day >= 26) {
+            $month++;
+            if ($month > 12) {
+                $month = 1;
+                $year++;
+            }
+        }
+
+        $this->filterBulan = sprintf('%04d-%02d', $year, $month);
+
         $user = Auth::user();
         $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
         // $jadwalId = M_Jadwal::where('bulan_tahun', $this->bulan_tahun)
@@ -98,23 +114,57 @@ class JadwalShift extends Component
     public function showEdit($id)
     {
         $jadwal = M_Jadwal::findOrFail(Crypt::decrypt($id));
-        $this->bulan_tahun = substr($jadwal->bulan_tahun, 0, 7);
-        // dd($this->bulan_tahun);
-        $this->selectedKaryawan = (string) $jadwal->user_id;
 
-        // Load shift harian
+        $this->selectedKaryawan = $jadwal->karyawan_id;
+        $this->namaKaryawan = M_DataKaryawan::find($this->selectedKaryawan)?->nama_karyawan ?? '';
+
+        $carbon = Carbon::parse($jadwal->bulan_tahun);
+        $year  = $carbon->year;
+        $month = $carbon->month;
+
+        $cutoff = $this->resolveCutoff($year, $month, 'cutoff_25');
+
+        $start = $cutoff['start']->copy();
+        $end   = $cutoff['end']->copy();
+
+        $this->bulan_tahun = $cutoff['bulanTahun'];
+
+        $currentMonth  = $carbon->format('Y-m');
+        $previousMonth = $carbon->copy()->subMonth()->format('Y-m');
+
+        $jadwalCurrent = M_Jadwal::where('bulan_tahun', $currentMonth)
+            ->where('karyawan_id', $this->selectedKaryawan)
+            ->first();
+
+        $jadwalPrevious = M_Jadwal::where('bulan_tahun', $previousMonth)
+            ->where('karyawan_id', $this->selectedKaryawan)
+            ->first();
+
         $this->kalender = [];
-        for ($i = 1; $i <= 31; $i++) {
-            $field = 'd' . $i;
-            if (!is_null($jadwal->$field)) {
-                $this->kalender[$i] = $jadwal->$field;
+
+        $currentDate = $start->copy();
+
+        while ($currentDate <= $end) {
+
+            $tanggal = $currentDate->format('Y-m-d');
+            $day     = $currentDate->day;
+
+            if ($currentDate->format('Y-m') === $currentMonth) {
+                $this->kalender[$tanggal] =
+                    $jadwalCurrent?->{'d' . $day} ?? null;
+            } else {
+                $this->kalender[$tanggal] =
+                    $jadwalPrevious?->{'d' . $day} ?? null;
             }
+
+            $currentDate->addDay();
         }
-        $this->selectedTemplateId = null;
-
-        $this->dispatch('edit-data', data: $jadwal->toArray());
-        // dd($this->bulan_tahun, $this->namaKaryawan, $this->kalender);
-
+        $this->dispatch('loadData', [
+            'id'           => $jadwal->id,
+            'bulan_tahun'  => $this->bulan_tahun,
+            'karyawan_id'  => $this->selectedKaryawan,
+            'kalender'     => $this->kalender,
+        ])->to(ModalJadwalShift::class);
 
         $this->dispatch('modalEditJadwal', action: 'show');
     }
@@ -122,50 +172,79 @@ class JadwalShift extends Component
     public function showDetail($id)
     {
         $jadwal = M_Jadwal::findOrFail(Crypt::decrypt($id));
-        $this->bulan_tahun = substr($jadwal->bulan_tahun, 0, 7);
-        $this->selectedKaryawan = (string) $jadwal->karyawan_id;
 
-        // Load shift harian
+        $this->selectedKaryawan = $jadwal->karyawan_id;
+
+        $carbon = Carbon::parse($jadwal->bulan_tahun);
+        $year  = $carbon->year;
+        $month = $carbon->month;
+
+        $cutoff = $this->resolveCutoff($year, $month, 'cutoff_25');
+
+        $startDate = $cutoff['start']->copy()->startOfDay();
+        $endDate   = $cutoff['end']->copy()->startOfDay();
+
+        $this->bulan_tahun = $cutoff['bulanTahun'];
+
+        $currentMonth  = $carbon->format('Y-m');
+        $previousMonth = $carbon->copy()->subMonth()->format('Y-m');
+
+        $jadwalCurrent = M_Jadwal::where('bulan_tahun', $currentMonth)
+            ->where('karyawan_id', $this->selectedKaryawan)
+            ->first();
+
+        $jadwalPrevious = M_Jadwal::where('bulan_tahun', $previousMonth)
+            ->where('karyawan_id', $this->selectedKaryawan)
+            ->first();
+
         $this->kalender = [];
-        for ($i = 1; $i <= 31; $i++) {
-            $field = 'd' . $i;
-            if (!is_null($jadwal->$field)) {
-                $this->kalender[$i] = $jadwal->$field;
-            }
-        }
-
         $izin = 0;
         $cuti = 0;
 
-        foreach ($this->kalender as $shiftId) {
-            // Asumsikan shiftId 99 = Izin, 98 = Cuti (ubah sesuai ID shift kamu)
+        $currentDate = $startDate->copy();
+
+        while ($currentDate <= $endDate) {
+
+            $tanggal = $currentDate->format('Y-m-d');
+            $day     = $currentDate->day;
+
+            if ($currentDate->format('Y-m') === $currentMonth) {
+                $shiftId = $jadwalCurrent?->{'d' . $day} ?? null;
+            } else {
+                $shiftId = $jadwalPrevious?->{'d' . $day} ?? null;
+            }
+
+            $this->kalender[$tanggal] = $shiftId;
+
             if ($shiftId == 3) $izin++;
             if ($shiftId == 2) $cuti++;
+
+            $currentDate->addDay();
         }
 
-        // Ambil data presensi
-        $presensiHadir = [];
-        $presensi = M_Presensi::where('user_id', $jadwal->karyawan_id)
-            ->whereYear('tanggal', substr($jadwal->bulan_tahun, 0, 4))
-            ->whereMonth('tanggal', substr($jadwal->bulan_tahun, 5, 2))
+        $presensi = M_Presensi::where('user_id', $this->selectedKaryawan)
+            ->whereBetween('tanggal', [$startDate, $endDate])
             ->get();
-        // dd($presensi);
+
+        $presensiHadir = [];
+
         foreach ($presensi as $p) {
-            $day = (int) Carbon::parse($p->tanggal)->format('j'); // tanggal 1-31 sebagai integer
-            $presensiHadir[$day] = $p->status;
+            $tanggal = Carbon::parse($p->tanggal)->format('Y-m-d');
+            $presensiHadir[$tanggal] = $p->status;
         }
 
-        // Kirim data jadwal + presensi
-        $this->dispatch('detail-data', data: [
-            ...$jadwal->toArray(),
+        $this->dispatch('detail-data', [
+            'karyawan_id' => $this->selectedKaryawan,
+            'kalender' => $this->kalender,
             'presensiHadir' => $presensiHadir,
+            'bulan_tahun' => $this->bulan_tahun,
             'rekap' => [
-                'izin' => $izin,
-                'cuti' => $cuti,
-                'terlambat' => $presensi->where('status', 1)->count(), // bisa dikosongkan jika belum ada
-                'kehadiran' => $presensi->where('status', '!=', '')->count(),
+                'izin'       => $izin,
+                'cuti'       => $cuti,
+                'terlambat'  => $presensi->where('status', 1)->count(),
+                'kehadiran'  => $presensi->count(),
             ],
-        ]);
+        ])->to(ModalJadwalShift::class);
 
         $this->dispatch('modalDetailJadwal', action: 'show');
     }

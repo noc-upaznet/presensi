@@ -1,49 +1,49 @@
 <div>
-    <div wire:ignore.self class="modal fade" id="modalTambahJadwal" tabindex="-1" aria-labelledby="modalTambahJadwalLabel" aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalTambahJadwal" tabindex="-1" aria-labelledby="modalTambahJadwalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-          <div class="modal-content" style="background-color: var(--bs-body-bg);">
-            <div class="modal-header border-bottom" style="color: var(--bs-body-color);">
-              <h5 class="modal-title text-primary fw-bold" id="modalTambahJadwalLabel">Tambah Jadwal</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
-            <div class="modal-body" style="color: var(--bs-body-color);">
-                {{-- Pilih Bulan --}}
-                <div wire:ignore class="mb-3">
-                    <label class="form-label fw-semibold">Bulan</label>
-                    <input type="month" id="bulan" wire:model="bulan_tahun" class="form-control">
+            <div class="modal-content" style="background-color: var(--bs-body-bg);">
+                <div class="modal-header border-bottom" style="color: var(--bs-body-color);">
+                    <h5 class="modal-title text-primary fw-bold" id="modalTambahJadwalLabel">Tambah Jadwal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
+                <div class="modal-body" style="color: var(--bs-body-color);">
+                    {{-- Pilih Bulan --}}
+                    <div wire:ignore class="mb-3">
+                        <label class="form-label fw-semibold">Bulan</label>
+                        <input type="month" id="bulan" wire:model="bulan_tahun" class="form-control">
+                    </div>
 
-                {{-- Pilih Karyawan --}}
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Karyawan</label>
-                    <select class="form-select" wire:model="selectedKaryawan">
-                        <option value="">-- Pilih Karyawan --</option>
-                        @foreach($karyawans as $key)
-                            <option value="{{ $key->id }}">{{ $key->nama_karyawan }}</option>
-                        @endforeach
-                    </select>
-                </div>
-      
-                {{-- Pilih Template --}}
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Template Mingguan</label>
-                    <select wire:model="selectedTemplateId" wire:change="fillCalendarFromTemplate" class="form-select">
-                        <option value="">-- Pilih Template --</option>
-                        @foreach ($templateWeeks as $template)
-                            <option value="{{ $template->id }}">{{ $template->nama_template }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                    {{-- Pilih Karyawan --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Karyawan</label>
+                        <select class="form-select" wire:model="selectedKaryawan">
+                            <option value="">-- Pilih Karyawan --</option>
+                            @foreach ($karyawans as $key)
+                                <option value="{{ $key->id }}">{{ $key->nama_karyawan }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                {{-- Kalender Jadwal --}}
-                <div>
-                    <label class="form-label fw-semibold">Kalender</label>
-                    <div class="table-responsive">
-                        @php
-                            $tanggal = 1;
-                        @endphp
+                    {{-- Pilih Template --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Template Mingguan</label>
+                        <select wire:model="selectedTemplateId" wire:change="fillCalendarFromTemplate"
+                            class="form-select">
+                            <option value="">-- Pilih Template --</option>
+                            @foreach ($templateWeeks as $template)
+                                <option value="{{ $template->id }}">{{ $template->nama_template }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                        <table class="table table-bordered" wire:key="kalender-{{ $kalenderVersion }}">
+                    {{-- Kalender Jadwal --}}
+                    <div>
+                        <label class="form-label fw-semibold">Kalender</label>
+                        <div class="table-responsive">
+                            @php $tanggal = 0; @endphp
+
+                            {{-- <table class="table table-bordered" wire:key="kalender-{{ $kalenderVersion }}">
                             <thead>
                                 <tr>
                                     <th>Minggu</th>
@@ -70,7 +70,7 @@
                                                     <div class="fw-semibold small">{{ $tanggal }}</div>
                                                     <select class="form-select form-select-sm mt-1 text-center" name="shift[{{ $tanggal }}]" wire:model.defer="kalender.{{ $tanggal }}">
                                                         <option value="">-- Pilih Shift --</option>
-                                                        @foreach($jadwalShifts as $shift)
+                                                        @foreach ($jadwalShifts as $shift)
                                                             <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
                                                         @endforeach
                                                     </select>
@@ -81,27 +81,99 @@
                                     </tr>
                                 @endfor
                             </tbody>
-                        </table>
+                        </table> --}}
+
+                            <table class="table table-bordered" wire:key="kalender-{{ $kalenderVersion }}">
+                                <thead>
+                                    <tr>
+                                        <th>Minggu</th>
+                                        <th>Senin</th>
+                                        <th>Selasa</th>
+                                        <th>Rabu</th>
+                                        <th>Kamis</th>
+                                        <th>Jumat</th>
+                                        <th>Sabtu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php $dayIndex = 0; @endphp
+
+                                    @for ($i = 0; $i < $jumlahBaris; $i++)
+                                        <tr>
+                                            @for ($j = 0; $j < 7; $j++)
+                                                @php
+                                                    $cellIndex = $i * 7 + $j;
+                                                @endphp
+
+                                                @if ($cellIndex < $hariPertama || $dayIndex >= $totalHari)
+                                                    <td></td>
+                                                @else
+                                                    @php
+                                                        $currentDate = $startDate->copy()->addDays($dayIndex);
+                                                        $tanggalFull = $currentDate->format('Y-m-d');
+                                                        $tanggalAngka = $currentDate->day;
+
+                                                        $isHoliday = isset($holidays[$tanggalFull]);
+                                                        $holidayName = $isHoliday
+                                                            ? $holidays[$tanggalFull]['name'] ?? 'Libur Nasional'
+                                                            : null;
+                                                    @endphp
+
+                                                    <td class="{{ $isHoliday ? 'bg-danger-subtle' : '' }}">
+                                                        <div class="fw-semibold small d-flex justify-content-between">
+                                                            <span>{{ $tanggalAngka }}</span>
+                                                            <small class="text-muted">
+                                                                {{ $currentDate->format('M') }}
+                                                            </small>
+                                                        </div>
+
+                                                        @if ($isHoliday)
+                                                            <div class="small text-muted">
+                                                                {{ $holidayName }}
+                                                            </div>
+                                                        @endif
+
+                                                        <select class="form-select form-select-sm mt-1 text-center"
+                                                            wire:model.defer="kalender.{{ $tanggalFull }}"
+                                                            {{ $isHoliday ? 'disabled' : '' }}>
+                                                            <option value="">-- Pilih Shift --</option>
+                                                            @foreach ($jadwalShifts as $shift)
+                                                                <option value="{{ $shift->id }}">
+                                                                    {{ $shift->nama_shift }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+
+                                                    @php $dayIndex++; @endphp
+                                                @endif
+                                            @endfor
+                                        </tr>
+                                    @endfor
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+
                 </div>
-      
+                <div class="modal-footer">
+                    {{-- <button type="button" wire:click="store" class="btn btn-primary">Simpan</button> --}}
+                    <button type="button" class="btn btn-primary" wire:click='store' wire:loading.attr="disabled"
+                        wire:target="store">
+                        <div wire:loading wire:target="store" class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span wire:loading.remove wire:target="store"><i class="fa fa-save"></i> Simpan</span>
+                        <span wire:loading wire:target="store">Loading...</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
             </div>
-            <div class="modal-footer">
-              {{-- <button type="button" wire:click="store" class="btn btn-primary">Simpan</button> --}}
-              <button type="button" class="btn btn-primary" wire:click='store' wire:loading.attr="disabled" wire:target="store">
-                    <div wire:loading wire:target="store" class="spinner-border spinner-border-sm" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <span wire:loading.remove wire:target="store"><i class="fa fa-save"></i> Simpan</span>
-                    <span wire:loading wire:target="store">Loading...</span>
-                </button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-            </div>
-          </div>
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="modalEditJadwal" tabindex="-1" aria-labelledby="modalEditJadwalLabel" aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalEditJadwal" tabindex="-1" aria-labelledby="modalEditJadwalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content" style="background-color: var(--bs-body-bg);">
                 <div class="modal-header border-bottom" style="color: var(--bs-body-color);">
@@ -115,44 +187,31 @@
                         <input type="month" id="bulan2" wire:model="bulan_tahun" class="form-control">
                     </div>
                     {{-- Pilih Karyawan --}}
+
                     <div class="mb-3">
+                        <input type="hidden" wire:model="selectedKaryawan">
                         <label class="form-label fw-semibold">Karyawan</label>
-                        <select class="form-select" wire:model="selectedKaryawan">
-                            <option value="">-- Pilih Karyawan --</option>
-                            @foreach($karyawans as $karyawan)
-                            <option value="{{ $karyawan->id }}">
-                                {{ $karyawan->nama_karyawan }}
-                            </option>
-                            @endforeach
-                        </select>
+
+                        <input type="text" class="form-control" value="{{ $namaKaryawan }}" readonly>
                     </div>
-      
+
                     {{-- Pilih Template --}}
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Template Mingguan</label>
-                        <select class="form-select" wire:model="selectedTemplateId" wire:change="fillCalendarFromTemplate">
+                        <select class="form-select" wire:model="selectedTemplateId"
+                            wire:change="fillCalendarFromTemplate">
                             <option>-- Pilih Template --</option>
                             @foreach ($templateWeeks as $template)
-                                <option value="{{ $template->id }}" @selected($selectedTemplateId == $template->id)>{{ $template->nama_template }}</option>
+                                <option value="{{ $template->id }}" @selected($selectedTemplateId == $template->id)>
+                                    {{ $template->nama_template }}</option>
                             @endforeach
                         </select>
                     </div>
-        
+
                     {{-- Kalender Jadwal --}}
                     <div>
                         <label class="form-label fw-semibold">Kalender</label>
                         <div class="table-responsive">
-                            @php
-                                $bulan = $this->bulanTahun['bulan'];
-                                $tahun = $this->bulanTahun['tahun'];
-
-                                $totalHari = \Carbon\Carbon::create($tahun, $bulan)->daysInMonth;
-                                $hariPertama = \Carbon\Carbon::create($tahun, $bulan, 1)->dayOfWeek;
-                                $totalCell = $hariPertama + $totalHari;
-                                $jumlahBaris = ceil($totalCell / 7);
-                                $tanggal = 1;
-                            @endphp
-    
                             <table class="table table-bordered" wire:key="kalender-{{ $this->bulan_tahun }}">
                                 <thead>
                                     <tr>
@@ -166,26 +225,56 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @php $dayIndex = 0; @endphp
+
                                     @for ($i = 0; $i < $jumlahBaris; $i++)
                                         <tr>
                                             @for ($j = 0; $j < 7; $j++)
                                                 @php
                                                     $cellIndex = $i * 7 + $j;
                                                 @endphp
-    
-                                                @if ($cellIndex < $hariPertama || $tanggal > $totalHari)
+
+                                                @if ($cellIndex < $hariPertama || $dayIndex >= $totalHari)
                                                     <td></td>
                                                 @else
-                                                <td>
-                                                    <div class="fw-semibold small">{{ $tanggal }}</div>
-                                                    <select class="form-select form-select-sm mt-1 text-center" name="shift[{{ $tanggal }}]" wire:model="kalender.{{ $tanggal }}">
-                                                        <option value="">-- Pilih Shift --</option>
-                                                        @foreach($jadwalShifts as $shift)
-                                                            <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    @php $tanggal++; @endphp
-                                                </td>
+                                                    @php
+                                                        $currentDate = $startDate->copy()->addDays($dayIndex);
+                                                        $tanggalFull = $currentDate->format('Y-m-d');
+                                                        $tanggalAngka = $currentDate->day;
+
+                                                        $isHoliday = isset($holidays[$tanggalFull]);
+                                                        $holidayName = $isHoliday
+                                                            ? $holidays[$tanggalFull]['name'] ?? 'Libur Nasional'
+                                                            : null;
+                                                    @endphp
+
+                                                    <td class="{{ $isHoliday ? 'bg-danger-subtle' : '' }}">
+                                                        <div class="fw-semibold small d-flex justify-content-between">
+                                                            <span>{{ $tanggalAngka }}</span>
+                                                            <small class="text-muted">
+                                                                {{ $currentDate->format('M') }}
+                                                            </small>
+                                                        </div>
+
+                                                        @if ($isHoliday)
+                                                            <div class="small text-muted">
+                                                                {{ $holidayName }}
+                                                            </div>
+                                                        @endif
+
+                                                        <select class="form-select form-select-sm mt-1 text-center"
+                                                            wire:model="kalender.{{ $tanggalFull }}"
+                                                            {{ $isHoliday ? 'disabled' : '' }}>
+                                                            <option value="">-- Pilih Shift --</option>
+                                                            @foreach ($jadwalShifts as $shift)
+                                                                <option value="{{ $shift->id }}">
+                                                                    {{ $shift->nama_shift }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+
+                                                    @php $dayIndex++; @endphp
                                                 @endif
                                             @endfor
                                         </tr>
@@ -196,7 +285,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" wire:click='saveEdit' wire:loading.attr="disabled" wire:target="edit">
+                    <button type="button" class="btn btn-primary" wire:click='saveEdit'
+                        wire:loading.attr="disabled" wire:target="edit">
                         <div wire:loading wire:target="edit" class="spinner-border spinner-border-sm" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
@@ -209,7 +299,8 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="modalDetailJadwal" tabindex="-1" aria-labelledby="modalDetailJadwalLabel" aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalDetailJadwal" tabindex="-1"
+        aria-labelledby="modalDetailJadwalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content" style="background-color: var(--bs-body-bg);">
                 <div class="modal-header border-bottom" style="color: var(--bs-body-color);">
@@ -224,33 +315,16 @@
                     </div>
                     {{-- Pilih Karyawan --}}
                     <div class="mb-3">
+                        <input type="hidden" wire:model="selectedKaryawan">
                         <label class="form-label fw-semibold">Karyawan</label>
-                        <select class="form-select" wire:model="selectedKaryawan" disabled>
-                            <option value="">-- Pilih Karyawan --</option>
-                            @foreach($karyawans as $karyawan)
-                            <option value="{{ $karyawan->id }}">
-                                {{ $karyawan->nama_karyawan }}
-                            </option>
-                            @endforeach
-                        </select>
+
+                        <input type="text" class="form-control" value="{{ $namaKaryawan }}" readonly>
                     </div>
-        
+
                     {{-- Kalender Jadwal --}}
                     <div>
                         <label class="form-label fw-semibold">Kalender</label>
                         <div class="table-responsive">
-                            @php
-                                $bulan = $this->bulanTahun['bulan'];
-                                $tahun = $this->bulanTahun['tahun'];
-
-                                $totalHari = \Carbon\Carbon::create($tahun, $bulan)->daysInMonth;
-                                $hariPertama = \Carbon\Carbon::create($tahun, $bulan, 1)->dayOfWeek;
-                                $totalCell = $hariPertama + $totalHari;
-                                $jumlahBaris = ceil($totalCell / 7);
-                                $tanggal = 1;
-
-                                
-                            @endphp
                             <table class="table table-bordered" wire:key="kalender-{{ $this->bulan_tahun }}">
                                 <thead>
                                     <tr>
@@ -264,33 +338,65 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @php $dayIndex = 0; @endphp
+
                                     @for ($i = 0; $i < $jumlahBaris; $i++)
                                         <tr>
                                             @for ($j = 0; $j < 7; $j++)
                                                 @php
                                                     $cellIndex = $i * 7 + $j;
-                                                    $statusPresensi = $presensiHadir[$tanggal] ?? null;
-                                                    $cellClass = match($statusPresensi) {
-                                                        0 => 'bg-success text-white',
-                                                        1 => 'bg-danger text-white',
-                                                        2 => 'bg-primary text-dark',
-                                                        default => ''
-                                                    };
                                                 @endphp
 
-                                                @if ($cellIndex < $hariPertama || $tanggal > $totalHari)
+                                                @if ($cellIndex < $hariPertama || $dayIndex >= $totalHari)
                                                     <td></td>
                                                 @else
-                                                    <td class="{{ $cellClass }}">
-                                                        <div class="fw-semibold small">{{ $tanggal }}</div>
-                                                        <select class="form-select form-select-sm mt-1 text-center" name="shift[{{ $tanggal }}]" wire:model="kalender.{{ $tanggal }}">
+                                                    @php
+                                                        $currentDate = $startDate->copy()->addDays($dayIndex);
+                                                        $tanggalFull = $currentDate->format('Y-m-d');
+                                                        $tanggalAngka = $currentDate->day;
+
+                                                        $isHoliday = isset($holidays[$tanggalFull]);
+                                                        $holidayName = $isHoliday
+                                                            ? $holidays[$tanggalFull]['name'] ?? 'Libur Nasional'
+                                                            : null;
+
+                                                        $statusPresensi = $presensiHadir[$tanggalFull] ?? null;
+
+                                                        $cellClass = match ($statusPresensi) {
+                                                            0 => 'bg-success text-white',
+                                                            1 => 'bg-danger text-white',
+                                                            2 => 'bg-primary text-white',
+                                                            default => '',
+                                                        };
+                                                    @endphp
+
+                                                    <td class="{{ $isHoliday ? 'bg-danger-subtle' : $cellClass }}">
+                                                        <div class="fw-semibold small d-flex justify-content-between">
+                                                            <span>{{ $tanggalAngka }}</span>
+                                                            <small class="text-muted">
+                                                                {{ $currentDate->format('M') }}
+                                                            </small>
+                                                        </div>
+
+                                                        @if ($isHoliday)
+                                                            <div class="small text-muted">
+                                                                {{ $holidayName }}
+                                                            </div>
+                                                        @endif
+
+                                                        <select class="form-select form-select-sm mt-1 text-center"
+                                                            wire:model="kalender.{{ $tanggalFull }}"
+                                                            {{ $isHoliday ? 'disabled' : '' }}>
                                                             <option value="">-- Pilih Shift --</option>
-                                                            @foreach($jadwalShifts as $shift)
-                                                                <option value="{{ $shift->id }}">{{ $shift->nama_shift }}</option>
+                                                            @foreach ($jadwalShifts as $shift)
+                                                                <option value="{{ $shift->id }}">
+                                                                    {{ $shift->nama_shift }}
+                                                                </option>
                                                             @endforeach
                                                         </select>
-                                                        @php $tanggal++; @endphp
                                                     </td>
+
+                                                    @php $dayIndex++; @endphp
                                                 @endif
                                             @endfor
                                         </tr>
@@ -354,35 +460,39 @@
 </div>
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const inputBulan = document.getElementById('bulan');
-        if (inputBulan && !inputBulan.value) {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = (now.getMonth() + 1).toString().padStart(2, '0');
-            inputBulan.value = `${year}-${month}`;
-        }
-        inputBulan.addEventListener('change', function () {
-            Livewire.dispatch('bulanChanged', { value: this.value });
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputBulan = document.getElementById('bulan');
+            if (inputBulan && !inputBulan.value) {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                inputBulan.value = `${year}-${month}`;
+            }
+            inputBulan.addEventListener('change', function() {
+                Livewire.dispatch('bulanChanged', {
+                    value: this.value
+                });
+            });
         });
-    });
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const inputBulan = document.getElementById('bulan2');
-        if (inputBulan && !inputBulan.value) {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = (now.getMonth() + 1).toString().padStart(2, '0');
-            inputBulan.value = `${year}-${month}`;
-        }
-        inputBulan.addEventListener('change', function () {
-            Livewire.dispatch('bulanChanged', { value: this.value });
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputBulan = document.getElementById('bulan2');
+            if (inputBulan && !inputBulan.value) {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                inputBulan.value = `${year}-${month}`;
+            }
+            inputBulan.addEventListener('change', function() {
+                Livewire.dispatch('bulanChanged', {
+                    value: this.value
+                });
+            });
         });
-    });
 
-    Livewire.on('swal', (e) => {
-        Swal.fire(e.params);
-    });
-</script>
+        Livewire.on('swal', (e) => {
+            Swal.fire(e.params);
+        });
+    </script>
 @endpush
