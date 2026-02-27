@@ -120,9 +120,9 @@ class Payroll extends Component
                     $item->total_gaji +
                     $item->bpjs +
                     $item->bpjs_jht +
-                    $item->voucher +
+                    // $item->voucher +
                     $item->tunjangan_kebudayaan +
-                    $item->terlambat +
+                    // $item->terlambat +
                     $item->kasbon +
                     $totalPotongan;
             });
@@ -144,9 +144,9 @@ class Payroll extends Component
                     $item->total_gaji +
                     $item->bpjs +
                     $item->bpjs_jht +
-                    $item->voucher +
+                    // $item->voucher +
                     $item->tunjangan_kebudayaan +
-                    $item->terlambat +
+                    // $item->terlambat +
                     $item->kasbon +
                     $totalPotongan;
             });
