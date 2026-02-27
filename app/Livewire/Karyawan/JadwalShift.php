@@ -325,7 +325,7 @@ class JadwalShift extends Component
                     ->where('entitas', $entitas);
             });
         }
-        $jadwals = $query->paginate(10);
+        $jadwals = $query->paginate(25);
         return view('livewire.karyawan.jadwal-shift', [
             'jadwals' => $jadwals,
         ]);

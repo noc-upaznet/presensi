@@ -2,17 +2,19 @@
     <div class="app-content-header">
         <!--begin::Container-->
         <div class="container-fluid">
-          <!--begin::Row-->
-          <div class="row">
-            <div class="col-sm-6 mt-5"><h3 class="mb-0" style="color: var(--bs-body-color);">Jadwal Shift Karyawan</h3></div>
-            <div class="col-sm-6">
-              <ol class="breadcrumb float-sm-end">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Jadwal Shift Karyawan</li>
-              </ol>
+            <!--begin::Row-->
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0" style="color: var(--bs-body-color);">Jadwal Shift Karyawan</h3>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Jadwal Shift Karyawan</li>
+                    </ol>
+                </div>
             </div>
-          </div>
-          <!--end::Row-->
+            <!--end::Row-->
         </div>
         <!--end::Container-->
     </div>
@@ -22,21 +24,23 @@
             <button class="btn btn-primary" wire:click="showAdd">
                 <i class="bi bi-plus"></i> Tambah
             </button>
-    
+
             <div class="d-flex gap-2">
-                <select class="form-select" style="width: 150px;" wire:model="filterKaryawan" wire:change="filterByKaryawan($event.target.value)">
+                <select class="form-select" style="width: 150px;" wire:model="filterKaryawan"
+                    wire:change="filterByKaryawan($event.target.value)">
                     <option value="" selected>Pilih Karyawan</option>
-                    @foreach($karyawans as $karyawan)
+                    @foreach ($karyawans as $karyawan)
                         <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
                     @endforeach
                 </select>
-    
-                <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan" wire:model.lazy="filterBulan">
-    
+
+                <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan"
+                    wire:model.lazy="filterBulan">
+
                 <button class="btn btn-light" disabled>Pilih Waktu</button>
             </div>
         </div>
-    
+
         <div class="table-responsive">
             <table class="table table-striped table-hover" style="background-color: var(--bs-body-bg);">
                 <thead>
@@ -52,9 +56,15 @@
                             <td style="color: var(--bs-body-color);">{{ $key->bulan_tahun }}</td>
                             <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}</td>
                             <td class="text-center" style="color: var(--bs-body-color);">
-                                <button class="btn btn-sm btn-info text-white" wire:click="showDetail('{{ Crypt::encrypt($key->id) }}')"><i class="fa fa-eye"></i></button>
-                                <button class="btn btn-sm btn-warning" wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="btn btn-sm btn-danger" wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"><i class="fa fa-trash"></i></button>
+                                <button class="btn btn-sm btn-info text-white"
+                                    wire:click="showDetail('{{ Crypt::encrypt($key->id) }}')"><i
+                                        class="fa fa-eye"></i></button>
+                                <button class="btn btn-sm btn-warning"
+                                    wire:click="showEdit('{{ Crypt::encrypt($key->id) }}')"><i
+                                        class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn btn-sm btn-danger"
+                                    wire:click="$dispatch('modal-confirm-delete',{id:'{{ Crypt::encrypt($key->id) }}',action:'show'})"><i
+                                        class="fa fa-trash"></i></button>
                             </td>
                         </tr>
                     @endforeach
