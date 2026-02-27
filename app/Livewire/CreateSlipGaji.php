@@ -472,7 +472,7 @@ class CreateSlipGaji extends Component
         if ($this->karyawan) {
             return $this->level === 'SPV'
                 && $this->jabatan === 'Sales Marketing'
-                && $this->entitas === 'UNR';
+                // && $this->entitas === 'UNR';
         }
     }
 
