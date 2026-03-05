@@ -328,10 +328,10 @@ class ClockInSelfie extends Component
 
         M_Presensi::create($data);
 
-        if ($getPoints) {
-            M_DataKaryawan::where('id', $karyawanId)
-                ->increment('poin', 1);
-        }
+        // if ($getPoints) {
+        //     M_DataKaryawan::where('id', $karyawanId)
+        //         ->increment('poin', 1);
+        // }
 
         $this->reset(['photo']);
         return redirect()->route('clock-in');
