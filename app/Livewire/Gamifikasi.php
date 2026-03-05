@@ -2,11 +2,16 @@
 
 namespace App\Livewire;
 
+use App\Models\M_DataKaryawan;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Gamifikasi extends Component
 {
+    public $editId;
+    public $poin;
+
     private function countKaryawan()
     {
         $entitas = session('selected_entitas', 'UHO');
@@ -64,8 +69,9 @@ class Gamifikasi extends Component
             ->where('data_karyawan.divisi', 'TEKNISI')
             ->where('data_karyawan.level', 'STAFF')
             ->selectRaw("
-            data_karyawan.id as user_id,
+            data_karyawan.id,
             data_karyawan.nama_karyawan,
+            data_karyawan.poin,
             SUM(
                 CASE 
                     WHEN TIME(presensi.clock_in) <= ADDTIME(shift.jam_masuk,'-00:15:00')
@@ -78,11 +84,72 @@ class Gamifikasi extends Component
             ->get();
     }
 
+    private function getKaryawan()
+    {
+        return DB::table('data_karyawan')
+            ->where('entitas', session('selected_entitas'))
+            ->where('divisi', 'TEKNISI')
+            ->where('level', 'STAFF')
+            ->get();
+    }
+
+    public function showEditModal($id)
+    {
+        $decryptedId = Crypt::decrypt($id);
+        $this->editId = $decryptedId;
+
+        $data = M_DataKaryawan::find($decryptedId);
+        // dd($data);
+        if (!$data) {
+            session()->flash('error', 'Data tiket tidak ditemukan!');
+            return;
+        }
+
+        // $this->poin = $data->poin;
+        $this->dispatch('editModal', action: 'show');
+    }
+
+    public function updatePoin()
+    {
+        $this->validate([
+            'poin' => 'required|numeric|min:0',
+        ]);
+
+        // Ambil data karyawan
+        $karyawan = $this->editId
+            ? M_DataKaryawan::find($this->editId)
+            : $this->karyawan;
+
+        if (!$karyawan) {
+            session()->flash('error', 'Data karyawan tidak ditemukan!');
+            return;
+        }
+
+        // Tambahkan poin ke poin lama
+        $poinLama = $karyawan->poin ?? 0;
+        $poinBaru = $poinLama + $this->poin;
+
+        $karyawan->update([
+            'poin' => $poinBaru,
+        ]);
+
+        $this->reset('poin');
+
+        $this->dispatch('editModal', action: 'hide');
+
+        $this->dispatch('swal', params: [
+            'title' => 'Poin Berhasil Ditambahkan',
+            'icon' => 'success',
+            'text' => "Poin bertambah, Total sekarang: $poinBaru"
+        ]);
+    }
+
     public function render()
     {
         return view('livewire.gamifikasi', [
             'data' => $this->hitungTepatWaktu(),
-            'totalKaryawan' => $this->countKaryawan()
+            'totalKaryawan' => $this->countKaryawan(),
+            'karyawans' => $this->getKaryawan(),
         ]);
     }
 }

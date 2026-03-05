@@ -23,15 +23,24 @@
                         <tr>
                             <th>No</th>
                             <th>Nama Karyawan</th>
-                            <th>Total</th>
+                            <th>Rekap</th>
+                            <th>Poin Gamifikasi</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($data as $index => $row)
+                        @forelse ($data as $index => $key)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td>{{ $row->nama_karyawan }}</td>
-                                <td>{{ $row->total_tepat_waktu }}</td>
+                                <td>{{ $key->nama_karyawan }}</td>
+                                <td>{{ $key->total_tepat_waktu }}</td>
+                                <td>{{ $key->poin }}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm"
+                                        wire:click="showEditModal('{{ Crypt::encrypt($key->id) }}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
                             </tr>
                         @empty
                             <tr>
@@ -43,4 +52,44 @@
             </div>
         </div>
     </div>
+    <div wire:ignore.self class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Form Tambah Poin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3 container">
+                        <label for="poin" class="form-label">Poin</label>
+                        <input type="text" class="form-control" id="poin" wire:model="poin">
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button" wire:click="updatePoin" class="btn btn-primary">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+@push('scripts')
+    <script>
+        Livewire.on('editModal', (event) => {
+            $('#editModal').modal(event.action);
+        });
+
+        Livewire.on('modal-confirm-delete', (event) => {
+            $('#modal-confirm-delete').modal(event.action);
+            $('#btn-confirm-delete').attr('wire:click', 'delete("' + event.id + '")');
+            $('#modal-confirm-delete').modal('hide');
+        });
+
+        Livewire.on('swal', (e) => {
+            Swal.fire(e.params);
+        });
+    </script>
+@endpush
