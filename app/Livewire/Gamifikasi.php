@@ -69,6 +69,7 @@ class Gamifikasi extends Component
             ->where('data_karyawan.divisi', 'TEKNISI')
             ->where('data_karyawan.level', 'STAFF')
             ->selectRaw("
+            data_karyawan.id as user_id,
             data_karyawan.id,
             data_karyawan.nama_karyawan,
             data_karyawan.poin,
