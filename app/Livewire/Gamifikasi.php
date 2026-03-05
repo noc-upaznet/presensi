@@ -80,7 +80,11 @@ class Gamifikasi extends Component
                 END
             ) as total_tepat_waktu
         ")
-            ->groupBy('data_karyawan.id', 'data_karyawan.nama_karyawan')
+            ->groupBy(
+                'data_karyawan.id',
+                'data_karyawan.nama_karyawan',
+                'data_karyawan.poin'
+            )
             ->orderByDesc('total_tepat_waktu')
             ->get();
     }
