@@ -134,6 +134,15 @@
                         <p>Riwayat Presensi</p>
                     </a>
                 </li>
+                @can('gamifikasi-view')
+                    <li class="nav-item">
+                        <a href="{{ route('gamifikasi') }}"
+                            class="nav-link {{ request()->routeIs('gamifikasi') ? 'active' : '' }}">
+                            <i class="bi bi-list-task"></i>
+                            <p>Gamifikasi</p>
+                        </a>
+                    </li>
+                @endcan
                 @hasanyrole('spv|hr')
                     <li class="nav-item">
                         <a href="{{ route('riwayat-presensi-staff') }}"
