@@ -22,7 +22,7 @@ class RiwayatPresensiStaff extends Component
     public $filterTanggal;
     public $filterBulan;
     public $filterkaryawan;
-    public $filterStatus = '';
+    public $filterStatus;
     public $editId;
     public $status;
     public $perPage = 25;
