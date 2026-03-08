@@ -104,13 +104,13 @@
             <h3 class="mb-0">Dashboard</h3>
 
             {{-- GAMIFICATION POINT --}}
-            {{-- @if ($showPoin)
+            @if ($showPoin)
                 <div class="dashboard-point">
                     <span class="point-icon">⭐</span>
                     <span class="point-value">{{ $poin }}</span>
                     <span class="point-label">Poin</span>
                 </div>
-            @endif --}}
+            @endif
         </div>
 
         <div class="text mb-4" style="color: var(--bs-body-color); justify-content: center; align-items: center;">
