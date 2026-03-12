@@ -4,9 +4,14 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Livewire\WithoutUrlPagination;
+use Livewire\WithPagination;
 
 class ListNotifikations extends Component
 {
+    use WithPagination, WithoutUrlPagination;
+    protected $paginationTheme = 'bootstrap';
+
     public function markAsRead($id)
     {
         Auth::user()
@@ -27,7 +32,7 @@ class ListNotifikations extends Component
             'notifications' => Auth::user()
                 ->notifications()
                 ->latest()
-                ->paginate(10),
+                ->paginate(25),
         ]);
     }
 }

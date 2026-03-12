@@ -18,15 +18,6 @@
         </div>
         <!--end::Container-->
     </div>
-    {{-- <div class="card-header d-flex justify-content-between align-items-center">
-        <strong>🔔 Notifikasi</strong>
-
-        @if (auth()->user()->unreadNotifications->count())
-            <button class="btn btn-sm btn-outline-primary" wire:click="markAllAsRead">
-                Tandai Semua Dibaca
-            </button>
-        @endif
-    </div> --}}
     <div class="app-content">
         <div class="container-fluid">
             <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
@@ -101,6 +92,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-3">
+                    {{ $notifications->links() }}
                 </div>
             </div>
         </div>

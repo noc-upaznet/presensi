@@ -54,9 +54,20 @@ class ReminderKontrakPopup extends Component
 
         $today = today();
         $oneMonthLater = today()->addMonth();
+        $twoMonthsLater = today()->addMonths(2);
 
-        $karyawans = M_DataKaryawan::whereIn('status_karyawan', ['Probation', 'PKWT Kontrak'])
-            ->whereBetween('tgl_keluar', [$today, $oneMonthLater])
+        $karyawans = M_DataKaryawan::where(function ($query) use ($today, $oneMonthLater, $twoMonthsLater) {
+
+            $query->where(function ($q) use ($today, $oneMonthLater) {
+                $q->where('status_karyawan', 'Probation')
+                    ->whereBetween('tgl_keluar', [$today, $oneMonthLater]);
+            });
+
+            $query->orWhere(function ($q) use ($today, $twoMonthsLater) {
+                $q->where('status_karyawan', 'PKWT Kontrak')
+                    ->whereBetween('tgl_keluar', [$today, $twoMonthsLater]);
+            });
+        })
             ->orderBy('tgl_keluar')
             ->get();
 
@@ -106,23 +117,23 @@ class ReminderKontrakPopup extends Component
                 : '#ef4444';
 
             $html .= '
-            <tr>
-                <td style="padding:6px 0">' . e($k->nama_karyawan) . '</td>
-                <td>' . e($k->entitas) . '</td>
-                <td>
-                    <span style="
-                        background:' . $color . ';
-                        color:#fff;
-                        padding:2px 8px;
-                        border-radius:6px;
-                        font-size:12px
-                    ">
-                        ' . e($k->status_karyawan) . '
-                    </span>
-                </td>
-                <td>' . \Carbon\Carbon::parse($k->tgl_keluar)->format('d M Y') . '</td>
-            </tr>
-        ';
+                    <tr>
+                        <td style="padding:6px 0">' . e($k->nama_karyawan) . '</td>
+                        <td>' . e($k->entitas) . '</td>
+                        <td>
+                            <span style="
+                                background:' . $color . ';
+                                color:#fff;
+                                padding:2px 8px;
+                                border-radius:6px;
+                                font-size:12px
+                            ">
+                                ' . e($k->status_karyawan) . '
+                            </span>
+                        </td>
+                        <td>' . \Carbon\Carbon::parse($k->tgl_keluar)->format('d M Y') . '</td>
+                    </tr>
+                ';
         }
 
         $html .= '</tbody></table></div>';
@@ -141,9 +152,23 @@ class ReminderKontrakPopup extends Component
 
         $userId = Auth::id();
 
+        $today = today();
+        $oneMonthLater = today()->addMonth();
+        $twoMonthsLater = today()->addMonths(2);
+
         $karyawan = M_DataKaryawan::where('user_id', $userId)
-            ->whereIn('status_karyawan', ['Probation', 'PKWT Kontrak'])
-            ->whereBetween('tgl_keluar', [today(), today()->addMonth()])
+            ->where(function ($query) use ($today, $oneMonthLater, $twoMonthsLater) {
+
+                $query->where(function ($q) use ($today, $oneMonthLater) {
+                    $q->where('status_karyawan', 'Probation')
+                        ->whereBetween('tgl_keluar', [$today, $oneMonthLater]);
+                });
+
+                $query->orWhere(function ($q) use ($today, $twoMonthsLater) {
+                    $q->where('status_karyawan', 'PKWT Kontrak')
+                        ->whereBetween('tgl_keluar', [$today, $twoMonthsLater]);
+                });
+            })
             ->first();
 
         if (!$karyawan) {
@@ -178,9 +203,6 @@ class ReminderKontrakPopup extends Component
 
         $this->dispatch('kontrak-reminder');
     }
-
-
-
 
     public function render()
     {
