@@ -104,27 +104,51 @@ class Payroll extends Component
         $entitas = session('selected_entitas', 'UHO');
 
         $karyawanIds = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
+
         $this->total_gaji = PayrollModel::whereIn('karyawan_id', $karyawanIds)
             ->where('periode', $this->periode)
             ->where('titip', 0)
             ->get()
             ->sum(function ($item) {
 
-                $potongan = is_string($item->potongan)
-                    ? json_decode($item->potongan, true)
-                    : $item->potongan;
+                $tunjanganArray = collect(json_decode($item->tunjangan, true) ?? []);
+                $potonganArray  = collect(json_decode($item->potongan, true) ?? []);
 
-                $totalPotongan = collect($potongan ?? [])
-                    ->sum(fn($p) => (int) ($p['nominal'] ?? 0));
-                return
-                    $item->total_gaji +
-                    $item->bpjs +
-                    $item->bpjs_jht +
-                    // $item->voucher +
-                    $item->tunjangan_kebudayaan +
-                    // $item->terlambat +
-                    $item->kasbon +
-                    $totalPotongan;
+                // =====================
+                // PENDAPATAN
+                // =====================
+                $pendapatan =
+                    ($item->gaji_pokok ?? 0)
+                    + ($item->tunjangan_jabatan ?? 0)
+                    + (($item->lembur ?? 0) + ($item->lembur_libur ?? 0))
+                    + ($item->tunjangan_kebudayaan ?? 0)
+                    + ($item->transport ?? 0)
+                    + ($item->uang_makan ?? 0)
+                    + ($item->fee_sharing ?? 0)
+                    + ($item->insentif ?? 0)
+                    + ($item->inov_reward ?? 0);
+
+                // Tambahan tunjangan dari JSON
+                foreach ($tunjanganArray as $t) {
+                    $pendapatan += (int) ($t['nominal'] ?? 0);
+                }
+
+                // =====================
+                // POTONGAN
+                // =====================
+                $potongan =
+                    ($item->izin ?? 0);
+
+                $excludePotongan = ['pph 21', 'pph21', 'potongan kebudayaan'];
+
+                foreach ($potonganArray as $p) {
+                    if (in_array(strtolower($p['nama'] ?? ''), $excludePotongan)) {
+                        continue;
+                    }
+                    $potongan += (int) ($p['nominal'] ?? 0);
+                }
+
+                return $pendapatan - $potongan;
             });
 
 
@@ -134,21 +158,44 @@ class Payroll extends Component
             ->get()
             ->sum(function ($item) {
 
-                $potongan = is_string($item->potongan)
-                    ? json_decode($item->potongan, true)
-                    : $item->potongan;
+                $tunjanganArray = collect(json_decode($item->tunjangan, true) ?? []);
+                $potonganArray  = collect(json_decode($item->potongan, true) ?? []);
 
-                $totalPotongan = collect($potongan ?? [])
-                    ->sum(fn($p) => (int) ($p['nominal'] ?? 0));
-                return
-                    $item->total_gaji +
-                    $item->bpjs +
-                    $item->bpjs_jht +
-                    // $item->voucher +
-                    $item->tunjangan_kebudayaan +
-                    // $item->terlambat +
-                    $item->kasbon +
-                    $totalPotongan;
+                // =====================
+                // PENDAPATAN
+                // =====================
+                $pendapatan =
+                    ($item->gaji_pokok ?? 0)
+                    + ($item->tunjangan_jabatan ?? 0)
+                    + (($item->lembur ?? 0) + ($item->lembur_libur ?? 0))
+                    + ($item->tunjangan_kebudayaan ?? 0)
+                    + ($item->transport ?? 0)
+                    + ($item->uang_makan ?? 0)
+                    + ($item->fee_sharing ?? 0)
+                    + ($item->insentif ?? 0)
+                    + ($item->inov_reward ?? 0);
+
+                // Tambahan tunjangan dari JSON
+                foreach ($tunjanganArray as $t) {
+                    $pendapatan += (int) ($t['nominal'] ?? 0);
+                }
+
+                // =====================
+                // POTONGAN
+                // =====================
+                $potongan =
+                    ($item->izin ?? 0);
+
+                $excludePotongan = ['pph 21', 'pph21', 'potongan kebudayaan'];
+
+                foreach ($potonganArray as $p) {
+                    if (in_array(strtolower($p['nama'] ?? ''), $excludePotongan)) {
+                        continue;
+                    }
+                    $potongan += (int) ($p['nominal'] ?? 0);
+                }
+
+                return $pendapatan - $potongan;
             });
 
         $this->bpjs_kes_pt = PayrollModel::whereIn('karyawan_id', $karyawanIds)
@@ -198,6 +245,7 @@ class Payroll extends Component
 
         $this->jumlahBelumPunyaSlip = M_DataKaryawan::query()
             ->where('entitas', $selectedEntitas)
+            ->where('status_karyawan', '!=', 'NONAKTIF')
             ->leftJoin('payroll', function ($join) {
                 $join->on('data_karyawan.id', '=', 'payroll.karyawan_id')
                     ->where('payroll.periode', '=', $this->periode);
@@ -207,6 +255,7 @@ class Payroll extends Component
 
         $this->jumlahBelumPunyaSlipTitip = M_DataKaryawan::query()
             ->where('entitas', '!=', $selectedEntitas)
+            ->where('status_karyawan', '!=', 'NONAKTIF')
             ->leftJoin('payroll', function ($join) {
                 $join->on('data_karyawan.id', '=', 'payroll.karyawan_id')
                     ->where('payroll.periode', '=', $this->periode);
