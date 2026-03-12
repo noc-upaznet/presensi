@@ -303,6 +303,15 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tax-status" class="form-label">Status Pajak</label>
+                                <input class="form-control" id="tax-status" wire:model="form.tax_status"
+                                    placeholder="Masukkan Status Pajak (PTKP)"
+                                    oninput="this.value = this.value.toUpperCase()" />
+                                @error('form.tax_status')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
 
                         <h4 style="color: blue; margin-bottom: 20px;">Penggajian</h4>

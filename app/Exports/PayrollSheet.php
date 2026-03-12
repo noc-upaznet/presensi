@@ -33,7 +33,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
         $query = PayrollModel::join('data_karyawan', 'payroll.karyawan_id', '=', 'data_karyawan.id')
             ->where('payroll.periode', $this->periode)
             ->where('payroll.entitas_id', $this->entitas)
-            ->orderBy('data_karyawan.nip_karyawan', 'asc');
+            ->orderBy('data_karyawan.nik', 'asc');
 
         if ($this->status == 'titip') {
             $query->where('payroll.titip', 1);
@@ -46,7 +46,9 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
         $data = $query->select(
             'payroll.*',
             'data_karyawan.nama_karyawan',
-            'data_karyawan.nip_karyawan'
+            'data_karyawan.nik',
+            'data_karyawan.jabatan',
+            'data_karyawan.tax_status'
         )->get();
 
         foreach ($data as $item) {
@@ -67,8 +69,9 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
         $header = [
             'No Slip',
             'Nama Karyawan',
-            'NIP',
-            'Divisi',
+            'NIK',
+            'Status Pajak',
+            'Jabatan',
             'Periode',
             'Tunjangan Jabatan',
             'Gaji Pokok',
@@ -109,8 +112,9 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $row = [
                 $item->no_slip,
                 $item->nama_karyawan,
-                $item->nip_karyawan,
-                $item->divisi,
+                $item->nik,
+                $item->tax_status,
+                $item->jabatan,
                 $item->periode,
                 $item->tunjangan_jabatan,
                 $item->gaji_pokok,
@@ -158,7 +162,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             }
 
             $potongan =
-                ($item->izin ?? 0) + ($item->terlambat ?? 0);
+                ($item->izin ?? 0);
 
             $excludePotongan = ['pph 21', 'pph21'];
             foreach ($this->uniquePotongan as $nama) {
@@ -225,9 +229,10 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
 
             $colLetter = Coordinate::stringFromColumnIndex($col);
 
-            if (in_array($header, ['terlambat', 'izin'])) {
+            if (in_array($header, ['izin'])) {
                 $color = 'FFFF0000';
             } elseif (in_array($header, [
+                'terlambat',
                 'bpjs kesehatan ka',
                 'bpjs jht ka',
                 'kasbon',

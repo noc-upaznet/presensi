@@ -56,6 +56,7 @@ class M_DataKaryawan extends Model
         'tgl_aktif_bpjs',
         'penanggung',
         'poin',
+        'tax_status',
     ];
 
     public function getJadwal()

@@ -6,12 +6,10 @@ use Livewire\Component;
 use App\Models\M_Entitas;
 use App\Models\M_Divisi;
 use App\Models\M_Jabatan;
-use Illuminate\Http\Request;
 use Livewire\WithFileUploads;
 use App\Models\M_DataKaryawan;
 use App\Imports\KaryawanImport;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Storage;
 use App\Livewire\Forms\TambahDataKaryawanForm;
 use App\Models\User;
 
@@ -109,6 +107,7 @@ class ModalKaryawan extends Component
             'anggota_bpjs' => $this->form->anggota_bpjs,
             'tgl_aktif_bpjs' => $this->form->tgl_aktif_bpjs,
             'penanggung' => $this->form->penanggung,
+            'tax_status' => $this->form->tax_status,
         ];
         // dd($data);
         User::where('id', $ticket->user_id)->update([
@@ -140,7 +139,6 @@ class ModalKaryawan extends Component
 
         // Import langsung dari file temporary
         Excel::import(new KaryawanImport, $filePath);
-        // Kirim notifikasi sukses
         $this->dispatch('swal', params: [
             'title' => 'Berhasil!',
             'text' => 'Data berhasil di-import.',

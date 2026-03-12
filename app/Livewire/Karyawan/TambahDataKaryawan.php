@@ -166,6 +166,7 @@ class TambahDataKaryawan extends Component
             'anggota_bpjs' => $this->form->anggota_bpjs,
             'tgl_aktif_bpjs' => $this->form->tgl_aktif_bpjs ?: null,
             'penanggung' => $this->form->penanggung,
+            'tax_status' => $this->form->tax_status,
         ];
 
         // dd($data);

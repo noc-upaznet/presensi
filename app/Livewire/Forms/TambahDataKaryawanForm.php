@@ -84,6 +84,7 @@ class TambahDataKaryawanForm extends Form
     public $voucher = '';
     public $kebudayaan = '';
     public $transport = '';
+    public $tax_status = '';
 
     #[Validate('required', 'Nama Bank')]
     public $nama_bank = '';
