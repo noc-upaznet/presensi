@@ -81,18 +81,22 @@ class M_Lembur extends Model
     {
         $auth = auth()->user();
 
-        // Hanya untuk Admin
+        // Hanya untuk admin
         if (! $auth || ! $auth->hasRole('admin')) {
             return false;
         }
 
-        // Cek status pengajuan
-        if ($this->status != 0) {
+        // Hanya kalau pengaju punya role HR
+        // if (! $this->pengajuRole('hr')) {
+        //     return false;
+        // }
+
+        elseif ($this->status != 0) {
             return false;
         }
 
-        // Pengaju harus HR atau Admin
-        return $this->pengajuRole('hr') || $this->pengajuRole('admin');
+        // Hanya kalau belum diapprove admin
+        return is_null($this->approve_admin);
     }
 
 
