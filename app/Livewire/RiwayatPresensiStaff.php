@@ -236,7 +236,7 @@ class RiwayatPresensiStaff extends Component
         $cutoffEnd   = $cutoff['end'];
 
         $query = M_Presensi::with('getUser')
-            ->where('user_id', '!=', $userId)
+            ->where('user_id', '!=', $karyawanId)
             ->whereBetween('tanggal', [
                 $cutoffStart,
                 $cutoffEnd
