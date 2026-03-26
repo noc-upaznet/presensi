@@ -236,35 +236,20 @@ class RiwayatPresensiStaff extends Component
         $cutoffEnd   = $cutoff['end'];
 
         $query = M_Presensi::with('getUser')
-            ->where('user_id', '!=', $karyawanId)
+            ->where('user_id', '!=', $userId)
             ->whereBetween('tanggal', [
-                $cutoffStart->toDateTimeString(),
-                $cutoffEnd->toDateTimeString(),
+                $cutoffStart,
+                $cutoffEnd
             ])
 
-            // Filter tanggal
             ->when($this->filterTanggal, function ($q) {
                 $q->whereDate('created_at', $this->filterTanggal);
             })
 
-            // Filter bulan
-            ->when(!$this->filterTanggal, function ($q) {
-                if ($this->filterBulan) {
-                    [$year, $month] = explode('-', $this->filterBulan);
-                    $q->whereYear('created_at', $year)
-                        ->whereMonth('created_at', $month);
-                } else {
-                    $q->whereYear('created_at', now()->year)
-                        ->whereMonth('created_at', now()->month);
-                }
-            })
-
-            // Filter karyawan
             ->when($this->filterkaryawan, function ($q) {
                 $q->where('user_id', $this->filterkaryawan);
             })
 
-            // Filter status (disederhanakan)
             ->when($this->filterStatus !== null, function ($q) {
                 $q->where('status', $this->filterStatus);
             });
