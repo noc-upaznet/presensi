@@ -346,6 +346,13 @@
                             @endif
                         </tbody>
                     </table>
+                    <div id="data" class="d-flex justify-content-between align-items-center mt-3">
+                        <span>
+                            Showing {{ $data->firstItem() }} to {{ $data->lastItem() }} of {{ $data->total() }}
+                            entries
+                        </span>
+                        {{ $data->links() }}
+                    </div>
                 </div>
 
                 <h5 class="text-secondary mb-3">Data Slip Karyawan Titip</h5>
@@ -426,13 +433,14 @@
                             @endif
                         </tbody>
                     </table>
-                </div>
 
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <span>
-                        Showing {{ $data->firstItem() }} to {{ $data->lastItem() }} of {{ $data->total() }} entries
-                    </span>
-                    {{ $data->links() }}
+                    <div id="data2" class="d-flex justify-content-between align-items-center mt-3">
+                        <span>
+                            Showing {{ $data2->firstItem() }} to {{ $data2->lastItem() }} of {{ $data2->total() }}
+                            entries
+                        </span>
+                        {{ $data2->links() }}
+                    </div>
                 </div>
             </div>
         </div>

@@ -23,6 +23,11 @@ class Payroll extends Component
     use WithPagination, WithoutUrlPagination;
     protected $paginationTheme = 'bootstrap';
 
+    protected $queryString = [
+        'page1' => ['except' => 1],
+        'page2' => ['except' => 1],
+    ];
+
     public $search = '';
     public $selectedYear;
     public $selectedMonth;
@@ -466,8 +471,13 @@ class Payroll extends Component
             $data2Query->where('periode', $periode);
         }
 
-        $data = $dataQuery->orderBy('created_at', 'desc')->paginate($this->perPage);
-        $data2 = $data2Query->orderBy('created_at', 'desc')->paginate($this->perPage);
+        $data = $dataQuery
+            ->orderBy('created_at', 'desc')
+            ->paginate($this->perPage, ['*'], 'page1');
+
+        $data2 = $data2Query
+            ->orderBy('created_at', 'desc')
+            ->paginate($this->perPage, ['*'], 'page2');
 
         return view('livewire.payroll', [
             'data' => $data,
