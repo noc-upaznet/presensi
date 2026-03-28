@@ -10,7 +10,6 @@ use App\Models\M_Pengajuan;
 use App\Models\PayrollModel;
 use App\Models\M_JadwalShift;
 use App\Models\M_DataKaryawan;
-use Illuminate\Support\Facades\Auth;
 
 class Dashboard extends Component
 {
@@ -19,6 +18,14 @@ class Dashboard extends Component
     public $tepatWaktu = [];
     public $terlambat = [];
     public $tidakAbsen = [];
+    public $total_gaji;
+    public $total_gaji_titip;
+    public $bpjs_kes_pt;
+    public $bpjs_jht_pt;
+    public $note_total_gaji;
+    public $note_total_gaji_titip;
+    public $note_bpjs_kes;
+    public $note_bpjs_jht;
 
     public function mount()
     {
@@ -88,91 +95,151 @@ class Dashboard extends Component
             $this->terlambat[] = $telat;
             $this->tidakAbsen[] = max($absen, 0);
         }
+
+        $this->countGaji();
+    }
+
+    public function countGaji()
+    {
+        $now = Carbon::now();
+
+        $start = $now->copy()->startOfMonth(); // tgl 1
+        $end   = $now->copy()->endOfMonth();   // tgl 30/31
+
+        // bulan sebelumnya
+        $lastStart = $now->copy()->subMonth()->startOfMonth();
+        $lastEnd   = $now->copy()->subMonth()->endOfMonth();
+
+        $entitas = session('selected_entitas', 'UHO');
+        $karyawanIds = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
+
+        // =========================
+        // FUNCTION HITUNG GAJI
+        // =========================
+        $hitungGaji = function ($items) {
+            return $items->sum(function ($item) {
+
+                $tunjanganArray = collect(json_decode($item->tunjangan, true) ?? []);
+                $potonganArray  = collect(json_decode($item->potongan, true) ?? []);
+
+                $pendapatan =
+                    ($item->gaji_pokok ?? 0)
+                    + ($item->tunjangan_jabatan ?? 0)
+                    + (($item->lembur ?? 0) + ($item->lembur_libur ?? 0))
+                    + ($item->tunjangan_kebudayaan ?? 0)
+                    + ($item->transport ?? 0)
+                    + ($item->uang_makan ?? 0)
+                    + ($item->fee_sharing ?? 0)
+                    + ($item->insentif ?? 0)
+                    + ($item->inov_reward ?? 0);
+
+                foreach ($tunjanganArray as $t) {
+                    $pendapatan += (int) ($t['nominal'] ?? 0);
+                }
+
+                $potongan = ($item->izin ?? 0);
+
+                $excludePotongan = ['pph 21', 'pph21', 'potongan kebudayaan'];
+
+                foreach ($potonganArray as $p) {
+                    if (in_array(strtolower($p['nama'] ?? ''), $excludePotongan)) {
+                        continue;
+                    }
+                    $potongan += (int) ($p['nominal'] ?? 0);
+                }
+
+                return $pendapatan - $potongan;
+            });
+        };
+
+        // =========================
+        // TOTAL GAJI (TIDAK TITIP)
+        // =========================
+        $currentGaji = $hitungGaji(
+            PayrollModel::whereIn('karyawan_id', $karyawanIds)
+                ->whereBetween('created_at', [$start, $end])
+                ->where('titip', 0)
+                ->get()
+        );
+
+        $lastGaji = $hitungGaji(
+            PayrollModel::whereIn('karyawan_id', $karyawanIds)
+                ->whereBetween('created_at', [$lastStart, $lastEnd])
+                ->where('titip', 0)
+                ->get()
+        );
+
+        $this->total_gaji = $currentGaji;
+        $this->note_total_gaji = $this->hitungPersen($currentGaji, $lastGaji);
+
+        // =========================
+        // GAJI TITIP
+        // =========================
+        $currentTitip = $hitungGaji(
+            PayrollModel::whereIn('karyawan_id', $karyawanIds)
+                ->whereBetween('created_at', [$start, $end])
+                ->where('titip', 1)
+                ->get()
+        );
+
+        $lastTitip = $hitungGaji(
+            PayrollModel::whereIn('karyawan_id', $karyawanIds)
+                ->whereBetween('created_at', [$lastStart, $lastEnd])
+                ->where('titip', 1)
+                ->get()
+        );
+
+        $this->total_gaji_titip = $currentTitip;
+        $this->note_total_gaji_titip = $this->hitungPersen($currentTitip, $lastTitip);
+
+        // =========================
+        // BPJS KES
+        // =========================
+        $currentBpjsKes = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->whereBetween('created_at', [$start, $end])
+            ->sum('bpjs_perusahaan');
+
+        $lastBpjsKes = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->whereBetween('created_at', [$lastStart, $lastEnd])
+            ->sum('bpjs_perusahaan');
+
+        $this->bpjs_kes_pt = $currentBpjsKes;
+        $this->note_bpjs_kes = $this->hitungPersen($currentBpjsKes, $lastBpjsKes);
+
+        // =========================
+        // BPJS JHT
+        // =========================
+        $currentBpjsJht = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->whereBetween('created_at', [$start, $end])
+            ->sum('bpjs_jht_perusahaan');
+
+        $lastBpjsJht = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->whereBetween('created_at', [$lastStart, $lastEnd])
+            ->sum('bpjs_jht_perusahaan');
+
+        $this->bpjs_jht_pt = $currentBpjsJht;
+        $this->note_bpjs_jht = $this->hitungPersen($currentBpjsJht, $lastBpjsJht);
+    }
+
+    private function hitungPersen($current, $last)
+    {
+        if ($last > 0) {
+            $diff = $current - $last;
+            $percent = round(($diff / $last) * 100, 2);
+            $isUp = $percent >= 0;
+
+            return ($isUp ? '▲ +' : '▼ ') . abs($percent) . '% dari bulan sebelumnya';
+        }
+
+        return 'Data bulan lalu tidak tersedia';
     }
 
     public function render()
     {
         $entitas = session('selected_entitas', 'UHO'); // default fallback
-        $entitasModel = M_Entitas::where('nama', $entitas)->first();
-        $entitasIdSaatIni = $entitasModel?->id;
 
         $karyawanIds = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
-        $karyawanIdTitip = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
 
-        // Filter berdasarkan ID karyawan dari entitas tersebut
-        $totalGaji = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            // ->where('periode', now()->format('Y-m'))
-            ->where('created_at', 'like', now()->format('Y-m') . '%')
-            ->sum('total_gaji');
-        // dd($totalGaji);
-        $totalGajiLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            // ->where('periode', now()->subMonth()->format('Y-m'))
-            ->where('created_at', 'like', now()->subMonth()->format('Y-m') . '%')
-            ->sum('total_gaji');
-        // dd($totalGajiLastMonth);
-
-        if ($totalGajiLastMonth > 0) {
-            $diff = $totalGaji - $totalGajiLastMonth;
-            $percentChange = round(($diff / $totalGajiLastMonth) * 100, 2);
-            $isUp = $percentChange >= 0;
-            $noteTotalGajiTetap = ($isUp ? '▲ +' : '▼ ') . abs($percentChange) . '% dari bulan sebelumnya';
-        } else {
-            $noteTotalGajiTetap = 'Data bulan lalu tidak tersedia';
-        }
-
-        $totalGajiTitip = PayrollModel::whereIn('karyawan_id', $karyawanIdTitip)
-            // ->where('periode', now()->format('Y-m'))
-            ->where('created_at', 'like', now()->format('Y-m') . '%')
-            ->where('titip', 1)
-            ->sum('total_gaji');
-        // dd($totalGajiTitip);
-        $totalGajiTitipLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIdTitip)
-            ->where('titip', 1)
-            // ->where('periode', now()->subMonth()->format('Y-m'))
-            ->where('created_at', 'like', now()->subMonth()->format('Y-m') . '%')
-            ->sum('total_gaji');
-        if ($totalGajiTitipLastMonth > 0) {
-            $diffTitip = $totalGajiTitip - $totalGajiTitipLastMonth;
-            $percentChangeTitip = round(($diffTitip / $totalGajiTitipLastMonth) * 100, 2);
-            $isUpTitip = $percentChangeTitip >= 0;
-            $noteTotalGajiTitip = ($isUpTitip ? '▲ +' : '▼ ') . abs($percentChangeTitip) . '% dari bulan sebelumnya';
-        } else {
-            $noteTotalGajiTitip = 'Data bulan lalu tidak tersedia';
-        }
-
-        $totalBpjskes = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            // ->where('periode', now()->format('Y-m'))
-            ->where('created_at', 'like', now()->format('Y-m') . '%')
-            ->sum('bpjs_perusahaan');
-        $totalBpjsKesLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            // ->where('periode', now()->subMonth()->format('Y-m'))
-            ->where('created_at', 'like', now()->subMonth()->format('Y-m') . '%')
-            ->sum('bpjs_perusahaan');
-        if ($totalBpjsKesLastMonth > 0) {
-            $diff = $totalBpjskes - $totalBpjsKesLastMonth;
-            $percentChange = round(($diff / $totalBpjsKesLastMonth) * 100, 2);
-            $isUp = $percentChange >= 0;
-            $noteTotalBpjskes = ($isUp ? '▲ +' : '▼ ') . abs($percentChange) . '% dari bulan sebelumnya';
-        } else {
-            $noteTotalBpjskes = 'Data bulan lalu tidak tersedia';
-        }
-
-        $totalBpjsJht = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            // ->where('periode', now()->format('Y-m'))
-            ->where('created_at', 'like', now()->format('Y-m') . '%')
-            ->sum('bpjs_jht_perusahaan');
-        $totalBpjsJhtLastMonth = PayrollModel::whereIn('karyawan_id', $karyawanIds)
-            // ->where('periode', now()->subMonth()->format('Y-m'))
-            ->where('created_at', 'like', now()->subMonth()->format('Y-m') . '%')
-            ->sum('bpjs_jht_perusahaan');
-        if ($totalBpjsJhtLastMonth > 0) {
-            $diffJht = $totalBpjsJht - $totalBpjsJhtLastMonth;
-            $percentChangeJht = round(($diffJht / $totalBpjsJhtLastMonth) * 100, 2);
-            $isUpJht = $percentChangeJht >= 0;
-            $noteTotalBpjsJht = ($isUpJht ? '▲ +' : '▼ ') . abs($percentChangeJht) . '% dari bulan sebelumnya';
-        } else {
-            $noteTotalBpjsJht = 'Data bulan lalu tidak tersedia';
-        }
         // dd($totalBpjskes);
         $totalIzinCuti = M_Pengajuan::whereIn('karyawan_id', $karyawanIds)
             ->where('status', 1)
@@ -209,17 +276,23 @@ class Dashboard extends Component
 
         return view('livewire.dashboard', [
             'totalPegawai' => $karyawanIds->count(),
-            'totalGaji' => $totalGaji,
-            'noteTotalGajiTetap' => $noteTotalGajiTetap,
-            'totalGajiTitip' => $totalGajiTitip,
-            'noteTotalGajiTitip' => $noteTotalGajiTitip,
+
+            'totalGaji' => $this->total_gaji,
+            'noteTotalGajiTetap' => $this->note_total_gaji,
+
+            'totalGajiTitip' => $this->total_gaji_titip,
+            'noteTotalGajiTitip' => $this->note_total_gaji_titip,
+
             'izinCuti' => $totalIzinCuti,
             'totalPresensi' => $totalPresensi,
             'statusKaryawan' => $statusKaryawan,
-            'totalBpjskes' => $totalBpjskes,
-            'noteTotalBpjskes' => $noteTotalBpjskes,
-            'totalBpjsJht' => $totalBpjsJht,
-            'noteTotalBpjsJht' => $noteTotalBpjsJht,
+
+            'totalBpjskes' => $this->bpjs_kes_pt,
+            'noteTotalBpjskes' => $this->note_bpjs_kes,
+
+            'totalBpjsJht' => $this->bpjs_jht_pt,
+            'noteTotalBpjsJht' => $this->note_bpjs_jht,
+
             'pendidikan' => [
                 'SMK' => 45,
                 'D3' => 23,
