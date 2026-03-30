@@ -223,6 +223,9 @@ class Kasbon extends Component
     public function render()
     {
         $kasbons = KasbonModel::with('karyawan')
+            ->whereHas('karyawan', function ($query) {
+                $query->where('entitas', session('selected_entitas', 'UHO'));
+            })
             ->latest()
             ->get();
         return view('livewire.kasbon.kasbon', [
