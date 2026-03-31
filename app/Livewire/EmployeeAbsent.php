@@ -30,6 +30,7 @@ class EmployeeAbsent extends Component
 
         $query = M_DataKaryawan::query()
             ->where('status_karyawan', '!=', 'NONAKTIF')
+            ->where('deleted_at', null)->where('jabatan', '!=', 'Komisaris')->where('jabatan', '!=', 'Direktur')
             ->where('entitas', $entitas);
 
         // filter
@@ -41,7 +42,6 @@ class EmployeeAbsent extends Component
             $query->where('nama_karyawan', 'like', '%' . $this->search . '%');
         }
 
-        // tidak presensi hari ini
         $query->whereNotIn('id', function ($q) {
             $q->select('user_id')
                 ->from('presensi')
@@ -49,7 +49,6 @@ class EmployeeAbsent extends Component
                 ->whereDate('tanggal', now());
         });
 
-        // MODE 2: harus ada pengajuan
         if ($this->mode === 'pengajuan') {
             $query->whereIn('id', function ($q) {
                 $q->select('karyawan_id')
