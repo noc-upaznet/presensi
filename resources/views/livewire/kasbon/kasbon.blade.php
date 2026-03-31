@@ -39,7 +39,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped table-hover" style="background-color: var(--bs-body-bg);">
+            <table class="table table-hover" style="background-color: var(--bs-body-bg);">
                 <thead>
                     <tr>
                         <th>Mulai Potong</th>

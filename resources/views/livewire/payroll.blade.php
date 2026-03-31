@@ -194,7 +194,7 @@
         </div>
     </div>
     <div class="container-fluid">
-        <div class="card">
+        <div class="card" style="background-color: var(--bs-body-bg);">
             <div class="card-header">
                 @php
                     $month = $selectedMonth ?? now()->subMonth()->format('n');
@@ -270,7 +270,7 @@
                 </div>
                 <h5 class="text-secondary mb-3">Data Slip Karyawan {{ $currentEntitas }}</h5>
                 <div class="table-responsive">
-                    <table class="table table-striped table-bordered">
+                    <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>No. Slip</th>
@@ -357,7 +357,7 @@
 
                 <h5 class="text-secondary mb-3">Data Slip Karyawan Titip</h5>
                 <div class="table-responsive">
-                    <table class="table table-striped table-bordered">
+                    <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>No. Slip</th>
