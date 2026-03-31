@@ -25,6 +25,7 @@ use App\Livewire\Karyawan\PembagianShift;
 use App\Http\Controllers\PayrollController;
 use App\Livewire\DataMaster;
 use App\Livewire\EditPayroll;
+use App\Livewire\EmployeeAbsent;
 use App\Livewire\Gamifikasi;
 use App\Livewire\Karyawan\DetailDataKaryawan;
 use App\Livewire\Karyawan\Pengajuan\Dispensasi;
@@ -113,4 +114,5 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/notifikasi', ListNotifikations::class)->name('notifikasi');
     Route::get('/kasbon', Kasbon::class)->name('kasbon')->middleware('check.kasbon-view');
     Route::get('/gamifikasi', Gamifikasi::class)->name('gamifikasi');
+    Route::get('/employee-absent', EmployeeAbsent::class)->name('employee-absent');
 });

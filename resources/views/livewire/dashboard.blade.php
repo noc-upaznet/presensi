@@ -30,7 +30,7 @@
                     'value' => $izinCuti ?? '0',
                     'icon' => 'fa-calendar-times',
                     'color' => 'danger',
-                    'href' => route('pengajuan'),
+                    'href' => route('employee-absent'),
                 ],
                 [
                     'title' => 'MASUK',
@@ -61,7 +61,7 @@
                     'icon' => 'fa-hospital-user',
                     'color' => 'info',
                     'note' => $noteTotalBpjskes,
-                    'href' => route('riwayat-presensi'),
+                    'href' => route('payroll'),
                 ],
                 [
                     'title' => 'BPJS Ketenagakerjaan',
@@ -69,7 +69,7 @@
                     'icon' => 'fa-briefcase',
                     'color' => 'primary',
                     'note' => $noteTotalBpjsJht,
-                    'href' => route('riwayat-presensi'),
+                    'href' => route('payroll'),
                 ],
             ];
 
