@@ -54,7 +54,7 @@
                         <thead>
                             <tr>
                                 <th>Nama</th>
-                                <th>Divisi</th>
+                                <th>Jabatan</th>
                                 <th>Keterangan</th>
                             </tr>
                         </thead>
@@ -63,7 +63,7 @@
                                 <tr>
                                     <td>{{ $item->nama_karyawan }}</td>
                                     </td>
-                                    <td>{{ $item->divisi ?? '-' }}</td>
+                                    <td>{{ $item->jabatan ?? '-' }}</td>
                                     <td>
                                         @php
                                             $punyaPengajuan = \App\Models\M_Pengajuan::where('karyawan_id', $item->id)
