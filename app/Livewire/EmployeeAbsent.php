@@ -19,6 +19,7 @@ class EmployeeAbsent extends Component
     public $filterDivisi;
     public $divisiList;
     public $search;
+    public $mode = 'all';
 
     public function mount()
     {
@@ -27,39 +28,41 @@ class EmployeeAbsent extends Component
 
     public function render()
     {
-        $query = M_Pengajuan::with(['getKaryawan', 'getShift']);
         $entitas = session('selected_entitas', 'UHO');
 
-        // 🔹 filter karyawan
-        $karyawanQuery = M_DataKaryawan::where('entitas', $entitas);
+        $query = M_DataKaryawan::query()
+            ->where('entitas', $entitas);
 
+        // filter
         if ($this->filterDivisi) {
-            $karyawanQuery->where('divisi', $this->filterDivisi);
+            $query->where('divisi', $this->filterDivisi);
         }
 
         if ($this->search) {
-            $karyawanQuery->where('nama_karyawan', 'like', '%' . $this->search . '%');
+            $query->where('nama_karyawan', 'like', '%' . $this->search . '%');
         }
 
-        $karyawanIdList = $karyawanQuery->pluck('id');
+        // tidak presensi hari ini
+        $query->whereNotIn('id', function ($q) {
+            $q->select('user_id')
+                ->from('presensi')
+                ->where('deleted_at', null)
+                ->whereDate('tanggal', now());
+        });
 
-        // ambil yang sudah presensi hari ini
-        $presensiHariIni = M_Presensi::whereDate('tanggal', now())
-            ->pluck('user_id');
+        // MODE 2: harus ada pengajuan
+        if ($this->mode === 'pengajuan') {
+            $query->whereIn('id', function ($q) {
+                $q->select('karyawan_id')
+                    ->from('pengajuan')
+                    ->where('status', 1)
+                    ->where('deleted_at', null)
+                    ->whereDate('tanggal', now());
+            });
+        }
 
-        // query utama
-        $datas = $query->whereIn('karyawan_id', $karyawanIdList)
-            ->where('status', 1)
-            ->whereDate('tanggal', now())
+        $datas = $query->paginate($this->perPage);
 
-            // tidak ada di presensi
-            ->whereNotIn('karyawan_id', $presensiHariIni)
-
-            ->orderBy('tanggal', 'desc')
-            ->paginate($this->perPage);
-
-        return view('livewire.employee-absent', [
-            'datas' => $datas,
-        ]);
+        return view('livewire.employee-absent', compact('datas'));
     }
 }

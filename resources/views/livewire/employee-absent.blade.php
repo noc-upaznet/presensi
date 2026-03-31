@@ -21,21 +21,16 @@
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="d-flex gap-2">
-                {{-- <select class="form-select" wire:model.lazy="selectedKaryawan" style="width: 200px;">
-                    <option value="">Pilih Karyawan</option>
-                    @foreach ($karyawanList as $karyawan)
-                        <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
-                    @endforeach
-                </select> --}}
                 <select class="form-select" wire:model.lazy="filterDivisi" style="width: 150px;">
                     <option value="">Pilih Divisi</option>
                     @foreach ($divisiList as $divisi)
                         <option value="{{ $divisi->nama }}">{{ $divisi->nama }}</option>
                     @endforeach
                 </select>
-
-                {{-- <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan"
-                    wire:model.lazy="filterBulan"> --}}
+                <select class="form-select" wire:model.live="mode" style="width: 220px;">
+                    <option value="all">Semua Tidak Hadir</option>
+                    <option value="pengajuan">Tidak Hadir + Pengajuan</option>
+                </select>
             </div>
         </div>
         <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
@@ -58,9 +53,7 @@
                     <table class="table table-hover mb-0" style="background-color: var(--bs-body-bg);">
                         <thead>
                             <tr>
-                                <th>Tanggal</th>
                                 <th>Nama</th>
-                                <th>Pengajuan</th>
                                 <th>Divisi</th>
                                 <th>Keterangan</th>
                             </tr>
@@ -68,16 +61,27 @@
                         <tbody>
                             @forelse ($datas as $item)
                                 <tr>
-                                    <td>{{ $item->tanggal ?? '-' }}</td>
-                                    <td>{{ $item->getKaryawan->nama_karyawan }}</td>
-                                    <td style="color: var(--bs-body-color);">{{ $item->getShift->nama_shift }}
+                                    <td>{{ $item->nama_karyawan }}</td>
                                     </td>
-                                    <td>{{ $item->getKaryawan->divisi ?? '-' }}</td>
-                                    <td>{{ $item->keterangan ?? '-' }}</td>
+                                    <td>{{ $item->divisi ?? '-' }}</td>
+                                    <td>
+                                        @php
+                                            $punyaPengajuan = \App\Models\M_Pengajuan::where('karyawan_id', $item->id)
+                                                ->where('status', 1)
+                                                ->whereDate('tanggal', now())
+                                                ->exists();
+                                        @endphp
+
+                                        @if ($punyaPengajuan)
+                                            <span class="badge bg-warning">Izin/Cuti</span>
+                                        @else
+                                            <span class="badge bg-danger">Alpha/Libur</span>
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center">
+                                    <td colspan="3" class="text-center">
                                         Tidak ada data.
                                     </td>
                                 </tr>
