@@ -31,6 +31,7 @@ class EmployeeAbsent extends Component
         $entitas = session('selected_entitas', 'UHO');
 
         $query = M_DataKaryawan::query()
+            ->where('status_karyawan', '!=', 'NONAKTIF')
             ->where('entitas', $entitas);
 
         // filter
