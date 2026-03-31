@@ -135,13 +135,13 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="{{ route('employee-absent') }}"
                         class="nav-link {{ request()->routeIs('employee-absent') ? 'active' : '' }}">
                         <i class="bi bi-list-task"></i>
                         <p>Karyawan Absen</p>
                     </a>
-                </li>
+                </li> --}}
 
                 @can('gamifikasi-view')
                     <li class="nav-item">
