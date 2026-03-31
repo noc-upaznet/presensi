@@ -1,0 +1,94 @@
+<div>
+    <div class="app-content-header">
+        <!--begin::Container-->
+        <div class="container-fluid">
+            <!--begin::Row-->
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0" style="color: var(--bs-body-color);">Daftar Karyawan Absen</h3>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Karyawan Absen</li>
+                    </ol>
+                </div>
+            </div>
+            <!--end::Row-->
+        </div>
+        <!--end::Container-->
+    </div>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex gap-2">
+                {{-- <select class="form-select" wire:model.lazy="selectedKaryawan" style="width: 200px;">
+                    <option value="">Pilih Karyawan</option>
+                    @foreach ($karyawanList as $karyawan)
+                        <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
+                    @endforeach
+                </select> --}}
+                <select class="form-select" wire:model.lazy="filterDivisi" style="width: 150px;">
+                    <option value="">Pilih Divisi</option>
+                    @foreach ($divisiList as $divisi)
+                        <option value="{{ $divisi->nama }}">{{ $divisi->nama }}</option>
+                    @endforeach
+                </select>
+
+                {{-- <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan"
+                    wire:model.lazy="filterBulan"> --}}
+            </div>
+        </div>
+        <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <label>Show <select class="form-select form-select-sm d-inline-block w-auto"
+                                wire:model.live="perPage">
+                                <option selected>25</option>
+                                <option>50</option>
+                                <option>100</option>
+                            </select> entries per page</label>
+                    </div>
+                    <div>
+                        <input type="text" class="form-control form-control-sm rounded-end-0"
+                            placeholder="Nama Karyawan" wire:model.live="search">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" style="background-color: var(--bs-body-bg);">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Nama</th>
+                                <th>Pengajuan</th>
+                                <th>Divisi</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($datas as $item)
+                                <tr>
+                                    <td>{{ $item->tanggal ?? '-' }}</td>
+                                    <td>{{ $item->getKaryawan->nama_karyawan }}</td>
+                                    <td style="color: var(--bs-body-color);">{{ $item->getShift->nama_shift }}
+                                    </td>
+                                    <td>{{ $item->getKaryawan->divisi ?? '-' }}</td>
+                                    <td>{{ $item->keterangan ?? '-' }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        Tidak ada data.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    {{ $datas->links() }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
