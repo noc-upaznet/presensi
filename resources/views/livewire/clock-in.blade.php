@@ -298,18 +298,22 @@
             Swal.fire(e.params);
         });
 
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.addEventListener('DOMContentLoaded', function() {
+            function updateClock() {
+                const el = document.getElementById('live-clock');
+                if (!el) return;
 
-            document.getElementById('live-clock').textContent = `${hours}:${minutes}:${seconds}`;
-        }
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
 
-        // Panggil fungsi setiap 1 detik
-        setInterval(updateClock, 1000);
-        updateClock(); // panggil sekali di awal agar tidak delay 1 detik
+                el.textContent = `${hours}:${minutes}:${seconds}`;
+            }
+
+            setInterval(updateClock, 1000);
+            updateClock();
+        });
 
         // Date format
         function updateDate() {
