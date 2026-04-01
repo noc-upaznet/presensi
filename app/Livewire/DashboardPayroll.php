@@ -2,10 +2,11 @@
 
 namespace App\Livewire;
 
-use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\PayrollModel;
 use App\Models\M_DataKaryawan;
+use App\Models\M_Entitas;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardPayroll extends Component
 {
@@ -27,16 +28,14 @@ class DashboardPayroll extends Component
     {
         $this->selectedMonth = now()->month;
         $this->selectedYear  = now()->year;
-
-        $this->currentEntitas = session('selected_entitas', 'UHO');
-
+        $branchId = Auth::user()->branch_id;
+        $entitasName = M_Entitas::find($branchId)?->nama;
+        $this->currentEntitas = $entitasName;
+        // dd($this->currentEntitas);
         $this->generatePeriode();
         $this->countGaji();
     }
 
-    // =========================
-    // AUTO UPDATE FILTER
-    // =========================
     public function updated($property)
     {
         if (in_array($property, ['selectedMonth', 'selectedYear'])) {
@@ -45,23 +44,17 @@ class DashboardPayroll extends Component
         }
     }
 
-    // =========================
-    // FORMAT PERIODE
-    // =========================
     public function generatePeriode()
     {
         $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
         $this->periode = $this->selectedYear . '-' . $bulanFormatted;
     }
 
-    // =========================
-    // HITUNG GAJI
-    // =========================
     public function countGaji()
     {
-        $entitas = session('selected_entitas', 'UHO');
-
-        $karyawanIds = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
+        $branchId = Auth::user()->branch_id;
+        $entitasName = M_Entitas::find($branchId)?->nama;
+        $karyawanIds = M_DataKaryawan::where('entitas', $entitasName)->pluck('id');
 
         $hitungGaji = function ($items) {
             return $items->sum(function ($item) {
@@ -99,9 +92,6 @@ class DashboardPayroll extends Component
             });
         };
 
-        // =========================
-        // GAJI NORMAL
-        // =========================
         $this->total_gaji = $hitungGaji(
             PayrollModel::whereIn('karyawan_id', $karyawanIds)
                 ->where('periode', $this->periode)
@@ -109,9 +99,6 @@ class DashboardPayroll extends Component
                 ->get()
         );
 
-        // =========================
-        // GAJI TITIP
-        // =========================
         $this->total_gaji_titip = $hitungGaji(
             PayrollModel::whereIn('karyawan_id', $karyawanIds)
                 ->where('periode', $this->periode)
@@ -119,9 +106,6 @@ class DashboardPayroll extends Component
                 ->get()
         );
 
-        // =========================
-        // BPJS
-        // =========================
         $this->bpjs_kes_pt = PayrollModel::whereIn('karyawan_id', $karyawanIds)
             ->where('periode', $this->periode)
             ->sum('bpjs_perusahaan');
@@ -130,9 +114,6 @@ class DashboardPayroll extends Component
             ->where('periode', $this->periode)
             ->sum('bpjs_jht_perusahaan');
 
-        // =========================
-        // POTONGAN TERLAMBAT
-        // =========================
         $this->potongan_terlambat = PayrollModel::whereIn('karyawan_id', $karyawanIds)
             ->where('periode', $this->periode)
             ->sum('terlambat');
