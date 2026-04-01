@@ -75,7 +75,7 @@
                                         @if ($punyaPengajuan)
                                             <span class="badge bg-warning">Izin/Cuti</span>
                                         @else
-                                            <span class="badge bg-danger">Alpha/Libur</span>
+                                            <span class="badge bg-danger">Belum Hadir/Alpha/Libur</span>
                                         @endif
                                     </td>
                                 </tr>
