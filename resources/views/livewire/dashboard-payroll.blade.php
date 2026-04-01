@@ -17,25 +17,9 @@
 
     <div class="container-fluid">
         <div class="row mb-4">
-
             <div class="col-md-3">
-                <select wire:model.live="selectedYear" class="form-select">
-                    @for ($i = now()->year; $i >= 2025; $i--)
-                        <option value="{{ $i }}">{{ $i }}</option>
-                    @endfor
-                </select>
+                <input type="month" wire:model.live="periode" class="form-control">
             </div>
-
-            <div class="col-md-3">
-                <select wire:model.live="selectedMonth" class="form-select">
-                    @foreach (range(1, 12) as $m)
-                        <option value="{{ $m }}">
-                            {{ \Carbon\Carbon::create()->month($m)->locale('id')->translatedFormat('F') }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
         </div>
         <div class="row">
             <div class="col-lg-3 col-6">

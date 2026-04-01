@@ -26,28 +26,17 @@ class DashboardPayroll extends Component
 
     public function mount()
     {
-        $this->selectedMonth = now()->month;
-        $this->selectedYear  = now()->year;
+        $this->periode = now()->format('Y-m');
+
         $branchId = Auth::user()->branch_id;
         $entitasName = M_Entitas::find($branchId)?->nama;
         $this->currentEntitas = $entitasName;
-        // dd($this->currentEntitas);
-        $this->generatePeriode();
         $this->countGaji();
     }
 
-    public function updated($property)
+    public function updatedPeriode()
     {
-        if (in_array($property, ['selectedMonth', 'selectedYear'])) {
-            $this->generatePeriode();
-            $this->countGaji();
-        }
-    }
-
-    public function generatePeriode()
-    {
-        $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
-        $this->periode = $this->selectedYear . '-' . $bulanFormatted;
+        $this->countGaji();
     }
 
     public function countGaji()
