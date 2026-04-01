@@ -415,7 +415,7 @@
                     role="tabpanel" aria-labelledby="dashboard-tab">
 
                     @if ($tab == 'dashboard')
-                        <div class="row mb-3">
+                        <div class="row mb-5">
                             {{-- Dropdown Tahun --}}
                             <div class="col-md-3">
                                 <select wire:model.lazy="selectedYear" class="form-select me-2">
