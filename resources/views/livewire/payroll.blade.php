@@ -14,433 +14,510 @@
             </div>
         </div>
     </div>
-
     <div class="app-content">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-3 col-6">
-                    <div class="small-box text-bg-success">
-                        <div class="inner pe-5">
-                            <h4>Rp. {{ number_format($total_gaji, 0, ',', '.') }}</h4>
-                            <span><b>Total Gaji {{ $currentEntitas }}</b></span>
-                        </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path
-                                d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
-                        </svg>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box text-bg-success">
-                        <div class="inner pe-5">
-                            <h4>Rp. {{ number_format($total_gaji_titip, 0, ',', '.') }}</h4>
-                            <span><b>Total Gaji {{ $currentEntitas }} Titip</b></span>
-                        </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path
-                                d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
-                        </svg>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box text-bg-success">
-                        <div class="inner pe-5">
-                            <h4>Rp. {{ number_format($bpjs_kes_pt, 0, ',', '.') }}</h4>
-                            <span><b>BPJS Kes PT {{ $currentEntitas }}</b></span>
-                        </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path
-                                d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
-                        </svg>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box text-bg-success">
-                        <div class="inner pe-5">
-                            <h4>Rp. {{ number_format($bpjs_jht_pt, 0, ',', '.') }}</h4>
-                            <span><b>BPJS JHT PT {{ $currentEntitas }}</b></span>
-                        </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path
-                                d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
-                        </svg>
-                    </div>
-                </div>
-                {{-- <div class="col-lg-3 col-6">
-                    <div class="small-box text-bg-success">
-                        <div class="inner pe-5">
-                            <h4>Rp. {{ number_format($bpjs_kes, 0, ',', '.') }}</h4>
-                            <span><b>BPJS Kes {{ $currentEntitas }}</b></span>
-                        </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path
-                                d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
-                        </svg>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box text-bg-success">
-                        <div class="inner pe-5">
-                            <h4>Rp. {{ number_format($bpjs_jht, 0, ',', '.') }}</h4>
-                            <span><b>BPJS JHT {{ $currentEntitas }}</b></span>
-                        </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path
-                                d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
-                        </svg>
-                    </div>
-                </div> --}}
-            </div>
-            <div class="row">
-                <div class="col-lg-3 col-6">
-                    <!--begin::Small Box Widget 3-->
-                    <div class="small-box text-bg-warning">
-                        <div class="inner pe-5">
-                            <!-- Tambahkan padding end/right -->
-                            <h3>{{ $jumlahBelumPunyaSlip }}</h3>
-                            <span>Slip Gaji Belum Dibuat</span><br>
-                            <span><b>Entitas {{ $currentEntitas }}</b></span>
-                        </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path
-                                d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
-                            </path>
-                        </svg>
-                        <a href="#" wire:click="showModal"
-                            class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
-                            More info <i class="bi bi-arrow-right-circle"></i>
-                        </a>
-                        <livewire:modal-payroll />
-                    </div>
-                    <!--end::Small Box Widget 3-->
-                </div>
-                <div class="col-lg-3 col-6">
-                    <!--begin::Small Box Widget 3-->
-                    <div class="small-box text-bg-warning">
-                        <div class="inner pe-5">
-                            <!-- Tambahkan padding end/right -->
-                            <h3>{{ $jumlahBelumPunyaSlipTitip }}</h3>
-                            <span>Slip Gaji Belum Dibuat</span><br>
-                            <span><b>Entitas Lainnya</b></span>
-                        </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path
-                                d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
-                            </path>
-                        </svg>
-                        <a href="#" wire:click="showModalEks"
-                            class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
-                            More info <i class="bi bi-arrow-right-circle"></i>
-                        </a>
-                        <livewire:modal-payroll />
-                    </div>
-                    <!--end::Small Box Widget 3-->
-                </div>
-                <div class="col-lg-3 col-6">
-                    <!--begin::Small Box Widget 3-->
-                    <div class="small-box text-bg-info">
-                        <div class="inner pe-5">
-                            <!-- Tambahkan padding end/right -->
-                            <h3>{{ $JumlahKaryawanInternal }}</h3>
-                            <span>Jumlah Slip Gaji</span><br>
-                            <span><b>Karyawan {{ $currentEntitas }} </b></span>
-                        </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path
-                                d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
-                            </path>
-                        </svg>
-                        <span
-                            class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
-                            -
-                        </span>
-                        <livewire:modal-payroll />
-                    </div>
-                    <!--end::Small Box Widget 3-->
-                </div>
-                <div class="col-lg-3 col-6">
-                    <!--begin::Small Box Widget 3-->
-                    <div class="small-box text-bg-info">
-                        <div class="inner pe-5">
-                            <!-- Tambahkan padding end/right -->
-                            <h3>{{ $JumlahKaryawanTitip }}</h3>
-                            <span>Jumlah Slip Gaji</span><br>
-                            <span><b>Karyawan Titip </b></span>
-                        </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path
-                                d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
-                            </path>
-                        </svg>
-                        <span
-                            class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
-                            -
-                        </span>
-                        <livewire:modal-payroll />
-                    </div>
-                    <!--end::Small Box Widget 3-->
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="container-fluid">
-        <div class="card" style="background-color: var(--bs-body-bg);">
-            <div class="card-header">
-                @php
-                    $month = $selectedMonth ?? now()->subMonth()->format('n');
-                    $year = $selectedYear ?? now()->year;
-                @endphp
-                @can('payroll-create')
-                    <a href="{{ route('create-slip-gaji-tambah', ['month' => $month, 'year' => $year]) }}"
-                        class="btn btn-sm btn-primary">
-                        <i class="fa-solid fa-plus"></i>
-                        Tambah
-                    </a>
-                @endcan
-            </div>
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist" style="background-color: var(--bs-body-bg);">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold @if ($tab == 'payroll') active @endif"
+                        wire:click='setTab("payroll")' id="payroll-tab" data-bs-toggle="tab" data-bs-target="#payroll"
+                        data-tab-name="payroll" type="button" role="tab" aria-controls="payroll"
+                        aria-selected="true">Payroll</button>
+                </li>
 
-            <div class="card-body">
-                <div class="d-flex mb-3 align-items-center">
-                    {{-- Dropdown Tahun --}}
-                    <select wire:model.lazy="selectedYear" class="form-select me-2" style="width: 100px;">
-                        @for ($i = now()->year; $i >= 2023; $i--)
-                            <option value="{{ $i }}">{{ $i }}</option>
-                        @endfor
-                    </select>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold @if ($tab == 'dashboard') active @endif"
+                        wire:click='setTab("dashboard")' id="dashboard-tab" data-bs-toggle="tab"
+                        data-bs-target="#dashboard" data-tab-name="dashboard" type="button" role="tab"
+                        aria-controls="dashboard" aria-selected="true">Dashboard</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade @if ($tab == 'payroll') active show @endif " id="payroll"
+                    role="tabpanel" aria-labelledby="payroll-tab">
 
-                    {{-- Dropdown Bulan --}}
-                    <select wire:model.lazy="selectedMonth" class="form-select me-2" style="width: 150px;">
-                        <option value="">Bulan</option>
-                        @foreach (range(1, 12) as $m)
-                            <option value="{{ $m }}">
-                                {{ \Carbon\Carbon::create()->month($m)->locale('id')->translatedFormat('F') }}
-                            </option>
-                        @endforeach
-                    </select>
+                    @if ($tab == 'payroll')
+                        <div class="row">
+                            <div class="col-lg-3 col-6">
+                                <!--begin::Small Box Widget 3-->
+                                <div class="small-box text-bg-warning">
+                                    <div class="inner pe-5">
+                                        <!-- Tambahkan padding end/right -->
+                                        <h3>{{ $jumlahBelumPunyaSlip }}</h3>
+                                        <span>Slip Gaji Belum Dibuat</span><br>
+                                        <span><b>Entitas {{ $currentEntitas }}</b></span>
+                                    </div>
+                                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
+                                        </path>
+                                    </svg>
+                                    <a href="#" wire:click="showModal"
+                                        class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+                                        More info <i class="bi bi-arrow-right-circle"></i>
+                                    </a>
+                                    <livewire:modal-payroll />
+                                </div>
+                                <!--end::Small Box Widget 3-->
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <!--begin::Small Box Widget 3-->
+                                <div class="small-box text-bg-warning">
+                                    <div class="inner pe-5">
+                                        <!-- Tambahkan padding end/right -->
+                                        <h3>{{ $jumlahBelumPunyaSlipTitip }}</h3>
+                                        <span>Slip Gaji Belum Dibuat</span><br>
+                                        <span><b>Entitas Lainnya</b></span>
+                                    </div>
+                                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
+                                        </path>
+                                    </svg>
+                                    <a href="#" wire:click="showModalEks"
+                                        class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+                                        More info <i class="bi bi-arrow-right-circle"></i>
+                                    </a>
+                                    <livewire:modal-payroll />
+                                </div>
+                                <!--end::Small Box Widget 3-->
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <!--begin::Small Box Widget 3-->
+                                <div class="small-box text-bg-info">
+                                    <div class="inner pe-5">
+                                        <!-- Tambahkan padding end/right -->
+                                        <h3>{{ $JumlahKaryawanInternal }}</h3>
+                                        <span>Jumlah Slip Gaji</span><br>
+                                        <span><b>Karyawan {{ $currentEntitas }} </b></span>
+                                    </div>
+                                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
+                                        </path>
+                                    </svg>
+                                    <span
+                                        class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+                                        -
+                                    </span>
+                                    <livewire:modal-payroll />
+                                </div>
+                                <!--end::Small Box Widget 3-->
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <!--begin::Small Box Widget 3-->
+                                <div class="small-box text-bg-info">
+                                    <div class="inner pe-5">
+                                        <!-- Tambahkan padding end/right -->
+                                        <h3>{{ $JumlahKaryawanTitip }}</h3>
+                                        <span>Jumlah Slip Gaji</span><br>
+                                        <span><b>Karyawan Titip </b></span>
+                                    </div>
+                                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
+                                        </path>
+                                    </svg>
+                                    <span
+                                        class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+                                        -
+                                    </span>
+                                    <livewire:modal-payroll />
+                                </div>
+                                <!--end::Small Box Widget 3-->
+                            </div>
+                        </div>
+                        <div class="card" style="background-color: var(--bs-body-bg);">
+                            {{-- <div class="card-header">
+                                @php
+                                    $month = $selectedMonth ?? now()->subMonth()->format('n');
+                                    $year = $selectedYear ?? now()->year;
+                                @endphp
+                                @can('payroll-create')
+                                    <a href="{{ route('create-slip-gaji-tambah', ['month' => $month, 'year' => $year]) }}"
+                                        class="btn btn-sm btn-primary">
+                                        <i class="fa-solid fa-plus"></i>
+                                        Tambah
+                                    </a>
+                                @endcan
+                            </div> --}}
 
-                    <select wire:model.lazy="selectedKaryawan" class="form-select me-2" style="width: 150px;">
-                        <option value="">Karyawan</option>
-                        @foreach ($karyawanList as $item)
-                            <option value="{{ $item->id }}">{{ $item->nama_karyawan }}</option>
-                        @endforeach
-                    </select>
+                            <div class="card-body">
+                                <div class="d-flex mb-3 align-items-center">
+                                    {{-- Dropdown Tahun --}}
+                                    <select wire:model.lazy="selectedYear" class="form-select me-2"
+                                        style="width: 100px;">
+                                        @for ($i = now()->year; $i >= 2025; $i--)
+                                            <option value="{{ $i }}">{{ $i }}</option>
+                                        @endfor
+                                    </select>
 
-                    <select wire:model.lazy="selectedStatus" class="form-select me-2" style="width: 150px;">
-                        <option value="">Status</option>
-                        <option value="0">Pending</option>
-                        <option value="1">Accepted</option>
-                    </select>
+                                    {{-- Dropdown Bulan --}}
+                                    <select wire:model.lazy="selectedMonth" class="form-select me-2"
+                                        style="width: 150px;">
+                                        <option value="">Bulan</option>
+                                        @foreach (range(1, 12) as $m)
+                                            <option value="{{ $m }}">
+                                                {{ \Carbon\Carbon::create()->month($m)->locale('id')->translatedFormat('F') }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                    <select wire:model.lazy="selectedKaryawan" class="form-select me-2"
+                                        style="width: 150px;">
+                                        <option value="">Karyawan</option>
+                                        @foreach ($karyawanList as $item)
+                                            <option value="{{ $item->id }}">{{ $item->nama_karyawan }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                    <select wire:model.lazy="selectedStatus" class="form-select me-2"
+                                        style="width: 150px;">
+                                        <option value="">Status</option>
+                                        <option value="0">Pending</option>
+                                        <option value="1">Accepted</option>
+                                    </select>
 
 
-                    <div class="ms-auto">
-                        <button type="button" class="btn btn-sm btn-success" wire:click="export">
-                            <i class="fas fa-file-export"></i> Export
-                        </button>
-                    </div>
-                </div>
+                                    <div class="ms-auto">
+                                        <button type="button" class="btn btn-sm btn-success" wire:click="export">
+                                            <i class="fas fa-file-export"></i> Export
+                                        </button>
+                                    </div>
+                                </div>
 
-                <h5 class="text-secondary mb-3">
-                    Periode:
-                    {{ $selectedMonth ? \Carbon\Carbon::createFromFormat('m', $selectedMonth)->locale('id')->translatedFormat('F') . ' ' . $selectedYear : 'Semua Periode' }}
-                </h5>
+                                <h5 class="text-secondary mb-3">
+                                    Periode:
+                                    {{ $selectedMonth ? \Carbon\Carbon::createFromFormat('m', $selectedMonth)->locale('id')->translatedFormat('F') . ' ' . $selectedYear : 'Semua Periode' }}
+                                </h5>
 
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label>
-                        Show
-                        <select wire:model="perPage" class="form-select form-select-sm d-inline-block w-auto mx-1">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                        </select>
-                        entries per page
-                    </label>
-                    <button class="btn btn-sm btn-primary" wire:click="publishAll">
-                        <i class="fas fa-square-check"></i> Publish All
-                    </button>
-                </div>
-                <h5 class="text-secondary mb-3">Data Slip Karyawan {{ $currentEntitas }}</h5>
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>No. Slip</th>
-                                <th>Nama</th>
-                                <th>NIP Karyawan</th>
-                                <th>Departemen</th>
-                                <th>Bulan</th>
-                                <th>Grand Total</th>
-                                <th>Status Titip</th>
-                                <th>Published</th>
-                                <th>Accepted</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if ($data->isEmpty())
-                                <tr>
-                                    <td colspan="12" class="text-center">Data tidak ditemukan.</td>
-                                </tr>
-                            @else
-                                @foreach ($data as $payroll)
-                                    <tr>
-                                        <td>{{ $payroll->no_slip }}</td>
-                                        <td>{{ $payroll->getKaryawan->nama_karyawan }}</td>
-                                        <td>{{ $payroll->nip_karyawan }}</td>
-                                        <td>{{ $payroll->divisi }}</td>
-                                        <td>{{ $payroll->periode }}</td>
-                                        <td>Rp. {{ number_format($payroll->total_gaji, 0, ',', '.') }}</td>
-                                        <td>
-                                            <div class="form-check form-switch d-inline-block">
-                                                <input type="checkbox" class="form-check-input"
-                                                    id="switchTitip{{ $payroll->id }}"
-                                                    wire:change="toggleTitip({{ $payroll->id }})"
-                                                    @if ($payroll->titip) checked @endif>
-                                                <label class="form-check-label" for="switchTitip{{ $payroll->id }}">
-                                                    {{ $payroll->titip ? 'Titip' : $currentEntitas }}
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            @if ($payroll->published == 0)
-                                                <button wire:click="publishPayroll({{ $payroll->id }})"
-                                                    class="btn btn-primary btn-sm">Publish</button>
-                                            @elseif ($payroll->published == 1)
-                                                <span class="badge bg-success">Published</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if ($payroll->accepted == 1)
-                                                <span class="badge bg-success">Accepted</span>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label>
+                                        Show
+                                        <select wire:model="perPage"
+                                            class="form-select form-select-sm d-inline-block w-auto mx-1">
+                                            <option value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                        </select>
+                                        entries per page
+                                    </label>
+                                    <button class="btn btn-sm btn-primary" wire:click="publishAll">
+                                        <i class="fas fa-square-check"></i> Publish All
+                                    </button>
+                                </div>
+                                <h5 class="text-secondary mb-3">Data Slip Karyawan {{ $currentEntitas }}</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>No. Slip</th>
+                                                <th>Nama</th>
+                                                <th>NIP Karyawan</th>
+                                                <th>Departemen</th>
+                                                <th>Bulan</th>
+                                                <th>Grand Total</th>
+                                                <th>Status Titip</th>
+                                                <th>Published</th>
+                                                <th>Accepted</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if ($data->isEmpty())
+                                                <tr>
+                                                    <td colspan="12" class="text-center">Data tidak ditemukan.
+                                                    </td>
+                                                </tr>
                                             @else
-                                                <span class="badge bg-warning text-dark">Pending</span>
+                                                @foreach ($data as $payroll)
+                                                    <tr>
+                                                        <td>{{ $payroll->no_slip }}</td>
+                                                        <td>{{ $payroll->getKaryawan->nama_karyawan }}</td>
+                                                        <td>{{ $payroll->nip_karyawan }}</td>
+                                                        <td>{{ $payroll->divisi }}</td>
+                                                        <td>{{ $payroll->periode }}</td>
+                                                        <td>Rp.
+                                                            {{ number_format($payroll->total_gaji, 0, ',', '.') }}
+                                                        </td>
+                                                        <td>
+                                                            <div class="form-check form-switch d-inline-block">
+                                                                <input type="checkbox" class="form-check-input"
+                                                                    id="switchTitip{{ $payroll->id }}"
+                                                                    wire:change="toggleTitip({{ $payroll->id }})"
+                                                                    @if ($payroll->titip) checked @endif>
+                                                                <label class="form-check-label"
+                                                                    for="switchTitip{{ $payroll->id }}">
+                                                                    {{ $payroll->titip ? 'Titip' : $currentEntitas }}
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            @if ($payroll->published == 0)
+                                                                <button
+                                                                    wire:click="publishPayroll({{ $payroll->id }})"
+                                                                    class="btn btn-primary btn-sm">Publish</button>
+                                                            @elseif ($payroll->published == 1)
+                                                                <span class="badge bg-success">Published</span>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if ($payroll->accepted == 1)
+                                                                <span class="badge bg-success">Accepted</span>
+                                                            @else
+                                                                <span class="badge bg-warning text-dark">Pending</span>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                                                                data-bs-target="#previewModal"
+                                                                onclick="loadSlipPreview('{{ Crypt::encrypt($payroll->id) }}')"><i
+                                                                    class="fa-solid fa-print"></i>
+                                                            </button>
+                                                            <button
+                                                                wire:click="editPayroll('{{ encrypt($payroll->id) }}')"
+                                                                class="btn btn-warning btn-sm"
+                                                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                                                title="Edit">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button
+                                                                wire:click="confirmHapusPayroll({{ $payroll->id }})"
+                                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip"
+                                                                data-bs-placement="top" title="Delete"><i
+                                                                    class="fas fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
                                             @endif
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#previewModal"
-                                                onclick="loadSlipPreview('{{ Crypt::encrypt($payroll->id) }}')"><i
-                                                    class="fa-solid fa-print"></i>
-                                            </button>
-                                            <button wire:click="editPayroll('{{ encrypt($payroll->id) }}')"
-                                                class="btn btn-warning btn-sm" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button wire:click="confirmHapusPayroll({{ $payroll->id }})"
-                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>
-                    <div id="data" class="d-flex justify-content-between align-items-center mt-3">
-                        <span>
-                            Showing {{ $data->firstItem() }} to {{ $data->lastItem() }} of {{ $data->total() }}
-                            entries
-                        </span>
-                        {{ $data->links() }}
-                    </div>
+                                        </tbody>
+                                    </table>
+                                    <div id="data"
+                                        class="d-flex justify-content-between align-items-center mt-3">
+                                        <span>
+                                            Showing {{ $data->firstItem() }} to {{ $data->lastItem() }} of
+                                            {{ $data->total() }}
+                                            entries
+                                        </span>
+                                        {{ $data->links() }}
+                                    </div>
+                                </div>
+
+                                <h5 class="text-secondary mb-3">Data Slip Karyawan Titip</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>No. Slip</th>
+                                                <th>Nama</th>
+                                                <th>NIP Karyawan</th>
+                                                <th>Departemen</th>
+                                                <th>Bulan</th>
+                                                <th>Grand Total</th>
+                                                <th>Status Titip</th>
+                                                <th>Published</th>
+                                                <th>Accepted</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if ($data2->isEmpty())
+                                                <tr>
+                                                    <td colspan="12" class="text-center">Data tidak ditemukan.
+                                                    </td>
+                                                </tr>
+                                            @else
+                                                @foreach ($data2 as $key)
+                                                    <tr>
+                                                        <td>{{ $key->no_slip }}</td>
+                                                        <td>{{ $key->getKaryawan->nama_karyawan }}</td>
+                                                        <td>{{ $key->nip_karyawan }}</td>
+                                                        <td>{{ $key->divisi }}</td>
+                                                        <td>{{ $key->periode }}</td>
+                                                        <td>Rp. {{ number_format($key->total_gaji, 0, ',', '.') }}
+                                                        </td>
+                                                        <td>
+                                                            <div class="form-check form-switch d-inline-block">
+                                                                <input type="checkbox" class="form-check-input"
+                                                                    id="switchTitip{{ $key->id }}"
+                                                                    wire:change="toggleTitip({{ $key->id }})"
+                                                                    @if ($key->titip) checked @endif>
+                                                                <label class="form-check-label"
+                                                                    for="switchTitip{{ $key->id }}">
+                                                                    {{ $key->titip ? 'Titip' : $currentEntitas }}
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            @if ($key->published == 0)
+                                                                <button
+                                                                    wire:click="publishPayroll({{ $key->id }})"
+                                                                    class="btn btn-primary btn-sm">Publish</button>
+                                                            @elseif ($key->published == 1)
+                                                                <span class="badge bg-success">Published</span>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if ($key->accepted == 1)
+                                                                <span class="badge bg-success">Accepted</span>
+                                                            @else
+                                                                <span class="badge bg-warning text-dark">Pending</span>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                                                                data-bs-target="#previewModal"
+                                                                onclick="loadSlipPreview('{{ Crypt::encrypt($key->id) }}')"><i
+                                                                    class="fa-solid fa-print"></i>
+                                                            </button>
+                                                            <button
+                                                                wire:click="editPayroll('{{ encrypt($key->id) }}')"
+                                                                class="btn btn-warning btn-sm"
+                                                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                                                title="Edit">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button
+                                                                wire:click="confirmHapusPayroll({{ $key->id }})"
+                                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip"
+                                                                data-bs-placement="top" title="Delete"><i
+                                                                    class="fas fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            @endif
+                                        </tbody>
+                                    </table>
+
+                                    <div id="data2"
+                                        class="d-flex justify-content-between align-items-center mt-3">
+                                        <span>
+                                            Showing {{ $data2->firstItem() }} to {{ $data2->lastItem() }} of
+                                            {{ $data2->total() }}
+                                            entries
+                                        </span>
+                                        {{ $data2->links() }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                 </div>
 
-                <h5 class="text-secondary mb-3">Data Slip Karyawan Titip</h5>
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>No. Slip</th>
-                                <th>Nama</th>
-                                <th>NIP Karyawan</th>
-                                <th>Departemen</th>
-                                <th>Bulan</th>
-                                <th>Grand Total</th>
-                                <th>Status Titip</th>
-                                <th>Published</th>
-                                <th>Accepted</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if ($data2->isEmpty())
-                                <tr>
-                                    <td colspan="12" class="text-center">Data tidak ditemukan.</td>
-                                </tr>
-                            @else
-                                @foreach ($data2 as $key)
-                                    <tr>
-                                        <td>{{ $key->no_slip }}</td>
-                                        <td>{{ $key->getKaryawan->nama_karyawan }}</td>
-                                        <td>{{ $key->nip_karyawan }}</td>
-                                        <td>{{ $key->divisi }}</td>
-                                        <td>{{ $key->periode }}</td>
-                                        <td>Rp. {{ number_format($key->total_gaji, 0, ',', '.') }}</td>
-                                        <td>
-                                            <div class="form-check form-switch d-inline-block">
-                                                <input type="checkbox" class="form-check-input"
-                                                    id="switchTitip{{ $key->id }}"
-                                                    wire:change="toggleTitip({{ $key->id }})"
-                                                    @if ($key->titip) checked @endif>
-                                                <label class="form-check-label" for="switchTitip{{ $key->id }}">
-                                                    {{ $key->titip ? 'Titip' : $currentEntitas }}
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            @if ($key->published == 0)
-                                                <button wire:click="publishPayroll({{ $key->id }})"
-                                                    class="btn btn-primary btn-sm">Publish</button>
-                                            @elseif ($key->published == 1)
-                                                <span class="badge bg-success">Published</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if ($key->accepted == 1)
-                                                <span class="badge bg-success">Accepted</span>
-                                            @else
-                                                <span class="badge bg-warning text-dark">Pending</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#previewModal"
-                                                onclick="loadSlipPreview('{{ Crypt::encrypt($key->id) }}')"><i
-                                                    class="fa-solid fa-print"></i>
-                                            </button>
-                                            <button wire:click="editPayroll('{{ encrypt($key->id) }}')"
-                                                class="btn btn-warning btn-sm" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button wire:click="confirmHapusPayroll({{ $key->id }})"
-                                                class="btn btn-danger btn-sm" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" title="Delete"><i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>
+                <div class="tab-pane fade @if ($tab == 'dashboard') active show @endif " id="dashboard"
+                    role="tabpanel" aria-labelledby="dashboard-tab">
 
-                    <div id="data2" class="d-flex justify-content-between align-items-center mt-3">
-                        <span>
-                            Showing {{ $data2->firstItem() }} to {{ $data2->lastItem() }} of {{ $data2->total() }}
-                            entries
-                        </span>
-                        {{ $data2->links() }}
-                    </div>
+                    @if ($tab == 'dashboard')
+                        <div class="row mb-3">
+                            {{-- Dropdown Tahun --}}
+                            <div class="col-md-3">
+                                <select wire:model.lazy="selectedYear" class="form-select me-2">
+                                    @for ($i = now()->year; $i >= 2025; $i--)
+                                        <option value="{{ $i }}">{{ $i }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                {{-- Dropdown Bulan --}}
+                                <select wire:model.lazy="selectedMonth" class="form-select me-2">
+                                    <option value="">Bulan</option>
+                                    @foreach (range(1, 12) as $m)
+                                        <option value="{{ $m }}">
+                                            {{ \Carbon\Carbon::create()->month($m)->locale('id')->translatedFormat('F') }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box text-bg-success">
+                                    <div class="inner pe-5">
+                                        <h4>Rp. {{ number_format($total_gaji, 0, ',', '.') }}</h4>
+                                        <span><b>Total Gaji {{ $currentEntitas }}</b></span>
+                                    </div>
+                                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box text-bg-success">
+                                    <div class="inner pe-5">
+                                        <h4>Rp. {{ number_format($total_gaji_titip, 0, ',', '.') }}</h4>
+                                        <span><b>Total Gaji {{ $currentEntitas }} Titip</b></span>
+                                    </div>
+                                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box text-bg-success">
+                                    <div class="inner pe-5">
+                                        <h4>Rp. {{ number_format($bpjs_kes_pt, 0, ',', '.') }}</h4>
+                                        <span><b>BPJS Kes PT {{ $currentEntitas }}</b></span>
+                                    </div>
+                                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box text-bg-success">
+                                    <div class="inner pe-5">
+                                        <h4>Rp. {{ number_format($bpjs_jht_pt, 0, ',', '.') }}</h4>
+                                        <span><b>BPJS JHT PT {{ $currentEntitas }}</b></span>
+                                    </div>
+                                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box text-bg-success">
+                                    <div class="inner pe-5">
+                                        <h4>Rp. {{ number_format($potongan_terlambat, 0, ',', '.') }}</h4>
+                                        <span><b> Potongan <br> Terlambat {{ $currentEntitas }}</b></span>
+                                    </div>
+                                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box text-bg-success">
+                                    <div class="inner pe-5">
+                                        <h4>Rp. {{ number_format($potongan_terlambat_titip, 0, ',', '.') }}</h4>
+                                        <span><b> Potongan <br> Terlambat {{ $currentEntitas }} Titip</b></span>
+                                    </div>
+                                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                 </div>
             </div>
         </div>

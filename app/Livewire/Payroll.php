@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Redirect;
+use Livewire\Attributes\Url;
 use Livewire\WithoutUrlPagination;
 
 class Payroll extends Component
@@ -62,6 +63,16 @@ class Payroll extends Component
     public $bpjs_jht_pt;
     public $bpjs_jht;
     public $total_gaji_titip;
+    public $potongan_terlambat;
+    public $potongan_terlambat_titip;
+
+    #[Url(as: 'tab')]
+    public $tab = 'payroll';
+
+    public function setTab($tab)
+    {
+        $this->tab = $tab;
+    }
 
     public function mount()
     {
@@ -211,6 +222,15 @@ class Payroll extends Component
         $this->bpjs_jht_pt = PayrollModel::whereIn('karyawan_id', $karyawanIds)
             ->where('periode', $this->periode)
             ->sum('bpjs_jht_perusahaan');
+
+        $this->potongan_terlambat = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', $this->periode)
+            ->sum('terlambat');
+
+        $this->potongan_terlambat_titip = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', $this->periode)
+            ->where('titip', 1)
+            ->sum('terlambat');
     }
 
     public function createSlipGaji($month, $year)
