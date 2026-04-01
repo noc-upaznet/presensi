@@ -67,7 +67,7 @@ class Payroll extends Component
     public $potongan_terlambat_titip;
 
     #[Url(as: 'tab')]
-    public $tab = 'payroll';
+    public $tab = 'dashboard';
 
     public function setTab($tab)
     {
