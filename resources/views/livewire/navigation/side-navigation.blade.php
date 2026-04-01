@@ -258,14 +258,6 @@
                         </ul>
                     </li>
 
-                    {{-- <li class="nav-item">
-                        <a href="{{ route('data-user') }}"
-                            class="nav-link {{ request()->routeIs('data-user') ? 'active' : '' }}">
-                            <i class="bi bi-person"></i>
-                            <p>Data User</p>
-                        </a>
-                    </li> --}}
-
                     <li class="nav-item">
                         <a href="{{ route('data-masters') }}"
                             class="nav-link {{ request()->routeIs('data-masters') ? 'active' : '' }}">
@@ -274,6 +266,16 @@
                         </a>
                     </li>
                 @endhasanyrole
+
+                @can('data-master-create')
+                    <li class="nav-item">
+                        <a href="{{ route('data-masters') }}"
+                            class="nav-link {{ request()->routeIs('data-masters') ? 'active' : '' }}">
+                            <i class="bi bi-person-fill-gear"></i>
+                            <p>Data Master</p>
+                        </a>
+                    </li>
+                @endcan
 
                 {{-- @hasanyrole('spv-teknisi|spv-helpdesk|spv-sales')
                     <li class="nav-item">
