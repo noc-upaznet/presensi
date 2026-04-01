@@ -267,6 +267,16 @@
                     </li>
                 @endhasanyrole
 
+                @can('payroll-finance-view')
+                    <li class="nav-item">
+                        <a href="{{ route('dashboard-payroll') }}"
+                            class="nav-link {{ request()->routeIs('dashboard-payroll') ? 'active' : '' }}">
+                            <i class="bi bi-clipboard"></i>
+                            <p>Dashboard Payroll</p>
+                        </a>
+                    </li>
+                @endcan
+
                 @can('data-master-create')
                     <li class="nav-item">
                         <a href="{{ route('data-masters') }}"

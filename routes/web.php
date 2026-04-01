@@ -14,15 +14,14 @@ use App\Livewire\JenisPotongan;
 use App\Livewire\CreateSlipGaji;
 use App\Livewire\JenisTunjangan;
 use App\Livewire\RiwayatPresensi;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Karyawan\JadwalShift;
 use App\Livewire\RiwayatPresensiStaff;
 use App\Livewire\Karyawan\DataKaryawan;
-use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\AuthController;
 use App\Livewire\Karyawan\PembagianShift;
 use App\Http\Controllers\PayrollController;
+use App\Livewire\DashboardPayroll;
 use App\Livewire\DataMaster;
 use App\Livewire\EditPayroll;
 use App\Livewire\EmployeeAbsent;
@@ -43,7 +42,6 @@ use App\Livewire\SlipGaji;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 
 // Route::redirect('/', '/login');
 // Halaman lupa password
@@ -115,4 +113,5 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/kasbon', Kasbon::class)->name('kasbon')->middleware('check.kasbon-view');
     Route::get('/gamifikasi', Gamifikasi::class)->name('gamifikasi');
     Route::get('/employee-absent', EmployeeAbsent::class)->name('employee-absent');
+    Route::get('/dashboard-payroll', DashboardPayroll::class)->name('dashboard-payroll');
 });
