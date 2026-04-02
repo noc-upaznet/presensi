@@ -55,6 +55,7 @@
                             <tr>
                                 <th>Nama</th>
                                 <th>Jabatan</th>
+                                <th>Pengajuan</th>
                                 <th>Keterangan</th>
                             </tr>
                         </thead>
@@ -62,26 +63,40 @@
                             @forelse ($datas as $item)
                                 <tr>
                                     <td>{{ $item->nama_karyawan }}</td>
-                                    </td>
                                     <td>{{ $item->jabatan ?? '-' }}</td>
                                     <td>
                                         @php
                                             $punyaPengajuan = \App\Models\M_Pengajuan::where('karyawan_id', $item->id)
-                                                ->where('status', 1)
+                                                ->whereIn('status', [0, 1])
                                                 ->whereDate('tanggal', now())
                                                 ->exists();
                                         @endphp
 
                                         @if ($punyaPengajuan)
-                                            <span class="badge bg-warning">Izin/Cuti</span>
+                                            <span
+                                                class="badge bg-warning">{{ $item->pengajuanHariIni?->getShift?->nama_shift ?? '-' }}</span>
                                         @else
-                                            <span class="badge bg-danger">Belum Hadir/Alpha/Libur</span>
+                                            <span>-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @php
+                                            $punyaPengajuan = \App\Models\M_Pengajuan::where('karyawan_id', $item->id)
+                                                ->whereIn('status', [0, 1])
+                                                ->whereDate('tanggal', now())
+                                                ->exists();
+                                        @endphp
+
+                                        @if ($punyaPengajuan)
+                                            <span>{{ $item->pengajuanHariIni?->keterangan ?? '-' }}</span>
+                                        @else
+                                            <span>Belum Hadir/Alpha/Libur</span>
                                         @endif
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="text-center">
+                                    <td colspan="4" class="text-center">
                                         Tidak ada data.
                                     </td>
                                 </tr>

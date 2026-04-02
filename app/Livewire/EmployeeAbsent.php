@@ -28,9 +28,11 @@ class EmployeeAbsent extends Component
     {
         $entitas = session('selected_entitas', 'UHO');
 
-        $query = M_DataKaryawan::query()
+        $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
             ->where('status_karyawan', '!=', 'NONAKTIF')
-            ->where('deleted_at', null)->where('jabatan', '!=', 'Komisaris')->where('jabatan', '!=', 'Direktur')
+            ->where('deleted_at', null)
+            ->where('jabatan', '!=', 'Komisaris')
+            ->where('jabatan', '!=', 'Direktur')
             ->where('entitas', $entitas);
 
         // filter
@@ -53,7 +55,7 @@ class EmployeeAbsent extends Component
             $query->whereIn('id', function ($q) {
                 $q->select('karyawan_id')
                     ->from('pengajuan')
-                    ->where('status', 1)
+                    ->whereIn('status', [0, 1])
                     ->where('deleted_at', null)
                     ->whereDate('tanggal', now());
             });
@@ -61,6 +63,8 @@ class EmployeeAbsent extends Component
 
         $datas = $query->paginate($this->perPage);
 
-        return view('livewire.employee-absent', compact('datas'));
+        return view('livewire.employee-absent', [
+            'datas' => $datas,
+        ]);
     }
 }

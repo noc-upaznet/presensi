@@ -99,6 +99,14 @@ class M_DataKaryawan extends Model
         return $this->hasOne(RoleLokasiModel::class, 'karyawan_id');
     }
 
+    public function pengajuanHariIni()
+    {
+        return $this->hasOne(M_Pengajuan::class, 'karyawan_id')
+            ->whereDate('tanggal', now())
+            ->whereIn('status', [0, 1])
+            ->whereNull('deleted_at');
+    }
+
     // public function jadwal()
     // {
     //     return $this->hasOne(M_Jadwal::class, 'id_karyawan', 'id');
