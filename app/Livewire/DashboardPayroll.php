@@ -21,6 +21,8 @@ class DashboardPayroll extends Component
     public $bpjs_jht_pt = 0;
     public $potongan_terlambat = 0;
     public $potongan_terlambat_titip = 0;
+    public $churn = 0;
+    public $churn_titip = 0;
 
     public $currentEntitas;
 
@@ -66,7 +68,7 @@ class DashboardPayroll extends Component
                     $pendapatan += (int) ($t['nominal'] ?? 0);
                 }
 
-                $potongan = ($item->izin ?? 0);
+                $potongan = ($item->izin ?? 0) + ($item->terlambat ?? 0) + ($item->churn ?? 0);
 
                 $excludePotongan = ['pph 21', 'pph21', 'potongan kebudayaan'];
 
@@ -111,6 +113,16 @@ class DashboardPayroll extends Component
             ->where('periode', $this->periode)
             ->where('titip', 1)
             ->sum('terlambat');
+
+        $this->churn = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', $this->periode)
+            ->where('titip', 0)
+            ->sum('churn');
+
+        $this->churn_titip = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', $this->periode)
+            ->where('titip', 1)
+            ->sum('churn');
     }
 
     public function render()
