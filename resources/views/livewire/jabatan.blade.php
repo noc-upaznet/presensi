@@ -5,6 +5,19 @@
                 class="fa-solid fa-plus"></i> Tambah Jabatan</button>
         <!-- /.card-header -->
     </div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <label>Show
+                <select class="form-select form-select-sm d-inline-block w-auto" wire:model.live="perPage">
+                    <option>10</option>
+                    <option>25</option>
+                    <option>50</option>
+                </select> entries per page</label>
+        </div>
+        <div>
+            <input type="search" class="form-control form-control-sm" placeholder="Search..." wire:model.live="search">
+        </div>
+    </div>
     <div class="p-0 table-responsive">
         <table class="table table-striped table-hover mb-0" style="background-color: var(--bs-body-bg);">
             <thead>
@@ -28,6 +41,8 @@
                 @endforeach
             </tbody>
         </table>
-        {{ $jabatans->links('') }}
+        <div class="mt-3">
+            {{ $jabatans->links('') }}
+        </div>
     </div>
 </div>

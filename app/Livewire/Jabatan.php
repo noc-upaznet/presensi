@@ -17,7 +17,10 @@ class Jabatan extends Component
     public $has_staff = false; // Default value
     public $spv_id = false; // Supervisor ID
     public $editId;
-    
+
+    public $search = '';
+    public $perPage = 10;
+
     public function showEdit($id)
     {
         $jabatan = M_Jabatan::find(Crypt::decrypt($id));
@@ -48,10 +51,16 @@ class Jabatan extends Component
             'text' => 'Data has been deleted successfully'
         ]);
     }
-    
+
     public function render()
     {
-        $jabatans = M_Jabatan::orderBy('created_at', 'desc')->latest()->paginate(10);
+        $jabatans = M_Jabatan::orderBy('created_at', 'desc')->latest()->paginate($this->perPage);
+        if ($this->search) {
+            $jabatans = M_Jabatan::where('nama_jabatan', 'like', '%' . $this->search . '%')
+                ->orderBy('created_at', 'desc')
+                ->latest()
+                ->paginate($this->perPage);
+        }
         return view('livewire.jabatan', [
             'jabatans' => $jabatans,
         ]);

@@ -17,30 +17,8 @@ class Divisi extends Component
     public $deskripsi;
     public $editId;
 
-    // public function store()
-    // {
-    //     $this->validate([
-    //         'nama' => 'required|string|max:255',
-    //         'deskripsi' => 'nullable|string|max:500',
-    //     ]);
-
-    //     M_Divisi::create([
-    //         'nama' => $this->nama,
-    //         'deskripsi' => $this->deskripsi,
-    //     ]);
-
-    //     // Reset input
-    //     $this->reset(['nama', 'deskripsi']);
-
-    //     // Kirim notifikasi
-    //     $this->dispatch('swal', params: [
-    //         'title' => 'Data Saved',
-    //         'icon' => 'success',
-    //         'text' => 'Data has been saved successfully'
-    //     ]);
-        
-    //     $this->dispatch('modalAdd', action: 'hide');
-    // }
+    public $search = '';
+    public $perPage = 10;
 
     public function showEditDivisi($id)
     {
@@ -81,7 +59,7 @@ class Divisi extends Component
             'icon' => 'success',
             'text' => 'Data has been updated successfully'
         ]);
-        
+
         $this->dispatch('modalEdit', action: 'hide');
     }
 
@@ -96,10 +74,16 @@ class Divisi extends Component
             'text' => 'Data has been deleted successfully'
         ]);
     }
-    
+
     public function render()
     {
-        $divisies = M_Divisi::orderBy('created_at', 'desc')->latest()->paginate(10);
+        $divisies = M_Divisi::orderBy('created_at', 'desc')->latest()->paginate($this->perPage);
+        if ($this->search) {
+            $divisies = M_Divisi::where('nama', 'like', '%' . $this->search . '%')
+                ->orderBy('created_at', 'desc')
+                ->latest()
+                ->paginate($this->perPage);
+        }
         return view('livewire.divisi', [
             'divisies' => $divisies,
         ]);
