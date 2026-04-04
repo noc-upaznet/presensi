@@ -88,6 +88,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             'BPJS JHT PT',
             'Fee Sharing',
             'Insentif',
+            'Churn',
             'Uang Makan',
         ];
 
@@ -112,7 +113,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $row = [
                 $item->no_slip,
                 $item->nama_karyawan,
-                $item->nik,
+                "'" . $item->nik,
                 $item->tax_status,
                 $item->jabatan,
                 $item->periode,
@@ -131,6 +132,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 $item->bpjs_jht_perusahaan,
                 $item->fee_sharing,
                 $item->insentif,
+                $item->churn,
                 $item->uang_makan,
             ];
 
@@ -162,7 +164,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             }
 
             $potongan =
-                ($item->izin ?? 0);
+                ($item->izin ?? 0) + ($item->terlambat ?? 0) + ($item->churn ?? 0);
 
             $excludePotongan = ['pph 21', 'pph21'];
             foreach ($this->uniquePotongan as $nama) {
@@ -229,7 +231,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
 
             $colLetter = Coordinate::stringFromColumnIndex($col);
 
-            if (in_array($header, ['izin'])) {
+            if (in_array($header, ['izin', 'churn', 'terlambat'])) {
                 $color = 'FFFF0000';
             } elseif (in_array($header, [
                 'terlambat',
