@@ -65,6 +65,8 @@ class Payroll extends Component
     public $total_gaji_titip;
     public $potongan_terlambat;
     public $potongan_terlambat_titip;
+    public $churn;
+    public $churn_titip;
 
     #[Url(as: 'tab')]
     public $tab = 'dashboard';
@@ -231,6 +233,16 @@ class Payroll extends Component
             ->where('periode', $this->periode)
             ->where('titip', 1)
             ->sum('terlambat');
+
+        $this->churn = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', $this->periode)
+            ->where('titip', 0)
+            ->sum('churn');
+
+        $this->churn_titip = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', $this->periode)
+            ->where('titip', 1)
+            ->sum('churn');
     }
 
     public function createSlipGaji($month, $year)

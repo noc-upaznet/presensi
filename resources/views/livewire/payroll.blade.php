@@ -18,17 +18,16 @@
         <div class="container-fluid">
             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist" style="background-color: var(--bs-body-bg);">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link fw-bold @if ($tab == 'payroll') active @endif"
-                        wire:click='setTab("payroll")' id="payroll-tab" data-bs-toggle="tab" data-bs-target="#payroll"
-                        data-tab-name="payroll" type="button" role="tab" aria-controls="payroll"
-                        aria-selected="true">Payroll</button>
-                </li>
-
-                <li class="nav-item" role="presentation">
                     <button class="nav-link fw-bold @if ($tab == 'dashboard') active @endif"
                         wire:click='setTab("dashboard")' id="dashboard-tab" data-bs-toggle="tab"
                         data-bs-target="#dashboard" data-tab-name="dashboard" type="button" role="tab"
                         aria-controls="dashboard" aria-selected="true">Dashboard</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold @if ($tab == 'payroll') active @endif"
+                        wire:click='setTab("payroll")' id="payroll-tab" data-bs-toggle="tab" data-bs-target="#payroll"
+                        data-tab-name="payroll" type="button" role="tab" aria-controls="payroll"
+                        aria-selected="true">Payroll</button>
                 </li>
             </ul>
             <div class="tab-content" id="pills-tabContent">
@@ -493,7 +492,7 @@
                                 <div class="small-box text-bg-success">
                                     <div class="inner pe-5">
                                         <h4>Rp. {{ number_format($potongan_terlambat, 0, ',', '.') }}</h4>
-                                        <span><b> Potongan <br> Terlambat {{ $currentEntitas }}</b></span>
+                                        <span><b> Total Terlambat {{ $currentEntitas }}</b></span>
                                     </div>
                                     <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
                                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -506,7 +505,34 @@
                                 <div class="small-box text-bg-success">
                                     <div class="inner pe-5">
                                         <h4>Rp. {{ number_format($potongan_terlambat_titip, 0, ',', '.') }}</h4>
-                                        <span><b> Potongan <br> Terlambat {{ $currentEntitas }} Titip</b></span>
+                                        <span><b> Total Terlambat {{ $currentEntitas }} Titip</b></span>
+                                    </div>
+                                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box text-bg-success">
+                                    <div class="inner pe-5">
+                                        <h4>Rp. {{ number_format($churn, 0, ',', '.') }}</h4>
+                                        <span><b>Total Churn {{ $currentEntitas }}</b></span>
+                                    </div>
+                                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M12 1.5a.75.75 0 01.75.75V3c2.48.33 4.25 1.87 4.25 3.75a.75.75 0 01-1.5 0c0-1.24-1.74-2.25-3.5-2.25S8.5 5.51 8.5 6.75c0 1.1 1.1 1.77 3.18 2.31l.64.17c2.48.65 4.68 1.68 4.68 4.02 0 2.04-1.77 3.58-4.25 3.9v.85a.75.75 0 01-1.5 0v-.85c-2.63-.33-4.5-1.92-4.5-4a.75.75 0 011.5 0c0 1.38 1.85 2.5 3.75 2.5s3.75-1.12 3.75-2.5c0-1.29-1.32-1.94-3.5-2.5l-.7-.18C9.2 9.53 7 8.5 7 6.75c0-1.88 1.77-3.42 4.25-3.75V2.25a.75.75 0 01.75-.75z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box text-bg-success">
+                                    <div class="inner pe-5">
+                                        <h4>Rp. {{ number_format($churn_titip, 0, ',', '.') }}</h4>
+                                        <span><b>Total Churn {{ $currentEntitas }} Titip</b></span>
                                     </div>
                                     <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
                                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

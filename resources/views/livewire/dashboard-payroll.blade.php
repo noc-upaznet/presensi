@@ -78,7 +78,7 @@
                 <div class="small-box text-bg-success">
                     <div class="inner pe-5">
                         <h4>Rp. {{ number_format($potongan_terlambat, 0, ',', '.') }}</h4>
-                        <span><b> Potongan <br> Terlambat {{ $currentEntitas }}</b></span>
+                        <span><b> Total Terlambat {{ $currentEntitas }}</b></span>
                     </div>
                     <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -91,7 +91,7 @@
                 <div class="small-box text-bg-success">
                     <div class="inner pe-5">
                         <h4>Rp. {{ number_format($potongan_terlambat_titip, 0, ',', '.') }}</h4>
-                        <span><b> Potongan <br> Terlambat {{ $currentEntitas }} Titip</b></span>
+                        <span><b> Total Terlambat {{ $currentEntitas }} Titip</b></span>
                     </div>
                     <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -104,7 +104,7 @@
                 <div class="small-box text-bg-success">
                     <div class="inner pe-5">
                         <h4>Rp. {{ number_format($churn, 0, ',', '.') }}</h4>
-                        <span><b> Churn <br> {{ $currentEntitas }}</b></span>
+                        <span><b> Total Churn {{ $currentEntitas }}</b></span>
                     </div>
                     <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -117,7 +117,7 @@
                 <div class="small-box text-bg-success">
                     <div class="inner pe-5">
                         <h4>Rp. {{ number_format($churn_titip, 0, ',', '.') }}</h4>
-                        <span><b> Churn <br> {{ $currentEntitas }} Titip</b></span>
+                        <span><b> Total Churn {{ $currentEntitas }} Titip</b></span>
                     </div>
                     <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
