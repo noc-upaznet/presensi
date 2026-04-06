@@ -136,7 +136,6 @@
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
-                                {{-- <th>Diajukan Pada</th> --}}
                                 @hasanyrole('admin|hr|spv|branch-manager')
                                     <th>Nama</th>
                                 @endhasanyrole
@@ -145,6 +144,9 @@
                                 <th>File</th>
                                 <th>Approve</th>
                                 <th>Status</th>
+                                @can('log-view')
+                                    <th>Diajukan Pada</th>
+                                @endcan
                                 <th class="text-center">Action</th>
                             </tr>
                         </thead>
@@ -158,7 +160,6 @@
                                 @foreach ($pengajuans as $key)
                                     <tr>
                                         <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
-                                        {{-- <td style="color: var(--bs-body-color);">{{ $key->created_at }}</td> --}}
                                         @hasanyrole('admin|hr|spv|branch-manager')
                                             <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}
                                             </td>
@@ -201,6 +202,10 @@
                                                 <span class="badge bg-danger">Ditolak</span>
                                             @endif
                                         </td>
+                                        @can('log-view')
+                                            <td style="color: var(--bs-body-color);">{{ $key->created_at }} |
+                                                {{ $key->updated_at }}</td>
+                                        @endcan
                                         @hasanyrole('user')
                                             @can('pengajuan-edit')
                                                 @if ($key->approve_spv == 0 && $key->approve_hr == 0)
