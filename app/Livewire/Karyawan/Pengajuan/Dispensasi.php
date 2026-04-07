@@ -32,6 +32,7 @@ class Dispensasi extends Component
     public $editId;
     public $oldFile;
     public int $perPage = 25;
+    public $existingFile;
 
     public function mount()
     {
@@ -72,8 +73,9 @@ class Dispensasi extends Component
 
         // Simpan file kalau ada upload
         $path = null;
-        if ($this->file instanceof UploadedFile) {
-            $path = $this->file->store('file-pengajuan-dispensasi', 'public');
+        if ($this->file) {
+            $filename = md5(uniqid()) . '.' . $this->file->extension();
+            $path = $this->file->storeAs('file-pengajuan-dispensasi', $filename, 's3');
         }
 
         $data = [
@@ -82,6 +84,7 @@ class Dispensasi extends Component
             'description' => $this->form->description,
             'file'        => $path,
         ];
+        // dd($data);
 
         M_Dispensation::create($data);
 
@@ -103,6 +106,8 @@ class Dispensasi extends Component
     {
         $pengajuan = M_Dispensation::find(decrypt($id));
         $this->editId = $id;
+        $this->existingFile = $pengajuan->file;
+
 
         if (!$pengajuan) {
             return;
@@ -132,33 +137,23 @@ class Dispensasi extends Component
         $path = null;
 
         // kalau ada upload file baru
-        if ($this->file instanceof \Illuminate\Http\UploadedFile) {
-            $this->validate([
-                'file' => 'nullable|mimes:jpg,jpeg,png|max:2048',
-            ]);
-
-            // hapus file lama kalau ada
-            if ($pengajuan->file && Storage::disk('public')->exists(str_replace('storage/', '', $pengajuan->file))) {
-                Storage::disk('public')->delete(str_replace('storage/', '', $pengajuan->file));
-            }
-
-            // simpan file baru
-            $path = $this->file->store('file-pengajuan-dispensasi', 'public');
+        if ($this->file && is_object($this->file)) {
+            $filename = md5(uniqid()) . '.' . $this->file->extension();
+            $path = $this->file->storeAs('file-pengajuan', $filename, 's3');
+        } elseif ($this->existingFile) {
+            // kalau tidak upload baru tapi sebelumnya sudah ada file, tetap simpan path lama
+            $path = $this->existingFile;
         }
 
         $data = [
             'date'        => $this->form->date,
             'description' => $this->form->description,
-            'file'        => $path
-                ? str_replace('public/', 'storage/', $path)
-                : $this->oldFile,
+            'file' => $path ?? ($this->existingFile ?? null),
         ];
 
         $pengajuan->update($data);
 
         $this->form->reset();
-        $this->file = null;
-        $this->oldFile = null;
 
         $this->dispatch('swal', params: [
             'title' => 'Data Updated',
@@ -168,12 +163,10 @@ class Dispensasi extends Component
         $this->dispatch('modalEditPengajuan', action: 'hide');
     }
 
-    public function removeOldFile()
+    public function removeFile()
     {
-        if ($this->oldFile && Storage::disk('public')->exists(str_replace('storage/', '', $this->oldFile))) {
-            Storage::disk('public')->delete(str_replace('storage/', '', $this->oldFile));
-        }
-        $this->oldFile = null;
+        $this->file = null;
+        $this->existingFile = null;
     }
 
 

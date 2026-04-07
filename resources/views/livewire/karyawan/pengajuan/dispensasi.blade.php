@@ -160,10 +160,15 @@
                                         <td style="color: var(--bs-body-color);">{{ $clockIn }}</td>
                                         <td style="color: var(--bs-body-color);">
                                             @if ($key->file)
-                                                <img src="{{ asset('storage/' . $key->file) }}" alt="Bukti Lembur"
+                                                @php
+                                                    $fileUrl = Illuminate\Support\Facades\Storage::disk(
+                                                        's3',
+                                                    )->temporaryUrl($key->file, now()->addMinutes(30));
+                                                @endphp
+                                                <img src="{{ $fileUrl }}" alt="Bukti Lembur"
                                                     style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
                                                     data-bs-target="#modalGambar"
-                                                    onclick="setModalImage('{{ asset('storage/' . $key->file) }}')">
+                                                    onclick="setModalImage('{{ $fileUrl }}')">
                                             @else
                                                 -
                                             @endif
@@ -260,18 +265,47 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="file" class="form-label fw-semibold">File</label>
-                            <input type="file" wire:model="file" class="form-control" accept="image/*">
-                            @error('file')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                            <small class="text-danger">
-                                @if (session()->has('error'))
-                                    {{ session('error') }}
+                            <label class="form-label fw-semibold">File Bukti</label>
+
+                            <label for="file"
+                                style="
+                                    display: block;
+                                    border: 2px dashed #cbd5e1;
+                                    border-radius: 12px;
+                                    padding: 1.5rem;
+                                    text-align: center;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                    background: #f8fafc;
+                                "
+                                onmouseover="this.style.borderColor='#6366f1';this.style.background='#f5f3ff'"
+                                onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#f8fafc'">
+
+                                <input type="file" class="d-none" id="file" wire:model="file"
+                                    accept=".jpg,.jpeg,.png">
+
+                                @if ($file && is_object($file))
+                                    {{-- Preview file yang dipilih --}}
+                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
+                                        style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
+                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @else
-                                    Ukuran maksimal file: 2MB
+                                    {{-- Belum ada file --}}
+                                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
+                                    <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
+                                    <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
                                 @endif
-                            </small>
+                            </label>
+
+                            @if (session()->has('error'))
+                                <small class="text-danger">{{ session('error') }}</small>
+                            @else
+                                <small class="text-muted">Ukuran maksimal file: 2MB</small>
+                            @endif
+
+                            @error('file')
+                                <small class="text-danger d-block">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
 
@@ -325,30 +359,65 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="file" class="form-label fw-semibold">File</label>
-                            @if ($oldFile)
-                                <div class="mb-2">
-                                    <p>File lama:</p>
-                                    <img src="{{ asset('storage/' . $oldFile) }}" class="img-thumbnail"
-                                        width="150">
-                                    <button type="button" class="btn btn-danger btn-sm mt-2"
-                                        wire:click="removeOldFile">
-                                        Hapus File Lama
-                                    </button>
-                                </div>
+                            <label class="form-label fw-semibold">File Bukti</label>
+
+                            <label for="file"
+                                style="
+                                    display: block;
+                                    border: 2px dashed #cbd5e1;
+                                    border-radius: 12px;
+                                    padding: 1.5rem;
+                                    text-align: center;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                    background: #f8fafc;
+                                "
+                                onmouseover="this.style.borderColor='#6366f1';this.style.background='#f5f3ff'"
+                                onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#f8fafc'">
+
+                                <input type="file" class="d-none" id="file" wire:model="file"
+                                    accept=".jpg,.jpeg,.png">
+
+                                @if ($file && is_object($file))
+                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
+                                        style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
+                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+                                @elseif ($existingFile)
+                                    <img src="{{ Storage::disk('s3')->temporaryUrl($existingFile, now()->addMinutes(30)) }}"
+                                        alt="File saat ini"
+                                        style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
+                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+                                @else
+                                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
+                                    <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
+                                    <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
+                                @endif
+                            </label>
+
+                            {{-- Tombol remove --}}
+                            @if (($file && is_object($file)) || $existingFile)
+                                <button type="button" wire:click="removeFile"
+                                    style="
+                                        margin-top: 8px;
+                                        padding: 4px 12px;
+                                        font-size: 12px;
+                                        border-radius: 8px;
+                                        border: 1px solid #fca5a5;
+                                        background: #fff1f2;
+                                        color: #dc2626;
+                                        cursor: pointer;
+                                    ">
+                                    🗑️ Hapus file
+                                </button>
                             @endif
 
-                            {{-- <input type="file" wire:model="file" class="form-control" accept="image/*">
-                                @error('file') <span class="text-danger">{{ $message }}</span> @enderror --}}
-                            <input type="file" class="form-control" id="file" wire:model="file"
-                                accept=".jpg,.jpeg,.png">
-                            <small class="text-danger">
-                                @if (session()->has('error'))
-                                    {{ session('error') }}
-                                @else
-                                    Ukuran maksimal file: 2MB
-                                @endif
-                            </small>
+                            @if (session()->has('error'))
+                                <small class="text-danger">{{ session('error') }}</small>
+                            @endif
+
+                            @error('file')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
 

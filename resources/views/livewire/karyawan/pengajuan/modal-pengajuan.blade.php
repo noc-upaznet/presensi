@@ -203,6 +203,23 @@
                                 @endif
                             </label>
 
+                            {{-- Tombol remove --}}
+                            @if (($file && is_object($file)) || $existingFile)
+                                <button type="button" wire:click="removeFile"
+                                    style="
+                                        margin-top: 8px;
+                                        padding: 4px 12px;
+                                        font-size: 12px;
+                                        border-radius: 8px;
+                                        border: 1px solid #fca5a5;
+                                        background: #fff1f2;
+                                        color: #dc2626;
+                                        cursor: pointer;
+                                    ">
+                                    🗑️ Hapus file
+                                </button>
+                            @endif
+
                             @if (session()->has('error'))
                                 <small class="text-danger">{{ session('error') }}</small>
                             @endif

@@ -49,13 +49,14 @@ class ModalPengajuan extends Component
     public function loadData($data)
     {
         // dd($data['id']);
+
         $this->pengajuanId = $data['id'];
         $this->existingFile = $data['file'];
         $this->form->fill($data);
         $this->form->pengajuan = $data['shift_id'];
         $this->form->tanggal = $data['tanggal'];
         $this->form->keterangan = $data['keterangan'];
-        $this->file = isset($data['file']) ? str_replace('storage/', '', $data['file']) : null;
+        // $this->file = isset($data['file']) ? str_replace('storage/', '', $data['file']) : null;
     }
 
     public function saveEdit()
@@ -70,15 +71,14 @@ class ModalPengajuan extends Component
         if ($this->file) {
             // dd($this->file);
             $this->validate([
-                'file' => 'nullable|mimes:jpg,jpeg,png|max:2048',
+                'file' => 'nullable|max:2048',
             ], [
                 'file.max' => 'Ukuran file maksimal 2MB.',
-                'file.mimes' => 'Format file harus JPG, JPEG, PNG.',
             ]);
         }
 
         $path = null;
-        if ($this->file) {
+        if ($this->file && is_object($this->file)) {
             $filename = md5(uniqid()) . '.' . $this->file->extension();
             $path = $this->file->storeAs('file-pengajuan', $filename, 's3');
         }
@@ -87,7 +87,7 @@ class ModalPengajuan extends Component
             'shift_id' => $this->form->pengajuan,
             'tanggal' => $this->form->tanggal,
             'keterangan' => $this->form->keterangan,
-            'file' => $path,
+            'file' => $path ?? ($this->existingFile ?? null),
         ];
         // dd($data);
 
@@ -106,6 +106,12 @@ class ModalPengajuan extends Component
         // Tutup modal
         $this->dispatch('modalEditPengajuan', action: 'hide');
         $this->dispatch('refresh');
+    }
+
+    public function removeFile()
+    {
+        $this->file = null;
+        $this->existingFile = null;
     }
 
     public function store()

@@ -113,7 +113,7 @@ class ModalPengajuanLembur extends Component
         $this->form->total_jam = $data['total_jam'] ? $data['total_jam'] : 0;
         $this->form->jenis = $data['jenis'] ?? 'Lembur';
         $this->form->keterangan = $data['keterangan'] ?? '';
-        $this->file_bukti = isset($data['file_bukti']) ? str_replace('storage/', '', $data['file_bukti']) : null;
+        // $this->file_bukti = isset($data['file_bukti']) ? str_replace('storage/', '', $data['file_bukti']) : null;
     }
 
     public function saveEdit()
@@ -129,34 +129,31 @@ class ModalPengajuanLembur extends Component
         if ($this->file_bukti) {
             // dd($this->file_bukti);
             $this->validate([
-                'file_bukti' => 'nullable|mimes:jpg,jpeg,png|max:2048',
+                'file_bukti' => 'nullable|max:2048',
             ], [
                 'file_bukti.max' => 'Ukuran file maksimal 2MB.',
-                'file_bukti.mimes' => 'Format file harus JPG, JPEG, PNG.',
             ]);
         }
 
         $path = null;
-        if ($this->file_bukti) {
+        if ($this->file_bukti && is_object($this->file_bukti)) {
             $filename = md5(uniqid()) . '.' . $this->file_bukti->extension();
             $path = $this->file_bukti->storeAs('file-lembur', $filename, 's3');
         }
 
 
         $data = [
-            // 'karyawan_id' => M_DataKaryawan::where('user_id', Auth::id())->value('id'),
             'tanggal' => $this->form->tanggal,
             'jenis' => $this->form->jenis,
             'keterangan' => $this->form->keterangan,
             'waktu_mulai' => $this->form->waktu_mulai,
             'waktu_akhir' => $this->form->waktu_akhir,
             'total_jam' => round($this->form->total_jam, 2),
-            'file_bukti' => $path,
+            'file_bukti' => $path ?? ($this->existingFile ?? null),
         ];
         // dd($data);
 
         $dataPengajuan->update($data);
-        // M_Pengajuan::where('id', Crypt::decrypt($this->form->id))->update($data);
 
         // Reset input
         $this->form->reset();
@@ -170,6 +167,12 @@ class ModalPengajuanLembur extends Component
         // Tutup modal
         $this->dispatch('modalEditPengajuanLembur', action: 'hide');
         $this->dispatch('refresh');
+    }
+
+    public function removeFile()
+    {
+        $this->file_bukti = null;
+        $this->existingFile = null;
     }
 
     public function delete($id)
