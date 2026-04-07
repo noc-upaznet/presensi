@@ -166,7 +166,7 @@
                                         @endhasanyrole
                                         <td style="color: var(--bs-body-color);">{{ $key->getShift->nama_shift }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->keterangan }}</td>
-                                        <td style="color: var(--bs-body-color);">
+                                        {{-- <td style="color: var(--bs-body-color);">
                                             @if ($key->file)
                                                 @php
                                                     $fileUrl = Illuminate\Support\Facades\Storage::disk(
@@ -177,6 +177,16 @@
                                                     style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
                                                     data-bs-target="#modalGambar"
                                                     onclick="setModalImage('{{ $fileUrl }}')">
+                                            @else
+                                                -
+                                            @endif
+                                        </td> --}}
+                                        <td style="color: var(--bs-body-color);">
+                                            @if ($key->file)
+                                                <img src="{{ asset('storage/' . $key->file) }}" alt="Bukti Lembur"
+                                                    style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
+                                                    data-bs-target="#modalGambar"
+                                                    onclick="setModalImage('{{ asset('storage/' . $key->file) }}')">
                                             @else
                                                 -
                                             @endif
