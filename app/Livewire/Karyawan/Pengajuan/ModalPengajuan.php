@@ -12,6 +12,7 @@ use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Auth;
 use App\Livewire\Forms\PengajuanForm;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 
 class ModalPengajuan extends Component
 {
@@ -26,6 +27,7 @@ class ModalPengajuan extends Component
     public $file;
     public $detail;
     public $pengajuanId;
+    public $existingFile;
 
     protected $listeners = ['refreshTable' => 'refresh', 'edit-pengajuan' => 'loadData'];
 
@@ -48,6 +50,7 @@ class ModalPengajuan extends Component
     {
         // dd($data['id']);
         $this->pengajuanId = $data['id'];
+        $this->existingFile = $data['file'];
         $this->form->fill($data);
         $this->form->pengajuan = $data['shift_id'];
         $this->form->tanggal = $data['tanggal'];
@@ -64,16 +67,27 @@ class ModalPengajuan extends Component
             return;
         }
 
+        if ($this->file) {
+            // dd($this->file);
+            $this->validate([
+                'file' => 'nullable|mimes:jpg,jpeg,png|max:2048',
+            ], [
+                'file.max' => 'Ukuran file maksimal 2MB.',
+                'file.mimes' => 'Format file harus JPG, JPEG, PNG.',
+            ]);
+        }
+
         $path = null;
         if ($this->file) {
-            $path = $this->file->store('file-pengajuan', 'public');
+            $filename = md5(uniqid()) . '.' . $this->file->extension();
+            $path = $this->file->storeAs('file-pengajuan', $filename, 's3');
         }
 
         $data = [
             'shift_id' => $this->form->pengajuan,
             'tanggal' => $this->form->tanggal,
             'keterangan' => $this->form->keterangan,
-            'file' => $path ? str_replace('public/', 'storage/', $path) : null,
+            'file' => $path,
         ];
         // dd($data);
 
@@ -110,7 +124,8 @@ class ModalPengajuan extends Component
 
         $path = null;
         if ($this->file) {
-            $path = $this->file->store('file-pengajuan', 'public');
+            $filename = md5(uniqid()) . '.' . $this->file->extension();
+            $path = $this->file->storeAs('file-pengajuan', $filename, 's3');
         }
         // dd(auth()->id());
         $data = [
@@ -118,7 +133,7 @@ class ModalPengajuan extends Component
             'shift_id' => $this->form->pengajuan,
             'tanggal' => $this->form->tanggal,
             'keterangan' => $this->form->keterangan,
-            'file' => $path ? str_replace('public/', 'storage/', $path) : null,
+            'file' => $path,
             'satatus' => 0,
         ];
         // dd($data);

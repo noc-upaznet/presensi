@@ -166,14 +166,19 @@
                                         @endhasanyrole
                                         <td style="color: var(--bs-body-color);">{{ $key->getShift->nama_shift }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->keterangan }}</td>
-                                        <td>
-                                            @if ($key->file && is_string($key->file) && file_exists(public_path('storage/' . $key->file)))
-                                                <img src="{{ asset('storage/' . $key->file) }}"
+                                        <td style="color: var(--bs-body-color);">
+                                            @if ($key->file)
+                                                @php
+                                                    $fileUrl = Illuminate\Support\Facades\Storage::disk(
+                                                        's3',
+                                                    )->temporaryUrl($key->file, now()->addMinutes(30));
+                                                @endphp
+                                                <img src="{{ $fileUrl }}" alt="Bukti Lembur"
                                                     style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
                                                     data-bs-target="#modalGambar"
-                                                    onclick="setModalImage('{{ asset('storage/' . $key->file) }}')">
+                                                    onclick="setModalImage('{{ $fileUrl }}')">
                                             @else
-                                                <span style="color: gray;">-</span>
+                                                -
                                             @endif
                                         </td>
                                         <td style="color: var(--bs-body-color);">
