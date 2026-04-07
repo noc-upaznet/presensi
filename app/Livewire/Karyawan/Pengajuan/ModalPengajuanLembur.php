@@ -25,7 +25,7 @@ class ModalPengajuanLembur extends Component
     public $file_bukti;
     protected $listeners = ['refreshTable' => 'refresh', 'edit-pengajuan' => 'loadData'];
     public $pengajuanId;
-    public $file;
+    public $existingFile;
 
 
     public function updated($propertyName)
@@ -66,7 +66,8 @@ class ModalPengajuanLembur extends Component
 
         $path = null;
         if ($this->file_bukti) {
-            $path = $this->file_bukti->store('file-lembur', 'public');
+            $filename = md5(uniqid()) . '.' . $this->file_bukti->extension();
+            $path = $this->file_bukti->storeAs('file-lembur', $filename, 's3');
         }
 
         $data = [
@@ -77,7 +78,7 @@ class ModalPengajuanLembur extends Component
             'waktu_mulai' => $this->form->waktu_mulai,
             'waktu_akhir' => $this->form->waktu_akhir,
             'total_jam' => round($this->form->total_jam, 2),
-            'file_bukti' => $path ? str_replace('public/', 'storage/', $path) : null,
+            'file_bukti' => $path,
             'satatus' => 0,
         ];
         // dd($data);
@@ -98,7 +99,6 @@ class ModalPengajuanLembur extends Component
         // Tutup modal
         $this->dispatch('modalTambahPengajuanLembur', action: 'hide');
         $this->dispatch('refresh');
-        
     }
 
     public function loadData($data)
@@ -106,13 +106,14 @@ class ModalPengajuanLembur extends Component
         // dd($data['id']);
         $this->pengajuanId = $data['id'];
         $this->form->fill($data);
+        $this->existingFile = $data['file_bukti'];
         $this->form->tanggal = $data['tanggal'];
         $this->form->waktu_mulai = $data['waktu_mulai'] ? Carbon::parse($data['waktu_mulai'])->format('H:i') : null;
         $this->form->waktu_akhir = $data['waktu_akhir'] ? Carbon::parse($data['waktu_akhir'])->format('H:i') : null;
         $this->form->total_jam = $data['total_jam'] ? $data['total_jam'] : 0;
         $this->form->jenis = $data['jenis'] ?? 'Lembur';
         $this->form->keterangan = $data['keterangan'] ?? '';
-        $this->file = isset($data['file_bukti']) ? str_replace('storage/', '', $data['file_bukti']) : null;
+        $this->file_bukti = isset($data['file_bukti']) ? str_replace('storage/', '', $data['file_bukti']) : null;
     }
 
     public function saveEdit()
@@ -125,23 +126,20 @@ class ModalPengajuanLembur extends Component
         }
         $this->form->validate();
 
-        $path = null;
-        if ($this->file_bukti && $this->file_bukti->isFile()) {
-            try {
-                $fileSize = $this->file_bukti->getSize();
+        if ($this->file_bukti) {
+            // dd($this->file_bukti);
+            $this->validate([
+                'file_bukti' => 'nullable|mimes:jpg,jpeg,png|max:2048',
+            ], [
+                'file_bukti.max' => 'Ukuran file maksimal 2MB.',
+                'file_bukti.mimes' => 'Format file harus JPG, JPEG, PNG.',
+            ]);
+        }
 
-                if ($fileSize > 2 * 1024 * 1024) { // lebih dari 2MB
-                    $this->reset('file_bukti');
-                    $this->dispatch('show-warning', message: 'Ukuran file tidak boleh lebih dari 2MB.');
-                    // lanjutkan simpan TANPA file
-                } else {
-                    $path = $this->file_bukti->store('file-lembur', 'public');
-                }
-            } catch (\Exception $e) {
-                $this->reset('file_bukti');
-                $this->dispatch('show-warning', message: 'File gagal disimpan. Mungkin ukurannya terlalu besar.');
-                // lanjutkan simpan TANPA file
-            }
+        $path = null;
+        if ($this->file_bukti) {
+            $filename = md5(uniqid()) . '.' . $this->file_bukti->extension();
+            $path = $this->file_bukti->storeAs('file-lembur', $filename, 's3');
         }
 
 
@@ -153,7 +151,7 @@ class ModalPengajuanLembur extends Component
             'waktu_mulai' => $this->form->waktu_mulai,
             'waktu_akhir' => $this->form->waktu_akhir,
             'total_jam' => round($this->form->total_jam, 2),
-            'file_bukti' => $path ? str_replace('public/', 'storage/', $path) : null,
+            'file_bukti' => $path,
         ];
         // dd($data);
 
@@ -191,7 +189,7 @@ class ModalPengajuanLembur extends Component
         $this->dispatch('modal-confirm-delete', action: 'hide');
         $this->dispatch('refresh');
     }
-    
+
     public function render()
     {
         return view('livewire.karyawan.pengajuan.modal-pengajuan-lembur');

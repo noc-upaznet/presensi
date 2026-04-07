@@ -1,6 +1,6 @@
 <div>
-    <div wire:ignore.self class="modal fade" id="modalTambahPengajuanLembur" tabindex="-1" aria-labelledby="modalTambahPengajuanLemburLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalTambahPengajuanLembur" tabindex="-1"
+        aria-labelledby="modalTambahPengajuanLemburLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-info">
@@ -10,9 +10,12 @@
 
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label for="tanggal" class="form-label fw-semibold">Tanggal <small class="text-danger">*</small></label>
+                        <label for="tanggal" class="form-label fw-semibold">Tanggal <small
+                                class="text-danger">*</small></label>
                         <input type="date" class="form-control" id="tanggal" wire:model="form.tanggal">
-                        @error('form.tanggal') <span class="text-danger">{{ $message }}</span> @enderror
+                        @error('form.tanggal')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
@@ -22,14 +25,17 @@
                             <option value="1">Hari Biasa</option>
                             <option value="2">Hari Libur</option>
                         </select>
-                        @error('form.jenis') <span class="text-danger">{{ $message }}</span> @enderror
+                        @error('form.jenis')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Rentang Waktu</label>
                         <div class="row">
                             <div class="col">
-                                <label for="waktu_mulai" class="form-label">Jam Mulai <small class="text-danger">*</small></label>
+                                <label for="waktu_mulai" class="form-label">Jam Mulai <small
+                                        class="text-danger">*</small></label>
                                 <select class="form-control" wire:model.lazy="form.waktu_mulai">
                                     <option value="">Pilih Jam</option>
                                     @for ($i = 0; $i < 48; $i++)
@@ -39,16 +45,19 @@
                                             $value = str_pad($hour, 2, '0', STR_PAD_LEFT) . ':' . $minute;
 
                                             // Label: jika 00:00 ditampilkan sebagai 24:00
-                                            $label = ($value === '00:00') ? '24:00' : $value;
+                                            $label = $value === '00:00' ? '24:00' : $value;
                                         @endphp
                                         <option value="{{ $value }}">{{ $label }}</option>
                                     @endfor
                                 </select>
-                                @error('form.waktu_mulai') <span class="text-danger">{{ $message }}</span> @enderror
+                                @error('form.waktu_mulai')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
 
                             <div class="col">
-                                <label for="waktu_akhir" class="form-label">Jam Selesai <small class="text-danger">*</small></label>
+                                <label for="waktu_akhir" class="form-label">Jam Selesai <small
+                                        class="text-danger">*</small></label>
                                 <select class="form-control" wire:model.lazy="form.waktu_akhir">
                                     <option value="">Pilih Jam</option>
                                     @for ($i = 0; $i < 48; $i++)
@@ -57,12 +66,14 @@
                                             $minute = $i % 2 == 0 ? '00' : '30';
                                             $value = str_pad($hour, 2, '0', STR_PAD_LEFT) . ':' . $minute;
 
-                                            $label = ($value === '00:00') ? '24:00' : $value;
+                                            $label = $value === '00:00' ? '24:00' : $value;
                                         @endphp
                                         <option value="{{ $value }}">{{ $label }}</option>
                                     @endfor
                                 </select>
-                                @error('form.waktu_akhir') <span class="text-danger">{{ $message }}</span> @enderror
+                                @error('form.waktu_akhir')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -72,25 +83,62 @@
                         <input type="text" id="total_jam" class="form-control" wire:model="form.total_jam" readonly>
                     </div>
                     <div class="mb-3">
-                        <label for="keterangan" class="form-label fw-semibold">Keterangan <small class="text-danger">*</small></label>
-                        <input type="text" class="form-control" id="keterangan" placeholder="Layanan Helpdesk" wire:model="form.keterangan">
-                        @error('form.keterangan') <span class="text-danger">{{ $message }}</span> @enderror
+                        <label for="keterangan" class="form-label fw-semibold">Keterangan <small
+                                class="text-danger">*</small></label>
+                        <input type="text" class="form-control" id="keterangan" placeholder="Layanan Helpdesk"
+                            wire:model="form.keterangan">
+                        @error('form.keterangan')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
-                        <label for="file" class="form-label fw-semibold">File</label>
-                        <input type="file" class="form-control" id="file" wire:model="file_bukti" accept=".jpg,.jpeg,.png">
-                        <small class="text-danger">
-                            @if (session()->has('error'))
-                                {{ session('error') }}
+                        <label class="form-label fw-semibold">File Bukti</label>
+
+                        <label for="file_bukti"
+                            style="
+                                    display: block;
+                                    border: 2px dashed #cbd5e1;
+                                    border-radius: 12px;
+                                    padding: 1.5rem;
+                                    text-align: center;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                    background: #f8fafc;
+                                "
+                            onmouseover="this.style.borderColor='#6366f1';this.style.background='#f5f3ff'"
+                            onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#f8fafc'">
+
+                            <input type="file" class="d-none" id="file_bukti" wire:model="file_bukti"
+                                accept=".jpg,.jpeg,.png">
+
+                            @if ($file_bukti && is_object($file_bukti))
+                                {{-- Preview file yang dipilih --}}
+                                <img src="{{ $file_bukti->temporaryUrl() }}" alt="Preview"
+                                    style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
+                                <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                             @else
-                                Ukuran maksimal file: 2MB
+                                {{-- Belum ada file --}}
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
+                                <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
+                                <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
                             @endif
-                        </small>
+                        </label>
+
+                        @if (session()->has('error'))
+                            <small class="text-danger">{{ session('error') }}</small>
+                        @else
+                            <small class="text-muted">Ukuran maksimal file: 2MB</small>
+                        @endif
+
+                        @error('file_bukti')
+                            <small class="text-danger d-block">{{ $message }}</small>
+                        @enderror
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary w-100 w-md-auto" wire:click='store' wire:loading.attr="disabled" wire:target="store">
+                    <button type="button" class="btn btn-primary w-100 w-md-auto" wire:click='store'
+                        wire:loading.attr="disabled" wire:target="store">
                         <div wire:loading wire:target="store" class="spinner-border spinner-border-sm" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
@@ -104,8 +152,8 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="modalEditPengajuanLembur" tabindex="-1" aria-labelledby="modalEditPengajuanLemburLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalEditPengajuanLembur" tabindex="-1"
+        aria-labelledby="modalEditPengajuanLemburLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-info">
@@ -115,26 +163,33 @@
 
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label for="tanggal" class="form-label fw-semibold">Tanggal <small class="text-danger">*</small></label>
+                        <label for="tanggal" class="form-label fw-semibold">Tanggal <small
+                                class="text-danger">*</small></label>
                         <input type="date" class="form-control" id="tanggal" wire:model="form.tanggal">
-                        @error('form.tanggal') <span class="text-danger">{{ $message }}</span> @enderror
+                        @error('form.tanggal')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Jenis Lembur <small class="text-danger">*</small></label>
+                        <label class="form-label fw-semibold">Jenis Lembur <small
+                                class="text-danger">*</small></label>
                         <select class="form-select" wire:model="form.jenis">
                             <option value="">-- Pilih Jenis Lembur --</option>
                             <option value="1">Hari Biasa</option>
                             <option value="2">Hari Libur</option>
                         </select>
-                        @error('form.jenis') <span class="text-danger">{{ $message }}</span> @enderror
+                        @error('form.jenis')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Rentang Waktu</label>
                         <div class="row">
                             <div class="col">
-                                <label for="waktu_mulai" class="form-label">Jam Mulai <small class="text-danger">*</small></label>
+                                <label for="waktu_mulai" class="form-label">Jam Mulai <small
+                                        class="text-danger">*</small></label>
                                 <select class="form-control" wire:model.lazy="form.waktu_mulai">
                                     <option value="">Pilih Jam</option>
                                     @php
@@ -142,14 +197,18 @@
                                         $end = \Carbon\Carbon::createFromTime(23, 30);
                                     @endphp
                                     @while ($start <= $end)
-                                        <option value="{{ $start->format('H:i') }}">{{ $start->format('H:i') }}</option>
+                                        <option value="{{ $start->format('H:i') }}">{{ $start->format('H:i') }}
+                                        </option>
                                         @php $start->addMinutes(30); @endphp
                                     @endwhile
                                 </select>
-                                @error('form.waktu_mulai') <span class="text-danger">{{ $message }}</span> @enderror
+                                @error('form.waktu_mulai')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
                             <div class="col">
-                                <label for="waktu_akhir" class="form-label">Jam Selesai <small class="text-danger">*</small></label>
+                                <label for="waktu_akhir" class="form-label">Jam Selesai <small
+                                        class="text-danger">*</small></label>
                                 <select class="form-control" wire:model.lazy="form.waktu_akhir">
                                     <option value="">Pilih Jam</option>
                                     @php
@@ -157,40 +216,86 @@
                                         $end = \Carbon\Carbon::createFromTime(23, 30);
                                     @endphp
                                     @while ($start <= $end)
-                                        <option value="{{ $start->format('H:i') }}">{{ $start->format('H:i') }}</option>
+                                        <option value="{{ $start->format('H:i') }}">{{ $start->format('H:i') }}
+                                        </option>
                                         @php $start->addMinutes(30); @endphp
                                     @endwhile
                                 </select>
-                                @error('form.waktu_akhir') <span class="text-danger">{{ $message }}</span> @enderror
+                                @error('form.waktu_akhir')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="total_jam" class="form-label fw-semibold">Jumlah Jam Lembur</label>
-                        <input type="text" id="total_jam" class="form-control" wire:model="form.total_jam" readonly>
+                        <input type="text" id="total_jam" class="form-control" wire:model="form.total_jam"
+                            readonly>
                     </div>
                     <div class="mb-3">
-                        <label for="keterangan" class="form-label fw-semibold">Keterangan <small class="text-danger">*</small></label>
-                        <input type="text" class="form-control" id="keterangan" placeholder="Layanan Helpdesk" wire:model="form.keterangan">
-                        @error('form.keterangan') <span class="text-danger">{{ $message }}</span> @enderror
+                        <label for="keterangan" class="form-label fw-semibold">Keterangan <small
+                                class="text-danger">*</small></label>
+                        <input type="text" class="form-control" id="keterangan" placeholder="Layanan Helpdesk"
+                            wire:model="form.keterangan">
+                        @error('form.keterangan')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
-                        <label for="file" class="form-label fw-semibold">File</label>
-                        <input type="file" class="form-control" id="file" wire:model="file_bukti">
-                        <small class="text-danger">Ukuran maksimal file: 2MB</small>
-                        <div x-data x-on:show-warning.window="alert($event.detail.message)"></div>
-                        @if ($file)
-                            <div class="mt-2">
-                                <img src="{{ asset('storage/' . $file) }}" alt="Preview File" style="max-width: 200px;" class="img-thumbnail">
-                            </div>
+                        <label class="form-label fw-semibold">File Bukti</label>
+
+                        <label for="file"
+                            style="
+                                        display: block;
+                                        border: 2px dashed #cbd5e1;
+                                        border-radius: 12px;
+                                        padding: 1.5rem;
+                                        text-align: center;
+                                        cursor: pointer;
+                                        transition: all 0.2s;
+                                        background: #f8fafc;
+                                    "
+                            onmouseover="this.style.borderColor='#6366f1';this.style.background='#f5f3ff'"
+                            onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#f8fafc'">
+
+                            <input type="file" class="d-none" id="file" wire:model="file_bukti"
+                                accept=".jpg,.jpeg,.png">
+
+                            @if ($file_bukti && is_object($file_bukti))
+                                {{-- Preview file baru --}}
+                                <img src="{{ $file_bukti->temporaryUrl() }}" alt="Preview"
+                                    style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
+                                <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+                            @elseif ($existingFile)
+                                {{-- Preview file lama dari S3 --}}
+                                <img src="{{ Storage::disk('s3')->temporaryUrl($existingFile, now()->addMinutes(30)) }}"
+                                    alt="File saat ini"
+                                    style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
+                                <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+                            @else
+                                {{-- Belum ada file --}}
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
+                                <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
+                                <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
+                            @endif
+                        </label>
+
+                        @if (session()->has('error'))
+                            <small class="text-danger">{{ session('error') }}</small>
                         @endif
+
+                        @error('file_bukti')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary w-100 w-md-auto" wire:click='saveEdit' wire:loading.attr="disabled" wire:target="saveEdit">
-                        <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm" role="status">
+                    <button type="button" class="btn btn-primary w-100 w-md-auto" wire:click='saveEdit'
+                        wire:loading.attr="disabled" wire:target="saveEdit">
+                        <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm"
+                            role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                         <span wire:loading.remove wire:target="saveEdit"><i class="fa fa-save"></i> Simpan</span>
@@ -229,7 +334,7 @@
     </div>
 </div>
 
-@push("scripts")
+@push('scripts')
     <script>
         Livewire.on('swal', (e) => {
             Swal.fire(e.params);
@@ -239,5 +344,4 @@
             Livewire.dispatch('refreshTable');
         });
     </script>
-    
 @endpush

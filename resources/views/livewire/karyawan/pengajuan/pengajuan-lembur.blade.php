@@ -169,10 +169,15 @@
                                         <td style="color: var(--bs-body-color);">{{ $key->keterangan }}</td>
                                         <td style="color: var(--bs-body-color);">
                                             @if ($key->file_bukti)
-                                                <img src="{{ asset('storage/' . $key->file_bukti) }}" alt="Bukti Lembur"
+                                                @php
+                                                    $fileUrl = Illuminate\Support\Facades\Storage::disk(
+                                                        's3',
+                                                    )->temporaryUrl($key->file_bukti, now()->addMinutes(30));
+                                                @endphp
+                                                <img src="{{ $fileUrl }}" alt="Bukti Lembur"
                                                     style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
                                                     data-bs-target="#modalGambar"
-                                                    onclick="setModalImage('{{ asset('storage/' . $key->file_bukti) }}')">
+                                                    onclick="setModalImage('{{ $fileUrl }}')">
                                             @else
                                                 -
                                             @endif
