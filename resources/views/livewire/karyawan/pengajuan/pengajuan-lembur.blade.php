@@ -167,7 +167,7 @@
                                         <td style="color: var(--bs-body-color);">{{ $key->waktu_mulai }} -
                                             {{ $key->waktu_akhir }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->keterangan }}</td>
-                                        <td style="color: var(--bs-body-color);">
+                                        {{-- <td style="color: var(--bs-body-color);">
                                             @if ($key->file_bukti)
                                                 @php
                                                     $fileUrl = Illuminate\Support\Facades\Storage::disk(
@@ -178,6 +178,16 @@
                                                     style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
                                                     data-bs-target="#modalGambar"
                                                     onclick="setModalImage('{{ $fileUrl }}')">
+                                            @else
+                                                -
+                                            @endif
+                                        </td> --}}
+                                        <td style="color: var(--bs-body-color);">
+                                            @if ($key->file_bukti)
+                                                <img src="{{ asset('storage/' . $key->file_bukti) }}" alt="Bukti Lembur"
+                                                    style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
+                                                    data-bs-target="#modalGambar"
+                                                    onclick="setModalImage('{{ asset('storage/' . $key->file_bukti) }}')">
                                             @else
                                                 -
                                             @endif
