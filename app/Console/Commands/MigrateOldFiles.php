@@ -12,7 +12,7 @@ class MigrateOldFiles extends Command
 
     public function handle()
     {
-        $basePath = storage_path('app/public/file-lembur');
+        $basePath = storage_path('app/public/file-pengajuan');
         $files = glob($basePath . '/*');
 
         $this->info("Total file ditemukan: " . count($files));
@@ -48,9 +48,9 @@ class MigrateOldFiles extends Command
 
             $this->info("SIZE: " . round($sizeMB, 2) . " MB");
 
-            $targetPath = 'file-lembur/' . $filename;
+            $targetPath = 'file-pengajuan/' . $filename;
 
-            $oldPngPath = 'file-lembur/' . pathinfo($filename, PATHINFO_FILENAME) . '.png';
+            $oldPngPath = 'file-pengajuan/' . pathinfo($filename, PATHINFO_FILENAME) . '.png';
 
             if ($oldPngPath !== $targetPath) {
                 Storage::disk('s3')->delete($oldPngPath);
