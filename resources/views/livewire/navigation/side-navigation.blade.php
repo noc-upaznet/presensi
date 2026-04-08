@@ -134,7 +134,7 @@
                         <p>Riwayat Presensi</p>
                     </a>
                 </li>
-                @role('admin')
+                @can('employee-absent-view')
                     <li class="nav-item">
                         <a href="{{ route('employee-absent') }}"
                             class="nav-link {{ request()->routeIs('employee-absent') ? 'active' : '' }}">
@@ -142,7 +142,7 @@
                             <p>Karyawan Absen</p>
                         </a>
                     </li>
-                @endrole
+                @endcan
 
                 @can('gamifikasi-view')
                     <li class="nav-item">

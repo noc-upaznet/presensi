@@ -21,15 +21,17 @@
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="d-flex gap-2">
-                <select class="form-select" wire:model.lazy="filterDivisi" style="width: 150px;">
-                    <option value="">Pilih Divisi</option>
-                    @foreach ($divisiList as $divisi)
-                        <option value="{{ $divisi->nama }}">{{ $divisi->nama }}</option>
-                    @endforeach
-                </select>
+                @role('admin|hr')
+                    <select class="form-select" wire:model.lazy="filterDivisi" style="width: 150px;">
+                        <option value="">Pilih Divisi</option>
+                        @foreach ($divisiList as $divisi)
+                            <option value="{{ $divisi->nama }}">{{ $divisi->nama }}</option>
+                        @endforeach
+                    </select>
+                @endrole
                 <select class="form-select" wire:model.live="mode" style="width: 220px;">
-                    <option value="all">Semua Tidak Hadir</option>
-                    <option value="pengajuan">Tidak Hadir + Pengajuan</option>
+                    <option value="all">Tanpa Keterangan</option>
+                    <option value="pengajuan">Pengajuan</option>
                 </select>
             </div>
         </div>

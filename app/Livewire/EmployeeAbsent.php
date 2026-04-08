@@ -28,6 +28,14 @@ class EmployeeAbsent extends Component
     {
         $entitas = session('selected_entitas', 'UHO');
 
+        // Cek level user yang login
+        $userKaryawan = M_DataKaryawan::where('user_id', auth()->id())->first();
+        $isSpv = $userKaryawan && strtolower($userKaryawan->level) === 'spv';
+
+        if ($isSpv && $userKaryawan->entitas) {
+            $entitas = $userKaryawan->entitas;
+        }
+
         $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
             ->where('status_karyawan', '!=', 'NONAKTIF')
             ->where('deleted_at', null)
@@ -35,8 +43,56 @@ class EmployeeAbsent extends Component
             ->where('jabatan', '!=', 'Direktur')
             ->where('entitas', $entitas);
 
-        // filter
-        if ($this->filterDivisi) {
+        // Jika SPV, paksa filter sesuai divisi sendiri
+        if ($isSpv) {
+            $divisi = strtolower($userKaryawan->divisi);
+
+            if ($divisi === 'noc') {
+                // Divisi NOC → tidak pakai entitas
+                $karyawanIdList = M_DataKaryawan::where('divisi', $userKaryawan->divisi)
+                    ->pluck('id');
+            } elseif ($divisi === 'finance' && strtoupper($entitas) === 'UNR') {
+                // Finance UNR → include semua entitas MC + divisi sendiri
+                $karyawanIdList = M_DataKaryawan::where(function ($q) use ($userKaryawan) {
+                    $q->whereRaw('UPPER(entitas) = ?', ['MC'])
+                        ->orWhere(function ($sub) use ($userKaryawan) {
+                            $sub->where('divisi', $userKaryawan->divisi)
+                                ->where('entitas', $userKaryawan->entitas);
+                        });
+                })->pluck('id');
+            } else {
+                // Default SPV → filter by divisi & entitas sendiri
+                $karyawanIdList = M_DataKaryawan::where('divisi', $userKaryawan->divisi)
+                    ->where('entitas', $entitas)
+                    ->pluck('id');
+            }
+
+            // Override query
+            if ($divisi === 'noc') {
+                $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
+                    ->where('status_karyawan', '!=', 'NONAKTIF')
+                    ->where('deleted_at', null)
+                    ->where('jabatan', '!=', 'Komisaris')
+                    ->where('jabatan', '!=', 'Direktur')
+                    ->whereIn('id', $karyawanIdList);
+            } elseif ($divisi === 'finance' && strtoupper($entitas) === 'UNR') {
+                // Finance UNR tidak filter entitas
+                $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
+                    ->where('status_karyawan', '!=', 'NONAKTIF')
+                    ->where('deleted_at', null)
+                    ->where('jabatan', '!=', 'Komisaris')
+                    ->where('jabatan', '!=', 'Direktur')
+                    ->whereIn('id', $karyawanIdList);
+            } else {
+                $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
+                    ->where('status_karyawan', '!=', 'NONAKTIF')
+                    ->where('deleted_at', null)
+                    ->where('jabatan', '!=', 'Komisaris')
+                    ->where('jabatan', '!=', 'Direktur')
+                    ->where('entitas', $entitas)
+                    ->whereIn('id', $karyawanIdList);
+            }
+        } elseif ($this->filterDivisi) {
             $query->where('divisi', $this->filterDivisi);
         }
 
@@ -65,6 +121,7 @@ class EmployeeAbsent extends Component
 
         return view('livewire.employee-absent', [
             'datas' => $datas,
+            'isSpv' => $isSpv,
         ]);
     }
 }
