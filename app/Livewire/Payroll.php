@@ -15,6 +15,7 @@ use App\Models\JenisTunjanganModel;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Livewire\Attributes\Url;
 use Livewire\WithoutUrlPagination;
@@ -67,6 +68,9 @@ class Payroll extends Component
     public $potongan_terlambat_titip;
     public $churn;
     public $churn_titip;
+    public $note;
+    public $tittle;
+    public $noteId;
 
     #[Url(as: 'tab')]
     public $tab = 'dashboard';
@@ -453,6 +457,108 @@ class Payroll extends Component
         $this->dispatch('modalPayroll', action: 'show', periode: $this->periode, id: encrypt($id));
     }
 
+    public function showAddNoteModal()
+    {
+        $this->dispatch('addNoteModal', action: 'show');
+    }
+
+    public function saveNote()
+    {
+        $this->validate([
+            'note' => 'required|string|max:255',
+            'tittle' => 'nullable|string|max:255'
+        ]);
+
+        $data = [
+            'tittle' => $this->tittle,
+            'note' => $this->note,
+            'date' => now('Asia/Jakarta')->format('Y-m-d'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        DB::table('notes_payroll')->insert($data);
+
+        $this->reset('note');
+
+        $this->dispatch('swal', params: [
+            'title' => 'Catatan Tersimpan',
+            'icon' => 'success',
+            'text' => 'Catatan telah disimpan dengan sukses'
+        ]);
+
+        $this->dispatch('addNoteModal', action: 'hide');
+    }
+
+    public function showEditNoteModal($id)
+    {
+        $note = DB::table('notes_payroll')->where('id', $id)->first();
+        if ($note) {
+            $this->tittle = $note->tittle;
+            $this->note = $note->note;
+            $this->noteId = $note->id;
+        }
+
+        $this->dispatch('EditNoteModal', action: 'show');
+    }
+
+    public function UpdateNote()
+    {
+        $this->validate([
+            'note' => 'required|string|max:255',
+            'tittle' => 'nullable|string|max:255'
+        ]);
+
+        if (!$this->noteId) {
+            $this->dispatch('swal', params: [
+                'title' => 'Gagal',
+                'icon' => 'error',
+                'text' => 'ID catatan tidak ditemukan'
+            ]);
+            return;
+        }
+
+        DB::table('notes_payroll')->where('id', $this->noteId)->update([
+            'tittle' => $this->tittle,
+            'note' => $this->note,
+            'updated_at' => now(),
+        ]);
+
+        $this->reset(['note', 'noteId']);
+
+        $this->dispatch('swal', params: [
+            'title' => 'Catatan Diperbarui',
+            'icon' => 'success',
+            'text' => 'Catatan telah diperbarui dengan sukses'
+        ]);
+
+        $this->dispatch('EditNoteModal', action: 'hide');
+    }
+
+    public function confirmDeleteNote($id)
+    {
+        $this->noteId = $id;
+        $this->dispatch('deleteNoteModal', action: 'show');
+    }
+
+    public function deletedNote()
+    {
+        if ($this->noteId) {
+            DB::table('notes_payroll')->where('id', $this->noteId)->delete();
+
+            $this->dispatch(
+                'swal',
+                params: [
+                    'title' => 'Data Deleted',
+                    'icon' => 'success',
+                    'text' => 'Data has been deleted successfully',
+                    'showConfirmButton' => false,
+                    'timer' => 1500
+                ]
+            );
+            $this->noteId = null;
+        }
+    }
+
     public function showModalEks()
     {
         $this->periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
@@ -511,9 +617,16 @@ class Payroll extends Component
             ->orderBy('created_at', 'desc')
             ->paginate($this->perPage, ['*'], 'page2');
 
+        $note = DB::table('notes_payroll')
+            ->where('date', '>=', $this->cutoffStart)
+            ->where('date', '<=', $this->cutoffEnd)
+            ->orderBy('date', 'desc')
+            ->get();
+
         return view('livewire.payroll', [
             'data' => $data,
-            'data2' => $data2
+            'data2' => $data2,
+            'notes' => $note,
         ]);
     }
 }

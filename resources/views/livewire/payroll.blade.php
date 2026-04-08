@@ -414,7 +414,7 @@
                     role="tabpanel" aria-labelledby="dashboard-tab">
 
                     @if ($tab == 'dashboard')
-                        <div class="row mb-5">
+                        <div class="row mb-3">
                             {{-- Dropdown Tahun --}}
                             <div class="col-md-3">
                                 <select wire:model.lazy="selectedYear" class="form-select me-2">
@@ -542,8 +542,174 @@
                                 </div>
                             </div>
                         </div>
+                        @role('hr')
+                            <div class="mb-3">
+                                <button class="btn btn-primary btn-sm" wire:click="showAddNoteModal"> <i
+                                        class="bi bi-plus-circle"></i>
+                                    Tambah Catatan</button>
+                            </div>
+                        @endrole
+                        <div class="card shadow-sm border-0 rounded-3 mb-3">
+                            <div
+                                class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 fw-semibold">
+                                    <i class="bi bi-journal-text me-2 text-primary"></i>Daftar Catatan
+                                </h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    @forelse ($notes as $index => $item)
+                                        <li class="list-group-item px-4 py-3">
+                                            <div class="d-flex align-items-start gap-3">
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0"
+                                                    style="width: 32px; height: 32px; font-size: 13px; font-weight: 600;">
+                                                    {{ $index + 1 }}
+                                                </div>
+
+                                                <div class="flex-grow-1">
+                                                    @if ($item->tittle)
+                                                        <h6 class="mb-1 fw-semibold">{{ $item->tittle }}</h6>
+                                                    @endif
+                                                    <p class="mb-1">{{ $item->note }}</p>
+                                                </div>
+                                                @role('hr')
+                                                    <div class="d-flex gap-2 flex-shrink-0">
+                                                        <button class="btn btn-sm btn-outline-warning"
+                                                            wire:click="showEditNoteModal({{ $item->id }})">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-danger"
+                                                            wire:click="confirmDeleteNote({{ $item->id }})">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                @endrole
+                                            </div>
+                                        </li>
+                                    @empty
+                                        <li class="list-group-item px-4 py-4 text-center text-muted">
+                                            <i class="bi bi-inbox me-2"></i>Belum ada catatan.
+                                        </li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                        </div>
                     @endif
 
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" wire:ignore.self id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Catatan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-muted">
+                        <div class="mb-4">
+                            <label for="tittle" class="form-label fw-semibold">Judul</label>
+                            <input type="text" class="form-control" id="tittle" wire:model="tittle"
+                                placeholder="Masukkan judul catatan (opsional)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="isi" class="form-label fw-semibold">Isi Catatan <span
+                                    class="text-danger">*</span></label>
+                            <textarea class="form-control" id="isi" rows="5" wire:model="note"
+                                placeholder="Tulis catatan di sini..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" wire:click="saveNote" class="btn btn-primary"
+                            wire:loading.attr="disabled" wire:target="saveNote">
+                            <div wire:loading wire:target="saveNote" class="spinner-border spinner-border-sm"
+                                role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <span wire:loading.remove wire:target="saveNote">
+                                <i class="fa fa-save"></i> Simpan
+                            </span>
+                            <span wire:loading wire:target="saveNote">Loading...</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            style="border-radius: 8px;">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" wire:ignore.self id="EditNoteModal" tabindex="-1" aria-labelledby="EditNoteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Catatan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-muted">
+                        <div class="mb-4">
+                            <label for="tittle" class="form-label fw-semibold">Judul</label>
+                            <input type="text" class="form-control" id="tittle" wire:model="tittle"
+                                placeholder="Masukkan judul catatan (opsional)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="isi" class="form-label fw-semibold">
+                                Isi Catatan <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control @error('note') is-invalid @enderror" id="isi" rows="5" wire:model="note"
+                                placeholder="Tulis catatan di sini..."></textarea>
+                            @error('note')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" wire:click="UpdateNote" class="btn btn-primary"
+                            wire:loading.attr="disabled" wire:target="UpdateNote">
+                            <div wire:loading wire:target="UpdateNote" class="spinner-border spinner-border-sm"
+                                role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <span wire:loading.remove wire:target="UpdateNote">
+                                <i class="fa fa-save"></i> Simpan
+                            </span>
+                            <span wire:loading wire:target="UpdateNote">Loading...</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            style="border-radius: 8px;">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div wire:ignore.self class="modal fade" id="deleteNoteModal" tabindex="-1"
+        aria-labelledby="deleteNoteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content"
+                style="border-radius: 0.375rem; border-top: 4px solid #dc3545; border-left: 1px solid #dee2e6;
+                        border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-danger" id="deleteNoteModalLabel">Hapus Catatan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Apakah Anda yakin ingin menghapus data catatan ini?</p>
+                    <p class="text-danger">Data yang dihapus tidak dapat dikembalikan.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 8px;">Batal</button>
+                    <button type="button" class="btn btn-danger" wire:click="deletedNote"
+                        style="border-radius: 8px;" data-bs-dismiss="modal">Hapus</button>
                 </div>
             </div>
         </div>
@@ -876,6 +1042,18 @@
 
         Livewire.on('hapusPayrollModal', (event) => {
             $('#hapusPayrollModal').modal(event.action);
+        });
+
+        Livewire.on('addNoteModal', (event) => {
+            $('#addNoteModal').modal(event.action);
+        });
+
+        Livewire.on('EditNoteModal', (event) => {
+            $('#EditNoteModal').modal(event.action);
+        });
+
+        Livewire.on('deleteNoteModal', (event) => {
+            $('#deleteNoteModal').modal(event.action);
         });
 
         Livewire.on('swal', (e) => {
