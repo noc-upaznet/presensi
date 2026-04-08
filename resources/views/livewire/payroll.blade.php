@@ -542,13 +542,13 @@
                                 </div>
                             </div>
                         </div>
-                        @role('hr')
+                        @can('note-create')
                             <div class="mb-3">
                                 <button class="btn btn-primary btn-sm" wire:click="showAddNoteModal"> <i
                                         class="bi bi-plus-circle"></i>
                                     Tambah Catatan</button>
                             </div>
-                        @endrole
+                        @endcan
                         <div class="card shadow-sm border-0 rounded-3 mb-3">
                             <div
                                 class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
@@ -572,7 +572,7 @@
                                                     @endif
                                                     <p class="mb-1">{{ $item->note }}</p>
                                                 </div>
-                                                @role('hr')
+                                                @can('note-edit')
                                                     <div class="d-flex gap-2 flex-shrink-0">
                                                         <button class="btn btn-sm btn-outline-warning"
                                                             wire:click="showEditNoteModal({{ $item->id }})">
@@ -583,7 +583,7 @@
                                                             <i class="bi bi-trash"></i>
                                                         </button>
                                                     </div>
-                                                @endrole
+                                                @endcan
                                             </div>
                                         </li>
                                     @empty
