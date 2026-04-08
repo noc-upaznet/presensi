@@ -92,6 +92,15 @@ class EmployeeAbsent extends Component
                     ->where('entitas', $entitas)
                     ->whereIn('id', $karyawanIdList);
             }
+        } elseif ($userKaryawan && strtolower($userKaryawan->jabatan) === 'branch manager') {
+            // Branch Manager → rebuild query dengan entitas sendiri
+            $entitas = $userKaryawan->entitas;
+            $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
+                ->where('status_karyawan', '!=', 'NONAKTIF')
+                ->where('deleted_at', null)
+                ->where('jabatan', '!=', 'Komisaris')
+                ->where('jabatan', '!=', 'Direktur')
+                ->where('entitas', $entitas);
         } elseif ($this->filterDivisi) {
             $query->where('divisi', $this->filterDivisi);
         }
