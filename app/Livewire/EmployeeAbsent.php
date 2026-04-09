@@ -33,7 +33,7 @@ class EmployeeAbsent extends Component
         $isSpv = $userKaryawan && strtolower($userKaryawan->level) === 'spv';
 
         if ($isSpv && $userKaryawan->entitas) {
-            $entitas = $userKaryawan->entitas;
+            $entitasUser = $userKaryawan->entitas;
         }
 
         $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
@@ -41,7 +41,7 @@ class EmployeeAbsent extends Component
             ->where('deleted_at', null)
             ->where('jabatan', '!=', 'Komisaris')
             ->where('jabatan', '!=', 'Direktur')
-            ->where('entitas', $entitas);
+            ->where('entitas', $entitasUser);
 
         // Jika SPV, paksa filter sesuai divisi sendiri
         if ($isSpv) {
@@ -51,7 +51,7 @@ class EmployeeAbsent extends Component
                 // Divisi NOC → tidak pakai entitas
                 $karyawanIdList = M_DataKaryawan::where('divisi', $userKaryawan->divisi)
                     ->pluck('id');
-            } elseif ($divisi === 'finance' && strtoupper($entitas) === 'UNR') {
+            } elseif ($divisi === 'finance' && strtoupper($entitasUser) === 'UNR') {
                 // Finance UNR → include semua entitas MC + divisi sendiri
                 $karyawanIdList = M_DataKaryawan::where(function ($q) use ($userKaryawan) {
                     $q->whereRaw('UPPER(entitas) = ?', ['MC'])
@@ -60,10 +60,12 @@ class EmployeeAbsent extends Component
                                 ->where('entitas', $userKaryawan->entitas);
                         });
                 })->pluck('id');
+            } elseif ($divisi === 'hr') {
+                $karyawanIdList = M_DataKaryawan::pluck('id');
             } else {
                 // Default SPV → filter by divisi & entitas sendiri
                 $karyawanIdList = M_DataKaryawan::where('divisi', $userKaryawan->divisi)
-                    ->where('entitas', $entitas)
+                    ->where('entitas', $entitasUser)
                     ->pluck('id');
             }
 
@@ -75,7 +77,7 @@ class EmployeeAbsent extends Component
                     ->where('jabatan', '!=', 'Komisaris')
                     ->where('jabatan', '!=', 'Direktur')
                     ->whereIn('id', $karyawanIdList);
-            } elseif ($divisi === 'finance' && strtoupper($entitas) === 'UNR') {
+            } elseif ($divisi === 'finance' && strtoupper($entitasUser) === 'UNR') {
                 // Finance UNR tidak filter entitas
                 $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
                     ->where('status_karyawan', '!=', 'NONAKTIF')
@@ -83,7 +85,7 @@ class EmployeeAbsent extends Component
                     ->where('jabatan', '!=', 'Komisaris')
                     ->where('jabatan', '!=', 'Direktur')
                     ->whereIn('id', $karyawanIdList);
-            } else {
+            } elseif ($divisi === 'hr') {
                 $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
                     ->where('status_karyawan', '!=', 'NONAKTIF')
                     ->where('deleted_at', null)
@@ -91,16 +93,24 @@ class EmployeeAbsent extends Component
                     ->where('jabatan', '!=', 'Direktur')
                     ->where('entitas', $entitas)
                     ->whereIn('id', $karyawanIdList);
+            } else {
+                $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
+                    ->where('status_karyawan', '!=', 'NONAKTIF')
+                    ->where('deleted_at', null)
+                    ->where('jabatan', '!=', 'Komisaris')
+                    ->where('jabatan', '!=', 'Direktur')
+                    ->where('entitas', $entitasUser)
+                    ->whereIn('id', $karyawanIdList);
             }
         } elseif ($userKaryawan && strtolower($userKaryawan->jabatan) === 'branch manager') {
             // Branch Manager → rebuild query dengan entitas sendiri
-            $entitas = $userKaryawan->entitas;
+            $entitasUser = $userKaryawan->entitas;
             $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
                 ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->where('deleted_at', null)
                 ->where('jabatan', '!=', 'Komisaris')
                 ->where('jabatan', '!=', 'Direktur')
-                ->where('entitas', $entitas);
+                ->where('entitas', $entitasUser);
         } elseif ($this->filterDivisi) {
             $query->where('divisi', $this->filterDivisi);
         }
