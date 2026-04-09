@@ -93,7 +93,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">File Bukti</label>
+                        <label class="form-label fw-semibold">File Bukti <span class="text-danger">*</span></label>
 
                         <label for="file_bukti"
                             style="
@@ -244,7 +244,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">File Bukti</label>
+                        <label class="form-label fw-semibold">File Bukti <span class="text-danger">*</span></label>
 
                         <label for="file"
                             style="

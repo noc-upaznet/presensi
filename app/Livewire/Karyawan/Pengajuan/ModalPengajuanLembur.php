@@ -57,7 +57,7 @@ class ModalPengajuanLembur extends Component
         if ($this->file_bukti) {
             // dd($this->file);
             $this->validate([
-                'file_bukti' => 'nullable|mimes:jpg,jpeg,png|max:2048',
+                'file_bukti' => 'required|mimes:jpg,jpeg,png|max:2048',
             ], [
                 'file_bukti.max' => 'Ukuran file maksimal 2MB.',
                 'file_bukti.mimes' => 'Format file harus JPG, JPEG, PNG.',
@@ -129,7 +129,7 @@ class ModalPengajuanLembur extends Component
         if ($this->file_bukti) {
             // dd($this->file_bukti);
             $this->validate([
-                'file_bukti' => 'nullable|max:2048',
+                'file_bukti' => 'required|max:2048',
             ], [
                 'file_bukti.max' => 'Ukuran file maksimal 2MB.',
             ]);
