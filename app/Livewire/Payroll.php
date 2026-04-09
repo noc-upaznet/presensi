@@ -419,7 +419,7 @@ class Payroll extends Component
                 // POTONGAN
                 // =====================
                 $potongan =
-                    ($item->izin ?? 0);
+                    ($item->izin ?? 0) + ($item->terlambat ?? 0) + ($item->churn ?? 0);
 
                 $excludePotongan = ['pph 21', 'pph21', 'potongan kebudayaan'];
 
