@@ -54,15 +54,13 @@ class ModalPengajuanLembur extends Component
     {
         $this->form->validate();
 
-        if ($this->file_bukti) {
-            // dd($this->file);
-            $this->validate([
-                'file_bukti' => 'required|mimes:jpg,jpeg,png|max:2048',
-            ], [
-                'file_bukti.max' => 'Ukuran file maksimal 2MB.',
-                'file_bukti.mimes' => 'Format file harus JPG, JPEG, PNG.',
-            ]);
-        }
+        $this->validate([
+            'file_bukti' => 'required|file|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'file_bukti.required' => 'File bukti harus diunggah.',
+            'file_bukti.max' => 'Ukuran file maksimal 2MB.',
+            'file_bukti.mimes' => 'Format file harus JPG, JPEG, PNG.',
+        ]);
 
         $path = null;
         if ($this->file_bukti) {
@@ -126,14 +124,12 @@ class ModalPengajuanLembur extends Component
         }
         $this->form->validate();
 
-        if ($this->file_bukti) {
-            // dd($this->file_bukti);
-            $this->validate([
-                'file_bukti' => 'required|max:2048',
-            ], [
-                'file_bukti.max' => 'Ukuran file maksimal 2MB.',
-            ]);
-        }
+        $this->validate([
+            'file_bukti' => $this->existingFile ? 'nullable|max:2048' : 'required|max:2048',
+        ], [
+            'file_bukti.required' => 'File bukti harus diunggah.',
+            'file_bukti.max' => 'Ukuran file maksimal 2MB.',
+        ]);
 
         $path = null;
         if ($this->file_bukti && is_object($this->file_bukti)) {
