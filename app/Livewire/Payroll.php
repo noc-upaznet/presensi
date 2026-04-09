@@ -12,6 +12,7 @@ use App\Exports\PayrollExport;
 use App\Models\M_DataKaryawan;
 use App\Models\JenisPotonganModel;
 use App\Models\JenisTunjanganModel;
+use App\Traits\CutoffPayrollTrait;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Crypt;
@@ -72,6 +73,19 @@ class Payroll extends Component
     public $tittle;
     public $noteId;
 
+    public $year;
+    public $month;
+    public $months     = [];
+    public $indicators = [];
+    public $totals     = [];
+
+    public $staticRows = [
+        'biaya_tambahan' => [],
+        'kenaikan_gaji'  => [],
+    ];
+
+    use CutoffPayrollTrait;
+
     #[Url(as: 'tab')]
     public $tab = 'dashboard';
 
@@ -80,26 +94,28 @@ class Payroll extends Component
         $this->tab = $tab;
     }
 
-    public function mount()
+    public function mount($year = null, $month = null)
     {
+        \Carbon\Carbon::setLocale('id');
+
         $this->selectedMonth = request()->query('month', now()->month);
         $this->selectedYear  = request()->query('year', now()->year);
 
         // Format periode (YYYY-MM) dari bulan yang dipilih
         $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
-        $this->periode = $this->selectedYear . '-' . $bulanFormatted;
+        $this->periode  = $this->selectedYear . '-' . $bulanFormatted;
 
         // Hitung tanggal cutoff
-        $cutoffEnd = \Carbon\Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 25);
+        $cutoffEnd   = \Carbon\Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 25);
         $cutoffStart = $cutoffEnd->copy()->subMonthNoOverflow()->setDay(26);
 
         $this->cutoffStart = $cutoffStart->format('Y-m-d');
-        $this->cutoffEnd = $cutoffEnd->format('Y-m-d');
+        $this->cutoffEnd   = $cutoffEnd->format('Y-m-d');
 
         $this->jenis_tunjangan = JenisTunjanganModel::all();
-        $this->jenis_potongan = JenisPotonganModel::all();
+        $this->jenis_potongan  = JenisPotonganModel::all();
 
-        // Entitas (misalnya: UHO)
+        // Entitas
         $selectedEntitas = session('selected_entitas', 'UHO');
         if (!session()->has('selected_entitas')) {
             session(['selected_entitas' => 'UHO']);
@@ -112,10 +128,254 @@ class Payroll extends Component
             ->orderBy('nama_karyawan', 'asc')
             ->get();
 
-        // Hitung jumlah karyawan yang belum punya slip gaji di periode tersebut
-        // $karyawanQuery = M_DataKaryawan::where('entitas', $selectedEntitas);
         $this->hitungSlip();
         $this->countGaji();
+
+        // Load data tabel indikator payroll
+        $this->year  = $this->selectedYear;
+        $this->month = $this->selectedMonth;
+
+        $this->loadPeriods();
+        $this->loadIndicators();
+        $this->loadTotals();
+        $this->loadStaticRows();
+    }
+
+    private function loadPeriods(): void
+    {
+        $this->months = $this->getPeriods()
+            ->pluck('label')
+            ->toArray();
+    }
+
+    private function getPeriods(): \Illuminate\Support\Collection
+    {
+        return collect([-1, 0])->map(function ($offset) {
+            $date   = \Carbon\Carbon::create($this->year, $this->month, 1)->addMonths($offset);
+            $cutoff = $this->resolveCutoff($date->year, $date->month, 'cutoff_25');
+
+            return [
+                'label' => \Carbon\Carbon::parse($cutoff['bulanTahun'])->translatedFormat('F'),
+                'start' => $cutoff['start'],
+                'end'   => $cutoff['end'],
+            ];
+        });
+    }
+
+    private function getIndicatorDefs(): array
+    {
+        $branch_id = M_Entitas::where('nama', $this->currentEntitas)->value('id');
+
+        return [
+            [
+                'label' => 'Lembur Karyawan',
+                'query' => fn($start, $end) => DB::table('payroll')
+                    ->where('entitas_id', $branch_id)
+                    ->whereBetween('periode', [$start, $end])
+                    ->sum(DB::raw('lembur + lembur_libur')),
+            ],
+            [
+                'label' => 'Sodaqoh / Punishment Karyawan',
+                'query' => fn($start, $end) => DB::table('payroll')
+                    ->where('entitas_id', $branch_id)
+                    ->whereBetween('periode', [$start, $end])
+                    ->sum('terlambat'),
+            ],
+            [
+                'label' => 'Potongan Izin Karyawan',
+                'query' => fn($start, $end) => DB::table('payroll')
+                    ->where('entitas_id', $branch_id)
+                    ->whereBetween('periode', [$start, $end])
+                    ->sum('izin'),
+            ],
+            [
+                'label' => 'Tunjangan Kehadiran',
+                'query' => fn($start, $end) => DB::table('payroll')
+                    ->where('entitas_id', $branch_id)
+                    ->whereBetween('periode', [$start, $end])
+                    ->get()
+                    ->sum(function ($row) {
+                        $tunjangan = json_decode($row->tunjangan, true) ?? [];
+                        $item = collect($tunjangan)->firstWhere('nama', 'Tunjangan Kehadiran');
+                        return $item['nominal'] ?? 0;
+                    }),
+            ],
+            [
+                'label' => 'Tunjangan Kebudayaan (+-)',
+                'query' => fn($start, $end) => DB::table('payroll')
+                    ->where('entitas_id', $branch_id)
+                    ->whereBetween('periode', [$start, $end])
+                    ->sum('tunjangan_kebudayaan'),
+            ],
+        ];
+    }
+
+    // -------------------------------------------------------
+    // Load Totals — dari kolom total_gaji
+    // -------------------------------------------------------
+
+    private function loadTotals(): void
+    {
+        $periods   = $this->getPeriods();
+        $branch_id = M_Entitas::where('nama', $this->currentEntitas)->value('id');
+
+        $this->totals = $periods->mapWithKeys(function ($period) use ($branch_id) {
+            $rows = DB::table('payroll')
+                ->where('entitas_id', $branch_id)
+                ->whereBetween('periode', [$period['start'], $period['end']])
+                ->get();
+
+            $total = $rows->sum(function ($item) {
+                $tunjanganArray = collect(json_decode($item->tunjangan, true) ?? []);
+                $potonganArray  = collect(json_decode($item->potongan, true) ?? []);
+
+                $pendapatan =
+                    ($item->gaji_pokok          ?? 0)
+                    + ($item->tunjangan_jabatan ?? 0)
+                    + ($item->lembur            ?? 0)
+                    + ($item->lembur_libur      ?? 0)
+                    + ($item->tunjangan_kebudayaan ?? 0)
+                    + ($item->transport         ?? 0)
+                    + ($item->uang_makan        ?? 0)
+                    + ($item->fee_sharing       ?? 0)
+                    + ($item->insentif          ?? 0)
+                    + ($item->inov_reward       ?? 0)
+                    + $tunjanganArray->sum('nominal');
+
+                $excludePotongan = ['pph 21', 'pph21'];
+
+                $potongan =
+                    ($item->izin        ?? 0)
+                    + ($item->terlambat ?? 0)
+                    + ($item->churn     ?? 0)
+                    + $potonganArray
+                    ->filter(fn($p) => !in_array(strtolower($p['nama'] ?? ''), $excludePotongan))
+                    ->sum('nominal');
+
+                return $pendapatan - $potongan;
+            });
+
+            return [$period['label'] => $total];
+        })->toArray();
+
+        $bulanIni              = $this->totals[$this->months[1]];
+        $bulanLalu             = $this->totals[$this->months[0]];
+        $this->totals['grand'] = $bulanIni - $bulanLalu;
+    }
+
+    // -------------------------------------------------------
+    // Load Indicators
+    // -------------------------------------------------------
+
+    private function loadIndicators(): void
+    {
+        $periods   = $this->getPeriods();
+        $branch_id = M_Entitas::where('nama', $this->currentEntitas)->value('id');
+
+        $currentBulanTahun = $this->resolveCutoff($this->year, $this->month, 'cutoff_25')['bulanTahun'];
+
+        $notes = DB::table('notes_payroll')
+            ->where('date', $currentBulanTahun)
+            ->where('branch_id', $branch_id) // ✅ pakai branch_id bukan nama entitas
+            ->pluck('note')
+            ->toArray();
+
+        $kesimpulan = implode(' ', $notes);
+
+        $this->indicators = collect($this->getIndicatorDefs())
+            ->map(function ($def, $index) use ($periods, $kesimpulan) {
+
+                $values = $periods->mapWithKeys(fn($period) => [
+                    $period['label'] => ($def['query'])($period['start'], $period['end']),
+                ])->toArray();
+
+                $monthValues = array_values($values);
+                $bulanIni    = $monthValues[1];
+                $bulanLalu   = $monthValues[0];
+                $total       = $bulanIni - $bulanLalu;
+
+                return [
+                    'label'      => $def['label'],
+                    'values'     => $values,
+                    'total'      => $total,
+                ];
+            })
+            ->toArray();
+    }
+
+    public $editMode = [
+        'kenaikan_gaji' => false,
+        'biaya_tambahan' => false,
+    ];
+
+    public function toggleEdit($key)
+    {
+        $this->editMode[$key] = !$this->editMode[$key];
+    }
+
+    public function saveStaticBatch($key)
+    {
+        foreach ($this->months as $month) {
+            $value = $this->staticRows[$key]['value_' . $month] ?? 0;
+            // dd($key, $month, $value);
+            $this->saveStaticRow($key, $month, (string) $value);
+        }
+        $this->loadStaticRows();
+
+
+        $this->editMode[$key] = false;
+    }
+
+    private function loadStaticRows(): void
+    {
+        $branch_id  = M_Entitas::where('nama', $this->currentEntitas)->value('id');
+
+        foreach (['biaya_tambahan', 'kenaikan_gaji'] as $key) {
+
+            $rows = DB::table('note_static_rows')
+                ->where('branch_id', $branch_id)
+                ->where('key', $key)
+                ->whereIn('month', $this->months)
+                ->pluck('nominal', 'month');
+
+            $values = [];
+
+            foreach ($this->months as $month) {
+                $values['value_' . $month] = $rows[$month] ?? 0;
+            }
+
+            $bulanIni  = $values['value_' . $this->months[1]] ?? 0;
+            $bulanLalu = $values['value_' . $this->months[0]] ?? 0;
+
+            $this->staticRows[$key] = array_merge($values, [
+                'total' => $bulanIni - $bulanLalu,
+            ]);
+        }
+    }
+
+    public function saveStaticRow(string $key, string $month, string $raw): void
+    {
+        if (!in_array($key, ['biaya_tambahan', 'kenaikan_gaji'])) return;
+
+        $branch_id  = M_Entitas::where('nama', $this->currentEntitas)->value('id');
+        $cutoff     = $this->resolveCutoff($this->year, $this->month, 'cutoff_25');
+        $bulanTahun = $cutoff['end']->format('Y-m-d');
+
+        $nominal = (int) preg_replace('/[^0-9]/', '', $raw);
+
+        DB::table('note_static_rows')->updateOrInsert(
+            [
+                'branch_id' => $branch_id,
+                'date'      => $bulanTahun,
+                'key'       => $key,
+                'month'     => $month,
+            ],
+            [
+                'nominal'    => $nominal,
+                'updated_at' => now(),
+                'created_at' => now(),
+            ]
+        );
     }
 
     public function countGaji()
@@ -259,14 +519,27 @@ class Payroll extends Component
 
     public function updatedSelectedMonth()
     {
+        $this->year  = $this->selectedYear;
+        $this->month = $this->selectedMonth;
+
         $this->hitungSlip();
         $this->countGaji();
+        $this->loadPeriods();
+        $this->loadIndicators();
+        $this->loadTotals();
+        $this->loadStaticRows();
     }
 
     public function updatedSelectedYear()
     {
+        $this->year  = $this->selectedYear;
+        $this->month = $this->selectedMonth;
+
         $this->hitungSlip();
         $this->countGaji();
+        $this->loadPeriods();
+        $this->loadIndicators();
+        $this->loadTotals();
     }
 
     private function hitungSlip()
@@ -466,16 +739,18 @@ class Payroll extends Component
     {
         $this->validate([
             'note' => 'required|string|max:255',
-            'tittle' => 'nullable|string|max:255'
+            'tittle' => 'nullable|string|max:255',
         ]);
 
         $data = [
+            'branch_id' => M_Entitas::where('nama', session('selected_entitas'))->value('id'),
             'tittle' => $this->tittle,
             'note' => $this->note,
             'date' => now('Asia/Jakarta')->format('Y-m-d'),
             'created_at' => now(),
             'updated_at' => now(),
         ];
+        // dd($data);
         DB::table('notes_payroll')->insert($data);
 
         $this->reset('note');
@@ -518,6 +793,7 @@ class Payroll extends Component
         }
 
         DB::table('notes_payroll')->where('id', $this->noteId)->update([
+            'branch_id' => M_Entitas::where('nama', session('selected_entitas'))->value('id'),
             'tittle' => $this->tittle,
             'note' => $this->note,
             'updated_at' => now(),
@@ -620,6 +896,7 @@ class Payroll extends Component
         $note = DB::table('notes_payroll')
             ->where('date', '>=', $this->cutoffStart)
             ->where('date', '<=', $this->cutoffEnd)
+            ->where('branch_id', $entitasIdAktif)
             ->orderBy('date', 'desc')
             ->get();
 
