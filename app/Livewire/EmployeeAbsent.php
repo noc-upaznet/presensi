@@ -41,7 +41,7 @@ class EmployeeAbsent extends Component
             ->where('deleted_at', null)
             ->where('jabatan', '!=', 'Komisaris')
             ->where('jabatan', '!=', 'Direktur')
-            ->where('entitas', $entitasUser);
+            ->where('entitas', $entitas);
 
         // Jika SPV, paksa filter sesuai divisi sendiri
         if ($isSpv) {
