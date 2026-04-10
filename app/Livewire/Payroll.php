@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use Carbon\Carbon;
-use App\Models\User;
 use Livewire\Component;
 use App\Models\M_Entitas;
 use App\Models\PayrollModel;
@@ -13,9 +12,7 @@ use App\Models\M_DataKaryawan;
 use App\Models\JenisPotonganModel;
 use App\Models\JenisTunjanganModel;
 use App\Traits\CutoffPayrollTrait;
-use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Livewire\Attributes\Url;
@@ -135,248 +132,240 @@ class Payroll extends Component
         $this->year  = $this->selectedYear;
         $this->month = $this->selectedMonth;
 
-        $this->loadPeriods();
-        $this->loadIndicators();
-        $this->loadTotals();
-        $this->loadStaticRows();
+        // $this->loadPeriods();
+        // $this->loadIndicators();
+        // $this->loadTotals();
+        // $this->loadStaticRows();
     }
 
-    private function loadPeriods(): void
-    {
-        $this->months = $this->getPeriods()
-            ->pluck('label')
-            ->toArray();
-    }
+    // private function loadPeriods(): void
+    // {
+    //     $this->months = $this->getPeriods()
+    //         ->pluck('label')
+    //         ->toArray();
+    // }
 
-    private function getPeriods(): \Illuminate\Support\Collection
-    {
-        return collect([-1, 0])->map(function ($offset) {
-            $date   = \Carbon\Carbon::create($this->year, $this->month, 1)->addMonths($offset);
-            $cutoff = $this->resolveCutoff($date->year, $date->month, 'cutoff_25');
+    // private function getPeriods(): \Illuminate\Support\Collection
+    // {
+    //     return collect([-1, 0])->map(function ($offset) {
+    //         $date   = \Carbon\Carbon::create($this->year, $this->month, 1)->addMonths($offset);
+    //         $cutoff = $this->resolveCutoff($date->year, $date->month, 'cutoff_25');
 
-            return [
-                'label' => \Carbon\Carbon::parse($cutoff['bulanTahun'])->translatedFormat('F'),
-                'start' => $cutoff['start'],
-                'end'   => $cutoff['end'],
-            ];
-        });
-    }
+    //         return [
+    //             'label' => \Carbon\Carbon::parse($cutoff['bulanTahun'])->translatedFormat('F'),
+    //             'start' => $cutoff['start'],
+    //             'end'   => $cutoff['end'],
+    //         ];
+    //     });
+    // }
 
-    private function getIndicatorDefs(): array
-    {
-        $branch_id = M_Entitas::where('nama', $this->currentEntitas)->value('id');
+    // private function getIndicatorDefs(): array
+    // {
+    //     $branch_id = M_Entitas::where('nama', $this->currentEntitas)->value('id');
 
-        return [
-            [
-                'label' => 'Lembur Karyawan',
-                'query' => fn($start, $end) => DB::table('payroll')
-                    ->where('entitas_id', $branch_id)
-                    ->whereBetween('periode', [$start, $end])
-                    ->sum(DB::raw('lembur + lembur_libur')),
-            ],
-            [
-                'label' => 'Sodaqoh / Punishment Karyawan',
-                'query' => fn($start, $end) => DB::table('payroll')
-                    ->where('entitas_id', $branch_id)
-                    ->whereBetween('periode', [$start, $end])
-                    ->sum('terlambat'),
-            ],
-            [
-                'label' => 'Potongan Izin Karyawan',
-                'query' => fn($start, $end) => DB::table('payroll')
-                    ->where('entitas_id', $branch_id)
-                    ->whereBetween('periode', [$start, $end])
-                    ->sum('izin'),
-            ],
-            [
-                'label' => 'Tunjangan Kehadiran',
-                'query' => fn($start, $end) => DB::table('payroll')
-                    ->where('entitas_id', $branch_id)
-                    ->whereBetween('periode', [$start, $end])
-                    ->get()
-                    ->sum(function ($row) {
-                        $tunjangan = json_decode($row->tunjangan, true) ?? [];
-                        $item = collect($tunjangan)->firstWhere('nama', 'Tunjangan Kehadiran');
-                        return $item['nominal'] ?? 0;
-                    }),
-            ],
-            [
-                'label' => 'Tunjangan Kebudayaan (+-)',
-                'query' => fn($start, $end) => DB::table('payroll')
-                    ->where('entitas_id', $branch_id)
-                    ->whereBetween('periode', [$start, $end])
-                    ->sum('tunjangan_kebudayaan'),
-            ],
-        ];
-    }
+    //     return [
+    //         [
+    //             'label' => 'Lembur Karyawan',
+    //             'query' => fn($start, $end) => DB::table('payroll')
+    //                 ->where('entitas_id', $branch_id)
+    //                 ->whereBetween('periode', [$start, $end])
+    //                 ->sum(DB::raw('lembur + lembur_libur')),
+    //         ],
+    //         [
+    //             'label' => 'Sodaqoh / Punishment Karyawan',
+    //             'query' => fn($start, $end) => DB::table('payroll')
+    //                 ->where('entitas_id', $branch_id)
+    //                 ->whereBetween('periode', [$start, $end])
+    //                 ->sum('terlambat'),
+    //         ],
+    //         [
+    //             'label' => 'Potongan Izin Karyawan',
+    //             'query' => fn($start, $end) => DB::table('payroll')
+    //                 ->where('entitas_id', $branch_id)
+    //                 ->whereBetween('periode', [$start, $end])
+    //                 ->sum('izin'),
+    //         ],
+    //         [
+    //             'label' => 'Tunjangan Kehadiran',
+    //             'query' => fn($start, $end) => DB::table('payroll')
+    //                 ->where('entitas_id', $branch_id)
+    //                 ->whereBetween('periode', [$start, $end])
+    //                 ->get()
+    //                 ->sum(function ($row) {
+    //                     $tunjangan = json_decode($row->tunjangan, true) ?? [];
+    //                     $item = collect($tunjangan)->firstWhere('nama', 'Tunjangan Kehadiran');
+    //                     return $item['nominal'] ?? 0;
+    //                 }),
+    //         ],
+    //         [
+    //             'label' => 'Tunjangan Kebudayaan (+-)',
+    //             'query' => fn($start, $end) => DB::table('payroll')
+    //                 ->where('entitas_id', $branch_id)
+    //                 ->whereBetween('periode', [$start, $end])
+    //                 ->sum('tunjangan_kebudayaan'),
+    //         ],
+    //     ];
+    // }
 
-    // -------------------------------------------------------
-    // Load Totals — dari kolom total_gaji
-    // -------------------------------------------------------
+    // private function loadTotals(): void
+    // {
+    //     $periods   = $this->getPeriods();
+    //     $branch_id = M_Entitas::where('nama', $this->currentEntitas)->value('id');
 
-    private function loadTotals(): void
-    {
-        $periods   = $this->getPeriods();
-        $branch_id = M_Entitas::where('nama', $this->currentEntitas)->value('id');
+    //     $this->totals = $periods->mapWithKeys(function ($period) use ($branch_id) {
+    //         $rows = DB::table('payroll')
+    //             ->where('entitas_id', $branch_id)
+    //             ->whereBetween('periode', [$period['start'], $period['end']])
+    //             ->get();
 
-        $this->totals = $periods->mapWithKeys(function ($period) use ($branch_id) {
-            $rows = DB::table('payroll')
-                ->where('entitas_id', $branch_id)
-                ->whereBetween('periode', [$period['start'], $period['end']])
-                ->get();
+    //         $total = $rows->sum(function ($item) {
+    //             $tunjanganArray = collect(json_decode($item->tunjangan, true) ?? []);
+    //             $potonganArray  = collect(json_decode($item->potongan, true) ?? []);
 
-            $total = $rows->sum(function ($item) {
-                $tunjanganArray = collect(json_decode($item->tunjangan, true) ?? []);
-                $potonganArray  = collect(json_decode($item->potongan, true) ?? []);
+    //             $pendapatan =
+    //                 ($item->gaji_pokok          ?? 0)
+    //                 + ($item->tunjangan_jabatan ?? 0)
+    //                 + ($item->lembur            ?? 0)
+    //                 + ($item->lembur_libur      ?? 0)
+    //                 + ($item->tunjangan_kebudayaan ?? 0)
+    //                 + ($item->transport         ?? 0)
+    //                 + ($item->uang_makan        ?? 0)
+    //                 + ($item->fee_sharing       ?? 0)
+    //                 + ($item->insentif          ?? 0)
+    //                 + ($item->inov_reward       ?? 0)
+    //                 + $tunjanganArray->sum('nominal');
 
-                $pendapatan =
-                    ($item->gaji_pokok          ?? 0)
-                    + ($item->tunjangan_jabatan ?? 0)
-                    + ($item->lembur            ?? 0)
-                    + ($item->lembur_libur      ?? 0)
-                    + ($item->tunjangan_kebudayaan ?? 0)
-                    + ($item->transport         ?? 0)
-                    + ($item->uang_makan        ?? 0)
-                    + ($item->fee_sharing       ?? 0)
-                    + ($item->insentif          ?? 0)
-                    + ($item->inov_reward       ?? 0)
-                    + $tunjanganArray->sum('nominal');
+    //             $excludePotongan = ['pph 21', 'pph21'];
 
-                $excludePotongan = ['pph 21', 'pph21'];
+    //             $potongan =
+    //                 ($item->izin        ?? 0)
+    //                 + ($item->terlambat ?? 0)
+    //                 + ($item->churn     ?? 0)
+    //                 + $potonganArray
+    //                 ->filter(fn($p) => !in_array(strtolower($p['nama'] ?? ''), $excludePotongan))
+    //                 ->sum('nominal');
 
-                $potongan =
-                    ($item->izin        ?? 0)
-                    + ($item->terlambat ?? 0)
-                    + ($item->churn     ?? 0)
-                    + $potonganArray
-                    ->filter(fn($p) => !in_array(strtolower($p['nama'] ?? ''), $excludePotongan))
-                    ->sum('nominal');
+    //             return $pendapatan - $potongan;
+    //         });
 
-                return $pendapatan - $potongan;
-            });
+    //         return [$period['label'] => $total];
+    //     })->toArray();
 
-            return [$period['label'] => $total];
-        })->toArray();
+    //     $bulanIni              = $this->totals[$this->months[1]];
+    //     $bulanLalu             = $this->totals[$this->months[0]];
+    //     $this->totals['grand'] = $bulanIni - $bulanLalu;
+    // }
 
-        $bulanIni              = $this->totals[$this->months[1]];
-        $bulanLalu             = $this->totals[$this->months[0]];
-        $this->totals['grand'] = $bulanIni - $bulanLalu;
-    }
+    // private function loadIndicators(): void
+    // {
+    //     $periods   = $this->getPeriods();
+    //     $branch_id = M_Entitas::where('nama', $this->currentEntitas)->value('id');
 
-    // -------------------------------------------------------
-    // Load Indicators
-    // -------------------------------------------------------
+    //     $currentBulanTahun = $this->resolveCutoff($this->year, $this->month, 'cutoff_25')['bulanTahun'];
 
-    private function loadIndicators(): void
-    {
-        $periods   = $this->getPeriods();
-        $branch_id = M_Entitas::where('nama', $this->currentEntitas)->value('id');
+    //     $notes = DB::table('notes_payroll')
+    //         ->where('date', $currentBulanTahun)
+    //         ->where('branch_id', $branch_id) // ✅ pakai branch_id bukan nama entitas
+    //         ->pluck('note')
+    //         ->toArray();
 
-        $currentBulanTahun = $this->resolveCutoff($this->year, $this->month, 'cutoff_25')['bulanTahun'];
+    //     $kesimpulan = implode(' ', $notes);
 
-        $notes = DB::table('notes_payroll')
-            ->where('date', $currentBulanTahun)
-            ->where('branch_id', $branch_id) // ✅ pakai branch_id bukan nama entitas
-            ->pluck('note')
-            ->toArray();
+    //     $this->indicators = collect($this->getIndicatorDefs())
+    //         ->map(function ($def, $index) use ($periods, $kesimpulan) {
 
-        $kesimpulan = implode(' ', $notes);
+    //             $values = $periods->mapWithKeys(fn($period) => [
+    //                 $period['label'] => ($def['query'])($period['start'], $period['end']),
+    //             ])->toArray();
 
-        $this->indicators = collect($this->getIndicatorDefs())
-            ->map(function ($def, $index) use ($periods, $kesimpulan) {
+    //             $monthValues = array_values($values);
+    //             $bulanIni    = $monthValues[1];
+    //             $bulanLalu   = $monthValues[0];
+    //             $total       = $bulanIni - $bulanLalu;
 
-                $values = $periods->mapWithKeys(fn($period) => [
-                    $period['label'] => ($def['query'])($period['start'], $period['end']),
-                ])->toArray();
-
-                $monthValues = array_values($values);
-                $bulanIni    = $monthValues[1];
-                $bulanLalu   = $monthValues[0];
-                $total       = $bulanIni - $bulanLalu;
-
-                return [
-                    'label'      => $def['label'],
-                    'values'     => $values,
-                    'total'      => $total,
-                ];
-            })
-            ->toArray();
-    }
+    //             return [
+    //                 'label'      => $def['label'],
+    //                 'values'     => $values,
+    //                 'total'      => $total,
+    //             ];
+    //         })
+    //         ->toArray();
+    // }
 
     public $editMode = [
         'kenaikan_gaji' => false,
         'biaya_tambahan' => false,
     ];
 
-    public function toggleEdit($key)
-    {
-        $this->editMode[$key] = !$this->editMode[$key];
-    }
+    // public function toggleEdit($key)
+    // {
+    //     $this->editMode[$key] = !$this->editMode[$key];
+    // }
 
-    public function saveStaticBatch($key)
-    {
-        foreach ($this->months as $month) {
-            $value = $this->staticRows[$key]['value_' . $month] ?? 0;
-            // dd($key, $month, $value);
-            $this->saveStaticRow($key, $month, (string) $value);
-        }
-        $this->loadStaticRows();
+    // public function saveStaticBatch($key)
+    // {
+    //     foreach ($this->months as $month) {
+    //         $value = $this->staticRows[$key]['value_' . $month] ?? 0;
+    //         // dd($key, $month, $value);
+    //         $this->saveStaticRow($key, $month, (string) $value);
+    //     }
+    //     $this->loadStaticRows();
 
 
-        $this->editMode[$key] = false;
-    }
+    //     $this->editMode[$key] = false;
+    // }
 
-    private function loadStaticRows(): void
-    {
-        $branch_id  = M_Entitas::where('nama', $this->currentEntitas)->value('id');
+    // private function loadStaticRows(): void
+    // {
+    //     $branch_id  = M_Entitas::where('nama', $this->currentEntitas)->value('id');
 
-        foreach (['biaya_tambahan', 'kenaikan_gaji'] as $key) {
+    //     foreach (['biaya_tambahan', 'kenaikan_gaji'] as $key) {
 
-            $rows = DB::table('note_static_rows')
-                ->where('branch_id', $branch_id)
-                ->where('key', $key)
-                ->whereIn('month', $this->months)
-                ->pluck('nominal', 'month');
+    //         $rows = DB::table('note_static_rows')
+    //             ->where('branch_id', $branch_id)
+    //             ->where('key', $key)
+    //             ->whereIn('month', $this->months)
+    //             ->pluck('nominal', 'month');
 
-            $values = [];
+    //         $values = [];
 
-            foreach ($this->months as $month) {
-                $values['value_' . $month] = $rows[$month] ?? 0;
-            }
+    //         foreach ($this->months as $month) {
+    //             $values['value_' . $month] = $rows[$month] ?? 0;
+    //         }
 
-            $bulanIni  = $values['value_' . $this->months[1]] ?? 0;
-            $bulanLalu = $values['value_' . $this->months[0]] ?? 0;
+    //         $bulanIni  = $values['value_' . $this->months[1]] ?? 0;
+    //         $bulanLalu = $values['value_' . $this->months[0]] ?? 0;
 
-            $this->staticRows[$key] = array_merge($values, [
-                'total' => $bulanIni - $bulanLalu,
-            ]);
-        }
-    }
+    //         $this->staticRows[$key] = array_merge($values, [
+    //             'total' => $bulanIni - $bulanLalu,
+    //         ]);
+    //     }
+    // }
 
-    public function saveStaticRow(string $key, string $month, string $raw): void
-    {
-        if (!in_array($key, ['biaya_tambahan', 'kenaikan_gaji'])) return;
+    // public function saveStaticRow(string $key, string $month, string $raw): void
+    // {
+    //     if (!in_array($key, ['biaya_tambahan', 'kenaikan_gaji'])) return;
 
-        $branch_id  = M_Entitas::where('nama', $this->currentEntitas)->value('id');
-        $cutoff     = $this->resolveCutoff($this->year, $this->month, 'cutoff_25');
-        $bulanTahun = $cutoff['end']->format('Y-m-d');
+    //     $branch_id  = M_Entitas::where('nama', $this->currentEntitas)->value('id');
+    //     $cutoff     = $this->resolveCutoff($this->year, $this->month, 'cutoff_25');
+    //     $bulanTahun = $cutoff['end']->format('Y-m-d');
 
-        $nominal = (int) preg_replace('/[^0-9]/', '', $raw);
+    //     $nominal = (int) preg_replace('/[^0-9]/', '', $raw);
 
-        DB::table('note_static_rows')->updateOrInsert(
-            [
-                'branch_id' => $branch_id,
-                'date'      => $bulanTahun,
-                'key'       => $key,
-                'month'     => $month,
-            ],
-            [
-                'nominal'    => $nominal,
-                'updated_at' => now(),
-                'created_at' => now(),
-            ]
-        );
-    }
+    //     DB::table('note_static_rows')->updateOrInsert(
+    //         [
+    //             'branch_id' => $branch_id,
+    //             'date'      => $bulanTahun,
+    //             'key'       => $key,
+    //             'month'     => $month,
+    //         ],
+    //         [
+    //             'nominal'    => $nominal,
+    //             'updated_at' => now(),
+    //             'created_at' => now(),
+    //         ]
+    //     );
+    // }
 
     public function countGaji()
     {
@@ -466,7 +455,7 @@ class Payroll extends Component
                 // POTONGAN
                 // =====================
                 $potongan =
-                    ($item->izin ?? 0);
+                    ($item->izin ?? 0) + ($item->terlambat ?? 0) + ($item->churn ?? 0);
 
                 $excludePotongan = ['pph 21', 'pph21', 'potongan kebudayaan'];
 
@@ -524,10 +513,12 @@ class Payroll extends Component
 
         $this->hitungSlip();
         $this->countGaji();
-        $this->loadPeriods();
-        $this->loadIndicators();
-        $this->loadTotals();
-        $this->loadStaticRows();
+
+        $this->dispatch('monthYearUpdated', month: $this->selectedMonth, year: $this->selectedYear);
+        // $this->loadPeriods();
+        // $this->loadIndicators();
+        // $this->loadTotals();
+        // $this->loadStaticRows();
     }
 
     public function updatedSelectedYear()
@@ -537,9 +528,11 @@ class Payroll extends Component
 
         $this->hitungSlip();
         $this->countGaji();
-        $this->loadPeriods();
-        $this->loadIndicators();
-        $this->loadTotals();
+
+        $this->dispatch('monthYearUpdated', month: $this->selectedMonth, year: $this->selectedYear);
+        // $this->loadPeriods();
+        // $this->loadIndicators();
+        // $this->loadTotals();
     }
 
     private function hitungSlip()
@@ -730,111 +723,6 @@ class Payroll extends Component
         $this->dispatch('modalPayroll', action: 'show', periode: $this->periode, id: encrypt($id));
     }
 
-    public function showAddNoteModal()
-    {
-        $this->dispatch('addNoteModal', action: 'show');
-    }
-
-    public function saveNote()
-    {
-        $this->validate([
-            'note' => 'required|string|max:255',
-            'tittle' => 'nullable|string|max:255',
-        ]);
-
-        $data = [
-            'branch_id' => M_Entitas::where('nama', session('selected_entitas'))->value('id'),
-            'tittle' => $this->tittle,
-            'note' => $this->note,
-            'date' => now('Asia/Jakarta')->format('Y-m-d'),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
-        // dd($data);
-        DB::table('notes_payroll')->insert($data);
-
-        $this->reset('note');
-
-        $this->dispatch('swal', params: [
-            'title' => 'Catatan Tersimpan',
-            'icon' => 'success',
-            'text' => 'Catatan telah disimpan dengan sukses'
-        ]);
-
-        $this->dispatch('addNoteModal', action: 'hide');
-    }
-
-    public function showEditNoteModal($id)
-    {
-        $note = DB::table('notes_payroll')->where('id', $id)->first();
-        if ($note) {
-            $this->tittle = $note->tittle;
-            $this->note = $note->note;
-            $this->noteId = $note->id;
-        }
-
-        $this->dispatch('EditNoteModal', action: 'show');
-    }
-
-    public function UpdateNote()
-    {
-        $this->validate([
-            'note' => 'required|string|max:255',
-            'tittle' => 'nullable|string|max:255'
-        ]);
-
-        if (!$this->noteId) {
-            $this->dispatch('swal', params: [
-                'title' => 'Gagal',
-                'icon' => 'error',
-                'text' => 'ID catatan tidak ditemukan'
-            ]);
-            return;
-        }
-
-        DB::table('notes_payroll')->where('id', $this->noteId)->update([
-            'branch_id' => M_Entitas::where('nama', session('selected_entitas'))->value('id'),
-            'tittle' => $this->tittle,
-            'note' => $this->note,
-            'updated_at' => now(),
-        ]);
-
-        $this->reset(['note', 'noteId']);
-
-        $this->dispatch('swal', params: [
-            'title' => 'Catatan Diperbarui',
-            'icon' => 'success',
-            'text' => 'Catatan telah diperbarui dengan sukses'
-        ]);
-
-        $this->dispatch('EditNoteModal', action: 'hide');
-    }
-
-    public function confirmDeleteNote($id)
-    {
-        $this->noteId = $id;
-        $this->dispatch('deleteNoteModal', action: 'show');
-    }
-
-    public function deletedNote()
-    {
-        if ($this->noteId) {
-            DB::table('notes_payroll')->where('id', $this->noteId)->delete();
-
-            $this->dispatch(
-                'swal',
-                params: [
-                    'title' => 'Data Deleted',
-                    'icon' => 'success',
-                    'text' => 'Data has been deleted successfully',
-                    'showConfirmButton' => false,
-                    'timer' => 1500
-                ]
-            );
-            $this->noteId = null;
-        }
-    }
-
     public function showModalEks()
     {
         $this->periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
@@ -893,17 +781,17 @@ class Payroll extends Component
             ->orderBy('created_at', 'desc')
             ->paginate($this->perPage, ['*'], 'page2');
 
-        $note = DB::table('notes_payroll')
-            ->where('date', '>=', $this->cutoffStart)
-            ->where('date', '<=', $this->cutoffEnd)
-            ->where('branch_id', $entitasIdAktif)
-            ->orderBy('date', 'desc')
-            ->get();
+        // $note = DB::table('notes_payroll')
+        //     ->where('date', '>=', $this->cutoffStart)
+        //     ->where('date', '<=', $this->cutoffEnd)
+        //     ->where('branch_id', $entitasIdAktif)
+        //     ->orderBy('date', 'desc')
+        //     ->get();
 
         return view('livewire.payroll', [
             'data' => $data,
             'data2' => $data2,
-            'notes' => $note,
+            // 'notes' => $note,
         ]);
     }
 }

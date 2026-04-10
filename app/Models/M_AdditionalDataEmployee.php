@@ -9,6 +9,7 @@ class M_AdditionalDataEmployee extends Model
     protected $table = 'additional_data_employee';
     protected $fillable = [
         'karyawan_id',
+        'photo',
         'dress_size',
         'shoe_size',
         'height',
