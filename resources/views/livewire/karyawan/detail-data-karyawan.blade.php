@@ -5,12 +5,14 @@
             border-collapse: collapse;
             font-size: 14px;
         }
+
         .bio-table th,
         .bio-table td {
             border: 1px solid #000;
             padding: 6px 8px;
             vertical-align: middle;
         }
+
         .bio-label {
             background: #d9e6f5;
             font-weight: bold;
@@ -19,7 +21,81 @@
     </style>
     <div class="p-4">
         <h5 class="fw-bold mb-3" style="color: var(--bs-body-color);">Detail Data Karyawan</h5>
-    
+        <div class="mb-3" style="max-width: 300px;">
+            <label class="form-label fw-semibold">Foto Profil</label>
+
+            <label for="file"
+                style="
+                        display: block;
+                        border: 2px dashed #cbd5e1;
+                        border-radius: 12px;
+                        padding: 1.5rem;
+                        text-align: center;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                        background: #f8fafc;
+                    "
+                onmouseover="this.style.borderColor='#6366f1';this.style.background='#f5f3ff'"
+                onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#f8fafc'">
+
+                <input type="file" class="d-none" id="file" wire:model="photo" accept=".jpg,.jpeg,.png">
+
+                {{-- PRIORITAS 1: preview file baru --}}
+                @if ($photo && is_object($photo))
+                    <img src="{{ $photo->temporaryUrl() }}" alt="Preview"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+
+                    {{-- PRIORITAS 2: tampilkan dari DB --}}
+                @elseif ($existingPhoto)
+                    <img src="{{ asset('storage/' . $existingPhoto) }}" alt="Foto saat ini"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+
+                    {{-- PRIORITAS 3: kosong --}}
+                @else
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
+                    <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
+                    <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
+                @endif
+            </label>
+
+            {{-- Tombol Hapus --}}
+            @if (($photo && is_object($photo)) || $existingPhoto)
+                <button type="button" wire:click="removePhoto"
+                    style="margin-top: 8px; padding: 4px 12px; font-size: 12px; border-radius: 8px; border: 1px solid #fca5a5; background: #fff1f2; color: #dc2626; cursor: pointer;">
+                    🗑️ Hapus Foto
+                </button>
+            @endif
+
+            {{-- Info --}}
+            @if (session()->has('error'))
+                <small class="text-danger">{{ session('error') }}</small>
+            @else
+                <small class="text-muted">Ukuran maksimal file: 2MB</small>
+            @endif
+
+            @error('photo')
+                <small class="text-danger d-block">{{ $message }}</small>
+            @enderror
+        </div>
+
+        {{-- Tombol simpan --}}
+        <div class="d-flex justify-content-end gap-2 mb-4" style="max-width: 300px;">
+            <button type="button" class="btn btn-primary w-100 w-md-auto" wire:click='saveFile'
+                wire:loading.attr="disabled" wire:target="saveFile">
+
+                <div wire:loading wire:target="saveFile" class="spinner-border spinner-border-sm"></div>
+
+                <span wire:loading.remove wire:target="saveFile">
+                    <i class="fa fa-save"></i> Simpan
+                </span>
+
+                <span wire:loading wire:target="saveFile">
+                    Loading...
+                </span>
+            </button>
+        </div>
         <div class="border rounded-4 p-4">
             <h6 class="fw-bold text-primary">PERSOAL DATA (DATA DIRI KARYAWAN)</h6>
             <div class="row align-items-start mt-3">
@@ -35,7 +111,9 @@
                             <td class="bio-label">TEMPAT LAHIR<br><small>(PLACE OF BIRTH)</small></td>
                             <td>: {{ $karyawan->tempat_lahir }}</td>
                             <td class="bio-label">TANGGAL LAHIR<br><small>(DATE OF BIRTH)</small></td>
-                            <td>: {{ \Carbon\Carbon::parse($karyawan->tanggal_lahir)->locale('id')->translatedFormat('d F Y') }}</td>
+                            <td>:
+                                {{ \Carbon\Carbon::parse($karyawan->tanggal_lahir)->locale('id')->translatedFormat('d F Y') }}
+                            </td>
                         </tr>
                         <tr>
                             <td class="bio-label">JENIS KELAMIN<br><small>(GENDER)</small></td>
@@ -114,9 +192,9 @@
                     </div> --}}
                 </div>
             </div>
-    
+
             <hr class="my-4">
-    
+
             {{-- Data Keluarga --}}
 
             <h6 class="fw-bold text-primary mb-3">DATA KELUARGA (FAMILY MEMBER OF KK) </h6>
@@ -145,14 +223,17 @@
                                 <td>{{ $item->nik ?? '-' }}</td>
                                 <td>{{ $item->gender ?? '-' }}</td>
                                 <td>{{ $item->place_of_birth ?? '-' }}</td>
-                                <td>{{ \Carbon\Carbon::parse($item->date_of_birth)->locale('id')->translatedFormat('d F Y') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($item->date_of_birth)->locale('id')->translatedFormat('d F Y') }}
+                                </td>
                                 <td>{{ $item->religion ?? '-' }}</td>
                                 <td>{{ $item->education ?? '-' }}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm mt-2" wire:click="showEditKeluarga('{{ $item->id }}')">
+                                    <button class="btn btn-warning btn-sm mt-2"
+                                        wire:click="showEditKeluarga('{{ $item->id }}')">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm mt-2" wire:click="deleteKeluarga('{{ $item->id }}')">
+                                    <button class="btn btn-danger btn-sm mt-2"
+                                        wire:click="deleteKeluarga('{{ $item->id }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -189,17 +270,20 @@
                                 @if ($item->wedding_date == null)
                                     <td>-</td>
                                 @else
-                                    <td>{{ \Carbon\Carbon::parse($item->wedding_date)->locale('id')->translatedFormat('d F Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($item->wedding_date)->locale('id')->translatedFormat('d F Y') }}
+                                    </td>
                                 @endif
                                 <td>{{ $item->relationship_in_family }}</td>
                                 <td>{{ $item->citizenship }}</td>
                                 <td>{{ $item->father }}</td>
                                 <td>{{ $item->mother }}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm mt-2" wire:click="showEditRelationship('{{ $item->id }}')">
+                                    <button class="btn btn-warning btn-sm mt-2"
+                                        wire:click="showEditRelationship('{{ $item->id }}')">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm mt-2" wire:click="deleteKeluarga('{{ $item->id }}')">
+                                    <button class="btn btn-danger btn-sm mt-2"
+                                        wire:click="deleteKeluarga('{{ $item->id }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -212,14 +296,14 @@
                     </tbody>
                 </table>
                 <div class="mt-3 mb-3">
-                    <button type="button" class="btn btn-primary btn-sm"
-                            wire:click="showAdd">
+                    <button type="button" class="btn btn-primary btn-sm" wire:click="showAdd">
                         <i class="bi bi-plus-square"></i> Tambah
                     </button>
                 </div>
             </div>
 
-            <h6 class="fw-bold text-primary mb-3 mt-3">Data Tanggungan (Suami/Istri/Anak) (Dependent Data of Husband/Wife/Children) </h6>
+            <h6 class="fw-bold text-primary mb-3 mt-3">Data Tanggungan (Suami/Istri/Anak) (Dependent Data of
+                Husband/Wife/Children) </h6>
 
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
@@ -245,15 +329,18 @@
                                 <td>{{ $item->name ?? '-' }}</td>
                                 <td>{{ $item->gender ?? '-' }}</td>
                                 <td>{{ $item->place_of_birth ?? '-' }}</td>
-                                <td>{{ \Carbon\Carbon::parse($item->date_of_birth)->locale('id')->translatedFormat('d F Y') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($item->date_of_birth)->locale('id')->translatedFormat('d F Y') }}
+                                </td>
                                 <td>{{ $item->education ?? '-' }}</td>
                                 <td>{{ $item->profession ?? '-' }}</td>
                                 <td>{{ $item->no_telp ?? '-' }}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm mt-2" wire:click="showEditTanggungan('{{ $item->id }}')">
+                                    <button class="btn btn-warning btn-sm mt-2"
+                                        wire:click="showEditTanggungan('{{ $item->id }}')">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm mt-2" wire:click="deleteTanggungan('{{ $item->id }}')">
+                                    <button class="btn btn-danger btn-sm mt-2"
+                                        wire:click="deleteTanggungan('{{ $item->id }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -267,8 +354,7 @@
                 </table>
 
                 <div class="mt-3 mb-3">
-                    <button type="button" class="btn btn-primary btn-sm"
-                            wire:click="showAddTanggungan">
+                    <button type="button" class="btn btn-primary btn-sm" wire:click="showAddTanggungan">
                         <i class="bi bi-plus-square"></i> Tambah
                     </button>
                 </div>
@@ -301,10 +387,12 @@
                                 <td>{{ $item->major ?? '-' }}</td>
                                 <td>{{ $item->nilai ?? '-' }}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm mt-2" wire:click="showEditEducation('{{ $item->id }}')">
+                                    <button class="btn btn-warning btn-sm mt-2"
+                                        wire:click="showEditEducation('{{ $item->id }}')">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm mt-2" wire:click="deletePendidikan('{{ $item->id }}')">
+                                    <button class="btn btn-danger btn-sm mt-2"
+                                        wire:click="deletePendidikan('{{ $item->id }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -317,8 +405,7 @@
                     </tbody>
                 </table>
                 <div class="mt-3 mb-3">
-                    <button type="button" class="btn btn-primary btn-sm"
-                            wire:click="showAddPendidikan">
+                    <button type="button" class="btn btn-primary btn-sm" wire:click="showAddPendidikan">
                         <i class="bi bi-plus-square"></i> Tambah
                     </button>
                 </div>
@@ -343,10 +430,12 @@
                                 <td>{{ $item->company }}</td>
                                 <td>{{ $item->employment_period ?? '-' }}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm mt-2" wire:click="showEditExperience('{{ $item->id }}')">
+                                    <button class="btn btn-warning btn-sm mt-2"
+                                        wire:click="showEditExperience('{{ $item->id }}')">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm mt-2" wire:click="deleteExperience('{{ $item->id }}')">
+                                    <button class="btn btn-danger btn-sm mt-2"
+                                        wire:click="deleteExperience('{{ $item->id }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -360,8 +449,7 @@
                 </table>
 
                 <div class="mt-3 mb-3">
-                    <button type="button" class="btn btn-primary btn-sm"
-                            wire:click="showAddExperience">
+                    <button type="button" class="btn btn-primary btn-sm" wire:click="showAddExperience">
                         <i class="bi bi-plus-square"></i> Tambah
                     </button>
                 </div>
@@ -384,39 +472,40 @@
                     <tbody>
                         @php
                             $fields = [
-                                'dress_size'        => 'UKURAN BAJU',
-                                'shoe_size'         => 'UKURAN SEPATU',
-                                'height'            => 'TINGGI BADAN',
-                                'weight'            => 'BERAT BADAN',
-                                'nip'               => 'NIP',
-                                'start_date'        => 'MULAI MASUK',
-                                'personality'       => 'PERSONALITY',
-                                'iq'                => 'IQ',
-                                'parent_address'    => 'ALAMAT ORANG TUA',
-                                'inlaw_address'     => 'ALAMAT MERTUA',
-                                'history_of_illness'=> 'RIWAYAT PENYAKIT',
-                                'name_father_in_law'=> 'NAMA MERTUA LAKI-LAKI',
-                                'name_mother_in_law'=> 'NAMA MERTUA PEREMPUAN',
+                                'dress_size' => 'UKURAN BAJU',
+                                'shoe_size' => 'UKURAN SEPATU',
+                                'height' => 'TINGGI BADAN',
+                                'weight' => 'BERAT BADAN',
+                                'nip' => 'NIP',
+                                'start_date' => 'MULAI MASUK',
+                                'personality' => 'PERSONALITY',
+                                'iq' => 'IQ',
+                                'parent_address' => 'ALAMAT ORANG TUA',
+                                'inlaw_address' => 'ALAMAT MERTUA',
+                                'history_of_illness' => 'RIWAYAT PENYAKIT',
+                                'name_father_in_law' => 'NAMA MERTUA LAKI-LAKI',
+                                'name_mother_in_law' => 'NAMA MERTUA PEREMPUAN',
                             ];
                             $no = 1;
                         @endphp
-                        @foreach($fields as $key => $label)
+                        @foreach ($fields as $key => $label)
                             <tr>
                                 <td>{{ $no++ }}</td>
                                 <td>{{ $label }}</td>
                                 <td>:</td>
                                 <td>
-                                    @if($editing[$key])
-                                        <input type="text" class="form-control" wire:model.defer="values.{{ $key }}">
+                                    @if ($editing[$key])
+                                        <input type="text" class="form-control"
+                                            wire:model.defer="values.{{ $key }}">
                                     @else
                                         {{ $values[$key] ?: '-' }}
                                     @endif
                                 </td>
                                 <td>
                                     <button type="button"
-                                            class="btn {{ $editing[$key] ? 'btn-success' : 'btn-warning' }}"
-                                            wire:click="toggleEdit('{{ $key }}')">
-                                        @if($editing[$key])
+                                        class="btn {{ $editing[$key] ? 'btn-success' : 'btn-warning' }}"
+                                        wire:click="toggleEdit('{{ $key }}')">
+                                        @if ($editing[$key])
                                             <i class="bi bi-save"></i> Simpan
                                         @else
                                             <i class="bi bi-pencil-square"></i> Edit
@@ -430,7 +519,7 @@
             </div>
 
             <hr class="my-4">
-    
+
             <h6 class="fw-bold text-primary">Data Gamifikasi</h6>
             <div style="color: var(--bs-body-color);">
                 <span>Jumlah Poin</span>
@@ -439,10 +528,12 @@
             <div class="d-flex justify-content-between" style="color: var(--bs-body-color);">
                 <div class="row">
                     <div class="mt-3 col-md-6">
-                        <input type="number" wire:model.lazy="jml_poin" class="form-control" id="jumlah-poin" placeholder="Masukkan Jml. Poin">
+                        <input type="number" wire:model.lazy="jml_poin" class="form-control" id="jumlah-poin"
+                            placeholder="Masukkan Jml. Poin">
                     </div>
                     <div class="mt-3 col-md-6">
-                        <button class="btn btn-primary" wire:click="updateGamifikasi"><i class="bi bi-save"></i> Simpan</button>
+                        <button class="btn btn-primary" wire:click="updateGamifikasi"><i class="bi bi-save"></i>
+                            Simpan</button>
                     </div>
                 </div>
             </div>
@@ -453,12 +544,13 @@
     </div>
 
     {{-- MODAL --}}
-    <div wire:ignore.self class="modal fade" id="modalTambahKeluarga" tabindex="-1" aria-labelledby="modalTambahKeluargaLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalTambahKeluarga" tabindex="-1"
+        aria-labelledby="modalTambahKeluargaLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-info">
-                    <h5 class="modal-title text-white" id="modalTambahKeluargaLabel">DATA KELUARGA (FAMILY MEMBER OF KK)</h5>
+                    <h5 class="modal-title text-white" id="modalTambahKeluargaLabel">DATA KELUARGA (FAMILY MEMBER OF
+                        KK)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 <div class="mt-3 p-3 mb-3">
@@ -476,44 +568,56 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Nama</label>
-                            <input type="text" class="form-control"
-                                wire:model="name">
+                            <input type="text" class="form-control" wire:model="name">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="nik" class="form-label">NIK</label>
-                            <input type="text" class="form-control" wire:model="nik" id="nik" name="nik">
-                            @error('form.nik') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" wire:model="nik" id="nik"
+                                name="nik">
+                            @error('form.nik')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="gender" class="form-label">Jenis Kelamin <small class="text-danger">*</small></label>
+                            <label for="gender" class="form-label">Jenis Kelamin <small
+                                    class="text-danger">*</small></label>
                             <select class="form-select" wire:model="gender" id="gender" name="gender">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="MALE">MALE</option>
                                 <option value="FEMALE">FEMALE</option>
                             </select>
-                            @error('form.gender') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.gender')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Tempat Lahir</label>
-                            <input type="text" class="form-control" id="name" wire:model="place_of_birth" name="name">
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="name" wire:model="place_of_birth"
+                                name="name">
+                            @error('form.name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="date_of_birth" class="form-label">Tanggal Lahir</label>
-                            <input type="date" class="form-control" id="date_of_birth" wire:model="date_of_birth" name="date_of_birth">
-                            @error('form.date_of_birth') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="date" class="form-control" id="date_of_birth" wire:model="date_of_birth"
+                                name="date_of_birth">
+                            @error('form.date_of_birth')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="agama" class="form-label">Agama <small class="text-danger">*</small></label>
+                            <label for="agama" class="form-label">Agama <small
+                                    class="text-danger">*</small></label>
                             <select class="form-select" wire:model="religion" id="agama" name="agama">
                                 <option selected>-- Pilih Agama --</option>
                                 <option value="Islam">Islam</option>
@@ -523,7 +627,9 @@
                                 <option value="Buddha">Buddha</option>
                                 <option value="Konghucu">Konghucu</option>
                             </select>
-                            @error('form.agama') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.agama')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Pendidikan</label>
@@ -535,14 +641,18 @@
                                 <option value="DIPLOMA IV/STRATA 1">DIPLOMA IV/STRATA 1</option>
                                 <option value="STRATA 2">STRATA 2</option>
                             </select>
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="relationships" class="form-label">Status Perkawinan <small class="text-danger">*</small></label>
-                            <select class="form-select" wire:model="marital_status" id="relationships" name="relationships">
+                            <label for="relationships" class="form-label">Status Perkawinan <small
+                                    class="text-danger">*</small></label>
+                            <select class="form-select" wire:model="marital_status" id="relationships"
+                                name="relationships">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="KAWIN TERCATAT">KAWIN TERCATAT</option>
                                 <option value="KAWIN BELUM TERCATAT">KAWIN BELUM TERCATAT</option>
@@ -554,19 +664,26 @@
                                 <option value="CERAI TERCATAT">CERAI TERCATAT</option>
                                 <option value="CERAI BELUM TERCATAT">CERAI BELUM TERCATAT</option>
                             </select>
-                            @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.relationships')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="wedding_date" class="form-label">Tanggal Perkawinan</label>
-                            <input type="date" class="form-control" id="wedding_date" wire:model="wedding_date" name="wedding_date">
-                            @error('form.wedding_date') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="date" class="form-control" id="wedding_date" wire:model="wedding_date"
+                                name="wedding_date">
+                            @error('form.wedding_date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="relationships" class="form-label">Status Hubungan Keluarga <small class="text-danger">*</small></label>
-                            <select class="form-select" wire:model="relationship_in_family" id="relationships" name="relationships">
+                            <label for="relationships" class="form-label">Status Hubungan Keluarga <small
+                                    class="text-danger">*</small></label>
+                            <select class="form-select" wire:model="relationship_in_family" id="relationships"
+                                name="relationships">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
                                 <option value="ISTRI">ISTRI</option>
@@ -576,38 +693,52 @@
                                 <option value="CUCU">CUCU</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
-                            @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.relationships')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Kewarganegaraan</label>
-                            <select class="form-select" wire:model="citizenship" id="relationships" name="relationships">
+                            <select class="form-select" wire:model="citizenship" id="relationships"
+                                name="relationships">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="WNI">WNI</option>
                                 <option value="WNA">WNA</option>
                             </select>
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Nama Ayah</label>
-                            <input type="text" class="form-control" id="name" wire:model="father" name="name">
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="name" wire:model="father"
+                                name="name">
+                            @error('form.name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Nama Ibu</label>
-                            <input type="text" class="form-control" id="name" wire:model="mother" name="name">
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="name" wire:model="mother"
+                                name="name">
+                            @error('form.name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary w-md-auto" wire:click='saveKeluarga' wire:loading.attr="disabled" wire:target="saveKeluarga">
-                            <div wire:loading wire:target="saveKeluarga" class="spinner-border spinner-border-sm" role="status">
+                        <button type="button" class="btn btn-primary w-md-auto" wire:click='saveKeluarga'
+                            wire:loading.attr="disabled" wire:target="saveKeluarga">
+                            <div wire:loading wire:target="saveKeluarga" class="spinner-border spinner-border-sm"
+                                role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <span wire:loading.remove wire:target="saveKeluarga"><i class="fa fa-save"></i> Simpan</span>
+                            <span wire:loading.remove wire:target="saveKeluarga"><i class="fa fa-save"></i>
+                                Simpan</span>
                             <span wire:loading wire:target="saveKeluarga">Loading...</span>
                         </button>
                         <button type="button" class="btn btn-secondary w-md-auto"
@@ -618,12 +749,13 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="modalTambahTanggungan" tabindex="-1" aria-labelledby="modalTambahTanggunganLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalTambahTanggungan" tabindex="-1"
+        aria-labelledby="modalTambahTanggunganLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-info">
-                    <h5 class="modal-title text-white" id="modalTambahTanggunganLabel">Data Tanggungan (Suami/Istri/Anak)</h5>
+                    <h5 class="modal-title text-white" id="modalTambahTanggunganLabel">Data Tanggungan
+                        (Suami/Istri/Anak)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 <div class="mt-3 p-3 mb-3">
@@ -641,33 +773,41 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Nama</label>
-                            <input type="text" class="form-control"
-                                wire:model="name">
+                            <input type="text" class="form-control" wire:model="name">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="gender" class="form-label">Jenis Kelamin <small class="text-danger">*</small></label>
+                            <label for="gender" class="form-label">Jenis Kelamin <small
+                                    class="text-danger">*</small></label>
                             <select class="form-select" wire:model="gender" id="gender" name="gender">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="MALE">MALE</option>
                                 <option value="FEMALE">FEMALE</option>
                             </select>
-                            @error('form.gender') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.gender')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="place_of_birth" class="form-label">Tempat Lahir</label>
-                            <input type="text" class="form-control" id="place_of_birth" wire:model="place_of_birth" name="place_of_birth">
-                            @error('form.place_of_birth') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="place_of_birth"
+                                wire:model="place_of_birth" name="place_of_birth">
+                            @error('form.place_of_birth')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="date_of_birth" class="form-label">Tanggal Lahir</label>
-                            <input type="date" class="form-control" id="date_of_birth" wire:model="date_of_birth" name="date_of_birth">
-                            @error('form.date_of_birth') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="date" class="form-control" id="date_of_birth" wire:model="date_of_birth"
+                                name="date_of_birth">
+                            @error('form.date_of_birth')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="education" class="form-label">Pendidikan</label>
@@ -679,29 +819,40 @@
                                 <option value="DIPLOMA IV/STRATA 1">DIPLOMA IV/STRATA 1</option>
                                 <option value="STRATA 2">STRATA 2</option>
                             </select>
-                            @error('form.education') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.education')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="profession" class="form-label">Pekerjaan</label>
-                            <input type="text" class="form-control" id="profession" wire:model="profession" name="profession">
-                            @error('form.profession') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="profession" wire:model="profession"
+                                name="profession">
+                            @error('form.profession')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="no_telp" class="form-label">No Telephone</label>
-                            <input type="text" class="form-control" id="no_telp" wire:model="no_telp" name="no_telp">
-                            @error('form.no_telp') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="no_telp" wire:model="no_telp"
+                                name="no_telp">
+                            @error('form.no_telp')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary w-md-auto" wire:click='saveTanggungan' wire:loading.attr="disabled" wire:target="saveTanggungan">
-                            <div wire:loading wire:target="saveTanggungan" class="spinner-border spinner-border-sm" role="status">
+                        <button type="button" class="btn btn-primary w-md-auto" wire:click='saveTanggungan'
+                            wire:loading.attr="disabled" wire:target="saveTanggungan">
+                            <div wire:loading wire:target="saveTanggungan" class="spinner-border spinner-border-sm"
+                                role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <span wire:loading.remove wire:target="saveTanggungan"><i class="fa fa-save"></i> Simpan</span>
+                            <span wire:loading.remove wire:target="saveTanggungan"><i class="fa fa-save"></i>
+                                Simpan</span>
                             <span wire:loading wire:target="saveTanggungan">Loading...</span>
                         </button>
                         <button type="button" class="btn btn-secondary w-md-auto"
@@ -712,58 +863,80 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="modalTambahPendidikan" tabindex="-1" aria-labelledby="modalTambahPendidikanLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalTambahPendidikan" tabindex="-1"
+        aria-labelledby="modalTambahPendidikanLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-info">
-                    <h5 class="modal-title text-white" id="modalTambahPendidikanLabel">RIWAYAT PENDIDIKAN (EDUCATIONAL BACKGROUND)</h5>
+                    <h5 class="modal-title text-white" id="modalTambahPendidikanLabel">RIWAYAT PENDIDIKAN (EDUCATIONAL
+                        BACKGROUND)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 <div class="mt-3 p-3 mb-3">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="level_of_education" class="form-label">Jenjang</label>
-                            <input type="text" class="form-control" id="level_of_education" wire:model="level_of_education" name="level_of_education" placeholder="SMA/STRATA 1">
-                            @error('form.level_of_education') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="level_of_education"
+                                wire:model="level_of_education" name="level_of_education" placeholder="SMA/STRATA 1">
+                            @error('form.level_of_education')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="institution" class="form-label">Nama Sekolah/Institut/Universitas</label>
-                            <input type="text" class="form-control" id="institution" wire:model="institution" name="institution">
-                            @error('form.institution') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="institution" wire:model="institution"
+                                name="institution">
+                            @error('form.institution')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="start_date" class="form-label">Tahun Mulai</label>
-                            <input type="date" class="form-control" id="start_date" wire:model="start_date" name="start_date">
-                            @error('form.start_date') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="date" class="form-control" id="start_date" wire:model="start_date"
+                                name="start_date">
+                            @error('form.start_date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="end_date" class="form-label">Tahun Akhir</label>
-                            <input type="date" class="form-control" id="end_date" wire:model="end_date" name="end_date">
-                            @error('form.end_date') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="date" class="form-control" id="end_date" wire:model="end_date"
+                                name="end_date">
+                            @error('form.end_date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="major" class="form-label">Jurusan</label>
-                            <input type="text" class="form-control" id="major" wire:model="major" name="major">
-                            @error('form.major') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="major" wire:model="major"
+                                name="major">
+                            @error('form.major')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="nilai" class="form-label">Nilai/IPK(CGPA)</label>
-                            <input type="text" class="form-control" id="nilai" wire:model="nilai" name="nilai">
-                            @error('form.nilai') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="nilai" wire:model="nilai"
+                                name="nilai">
+                            @error('form.nilai')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary w-md-auto" wire:click='savePendidikan' wire:loading.attr="disabled" wire:target="savePendidikan">
-                            <div wire:loading wire:target="savePendidikan" class="spinner-border spinner-border-sm" role="status">
+                        <button type="button" class="btn btn-primary w-md-auto" wire:click='savePendidikan'
+                            wire:loading.attr="disabled" wire:target="savePendidikan">
+                            <div wire:loading wire:target="savePendidikan" class="spinner-border spinner-border-sm"
+                                role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <span wire:loading.remove wire:target="savePendidikan"><i class="fa fa-save"></i> Simpan</span>
+                            <span wire:loading.remove wire:target="savePendidikan"><i class="fa fa-save"></i>
+                                Simpan</span>
                             <span wire:loading wire:target="savePendidikan">Loading...</span>
                         </button>
                         <button type="button" class="btn btn-secondary w-md-auto"
@@ -774,8 +947,8 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="modalTambahExperience" tabindex="-1" aria-labelledby="modalTambahExperienceLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalTambahExperience" tabindex="-1"
+        aria-labelledby="modalTambahExperienceLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-info">
@@ -786,22 +959,32 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="company" class="form-label">Perusahaan</label>
-                            <input type="text" class="form-control" id="company" wire:model="company" name="company" placeholder="PT. xxx">
-                            @error('form.company') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="company" wire:model="company"
+                                name="company" placeholder="PT. xxx">
+                            @error('form.company')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="employment_period" class="form-label">Periode Kerja</label>
-                            <input type="text" class="form-control" id="employment_period" wire:model="employment_period" name="employment_period" placeholder="Jan 2025 - Des 2025">
-                            @error('form.employment_period') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="employment_period"
+                                wire:model="employment_period" name="employment_period"
+                                placeholder="Jan 2025 - Des 2025">
+                            @error('form.employment_period')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary w-md-auto" wire:click='saveExperience' wire:loading.attr="disabled" wire:target="saveExperience">
-                            <div wire:loading wire:target="saveExperience" class="spinner-border spinner-border-sm" role="status">
+                        <button type="button" class="btn btn-primary w-md-auto" wire:click='saveExperience'
+                            wire:loading.attr="disabled" wire:target="saveExperience">
+                            <div wire:loading wire:target="saveExperience" class="spinner-border spinner-border-sm"
+                                role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <span wire:loading.remove wire:target="saveExperience"><i class="fa fa-save"></i> Simpan</span>
+                            <span wire:loading.remove wire:target="saveExperience"><i class="fa fa-save"></i>
+                                Simpan</span>
                             <span wire:loading wire:target="saveExperience">Loading...</span>
                         </button>
                         <button type="button" class="btn btn-secondary w-md-auto"
@@ -812,12 +995,13 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="modalEditKeluarga" tabindex="-1" aria-labelledby="modalEditKeluargaLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalEditKeluarga" tabindex="-1"
+        aria-labelledby="modalEditKeluargaLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-info">
-                    <h5 class="modal-title text-white" id="modalEditKeluargaLabel">DATA KELUARGA (FAMILY MEMBER OF KK)</h5>
+                    <h5 class="modal-title text-white" id="modalEditKeluargaLabel">DATA KELUARGA (FAMILY MEMBER OF KK)
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 <div class="mt-3 p-3 mb-3">
@@ -835,44 +1019,56 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Nama</label>
-                            <input type="text" class="form-control"
-                                wire:model="name">
+                            <input type="text" class="form-control" wire:model="name">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="nik" class="form-label">NIK</label>
-                            <input type="text" class="form-control" wire:model="nik" id="nik" name="nik">
-                            @error('form.nik') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" wire:model="nik" id="nik"
+                                name="nik">
+                            @error('form.nik')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="gender" class="form-label">Jenis Kelamin <small class="text-danger">*</small></label>
+                            <label for="gender" class="form-label">Jenis Kelamin <small
+                                    class="text-danger">*</small></label>
                             <select class="form-select" wire:model="gender" id="gender" name="gender">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="MALE">MALE</option>
                                 <option value="FEMALE">FEMALE</option>
                             </select>
-                            @error('form.gender') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.gender')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Tempat Lahir</label>
-                            <input type="text" class="form-control" id="name" wire:model="place_of_birth" name="name">
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="name" wire:model="place_of_birth"
+                                name="name">
+                            @error('form.name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Tanggal Lahir</label>
-                            <input type="date" class="form-control" id="name" wire:model="date_of_birth" name="name">
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="date" class="form-control" id="name" wire:model="date_of_birth"
+                                name="name">
+                            @error('form.name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="agama" class="form-label">Agama <small class="text-danger">*</small></label>
+                            <label for="agama" class="form-label">Agama <small
+                                    class="text-danger">*</small></label>
                             <select class="form-select" wire:model="religion" id="agama" name="agama">
                                 <option selected>-- Pilih Agama --</option>
                                 <option value="Islam">Islam</option>
@@ -882,7 +1078,9 @@
                                 <option value="Buddha">Buddha</option>
                                 <option value="Konghucu">Konghucu</option>
                             </select>
-                            @error('form.agama') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.agama')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Pendidikan</label>
@@ -894,16 +1092,21 @@
                                 <option value="DIPLOMA IV/STRATA 1">DIPLOMA IV/STRATA 1</option>
                                 <option value="STRATA 2">STRATA 2</option>
                             </select>
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary w-md-auto" wire:click='updateKeluarga' wire:loading.attr="disabled" wire:target="updateKeluarga">
-                            <div wire:loading wire:target="updateKeluarga" class="spinner-border spinner-border-sm" role="status">
+                        <button type="button" class="btn btn-primary w-md-auto" wire:click='updateKeluarga'
+                            wire:loading.attr="disabled" wire:target="updateKeluarga">
+                            <div wire:loading wire:target="updateKeluarga" class="spinner-border spinner-border-sm"
+                                role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <span wire:loading.remove wire:target="updateKeluarga"><i class="fa fa-save"></i> Simpan</span>
+                            <span wire:loading.remove wire:target="updateKeluarga"><i class="fa fa-save"></i>
+                                Simpan</span>
                             <span wire:loading wire:target="updateKeluarga">Loading...</span>
                         </button>
                         <button type="button" class="btn btn-secondary w-md-auto"
@@ -914,19 +1117,22 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="modalEditRelationship" tabindex="-1" aria-labelledby="modalEditRelationshipLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalEditRelationship" tabindex="-1"
+        aria-labelledby="modalEditRelationshipLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-info">
-                    <h5 class="modal-title text-white" id="modalEditRelationshipLabel">DATA KELUARGA (FAMILY MEMBER OF KK)</h5>
+                    <h5 class="modal-title text-white" id="modalEditRelationshipLabel">DATA KELUARGA (FAMILY MEMBER OF
+                        KK)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 <div class="mt-3 p-3 mb-3">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="relationships" class="form-label">Status Perkawinan <small class="text-danger">*</small></label>
-                            <select class="form-select" wire:model="marital_status" id="relationships" name="relationships">
+                            <label for="relationships" class="form-label">Status Perkawinan <small
+                                    class="text-danger">*</small></label>
+                            <select class="form-select" wire:model="marital_status" id="relationships"
+                                name="relationships">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="KAWIN TERCATAT">KAWIN TERCATAT</option>
                                 <option value="KAWIN BELUM TERCATAT">KAWIN BELUM TERCATAT</option>
@@ -938,19 +1144,26 @@
                                 <option value="CERAI TERCATAT">CERAI TERCATAT</option>
                                 <option value="CERAI BELUM TERCATAT">CERAI BELUM TERCATAT</option>
                             </select>
-                            @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.relationships')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Tanggal Perkawinan</label>
-                            <input type="date" class="form-control" id="name" wire:model="wedding_date" name="name">
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="date" class="form-control" id="name" wire:model="wedding_date"
+                                name="name">
+                            @error('form.name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="relationships" class="form-label">Status Hubungan Keluarga <small class="text-danger">*</small></label>
-                            <select class="form-select" wire:model="relationship_in_family" id="relationships" name="relationships">
+                            <label for="relationships" class="form-label">Status Hubungan Keluarga <small
+                                    class="text-danger">*</small></label>
+                            <select class="form-select" wire:model="relationship_in_family" id="relationships"
+                                name="relationships">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
                                 <option value="ISTRI">ISTRI</option>
@@ -960,38 +1173,52 @@
                                 <option value="CUCU">CUCU</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
-                            @error('form.relationships') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.relationships')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Kewarganegaraan</label>
-                            <select class="form-select" wire:model="citizenship" id="relationships" name="relationships">
+                            <select class="form-select" wire:model="citizenship" id="relationships"
+                                name="relationships">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="WNI">WNI</option>
                                 <option value="WNA">WNA</option>
                             </select>
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Nama Ayah</label>
-                            <input type="text" class="form-control" id="name" wire:model="father" name="name">
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="name" wire:model="father"
+                                name="name">
+                            @error('form.name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Nama Ibu</label>
-                            <input type="text" class="form-control" id="name" wire:model="mother" name="name">
-                            @error('form.name') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="name" wire:model="mother"
+                                name="name">
+                            @error('form.name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary w-md-auto" wire:click='updateRelationship' wire:loading.attr="disabled" wire:target="updateRelationship">
-                            <div wire:loading wire:target="updateRelationship" class="spinner-border spinner-border-sm" role="status">
+                        <button type="button" class="btn btn-primary w-md-auto" wire:click='updateRelationship'
+                            wire:loading.attr="disabled" wire:target="updateRelationship">
+                            <div wire:loading wire:target="updateRelationship"
+                                class="spinner-border spinner-border-sm" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <span wire:loading.remove wire:target="updateRelationship"><i class="fa fa-save"></i> Simpan</span>
+                            <span wire:loading.remove wire:target="updateRelationship"><i class="fa fa-save"></i>
+                                Simpan</span>
                             <span wire:loading wire:target="updateRelationship">Loading...</span>
                         </button>
                         <button type="button" class="btn btn-secondary w-md-auto"
@@ -1002,12 +1229,13 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="modalEditTanggungan" tabindex="-1" aria-labelledby="modalEditTanggunganLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalEditTanggungan" tabindex="-1"
+        aria-labelledby="modalEditTanggunganLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-info">
-                    <h5 class="modal-title text-white" id="modalEditTanggunganLabel">Data Tanggungan (Suami/Istri/Anak)</h5>
+                    <h5 class="modal-title text-white" id="modalEditTanggunganLabel">Data Tanggungan
+                        (Suami/Istri/Anak)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 <div class="mt-3 p-3 mb-3">
@@ -1025,33 +1253,41 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Nama</label>
-                            <input type="text" class="form-control"
-                                wire:model="name">
+                            <input type="text" class="form-control" wire:model="name">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="gender" class="form-label">Jenis Kelamin <small class="text-danger">*</small></label>
+                            <label for="gender" class="form-label">Jenis Kelamin <small
+                                    class="text-danger">*</small></label>
                             <select class="form-select" wire:model="gender" id="gender" name="gender">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="MALE">MALE</option>
                                 <option value="FEMALE">FEMALE</option>
                             </select>
-                            @error('form.gender') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.gender')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="place_of_birth" class="form-label">Tempat Lahir</label>
-                            <input type="text" class="form-control" id="place_of_birth" wire:model="place_of_birth" name="place_of_birth">
-                            @error('form.place_of_birth') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="place_of_birth"
+                                wire:model="place_of_birth" name="place_of_birth">
+                            @error('form.place_of_birth')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="date_of_birth" class="form-label">Tanggal Lahir</label>
-                            <input type="date" class="form-control" id="date_of_birth" wire:model="date_of_birth" name="date_of_birth">
-                            @error('form.date_of_birth') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="date" class="form-control" id="date_of_birth" wire:model="date_of_birth"
+                                name="date_of_birth">
+                            @error('form.date_of_birth')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="education" class="form-label">Pendidikan</label>
@@ -1063,29 +1299,40 @@
                                 <option value="DIPLOMA IV/STRATA 1">DIPLOMA IV/STRATA 1</option>
                                 <option value="STRATA 2">STRATA 2</option>
                             </select>
-                            @error('form.education') <span class="text-danger">{{ $message }}</span> @enderror
+                            @error('form.education')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="profession" class="form-label">Pekerjaan</label>
-                            <input type="text" class="form-control" id="profession" wire:model="profession" name="profession">
-                            @error('form.profession') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="profession" wire:model="profession"
+                                name="profession">
+                            @error('form.profession')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="no_telp" class="form-label">No Telephone</label>
-                            <input type="text" class="form-control" id="no_telp" wire:model="no_telp" name="no_telp">
-                            @error('form.no_telp') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="no_telp" wire:model="no_telp"
+                                name="no_telp">
+                            @error('form.no_telp')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary w-md-auto" wire:click='updateTanggungan' wire:loading.attr="disabled" wire:target="updateTanggungan">
-                            <div wire:loading wire:target="updateTanggungan" class="spinner-border spinner-border-sm" role="status">
+                        <button type="button" class="btn btn-primary w-md-auto" wire:click='updateTanggungan'
+                            wire:loading.attr="disabled" wire:target="updateTanggungan">
+                            <div wire:loading wire:target="updateTanggungan" class="spinner-border spinner-border-sm"
+                                role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <span wire:loading.remove wire:target="updateTanggungan"><i class="fa fa-save"></i> Simpan</span>
+                            <span wire:loading.remove wire:target="updateTanggungan"><i class="fa fa-save"></i>
+                                Simpan</span>
                             <span wire:loading wire:target="updateTanggungan">Loading...</span>
                         </button>
                         <button type="button" class="btn btn-secondary w-md-auto"
@@ -1096,58 +1343,80 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="modalEditPendidikan" tabindex="-1" aria-labelledby="modalEditPendidikanLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalEditPendidikan" tabindex="-1"
+        aria-labelledby="modalEditPendidikanLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-info">
-                    <h5 class="modal-title text-white" id="modalEditPendidikanLabel">RIWAYAT PENDIDIKAN (EDUCATIONAL BACKGROUND)</h5>
+                    <h5 class="modal-title text-white" id="modalEditPendidikanLabel">RIWAYAT PENDIDIKAN (EDUCATIONAL
+                        BACKGROUND)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 <div class="mt-3 p-3 mb-3">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="level_of_education" class="form-label">Jenjang</label>
-                            <input type="text" class="form-control" id="level_of_education" wire:model="level_of_education" name="level_of_education" placeholder="SMA/STRATA 1">
-                            @error('form.level_of_education') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="level_of_education"
+                                wire:model="level_of_education" name="level_of_education" placeholder="SMA/STRATA 1">
+                            @error('form.level_of_education')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="institution" class="form-label">Nama Sekolah/Institut/Universitas</label>
-                            <input type="text" class="form-control" id="institution" wire:model="institution" name="institution">
-                            @error('form.institution') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="institution" wire:model="institution"
+                                name="institution">
+                            @error('form.institution')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="start_date" class="form-label">Tahun Mulai</label>
-                            <input type="date" class="form-control" id="start_date" wire:model="start_date" name="start_date">
-                            @error('form.start_date') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="date" class="form-control" id="start_date" wire:model="start_date"
+                                name="start_date">
+                            @error('form.start_date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="end_date" class="form-label">Tahun Akhir</label>
-                            <input type="date" class="form-control" id="end_date" wire:model="end_date" name="end_date">
-                            @error('form.end_date') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="date" class="form-control" id="end_date" wire:model="end_date"
+                                name="end_date">
+                            @error('form.end_date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="major" class="form-label">Jurusan</label>
-                            <input type="text" class="form-control" id="major" wire:model="major" name="major">
-                            @error('form.major') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="major" wire:model="major"
+                                name="major">
+                            @error('form.major')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="nilai" class="form-label">Nilai/IPK(CGPA)</label>
-                            <input type="text" class="form-control" id="nilai" wire:model="nilai" name="nilai">
-                            @error('form.nilai') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="nilai" wire:model="nilai"
+                                name="nilai">
+                            @error('form.nilai')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary w-md-auto" wire:click='updateEducation' wire:loading.attr="disabled" wire:target="updateEducation">
-                            <div wire:loading wire:target="updateEducation" class="spinner-border spinner-border-sm" role="status">
+                        <button type="button" class="btn btn-primary w-md-auto" wire:click='updateEducation'
+                            wire:loading.attr="disabled" wire:target="updateEducation">
+                            <div wire:loading wire:target="updateEducation" class="spinner-border spinner-border-sm"
+                                role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <span wire:loading.remove wire:target="updateEducation"><i class="fa fa-save"></i> Simpan</span>
+                            <span wire:loading.remove wire:target="updateEducation"><i class="fa fa-save"></i>
+                                Simpan</span>
                             <span wire:loading wire:target="updateEducation">Loading...</span>
                         </button>
                         <button type="button" class="btn btn-secondary w-md-auto"
@@ -1158,34 +1427,45 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="modalEditExperience" tabindex="-1" aria-labelledby="modalEditExperienceLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="modalEditExperience" tabindex="-1"
+        aria-labelledby="modalEditExperienceLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-info">
                     <h5 class="modal-title text-white" id="modalEditExperienceLabel">PENGALAMAN KERJA</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Tutup"></button>
                 </div>
                 <div class="mt-3 p-3 mb-3">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="company" class="form-label">Perusahaan</label>
-                            <input type="text" class="form-control" id="company" wire:model="company" name="company" placeholder="PT. xxx">
-                            @error('form.company') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="company" wire:model="company"
+                                name="company" placeholder="PT. xxx">
+                            @error('form.company')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="employment_period" class="form-label">Periode Kerja</label>
-                            <input type="text" class="form-control" id="employment_period" wire:model="employment_period" name="employment_period" placeholder="Jan 2025 - Des 2025">
-                            @error('form.employment_period') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control" id="employment_period"
+                                wire:model="employment_period" name="employment_period"
+                                placeholder="Jan 2025 - Des 2025">
+                            @error('form.employment_period')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary w-md-auto" wire:click='updateExperience' wire:loading.attr="disabled" wire:target="updateExperience">
-                            <div wire:loading wire:target="updateExperience" class="spinner-border spinner-border-sm" role="status">
+                        <button type="button" class="btn btn-primary w-md-auto" wire:click='updateExperience'
+                            wire:loading.attr="disabled" wire:target="updateExperience">
+                            <div wire:loading wire:target="updateExperience"
+                                class="spinner-border spinner-border-sm" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <span wire:loading.remove wire:target="updateExperience"><i class="fa fa-save"></i> Simpan</span>
+                            <span wire:loading.remove wire:target="updateExperience"><i class="fa fa-save"></i>
+                                Simpan</span>
                             <span wire:loading wire:target="updateExperience">Loading...</span>
                         </button>
                         <button type="button" class="btn btn-secondary w-md-auto"
@@ -1238,10 +1518,10 @@
             $('#modalEditExperience').modal(event.action);
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.btn-edit').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    const row  = btn.closest('tr');
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.btn-edit').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const row = btn.closest('tr');
                     const cell = row.querySelector('.value-cell');
                     const field = row.dataset.field; // ambil nama field dari tr
 
@@ -1252,9 +1532,11 @@
                         if (field === 'start_date') {
                             // format ke YYYY-MM
                             let dateValue = currentValue !== '-' ? currentValue : '';
-                            cell.innerHTML = `<input type="month" class="form-control form-control-sm" value="${dateValue}">`;
+                            cell.innerHTML =
+                                `<input type="month" class="form-control form-control-sm" value="${dateValue}">`;
                         } else {
-                            cell.innerHTML = `<input type="text" class="form-control form-control-sm" value="${currentValue === '-' ? '' : currentValue}">`;
+                            cell.innerHTML =
+                                `<input type="text" class="form-control form-control-sm" value="${currentValue === '-' ? '' : currentValue}">`;
                         }
 
                         btn.innerHTML = '<i class="bi bi-save"></i> Simpan';
@@ -1265,32 +1547,53 @@
                         const newValue = cell.querySelector('input').value;
 
                         fetch(`/karyawan/additional/update`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                            },
-                            body: JSON.stringify({
-                                karyawan_id: {{ $karyawan->id }},
-                                field: field,
-                                value: newValue
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector(
+                                        'meta[name="csrf-token"]').content
+                                },
+                                body: JSON.stringify({
+                                    karyawan_id: {{ $karyawan->id }},
+                                    field: field,
+                                    value: newValue
+                                })
                             })
-                        })
-                        .then(r => r.json())
-                        .then(res => {
-                            if (res.success) {
-                                cell.textContent = newValue || '-';
-                                btn.innerHTML = '<i class="bi bi-pencil-square"></i>';
-                                btn.classList.remove('btn-success');
-                                btn.classList.add('btn-warning');
-                            } else {
-                                alert('Gagal menyimpan data');
-                            }
-                        });
+                            .then(r => r.json())
+                            .then(res => {
+                                if (res.success) {
+                                    cell.textContent = newValue || '-';
+                                    btn.innerHTML = '<i class="bi bi-pencil-square"></i>';
+                                    btn.classList.remove('btn-success');
+                                    btn.classList.add('btn-warning');
+                                } else {
+                                    alert('Gagal menyimpan data');
+                                }
+                            });
                     }
                 });
             });
         });
+    </script>
 
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const previewImage = document.getElementById('previewImage');
+
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+
+                reader.readAsDataURL(file);
+            }
+        });
     </script>
 @endpush

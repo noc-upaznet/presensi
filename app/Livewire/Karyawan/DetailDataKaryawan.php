@@ -10,6 +10,9 @@ use App\Models\M_Education;
 use App\Models\M_Family;
 use App\Models\M_WorkExperience;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 class DetailDataKaryawan extends Component
 {
@@ -54,9 +57,14 @@ class DetailDataKaryawan extends Component
     public $editing = [];
     public $edit_id;
 
+    public $photo;
+    public $existingPhoto;
+
     protected $rules = [
         'value' => 'nullable|string|max:255',
     ];
+
+    use WithFileUploads;
 
     public function mount($id)
     {
@@ -70,6 +78,7 @@ class DetailDataKaryawan extends Component
         $data = M_AdditionalDataEmployee::where('karyawan_id', $this->id)->first();
 
         $this->values = [
+            'photo'             => $data->photo ?? '',
             'dress_size'        => $data->dress_size ?? '',
             'shoe_size'         => $data->shoe_size ?? '',
             'height'            => $data->height ?? '',
@@ -80,15 +89,60 @@ class DetailDataKaryawan extends Component
             'iq'                => $data->iq ?? '',
             'parent_address'    => $data->parent_address ?? '',
             'inlaw_address'     => $data->inlaw_address ?? '',
-            'history_of_illness'=> $data->history_of_illness ?? '',
-            'name_father_in_law'=> $data->name_father_in_law ?? '',
-            'name_mother_in_law'=> $data->name_mother_in_law ?? '',
+            'history_of_illness' => $data->history_of_illness ?? '',
+            'name_father_in_law' => $data->name_father_in_law ?? '',
+            'name_mother_in_law' => $data->name_mother_in_law ?? '',
         ];
 
         // set semua editing = false
         foreach ($this->values as $key => $val) {
             $this->editing[$key] = false;
         }
+
+        $this->existingPhoto = $data?->photo;
+    }
+
+    public function saveFile()
+    {
+        $this->validate([
+            'photo' => 'required|image|max:2048',
+        ]);
+
+        $path = $this->photo->store('profile-photos', 'public');
+
+        M_AdditionalDataEmployee::updateOrCreate(
+            ['karyawan_id' => $this->id],
+            ['photo' => $path]
+        );
+
+        $this->dispatch('swal', params: [
+            'title' => 'Tersimpan',
+            'icon'  => 'success',
+            'text'  => 'Foto berhasil diunggah'
+        ]);
+
+        // update tampilan
+        $this->existingPhoto = $path;
+
+        // reset preview temporary
+        $this->reset('photo');
+    }
+
+    public function removePhoto()
+    {
+        if ($this->existingPhoto) {
+            Storage::disk('public')->delete($this->existingPhoto);
+
+            M_AdditionalDataEmployee::where('karyawan_id', $this->id)
+                ->update(['photo' => null]);
+        }
+        $this->dispatch('swal', params: [
+            'title' => 'Tersimpan',
+            'icon'  => 'success',
+            'text'  => 'Foto berhasil dihapus'
+        ]);
+
+        $this->reset(['photo', 'existingPhoto']);
     }
 
     public function toggleEdit($field)
@@ -109,7 +163,7 @@ class DetailDataKaryawan extends Component
 
         $this->editing[$field] = ! $this->editing[$field];
     }
-    
+
     public function updateGamifikasi()
     {
         $this->validate([
