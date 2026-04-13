@@ -21,18 +21,30 @@
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="d-flex gap-2">
-                @role('admin|hr')
-                    <select class="form-select" wire:model.lazy="filterDivisi" style="width: 150px;">
-                        <option value="">Pilih Divisi</option>
-                        @foreach ($divisiList as $divisi)
-                            <option value="{{ $divisi->nama }}">{{ $divisi->nama }}</option>
-                        @endforeach
-                    </select>
-                @endrole
+                <select class="form-select" wire:model.lazy="filterDivisi" style="width: 150px;">
+                    <option value="">Pilih Divisi</option>
+                    @foreach ($divisiList as $divisi)
+                        <option value="{{ $divisi->nama }}">{{ $divisi->nama }}</option>
+                    @endforeach
+                </select>
+
                 <select class="form-select" wire:model.live="mode" style="width: 220px;">
                     <option value="all">Tanpa Keterangan</option>
                     <option value="pengajuan">Pengajuan</option>
                 </select>
+
+                <div style="min-width: 150px;">
+                    <select class="form-select form-select" wire:model="selectedEntitas"
+                        wire:change="selectEntitas($event.target.value)">
+
+                        @foreach ($entitasList as $entitas)
+                            <option value="{{ $entitas }}">
+                                {{ $entitas }}
+                            </option>
+                        @endforeach
+
+                    </select>
+                </div>
             </div>
         </div>
         <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">

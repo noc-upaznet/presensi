@@ -4,6 +4,9 @@ namespace App\Livewire;
 
 use App\Models\M_DataKaryawan;
 use App\Models\M_Divisi;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
@@ -18,120 +21,96 @@ class EmployeeAbsent extends Component
     public $divisiList;
     public $search;
     public $mode = 'all';
+    public $selectedEntitas;
+    public $currentRole;
+    public $showRoleSwitcher = false;
+    public $entitasList = [];
+    public $roles = [];
 
     public function mount()
     {
+        $this->selectedEntitas = session('selected_entitas', 'UHO');
         $this->divisiList = M_Divisi::all();
+
+        $user = Auth::user();
+
+        if ($user) {
+            $this->roles = $user->roles->pluck('name')->toArray();
+
+            // Ambil branch milik user
+            $branches = $user->branches()
+                ->pluck('nama', 'id')
+                ->toArray();
+
+            // Tambahkan opsi ALL di paling atas
+            $this->entitasList = $branches;
+        }
+    }
+
+    public function switchRole($role)
+    {
+        $user = User::find(Auth::id());
+
+        if (!$user || !$user->roles->pluck('role')->contains($role)) {
+            session()->flash('error', 'Kamu tidak memiliki role tersebut.');
+            return;
+        }
+
+        $user->current_role = $role;
+        $user->save();
+
+        $this->currentRole = $user->current_role;
+
+        // Redirect full-page via Livewire (bukan SPA refresh)
+        return redirect(request()->header('Referer') ?? '/');
+    }
+
+
+
+    public function selectEntitas($entitas)
+    {
+        $this->selectedEntitas = $entitas;
+        Session::put('selected_entitas', $entitas);
+
+        // Redirect ke halaman sebelumnya atau home
+        return redirect(request()->header('Referer') ?? '/');
     }
 
     public function render()
     {
         $entitas = session('selected_entitas', 'UHO');
 
-        // Cek level user yang login
-        $userKaryawan = M_DataKaryawan::where('user_id', auth()->id())->first();
-        $isSpv = $userKaryawan && strtolower($userKaryawan->level) === 'spv';
-
-        if ($isSpv && $userKaryawan->entitas) {
-            $entitasUser = $userKaryawan->entitas;
-        }
-
         $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
             ->where('status_karyawan', '!=', 'NONAKTIF')
-            ->where('deleted_at', null)
-            ->where('jabatan', '!=', 'Komisaris')
-            ->where('jabatan', '!=', 'Direktur')
+            ->whereNull('deleted_at')
+            ->whereNotIn('jabatan', ['Komisaris', 'Direktur'])
             ->where('entitas', $entitas);
 
-        // Jika SPV, paksa filter sesuai divisi sendiri
-        if ($isSpv) {
-            $divisi = strtolower($userKaryawan->divisi);
-
-            if ($divisi === 'noc') {
-                // Divisi NOC → tidak pakai entitas
-                $karyawanIdList = M_DataKaryawan::where('divisi', $userKaryawan->divisi)
-                    ->pluck('id');
-            } elseif ($divisi === 'finance' && strtoupper($entitasUser) === 'UNR') {
-                // Finance UNR → include semua entitas MC + divisi sendiri
-                $karyawanIdList = M_DataKaryawan::where(function ($q) use ($userKaryawan) {
-                    $q->whereRaw('UPPER(entitas) = ?', ['MC'])
-                        ->orWhere(function ($sub) use ($userKaryawan) {
-                            $sub->where('divisi', $userKaryawan->divisi)
-                                ->where('entitas', $userKaryawan->entitas);
-                        });
-                })->pluck('id');
-            } elseif ($divisi === 'hr') {
-                $karyawanIdList = M_DataKaryawan::pluck('id');
-            } else {
-                // Default SPV → filter by divisi & entitas sendiri
-                $karyawanIdList = M_DataKaryawan::where('divisi', $userKaryawan->divisi)
-                    ->where('entitas', $entitasUser)
-                    ->pluck('id');
-            }
-
-            // Override query
-            if ($divisi === 'noc') {
-                $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
-                    ->where('status_karyawan', '!=', 'NONAKTIF')
-                    ->where('deleted_at', null)
-                    ->where('jabatan', '!=', 'Komisaris')
-                    ->where('jabatan', '!=', 'Direktur')
-                    ->whereIn('id', $karyawanIdList);
-            } elseif ($divisi === 'finance' && strtoupper($entitasUser) === 'UNR') {
-                // Finance UNR tidak filter entitas
-                $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
-                    ->where('status_karyawan', '!=', 'NONAKTIF')
-                    ->where('deleted_at', null)
-                    ->where('jabatan', '!=', 'Komisaris')
-                    ->where('jabatan', '!=', 'Direktur')
-                    ->whereIn('id', $karyawanIdList);
-            } elseif ($divisi === 'hr') {
-                $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
-                    ->where('status_karyawan', '!=', 'NONAKTIF')
-                    ->where('deleted_at', null)
-                    ->where('jabatan', '!=', 'Komisaris')
-                    ->where('jabatan', '!=', 'Direktur')
-                    ->where('entitas', $entitas)
-                    ->whereIn('id', $karyawanIdList);
-            } else {
-                $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
-                    ->where('status_karyawan', '!=', 'NONAKTIF')
-                    ->where('deleted_at', null)
-                    ->where('jabatan', '!=', 'Komisaris')
-                    ->where('jabatan', '!=', 'Direktur')
-                    ->where('entitas', $entitasUser)
-                    ->whereIn('id', $karyawanIdList);
-            }
-        } elseif ($userKaryawan && strtolower($userKaryawan->jabatan) === 'branch manager') {
-            // Branch Manager → rebuild query dengan entitas sendiri
-            $entitasUser = $userKaryawan->entitas;
-            $query = M_DataKaryawan::with(['pengajuanHariIni.getShift'])
-                ->where('status_karyawan', '!=', 'NONAKTIF')
-                ->where('deleted_at', null)
-                ->where('jabatan', '!=', 'Komisaris')
-                ->where('jabatan', '!=', 'Direktur')
-                ->where('entitas', $entitasUser);
-        } elseif ($this->filterDivisi) {
+        // Optional filter divisi (tetap dipakai)
+        if ($this->filterDivisi) {
             $query->where('divisi', $this->filterDivisi);
         }
 
+        // Search
         if ($this->search) {
             $query->where('nama_karyawan', 'like', '%' . $this->search . '%');
         }
 
+        // Belum presensi hari ini
         $query->whereNotIn('id', function ($q) {
             $q->select('user_id')
                 ->from('presensi')
-                ->where('deleted_at', null)
+                ->whereNull('deleted_at')
                 ->whereDate('tanggal', now());
         });
 
+        // Mode pengajuan
         if ($this->mode === 'pengajuan') {
             $query->whereIn('id', function ($q) {
                 $q->select('karyawan_id')
                     ->from('pengajuan')
                     ->whereIn('status', [0, 1])
-                    ->where('deleted_at', null)
+                    ->whereNull('deleted_at')
                     ->whereDate('tanggal', now());
             });
         }
@@ -140,7 +119,6 @@ class EmployeeAbsent extends Component
 
         return view('livewire.employee-absent', [
             'datas' => $datas,
-            'isSpv' => $isSpv,
         ]);
     }
 }
