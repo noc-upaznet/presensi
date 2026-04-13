@@ -24,78 +24,90 @@
         <div class="mb-3" style="max-width: 300px;">
             <label class="form-label fw-semibold">Foto Profil</label>
 
-            <label for="file"
-                style="
-                        display: block;
-                        border: 2px dashed #cbd5e1;
-                        border-radius: 12px;
-                        padding: 1.5rem;
-                        text-align: center;
-                        cursor: pointer;
-                        transition: all 0.2s;
-                        background: #f8fafc;
-                    "
-                onmouseover="this.style.borderColor='#6366f1';this.style.background='#f5f3ff'"
-                onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#f8fafc'">
+            @can('foto-profil-edit')
+                {{-- ================= EDIT MODE ================= --}}
 
-                <input type="file" class="d-none" id="file" wire:model="photo" accept=".jpg,.jpeg,.png">
+                <label for="file"
+                    style="display: block; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; background: #f8fafc;"
+                    onmouseover="this.style.borderColor='#6366f1';this.style.background='#f5f3ff'"
+                    onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#f8fafc'">
 
-                {{-- PRIORITAS 1: preview file baru --}}
-                @if ($photo && is_object($photo))
-                    <img src="{{ $photo->temporaryUrl() }}" alt="Preview"
-                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+                    <input type="file" class="d-none" id="file" wire:model="photo" accept=".jpg,.jpeg,.png">
 
-                    {{-- PRIORITAS 2: tampilkan dari DB --}}
-                @elseif ($existingPhoto)
-                    <img src="{{ asset('storage/' . $existingPhoto) }}" alt="Foto saat ini"
-                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+                    @if ($photo && is_object($photo))
+                        <img src="{{ $photo->temporaryUrl() }}"
+                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                        <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+                    @elseif ($existingPhoto)
+                        <img src="{{ asset('storage/' . $existingPhoto) }}"
+                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                        <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+                    @else
+                        <div style="font-size: 2rem;">🖼️</div>
+                        <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
+                        <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
+                    @endif
+                </label>
+                @can('foto-profil-edit')
+                    {{-- Tombol Hapus --}}
+                    @if (($photo && is_object($photo)) || $existingPhoto)
+                        <button type="button" wire:click="removePhoto"
+                            style="margin-top: 8px; padding: 4px 12px; font-size: 12px; border-radius: 8px; border: 1px solid #fca5a5; background: #fff1f2; color: #dc2626; cursor: pointer;">
+                            🗑️ Hapus Foto
+                        </button>
+                    @endif
 
-                    {{-- PRIORITAS 3: kosong --}}
-                @else
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
-                    <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
-                    <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
-                @endif
-            </label>
+                    {{-- Info --}}
+                    @if (session()->has('error'))
+                        <small class="text-danger">{{ session('error') }}</small>
+                    @else
+                        <small class="text-muted">Ukuran maksimal file: 2MB</small>
+                    @endif
 
-            {{-- Tombol Hapus --}}
-            @if (($photo && is_object($photo)) || $existingPhoto)
-                <button type="button" wire:click="removePhoto"
-                    style="margin-top: 8px; padding: 4px 12px; font-size: 12px; border-radius: 8px; border: 1px solid #fca5a5; background: #fff1f2; color: #dc2626; cursor: pointer;">
-                    🗑️ Hapus Foto
-                </button>
-            @endif
-
-            {{-- Info --}}
-            @if (session()->has('error'))
-                <small class="text-danger">{{ session('error') }}</small>
+                    @error('photo')
+                        <small class="text-danger d-block">{{ $message }}</small>
+                    @enderror
+                @endcan
             @else
-                <small class="text-muted">Ukuran maksimal file: 2MB</small>
-            @endif
+                {{-- ================= VIEW ONLY MODE ================= --}}
 
-            @error('photo')
-                <small class="text-danger d-block">{{ $message }}</small>
-            @enderror
+                <div
+                    style="display: block; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 1.5rem; text-align: center; background: #f8fafc;">
+
+                    @if ($existingPhoto)
+                        <img src="{{ asset('storage/' . $existingPhoto) }}"
+                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer;"
+                            data-bs-toggle="modal" data-bs-target="#modalPreviewFoto"
+                            onclick="setModalImage('{{ asset('storage/' . $existingPhoto) }}')">
+
+                        <p class="mt-2 mb-0 text-muted small">Klik untuk melihat</p>
+                    @else
+                        <div style="font-size: 2rem;">🖼️</div>
+                        <p class="mb-0 text-muted small">Tidak ada foto</p>
+                    @endif
+
+                </div>
+            @endcan
         </div>
+        @can('foto-profil-edit')
+            {{-- Tombol simpan --}}
+            <div class="d-flex justify-content-end gap-2 mb-4" style="max-width: 300px;">
+                <button type="button" class="btn btn-primary w-100 w-md-auto" wire:click='saveFile'
+                    wire:loading.attr="disabled" wire:target="saveFile">
 
-        {{-- Tombol simpan --}}
-        <div class="d-flex justify-content-end gap-2 mb-4" style="max-width: 300px;">
-            <button type="button" class="btn btn-primary w-100 w-md-auto" wire:click='saveFile'
-                wire:loading.attr="disabled" wire:target="saveFile">
+                    <div wire:loading wire:target="saveFile" class="spinner-border spinner-border-sm"></div>
 
-                <div wire:loading wire:target="saveFile" class="spinner-border spinner-border-sm"></div>
+                    <span wire:loading.remove wire:target="saveFile">
+                        <i class="fa fa-save"></i> Simpan
+                    </span>
 
-                <span wire:loading.remove wire:target="saveFile">
-                    <i class="fa fa-save"></i> Simpan
-                </span>
+                    <span wire:loading wire:target="saveFile">
+                        Loading...
+                    </span>
+                </button>
+            </div>
+        @endcan
 
-                <span wire:loading wire:target="saveFile">
-                    Loading...
-                </span>
-            </button>
-        </div>
         <div class="border rounded-4 p-4">
             <h6 class="fw-bold text-primary">PERSOAL DATA (DATA DIRI KARYAWAN)</h6>
             <div class="row align-items-start mt-3">
@@ -1357,7 +1369,8 @@
                         <div class="col-md-6 mb-3">
                             <label for="level_of_education" class="form-label">Jenjang</label>
                             <input type="text" class="form-control" id="level_of_education"
-                                wire:model="level_of_education" name="level_of_education" placeholder="SMA/STRATA 1">
+                                wire:model="level_of_education" name="level_of_education"
+                                placeholder="SMA/STRATA 1">
                             @error('form.level_of_education')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -1471,6 +1484,17 @@
                         <button type="button" class="btn btn-secondary w-md-auto"
                             data-bs-dismiss="modal">Cancel</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div wire:ignore.self class="modal fade" id="modalPreviewFoto" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-body text-center p-0">
+                    <img id="previewImage" src=""
+                        style="max-width: 100%; max-height: 80vh; border-radius: 10px;">
                 </div>
             </div>
         </div>
@@ -1595,5 +1619,9 @@
                 reader.readAsDataURL(file);
             }
         });
+
+        function setModalImage(src) {
+            document.getElementById('previewImage').src = src;
+        }
     </script>
 @endpush
