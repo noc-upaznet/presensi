@@ -13,6 +13,7 @@ use App\Models\M_DataKaryawan;
 use App\Traits\CutoffPayrollTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Livewire\WithoutUrlPagination;
 
 class Pengajuan extends Component
@@ -305,24 +306,12 @@ class Pengajuan extends Component
             $query->whereIn('karyawan_id', $karyawanIdList);
         } elseif ($user->hasRole('spv')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
-            // if ($dataKaryawan) {
-            //     if (strtolower($dataKaryawan->divisi) === 'noc') {
-            //         // Divisi NOC → tidak pakai entitas
-            //         $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
-            //             ->pluck('id');
-            //     } else {
-            //         // Divisi lain → filter divisi + entitas
-            //         $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
-            //             ->where('entitas', $dataKaryawan->entitas)
-            //             ->pluck('id');
-            //     }
-            //     $query->whereIn('karyawan_id', $karyawanIdList);
-            // }
 
             if ($dataKaryawan) {
 
                 $divisi  = strtolower($dataKaryawan->divisi);
                 $entitas = strtoupper($dataKaryawan->entitas);
+                // dd($divisi, $entitas);
 
                 if ($divisi === 'noc') {
                     // Divisi NOC → tidak pakai entitas
@@ -332,6 +321,21 @@ class Pengajuan extends Component
                     $karyawanIdList = M_DataKaryawan::where(function ($q) use ($dataKaryawan) {
                         // 1. Semua karyawan entitas MC
                         $q->whereRaw('UPPER(entitas) = ?', ['MC'])
+
+                            // 2. Divisi & entitas sendiri
+                            ->orWhere(function ($sub) use ($dataKaryawan) {
+                                $sub->where('divisi', $dataKaryawan->divisi)
+                                    ->where('entitas', $dataKaryawan->entitas);
+                            });
+                    })->pluck('id');
+                } elseif ($divisi === 'sales marketing' && $entitas === 'UHO') {
+                    $karyawanIdList = M_DataKaryawan::whereRaw('UPPER(entitas) = ?', [strtoupper($dataKaryawan->entitas)])
+                        ->whereIn(DB::raw('UPPER(divisi)'), ['SALES MARKETING', 'TEKNISI'])
+                        ->pluck('id');
+                } elseif ($divisi === 'finance' && $entitas === 'UHO') {
+                    $karyawanIdList = M_DataKaryawan::where(function ($q) use ($dataKaryawan) {
+                        // 1. Semua karyawan entitas UHO
+                        $q->whereRaw('UPPER(entitas) = ?', ['UHO'])
 
                             // 2. Divisi & entitas sendiri
                             ->orWhere(function ($sub) use ($dataKaryawan) {
@@ -349,7 +353,7 @@ class Pengajuan extends Component
                 $query->whereIn('karyawan_id', $karyawanIdList);
             }
 
-            // 🔹 HR → semua karyawan semua entitas
+            // HR → semua karyawan semua entitas
         } elseif ($user->hasRole('hr')) {
             $karyawanIdList = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
             $query->whereIn('karyawan_id', $karyawanIdList);
