@@ -11,6 +11,7 @@ use App\Models\M_DataKaryawan;
 use App\Traits\CutoffPayrollTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
 
@@ -287,6 +288,10 @@ class PengajuanLembur extends Component
                 if ($divisi === 'noc') {
                     // Divisi NOC → tidak pakai entitas
                     $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
+                        ->pluck('id');
+                } elseif ($divisi === 'sales marketing' && $entitas === 'UHO') {
+                    $karyawanIdList = M_DataKaryawan::whereRaw('UPPER(entitas) = ?', [strtoupper($dataKaryawan->entitas)])
+                        ->whereIn(DB::raw('UPPER(divisi)'), ['SALES MARKETING', 'TEKNISI'])
                         ->pluck('id');
                 } elseif ($divisi === 'finance' && $entitas === 'UNR') {
                     $karyawanIdList = M_DataKaryawan::where(function ($q) use ($dataKaryawan) {
