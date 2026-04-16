@@ -34,6 +34,7 @@ use App\Livewire\Karyawan\TambahPembagianShift;
 use App\Livewire\Karyawan\Shifts\TemplateMingguan;
 use App\Livewire\Karyawan\Pengajuan\PengajuanLembur;
 use App\Livewire\Karyawan\Pengajuan\Sharing;
+use App\Livewire\Karyawan\Shifts\ManageTim;
 use App\Livewire\Kasbon\Kasbon;
 use App\Livewire\ListNotifikations;
 use App\Livewire\ManageUser;
@@ -41,7 +42,9 @@ use App\Livewire\QuestionBank\QuestionBank;
 use App\Livewire\SlipGaji;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 // Route::redirect('/', '/login');
 // Halaman lupa password
@@ -114,4 +117,17 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/gamifikasi', Gamifikasi::class)->name('gamifikasi');
     Route::get('/employee-absent', EmployeeAbsent::class)->name('employee-absent');
     Route::get('/dashboard-payroll', DashboardPayroll::class)->name('dashboard-payroll');
+
+    Route::get('/file/view/{encrypted}', function ($encrypted) {
+        try {
+            $path = decrypt($encrypted);
+        } catch (\Exception $e) {
+            abort(403);
+        }
+
+        // redirect ke signed URL (tapi hanya setelah auth)
+        return redirect(
+            Storage::disk('s3')->temporaryUrl($path, now()->addMinutes(5))
+        );
+    })->middleware('auth')->name('file.view');
 });

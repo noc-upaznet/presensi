@@ -155,10 +155,13 @@
                                         <td style="color: var(--bs-body-color);">{{ $key->description }}</td>
                                         <td style="color: var(--bs-body-color);">
                                             @if ($key->file)
-                                                <img src="{{ asset('storage/' . $key->file) }}" alt="Bukti Lembur"
+                                                @php
+                                                    $fileUrl = route('file.view', encrypt($key->file));
+                                                @endphp
+                                                <img src="{{ $fileUrl }}" alt="Bukti Dispensasi"
                                                     style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
                                                     data-bs-target="#modalGambar"
-                                                    onclick="setModalImage('{{ asset('storage/' . $key->file) }}')">
+                                                    onclick="setModalImage('{{ $fileUrl }}')">
                                             @else
                                                 -
                                             @endif

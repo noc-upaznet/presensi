@@ -57,19 +57,20 @@ class Sharing extends Component
         $this->form->validate();
 
         // Validasi file kalau ada
-        if ($this->file instanceof UploadedFile) {
+        if ($this->file) {
+            // dd($this->file);
             $this->validate([
                 'file' => 'nullable|mimes:jpg,jpeg,png|max:2048',
             ], [
-                'file.max'   => 'Ukuran file maksimal 2MB.',
+                'file.max' => 'Ukuran file maksimal 2MB.',
                 'file.mimes' => 'Format file harus JPG, JPEG, PNG.',
             ]);
         }
 
-        // Simpan file kalau ada upload
         $path = null;
-        if ($this->file instanceof UploadedFile) {
-            $path = $this->file->store('file-pengajuan-dispensasi', 'public');
+        if ($this->file) {
+            $filename = md5(uniqid()) . '.' . $this->file->extension();
+            $path = $this->file->storeAs('file-sharing', $filename, 's3');
         }
 
         $data = [
