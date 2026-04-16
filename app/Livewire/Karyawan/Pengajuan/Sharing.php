@@ -70,7 +70,7 @@ class Sharing extends Component
         $path = null;
         if ($this->file) {
             $filename = md5(uniqid()) . '.' . $this->file->extension();
-            $path = $this->file->storeAs('file-sharing', $filename, 's3');
+            $path = $this->file->storeAs('presensi/file-sharing', $filename, 's3');
         }
 
         $data = [
