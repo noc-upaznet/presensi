@@ -71,9 +71,25 @@ class Sharing extends Component
         }
 
         $path = null;
+        // if ($this->file) {
+        //     $filename = md5(uniqid()) . '.' . $this->file->extension();
+        //     $path = $this->file->storeAs('presensi/file-sharing', $filename, 's3');
+        // }
+
         if ($this->file) {
             $filename = md5(uniqid()) . '.' . $this->file->extension();
-            $path = $this->file->storeAs('presensi/file-sharing', $filename, 's3');
+
+            $fullPath = 'presensi/file-sharing/' . $filename;
+            $uploaded = Storage::disk('s3')->put(
+                $fullPath,
+                fopen($this->file->getRealPath(), 'r')
+            );
+
+            if (!$uploaded) {
+                throw new \Exception('Upload ke Garage gagal');
+            }
+
+            $path = $fullPath;
         }
 
         $data = [
