@@ -11,7 +11,10 @@ use App\Traits\CutoffPayrollTrait;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 use Livewire\WithoutUrlPagination;
@@ -132,6 +135,24 @@ class Sharing extends Component
 
         $pengajuan->save();
 
+        $this->dispatch('refresh');
+    }
+
+    public function delete($id)
+    {
+        $pengajuan = M_Sharing::findOrFail(Crypt::decrypt($id));
+        // dd($pengajuan);
+        if (!$pengajuan) return;
+
+        $pengajuan->delete();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Pengajuan Dihapus',
+            'icon' => 'success',
+            'text' => 'Data pengajuan dihapus.'
+        ]);
+
+        $this->dispatch('modal-confirm-delete', action: 'hide');
         $this->dispatch('refresh');
     }
 
