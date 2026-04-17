@@ -116,7 +116,8 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/kasbon', Kasbon::class)->name('kasbon')->middleware('check.kasbon-view');
     Route::get('/gamifikasi', Gamifikasi::class)->name('gamifikasi');
     Route::get('/employee-absent', EmployeeAbsent::class)->name('employee-absent');
-    Route::get('/dashboard-payroll', DashboardPayroll::class)->name('dashboard-payroll');
+    // Route::get('/dashboard-payroll', DashboardPayroll::class)->name('dashboard-payroll');
+    // Route::get('/manage-tim', ManageTim::class)->name('manage-tim');
 
     Route::get('/file/view/{encrypted}', function ($encrypted) {
         try {
@@ -125,9 +126,10 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
             abort(403);
         }
 
-        // redirect ke signed URL (tapi hanya setelah auth)
-        return redirect(
-            Storage::disk('s3')->temporaryUrl($path, now()->addMinutes(5))
-        );
-    })->middleware('auth')->name('file.view');
+        $file = Storage::disk('s3')->get($path);
+        $mime = Storage::disk('s3')->mimeType($path);
+
+        return response($file, 200)
+            ->header('Content-Type', $mime);
+    })->middleware('auth');
 });
