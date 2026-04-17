@@ -531,6 +531,7 @@
         'secret' => 'c92cb029e2b8425aa2059ff0afff6b319068fa8a011f5842a79e12087e0d421c',
         'region' => 'garage',
         'bucket' => 'mybucket',
+        'url' => 'https://assets.upaz.net.id',
         'endpoint' => 'http://10.96.8.11:3900',
         'use_path_style_endpoint' => true,
         'throw' => false,

@@ -117,7 +117,7 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/gamifikasi', Gamifikasi::class)->name('gamifikasi');
     Route::get('/employee-absent', EmployeeAbsent::class)->name('employee-absent');
     Route::get('/dashboard-payroll', DashboardPayroll::class)->name('dashboard-payroll');
-    // Route::get('/manage-tim', ManageTim::class)->name('manage-tim');
+    Route::get('/manage-tim', ManageTim::class)->name('manage-tim');
 
     Route::get('/file/view/{encrypted}', function ($encrypted) {
         try {
@@ -131,5 +131,5 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
 
         return response($file, 200)
             ->header('Content-Type', $mime);
-    })->middleware('auth');
+    })->middleware('auth')->name('file.view');
 });
