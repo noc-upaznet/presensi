@@ -166,14 +166,26 @@
                                         @endhasanyrole
                                         <td style="color: var(--bs-body-color);">{{ $key->getShift->nama_shift }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->keterangan }}</td>
+                                        <td style="color: var(--bs-body-color);">
+                                            @if ($key->file)
+                                                @php
+                                                    $fileUrl = route('file.pengajuan', encrypt(basename($key->file)));
+                                                @endphp
+                                                <img src="{{ $fileUrl }}" alt="Bukti"
+                                                    style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
+                                                    data-bs-target="#modalGambar"
+                                                    onclick="setModalImage('{{ $fileUrl }}')">
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+
                                         {{-- <td style="color: var(--bs-body-color);">
                                             @if ($key->file)
                                                 @php
-                                                    $fileUrl = Illuminate\Support\Facades\Storage::disk(
-                                                        's3',
-                                                    )->temporaryUrl($key->file, now()->addMinutes(30));
+                                                    $fileUrl = route('file.view', ['encrypted' => encrypt($key->file)]);
                                                 @endphp
-                                                <img src="{{ $fileUrl }}" alt="Bukti Lembur"
+                                                <img src="{{ $fileUrl }}" alt="Bukti"
                                                     style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
                                                     data-bs-target="#modalGambar"
                                                     onclick="setModalImage('{{ $fileUrl }}')">
@@ -181,16 +193,6 @@
                                                 -
                                             @endif
                                         </td> --}}
-                                        <td style="color: var(--bs-body-color);">
-                                            @if ($key->file)
-                                                <img src="{{ asset('storage/' . $key->file) }}" alt="Bukti Lembur"
-                                                    style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
-                                                    data-bs-target="#modalGambar"
-                                                    onclick="setModalImage('{{ asset('storage/' . $key->file) }}')">
-                                            @else
-                                                -
-                                            @endif
-                                        </td>
                                         <td style="color: var(--bs-body-color);">
                                             @if ($key->approve_spv == 1)
                                                 <span class="badge bg-success">SPV</span>

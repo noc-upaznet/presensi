@@ -65,7 +65,7 @@ class ModalPengajuanLembur extends Component
         $path = null;
         if ($this->file_bukti) {
             $filename = md5(uniqid()) . '.' . $this->file_bukti->extension();
-            $path = $this->file_bukti->storeAs('file-lembur', $filename, 'public');
+            $path = $this->file_bukti->storeAs('presensi/file-lembur', $filename, 's3');
         }
 
         $data = [
@@ -134,7 +134,7 @@ class ModalPengajuanLembur extends Component
         $path = null;
         if ($this->file_bukti && is_object($this->file_bukti)) {
             $filename = md5(uniqid()) . '.' . $this->file_bukti->extension();
-            $path = $this->file_bukti->storeAs('file-lembur', $filename, 'public');
+            $path = $this->file_bukti->storeAs('presensi/file-lembur', $filename, 's3');
         }
 
 

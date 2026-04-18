@@ -167,22 +167,23 @@
                                         <td style="color: var(--bs-body-color);">{{ $key->waktu_mulai }} -
                                             {{ $key->waktu_akhir }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->keterangan }}</td>
-                                        {{-- <td style="color: var(--bs-body-color);">
+                                        <td style="color: var(--bs-body-color);">
                                             @if ($key->file_bukti)
                                                 @php
-                                                    $fileUrl = Illuminate\Support\Facades\Storage::disk(
-                                                        's3',
-                                                    )->temporaryUrl($key->file_bukti, now()->addMinutes(30));
+                                                    $fileUrl = route(
+                                                        'file.lembur',
+                                                        encrypt(basename($key->file_bukti)),
+                                                    );
                                                 @endphp
-                                                <img src="{{ $fileUrl }}" alt="Bukti Lembur"
+                                                <img src="{{ $fileUrl }}" alt="Bukti"
                                                     style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
                                                     data-bs-target="#modalGambar"
                                                     onclick="setModalImage('{{ $fileUrl }}')">
                                             @else
                                                 -
                                             @endif
-                                        </td> --}}
-                                        <td style="color: var(--bs-body-color);">
+                                        </td>
+                                        {{-- <td style="color: var(--bs-body-color);">
                                             @if ($key->file_bukti)
                                                 <img src="{{ asset('storage/' . $key->file_bukti) }}" alt="Bukti Lembur"
                                                     style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
@@ -191,7 +192,7 @@
                                             @else
                                                 -
                                             @endif
-                                        </td>
+                                        </td> --}}
                                         <td style="color: var(--bs-body-color);">
                                             @if ($key->approve_spv == 1)
                                                 <span class="badge bg-success">SPV</span>

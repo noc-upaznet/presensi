@@ -170,4 +170,56 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
         return response($file, 200)
             ->header('Content-Type', $mime);
     })->middleware('auth')->name('file.dispensasi');
+
+    Route::get('/file/lembur/{encrypted}', function ($encrypted) {
+        try {
+            $filename = decrypt($encrypted);
+        } catch (\Exception $e) {
+            abort(403);
+        }
+
+        $newPath = 'presensi/file-lembur/' . $filename;
+
+        $oldPath = 'file-lembur/' . $filename;
+
+        if (Storage::disk('s3')->exists($newPath)) {
+            $path = $newPath;
+        } elseif (Storage::disk('s3')->exists($oldPath)) {
+            $path = $oldPath;
+        } else {
+            abort(404);
+        }
+
+        $file = Storage::disk('s3')->get($path);
+        $mime = Storage::disk('s3')->mimeType($path);
+
+        return response($file, 200)
+            ->header('Content-Type', $mime);
+    })->middleware('auth')->name('file.lembur');
+
+    Route::get('/file/pengajuan/{encrypted}', function ($encrypted) {
+        try {
+            $filename = decrypt($encrypted);
+        } catch (\Exception $e) {
+            abort(403);
+        }
+
+        $newPath = 'presensi/file-pengajuan/' . $filename;
+
+        $oldPath = 'file-pengajuan/' . $filename;
+
+        if (Storage::disk('s3')->exists($newPath)) {
+            $path = $newPath;
+        } elseif (Storage::disk('s3')->exists($oldPath)) {
+            $path = $oldPath;
+        } else {
+            abort(404);
+        }
+
+        $file = Storage::disk('s3')->get($path);
+        $mime = Storage::disk('s3')->mimeType($path);
+
+        return response($file, 200)
+            ->header('Content-Type', $mime);
+    })->middleware('auth')->name('file.pengajuan');
 });
