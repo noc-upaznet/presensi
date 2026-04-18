@@ -35,11 +35,19 @@
                     <input type="file" class="d-none" id="file" wire:model="photo" accept=".jpg,.jpeg,.png">
 
                     @if ($photo && is_object($photo))
-                        <img src="{{ $photo->temporaryUrl() }}"
+                        @php
+                            $fileUrl = route('file.profile', encrypt(basename($existingPhoto)));
+                        @endphp
+
+                        <img src="{{ $fileUrl }}"
                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
                         <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                     @elseif ($existingPhoto)
-                        <img src="{{ asset('storage/' . $existingPhoto) }}"
+                        @php
+                            $fileUrl = route('file.profile', encrypt(basename($existingPhoto)));
+                        @endphp
+
+                        <img src="{{ $fileUrl }}"
                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
                         <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                     @else
@@ -75,10 +83,14 @@
                     style="display: block; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 1.5rem; text-align: center; background: #f8fafc;">
 
                     @if ($existingPhoto)
-                        <img src="{{ asset('storage/' . $existingPhoto) }}"
+                        @php
+                            $fileUrl = route('file.profile', encrypt(basename($existingPhoto)));
+                        @endphp
+
+                        <img src="{{ $fileUrl }}"
                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer;"
                             data-bs-toggle="modal" data-bs-target="#modalPreviewFoto"
-                            onclick="setModalImage('{{ asset('storage/' . $existingPhoto) }}')">
+                            onclick="setModalImage('{{ $fileUrl }}')">
 
                         <p class="mt-2 mb-0 text-muted small">Klik untuk melihat</p>
                     @else

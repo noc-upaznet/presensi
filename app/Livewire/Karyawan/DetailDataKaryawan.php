@@ -108,7 +108,7 @@ class DetailDataKaryawan extends Component
             'photo' => 'required|image|max:2048',
         ]);
 
-        $path = $this->photo->store('profile-photos', 'public');
+        $path = $this->photo->store('presensi/profile-photos', 's3');
 
         M_AdditionalDataEmployee::updateOrCreate(
             ['karyawan_id' => $this->id],
@@ -131,11 +131,25 @@ class DetailDataKaryawan extends Component
     public function removePhoto()
     {
         if ($this->existingPhoto) {
-            Storage::disk('public')->delete($this->existingPhoto);
+
+            $filename = basename($this->existingPhoto);
+
+            $newPath = 'presensi/profile-photos/' . $filename;
+
+            $oldPath = 'profile-photos/' . $filename;
+
+            if (Storage::disk('s3')->exists($newPath)) {
+                Storage::disk('s3')->delete($newPath);
+            }
+
+            if (Storage::disk('s3')->exists($oldPath)) {
+                Storage::disk('s3')->delete($oldPath);
+            }
 
             M_AdditionalDataEmployee::where('karyawan_id', $this->id)
                 ->update(['photo' => null]);
         }
+
         $this->dispatch('swal', params: [
             'title' => 'Tersimpan',
             'icon'  => 'success',
