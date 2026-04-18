@@ -156,7 +156,7 @@
                                         <td style="color: var(--bs-body-color);">
                                             @if ($key->file)
                                                 @php
-                                                    $fileUrl = route('file.view', encrypt($key->file));
+                                                    $fileUrl = route('file.sharing', encrypt(basename($key->file)));
                                                 @endphp
                                                 <img src="{{ $fileUrl }}" alt="Bukti"
                                                     style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"

@@ -119,11 +119,23 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/dashboard-payroll', DashboardPayroll::class)->name('dashboard-payroll');
     // Route::get('/manage-tim', ManageTim::class)->name('manage-tim');
 
-    Route::get('/file/view/{encrypted}', function ($encrypted) {
+    Route::get('/file/sharing/{encrypted}', function ($encrypted) {
         try {
-            $path = decrypt($encrypted);
+            $filename = decrypt($encrypted);
         } catch (\Exception $e) {
             abort(403);
+        }
+
+        $newPath = 'presensi/file-sharing/' . $filename;
+
+        $oldPath = 'file-sharing/' . $filename;
+
+        if (Storage::disk('s3')->exists($newPath)) {
+            $path = $newPath;
+        } elseif (Storage::disk('s3')->exists($oldPath)) {
+            $path = $oldPath;
+        } else {
+            abort(404);
         }
 
         $file = Storage::disk('s3')->get($path);
@@ -131,5 +143,31 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
 
         return response($file, 200)
             ->header('Content-Type', $mime);
-    })->middleware('auth')->name('file.view');
+    })->middleware('auth')->name('file.sharing');
+
+    Route::get('/file/dispensasi/{encrypted}', function ($encrypted) {
+        try {
+            $filename = decrypt($encrypted);
+        } catch (\Exception $e) {
+            abort(403);
+        }
+
+        $newPath = 'presensi/file-pengajuan-dispensasi/' . $filename;
+
+        $oldPath = 'file-pengajuan-dispensasi/' . $filename;
+
+        if (Storage::disk('s3')->exists($newPath)) {
+            $path = $newPath;
+        } elseif (Storage::disk('s3')->exists($oldPath)) {
+            $path = $oldPath;
+        } else {
+            abort(404);
+        }
+
+        $file = Storage::disk('s3')->get($path);
+        $mime = Storage::disk('s3')->mimeType($path);
+
+        return response($file, 200)
+            ->header('Content-Type', $mime);
+    })->middleware('auth')->name('file.dispensasi');
 });
