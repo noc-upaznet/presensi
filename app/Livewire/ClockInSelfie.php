@@ -181,7 +181,7 @@ class ClockInSelfie extends Component
         $image = base64_decode($base64Image);
 
         $filename = 'selfie_' . Str::uuid() . '.png';
-        Storage::disk('public')->put('selfies/' . $filename, $image);
+        Storage::disk('s3')->put('presensi/selfies/' . $filename, $image);
 
         $this->photo = 'selfies/' . $filename;
         $this->latitude = $latitude;

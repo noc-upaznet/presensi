@@ -111,9 +111,20 @@
                                             </td>
                                         @endrole
                                         <td style="color: var(--bs-body-color);">
-                                            <img src="{{ asset('storage/' . $key->file) }}" style="max-width: 100px;"
-                                                alt="Selfie" class="img-fluid" />
-                                            {{-- {{ $key->file }} --}}
+                                        <td style="color: var(--bs-body-color);">
+                                            @if ($key->file)
+                                                @php
+                                                    $fileUrl = route('file.selfies', encrypt(basename($key->file)));
+                                                @endphp
+                                                <img src="{{ $fileUrl }}" alt="Bukti"
+                                                    style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
+                                                    data-bs-target="#modalGambar"
+                                                    onclick="setModalImage('{{ $fileUrl }}')">
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        {{-- {{ $key->file }} --}}
                                         </td>
                                         <td>
                                             @if ($key->status == '0')
