@@ -117,9 +117,18 @@
                                                 <span class="badge bg-secondary">Unknown</span>
                                         @endswitch
                                     </td>
-                                    <td>
-                                        <img src="{{ asset('storage/' . $key->file) }}" style="max-width:100px"
-                                            class="img-fluid" alt="Selfie">
+                                    <td style="color: var(--bs-body-color);">
+                                        @if ($key->file)
+                                            @php
+                                                $fileUrl = route('file.selfies', encrypt(basename($key->file)));
+                                            @endphp
+                                            <img src="{{ $fileUrl }}" alt="Bukti"
+                                                style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
+                                                data-bs-target="#modalGambar"
+                                                onclick="setModalImage('{{ $fileUrl }}')">
+                                        @else
+                                            -
+                                        @endif
                                     </td>
                                     <td>
                                         @switch($key->status)
@@ -213,6 +222,19 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="modalGambar" tabindex="-1" aria-labelledby="modalGambarLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalGambarLabel">Foto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img id="modalImage" src="" alt="Bukti" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 
@@ -226,5 +248,9 @@
             Livewire.on('swal', (e) => {
                 Swal.fire(e.params);
             });
+
+            function setModalImage(src) {
+                document.getElementById('modalImage').src = src;
+            }
         </script>
     @endpush
