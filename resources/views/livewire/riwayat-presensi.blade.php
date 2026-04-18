@@ -111,7 +111,6 @@
                                             </td>
                                         @endrole
                                         <td style="color: var(--bs-body-color);">
-                                        <td style="color: var(--bs-body-color);">
                                             @if ($key->file)
                                                 @php
                                                     $fileUrl = route('file.selfies', encrypt(basename($key->file)));
@@ -123,8 +122,6 @@
                                             @else
                                                 -
                                             @endif
-                                        </td>
-                                        {{-- {{ $key->file }} --}}
                                         </td>
                                         <td>
                                             @if ($key->status == '0')
