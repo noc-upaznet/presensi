@@ -158,23 +158,21 @@
                                             $clockIn = $presensiClockIn[$keyPresensi][0]->clock_in ?? null;
                                         @endphp
                                         <td style="color: var(--bs-body-color);">{{ $clockIn }}</td>
-                                        {{-- <td style="color: var(--bs-body-color);">
+                                        <td style="color: var(--bs-body-color);">
                                             @if ($key->file)
                                                 @php
-                                                    $fileUrl = Illuminate\Support\Facades\Storage::disk(
-                                                        's3',
-                                                    )->temporaryUrl($key->file, now()->addMinutes(30));
+                                                    $fileUrl = route('file.view', encrypt($key->file));
                                                 @endphp
-                                                <img src="{{ $fileUrl }}" alt="Bukti Dispensasi"
+                                                <img src="{{ $fileUrl }}" alt="Bukti"
                                                     style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
                                                     data-bs-target="#modalGambar"
                                                     onclick="setModalImage('{{ $fileUrl }}')">
                                             @else
                                                 -
                                             @endif
-                                        </td> --}}
+                                        </td>
 
-                                        <td style="color: var(--bs-body-color);">
+                                        {{-- <td style="color: var(--bs-body-color);">
                                             @if ($key->file)
                                                 <img src="{{ asset('storage/' . $key->file) }}" alt="Bukti Dispensasi"
                                                     style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
@@ -183,7 +181,7 @@
                                             @else
                                                 -
                                             @endif
-                                        </td>
+                                        </td> --}}
                                         <td style="color: var(--bs-body-color);">
                                             @if ($key->approve_hr == 1)
                                                 <span class="badge bg-success">HRD</span>
@@ -389,7 +387,7 @@
                                 <input type="file" class="d-none" id="file" wire:model="file"
                                     accept=".jpg,.jpeg,.png">
 
-                                {{-- @if ($file && is_object($file))
+                                @if ($file && is_object($file))
                                     <img src="{{ $file->temporaryUrl() }}" alt="Preview"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
                                     <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
@@ -402,24 +400,21 @@
                                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
                                     <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
                                     <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
-                                @endif --}}
+                                @endif
 
-                                @if ($file && is_object($file))
-                                    {{-- Preview file baru --}}
+                                {{-- @if ($file && is_object($file))
                                     <img src="{{ $file->temporaryUrl() }}" alt="Preview"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
                                     <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @elseif ($existingFile)
-                                    {{-- Preview file lama dari public storage --}}
                                     <img src="{{ asset('storage/' . $existingFile) }}" alt="File saat ini"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
                                     <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @else
-                                    {{-- Belum ada file --}}
                                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
                                     <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
                                     <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
-                                @endif
+                                @endif --}}
                             </label>
 
                             {{-- Tombol remove --}}
