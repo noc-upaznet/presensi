@@ -28,11 +28,12 @@ class ListNotifikations extends Component
 
     public function render()
     {
+        $notifications = Auth::user()
+            ->notifications()
+            ->latest()
+            ->paginate(25);
         return view('livewire.list-notifikations', [
-            'notifications' => Auth::user()
-                ->notifications()
-                ->latest()
-                ->paginate(25),
+            'notifications' => $notifications,
         ]);
     }
 }
