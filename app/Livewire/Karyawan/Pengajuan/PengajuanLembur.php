@@ -117,6 +117,11 @@ class PengajuanLembur extends Component
 
             if ($status == 1) {
                 $pengajuan->approve_spv = 1;
+                $this->dispatch('swal', params: [
+                    'title' => 'Status Diperbarui',
+                    'icon'  => 'success',
+                    'text'  => 'Status berhasil diperbarui.'
+                ]);
             } elseif ($status == 2) {
                 $pengajuan->approve_spv = 2;
                 $pengajuan->status      = 2;
@@ -141,6 +146,11 @@ class PengajuanLembur extends Component
                     $pengajuan->approve_hr  = 1;
                     $pengajuan->approve_spv = 1;
                     $pengajuan->status      = 1;
+                    $this->dispatch('swal', params: [
+                        'title' => 'Status Diperbarui',
+                        'icon'  => 'success',
+                        'text'  => 'Status dan jadwal berhasil diperbarui.'
+                    ]);
                 } elseif ($status == 2) {
                     $pengajuan->approve_hr  = 2;
                     $pengajuan->approve_spv = 2;
@@ -157,6 +167,11 @@ class PengajuanLembur extends Component
                 if ($status == 1) {
                     $pengajuan->approve_hr = 1;
                     $pengajuan->status     = 1;
+                    $this->dispatch('swal', params: [
+                        'title' => 'Status Diperbarui',
+                        'icon'  => 'success',
+                        'text'  => 'Status berhasil diperbarui.'
+                    ]);
                 } elseif ($status == 2) {
                     $pengajuan->approve_hr = 2;
                     $pengajuan->status     = 2;
@@ -189,6 +204,11 @@ class PengajuanLembur extends Component
                     if ($status == 1) {
                         $pengajuan->approve_hr = 1;
                         $pengajuan->status     = 1;
+                        $this->dispatch('swal', params: [
+                            'title' => 'Status Diperbarui',
+                            'icon'  => 'success',
+                            'text'  => 'Status berhasil diperbarui.'
+                        ]);
                     } elseif ($status == 2) {
                         $pengajuan->approve_hr = 2;
                         $pengajuan->status     = 2;
@@ -290,8 +310,14 @@ class PengajuanLembur extends Component
                     $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
                         ->pluck('id');
                 } elseif ($divisi === 'sales marketing' && $entitas === 'UHO') {
+                    // khusus UHO
                     $karyawanIdList = M_DataKaryawan::whereRaw('UPPER(entitas) = ?', [strtoupper($dataKaryawan->entitas)])
                         ->whereIn(DB::raw('UPPER(divisi)'), ['SALES MARKETING', 'TEKNISI'])
+                        ->pluck('id');
+                } elseif ($divisi === 'sales marketing') {
+                    // khusus jabatan GO
+                    $karyawanIdList = M_DataKaryawan::whereRaw('UPPER(entitas) = ?', [strtoupper($dataKaryawan->entitas)])
+                        ->whereIn(DB::raw('UPPER(jabatan)'), ['SALES MARKETING', 'GO'])
                         ->pluck('id');
                 } elseif ($divisi === 'finance' && $entitas === 'UNR') {
                     $karyawanIdList = M_DataKaryawan::where(function ($q) use ($dataKaryawan) {
