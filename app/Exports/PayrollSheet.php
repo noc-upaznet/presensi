@@ -231,7 +231,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
 
             $colLetter = Coordinate::stringFromColumnIndex($col);
 
-            if (in_array($header, ['izin', 'churn', 'terlambat'])) {
+            if (in_array($header, ['izin', 'churn', 'terlambat', 'potongan kebudayaan'])) {
                 $color = 'FFFF0000';
             } elseif (in_array($header, [
                 'terlambat',
