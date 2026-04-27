@@ -166,7 +166,7 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             $potongan =
                 ($item->izin ?? 0) + ($item->terlambat ?? 0) + ($item->churn ?? 0);
 
-            $excludePotongan = ['pph 21', 'pph21'];
+            $excludePotongan = ['pph 21', 'pph21', 'potongan kebudayaan'];
             foreach ($this->uniquePotongan as $nama) {
                 if (in_array(strtolower($nama), $excludePotongan)) {
                     continue;
