@@ -13,6 +13,7 @@ use App\Models\PayrollModel;
 use App\Models\M_DataKaryawan;
 use App\Models\JenisPotonganModel;
 use App\Models\JenisTunjanganModel;
+use App\Models\M_Sharing;
 use Illuminate\Support\Facades\Crypt;
 use App\Traits\CutoffPayrollTrait;
 
@@ -285,6 +286,17 @@ class EditPayroll extends Component
 
     public function loadData($id)
     {
+        $sharingData = M_Sharing::where('karyawan_id', $this->karyawan->id)
+            ->whereBetween('date', [
+                $this->cutoffStart->toDateString(),
+                $this->cutoffEnd->toDateString(),
+            ])
+            ->where('status', 1)
+            ->get();
+
+        // Set nominal (jumlah data * 100.000)
+        $this->fee_sharing = $sharingData->count() * 100000;
+
         $payroll = PayrollModel::findOrFail($id);
         // dd($payroll);
 
