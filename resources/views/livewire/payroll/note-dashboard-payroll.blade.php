@@ -182,188 +182,190 @@
 
                     </tbody>
                 </table>
+                @if ($branchUHO === false)
+                    <h3 class="mb-3">Gaji {{ $currentEntitas }} Titip</h3>
+                    <table class="table table-bordered mb-0 align-middle mb-3" style="font-size: 14px;">
 
-                <h3 class="mb-3">Gaji {{ $currentEntitas }} Titip</h3>
-                <table class="table table-bordered mb-0 align-middle mb-3" style="font-size: 14px;">
+                        <thead>
+                            <tr style="background-color: #b8cce4;">
+                                <th class="text-center fw-bold px-3 py-2" style="width: 50px;">NO</th>
+                                <th class="text-center fw-bold px-3 py-2">INDIKATOR</th>
+                                @foreach ($months as $month)
+                                    <th class="text-center fw-bold px-3 py-2">{{ $month }}</th>
+                                @endforeach
+                                <th class="text-center fw-bold px-3 py-2">TOTAL</th>
+                                @can('note-edit')
+                                    <th class="text-center fw-bold px-3 py-2" style="width: 100px;">Action
+                                    </th>
+                                @endcan
+                            </tr>
+                        </thead>
 
-                    <thead>
-                        <tr style="background-color: #b8cce4;">
-                            <th class="text-center fw-bold px-3 py-2" style="width: 50px;">NO</th>
-                            <th class="text-center fw-bold px-3 py-2">INDIKATOR</th>
-                            @foreach ($months as $month)
-                                <th class="text-center fw-bold px-3 py-2">{{ $month }}</th>
+                        <tbody>
+
+                            {{-- ================= AUTO ROW ================= --}}
+                            @foreach ($indicatorsTitip as $index => $row)
+                                <tr>
+                                    <td class="text-center px-3 py-2">{{ $index + 1 }}</td>
+                                    <td class="px-3 py-2">{{ $row['label'] }}</td>
+
+                                    @foreach ($months as $month)
+                                        <td class="text-end px-3 py-2">
+                                            Rp
+                                            {{ number_format($row['values'][$month] ?? 0, 0, ',', '.') }}
+                                        </td>
+                                    @endforeach
+
+                                    <td
+                                        class="text-end px-3 py-2 fw-bold {{ ($row['total'] ?? 0) < 0 ? 'text-danger' : '' }}">
+                                        {{ ($row['total'] ?? 0) < 0 ? '-' : '' }}
+                                        Rp{{ number_format(abs($row['total'] ?? 0), 0, ',', '.') }}
+                                    </td>
+                                </tr>
                             @endforeach
-                            <th class="text-center fw-bold px-3 py-2">TOTAL</th>
-                            @can('note-edit')
-                                <th class="text-center fw-bold px-3 py-2" style="width: 100px;">Action
-                                </th>
-                            @endcan
-                        </tr>
-                    </thead>
 
-                    <tbody>
 
-                        {{-- ================= AUTO ROW ================= --}}
-                        @foreach ($indicatorsTitip as $index => $row)
+                            {{-- ================= BIAYA TAMBAHAN TITIP ================= --}}
                             <tr>
-                                <td class="text-center px-3 py-2">{{ $index + 1 }}</td>
-                                <td class="px-3 py-2">{{ $row['label'] }}</td>
+                                <td class="text-center px-3 py-2">{{ count($indicators) + 1 }}</td>
+                                <td class="px-3 py-2">Biaya Tambahan Karyawan Baru</td>
 
                                 @foreach ($months as $month)
                                     <td class="text-end px-3 py-2">
-                                        Rp
-                                        {{ number_format($row['values'][$month] ?? 0, 0, ',', '.') }}
+
+                                        {{-- VIEW --}}
+                                        @if (!$editMode['titip']['biaya_tambahan'])
+                                            <span>
+                                                Rp{{ number_format($staticRows['titip']['biaya_tambahan']['value_' . $month] ?? 0, 0, ',', '.') }}
+                                            </span>
+                                        @endif
+
+                                        {{-- EDIT --}}
+                                        @if ($editMode['titip']['biaya_tambahan'])
+                                            <input type="number" class="form-control form-control-sm text-end"
+                                                wire:model.lazy="staticRows.titip.biaya_tambahan.value_{{ $month }}">
+                                        @endif
+
                                     </td>
                                 @endforeach
 
                                 <td
-                                    class="text-end px-3 py-2 fw-bold {{ ($row['total'] ?? 0) < 0 ? 'text-danger' : '' }}">
-                                    {{ ($row['total'] ?? 0) < 0 ? '-' : '' }}
-                                    Rp{{ number_format(abs($row['total'] ?? 0), 0, ',', '.') }}
+                                    class="text-end px-3 py-2 fw-bold {{ ($staticRows['titip']['biaya_tambahan']['total'] ?? 0) < 0 ? 'text-danger' : '' }}">
+                                    {{ ($staticRows['titip']['biaya_tambahan']['total'] ?? 0) < 0 ? '-' : '' }}
+                                    Rp{{ number_format(abs($staticRows['titip']['biaya_tambahan']['total'] ?? 0), 0, ',', '.') }}
+                                </td>
+                                @can('note-edit')
+                                    <td class="text-center px-3 py-2" style="width: 100px;">
+
+                                        {{-- EDIT --}}
+                                        <button class="btn btn-sm btn-outline-warning"
+                                            wire:click="toggleEdit('titip','biaya_tambahan')"
+                                            @if ($editMode['titip']['biaya_tambahan']) style="display:none;" @endif>
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+
+                                        {{-- SAVE --}}
+                                        <button class="btn btn-sm btn-success"
+                                            wire:click="saveStaticBatch('titip','biaya_tambahan')"
+                                            @if (!$editMode['titip']['biaya_tambahan']) style="display:none;" @endif>
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+
+                                        {{-- CANCEL --}}
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            wire:click="toggleEdit('titip','biaya_tambahan')"
+                                            @if (!$editMode['titip']['biaya_tambahan']) style="display:none;" @endif>
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+
+                                    </td>
+                                @endcan
+                            </tr>
+
+
+                            {{-- ================= KENAIKAN GAJI TITIP ================= --}}
+                            <tr>
+                                <td class="text-center px-3 py-2">{{ count($indicators) + 2 }}
+                                </td>
+                                <td class="px-3 py-2">Kenaikan Gaji Karyawan/Bonus</td>
+
+                                @foreach ($months as $month)
+                                    <td class="text-end px-3 py-2">
+
+                                        {{-- VIEW --}}
+                                        @if (!$editMode['titip']['kenaikan_gaji'])
+                                            <span>
+                                                Rp{{ number_format($staticRows['titip']['kenaikan_gaji']['value_' . $month] ?? 0, 0, ',', '.') }}
+                                            </span>
+                                        @endif
+
+                                        {{-- EDIT --}}
+                                        @if ($editMode['titip']['kenaikan_gaji'])
+                                            <input type="number" class="form-control form-control-sm text-end"
+                                                wire:model.lazy="staticRows.titip.kenaikan_gaji.value_{{ $month }}">
+                                        @endif
+
+                                    </td>
+                                @endforeach
+
+                                <td
+                                    class="text-end px-3 py-2 fw-bold {{ ($staticRows['titip']['kenaikan_gaji']['total'] ?? 0) < 0 ? 'text-danger' : '' }}">
+                                    {{ ($staticRows['titip']['kenaikan_gaji']['total'] ?? 0) < 0 ? '-' : '' }}
+                                    Rp{{ number_format(abs($staticRows['titip']['kenaikan_gaji']['total'] ?? 0), 0, ',', '.') }}
+                                </td>
+                                @can('note-edit')
+                                    <td class="text-center px-3 py-2" style="width: 100px;">
+
+                                        {{-- EDIT --}}
+                                        <button type="button" class="btn btn-sm btn-outline-warning"
+                                            wire:click="toggleEdit('titip','kenaikan_gaji')"
+                                            @if ($editMode['titip']['kenaikan_gaji']) style="display:none;" @endif>
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+
+                                        {{-- SAVE --}}
+                                        <button type="button" class="btn btn-sm btn-success"
+                                            wire:click="saveStaticBatch('titip','kenaikan_gaji')"
+                                            @if (!$editMode['titip']['kenaikan_gaji']) style="display:none;" @endif>
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+
+                                        {{-- CANCEL --}}
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            wire:click="toggleEdit('titip','kenaikan_gaji')"
+                                            @if (!$editMode['titip']['kenaikan_gaji']) style="display:none;" @endif>
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+
+                                    </td>
+                                @endcan
+                            </tr>
+
+
+                            {{-- ================= TOTAL TITIP ================= --}}
+                            <tr>
+                                <td colspan="2" class="text-center fw-bold px-3 py-2"
+                                    style="background-color: #e06c6c; color: white;">
+                                    Total Gaji
+                                </td>
+
+                                @foreach ($months as $month)
+                                    <td class="text-end fw-bold px-3 py-2"
+                                        style="background-color: #e06c6c; color: white;">
+                                        Rp{{ number_format($totalsTitip[$month] ?? 0, 0, ',', '.') }}
+                                    </td>
+                                @endforeach
+
+                                <td class="text-end fw-bold px-3 py-2"
+                                    style="background-color: #d4956a; color: white;">
+                                    {{ ($totalsTitip['grand'] ?? 0) < 0 ? '-' : '' }}
+                                    Rp{{ number_format(abs($totalsTitip['grand'] ?? 0), 0, ',', '.') }}
                                 </td>
                             </tr>
-                        @endforeach
 
-
-                        {{-- ================= BIAYA TAMBAHAN TITIP ================= --}}
-                        <tr>
-                            <td class="text-center px-3 py-2">{{ count($indicators) + 1 }}</td>
-                            <td class="px-3 py-2">Biaya Tambahan Karyawan Baru</td>
-
-                            @foreach ($months as $month)
-                                <td class="text-end px-3 py-2">
-
-                                    {{-- VIEW --}}
-                                    @if (!$editMode['titip']['biaya_tambahan'])
-                                        <span>
-                                            Rp{{ number_format($staticRows['titip']['biaya_tambahan']['value_' . $month] ?? 0, 0, ',', '.') }}
-                                        </span>
-                                    @endif
-
-                                    {{-- EDIT --}}
-                                    @if ($editMode['titip']['biaya_tambahan'])
-                                        <input type="number" class="form-control form-control-sm text-end"
-                                            wire:model.lazy="staticRows.titip.biaya_tambahan.value_{{ $month }}">
-                                    @endif
-
-                                </td>
-                            @endforeach
-
-                            <td
-                                class="text-end px-3 py-2 fw-bold {{ ($staticRows['titip']['biaya_tambahan']['total'] ?? 0) < 0 ? 'text-danger' : '' }}">
-                                {{ ($staticRows['titip']['biaya_tambahan']['total'] ?? 0) < 0 ? '-' : '' }}
-                                Rp{{ number_format(abs($staticRows['titip']['biaya_tambahan']['total'] ?? 0), 0, ',', '.') }}
-                            </td>
-                            @can('note-edit')
-                                <td class="text-center px-3 py-2" style="width: 100px;">
-
-                                    {{-- EDIT --}}
-                                    <button class="btn btn-sm btn-outline-warning"
-                                        wire:click="toggleEdit('titip','biaya_tambahan')"
-                                        @if ($editMode['titip']['biaya_tambahan']) style="display:none;" @endif>
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-
-                                    {{-- SAVE --}}
-                                    <button class="btn btn-sm btn-success"
-                                        wire:click="saveStaticBatch('titip','biaya_tambahan')"
-                                        @if (!$editMode['titip']['biaya_tambahan']) style="display:none;" @endif>
-                                        <i class="bi bi-check-lg"></i>
-                                    </button>
-
-                                    {{-- CANCEL --}}
-                                    <button class="btn btn-sm btn-outline-secondary"
-                                        wire:click="toggleEdit('titip','biaya_tambahan')"
-                                        @if (!$editMode['titip']['biaya_tambahan']) style="display:none;" @endif>
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-
-                                </td>
-                            @endcan
-                        </tr>
-
-
-                        {{-- ================= KENAIKAN GAJI TITIP ================= --}}
-                        <tr>
-                            <td class="text-center px-3 py-2">{{ count($indicators) + 2 }}
-                            </td>
-                            <td class="px-3 py-2">Kenaikan Gaji Karyawan/Bonus</td>
-
-                            @foreach ($months as $month)
-                                <td class="text-end px-3 py-2">
-
-                                    {{-- VIEW --}}
-                                    @if (!$editMode['titip']['kenaikan_gaji'])
-                                        <span>
-                                            Rp{{ number_format($staticRows['titip']['kenaikan_gaji']['value_' . $month] ?? 0, 0, ',', '.') }}
-                                        </span>
-                                    @endif
-
-                                    {{-- EDIT --}}
-                                    @if ($editMode['titip']['kenaikan_gaji'])
-                                        <input type="number" class="form-control form-control-sm text-end"
-                                            wire:model.lazy="staticRows.titip.kenaikan_gaji.value_{{ $month }}">
-                                    @endif
-
-                                </td>
-                            @endforeach
-
-                            <td
-                                class="text-end px-3 py-2 fw-bold {{ ($staticRows['titip']['kenaikan_gaji']['total'] ?? 0) < 0 ? 'text-danger' : '' }}">
-                                {{ ($staticRows['titip']['kenaikan_gaji']['total'] ?? 0) < 0 ? '-' : '' }}
-                                Rp{{ number_format(abs($staticRows['titip']['kenaikan_gaji']['total'] ?? 0), 0, ',', '.') }}
-                            </td>
-                            @can('note-edit')
-                                <td class="text-center px-3 py-2" style="width: 100px;">
-
-                                    {{-- EDIT --}}
-                                    <button type="button" class="btn btn-sm btn-outline-warning"
-                                        wire:click="toggleEdit('titip','kenaikan_gaji')"
-                                        @if ($editMode['titip']['kenaikan_gaji']) style="display:none;" @endif>
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-
-                                    {{-- SAVE --}}
-                                    <button type="button" class="btn btn-sm btn-success"
-                                        wire:click="saveStaticBatch('titip','kenaikan_gaji')"
-                                        @if (!$editMode['titip']['kenaikan_gaji']) style="display:none;" @endif>
-                                        <i class="bi bi-check-lg"></i>
-                                    </button>
-
-                                    {{-- CANCEL --}}
-                                    <button type="button" class="btn btn-sm btn-outline-secondary"
-                                        wire:click="toggleEdit('titip','kenaikan_gaji')"
-                                        @if (!$editMode['titip']['kenaikan_gaji']) style="display:none;" @endif>
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-
-                                </td>
-                            @endcan
-                        </tr>
-
-
-                        {{-- ================= TOTAL TITIP ================= --}}
-                        <tr>
-                            <td colspan="2" class="text-center fw-bold px-3 py-2"
-                                style="background-color: #e06c6c; color: white;">
-                                Total Gaji
-                            </td>
-
-                            @foreach ($months as $month)
-                                <td class="text-end fw-bold px-3 py-2"
-                                    style="background-color: #e06c6c; color: white;">
-                                    Rp{{ number_format($totalsTitip[$month] ?? 0, 0, ',', '.') }}
-                                </td>
-                            @endforeach
-
-                            <td class="text-end fw-bold px-3 py-2" style="background-color: #d4956a; color: white;">
-                                {{ ($totalsTitip['grand'] ?? 0) < 0 ? '-' : '' }}
-                                Rp{{ number_format(abs($totalsTitip['grand'] ?? 0), 0, ',', '.') }}
-                            </td>
-                        </tr>
-
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                @endif
             </div>
         </div>
     </div>

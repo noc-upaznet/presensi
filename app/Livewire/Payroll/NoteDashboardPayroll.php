@@ -31,6 +31,8 @@ class NoteDashboardPayroll extends Component
 
     public $indicatorsTitip = [];
 
+    public $branchUHO = false;
+
     public $staticRows = [
         'non_titip' => [
             'biaya_tambahan' => [],
@@ -67,6 +69,12 @@ class NoteDashboardPayroll extends Component
         if (!session()->has('selected_entitas')) {
             session(['selected_entitas' => 'UHO']);
             $selectedEntitas = 'UHO';
+        }
+
+        if ($selectedEntitas !== 'UHO') {
+            $this->branchUHO = false;
+        } else {
+            $this->branchUHO = true;
         }
 
         $this->currentEntitas = $selectedEntitas;
