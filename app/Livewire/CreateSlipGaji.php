@@ -244,9 +244,9 @@ class CreateSlipGaji extends Component
                         $this->cutoffEnd->toDateString(),
                     ])
                     ->where('status', 1)
-                    ->exists();
+                    ->get();
 
-                $this->fee_sharing_nominal = $this->fee_sharing ? 100000 : 0;
+                $this->fee_sharing_nominal = $this->fee_sharing->count() * 100000;
 
                 $this->inovation_reward_jumlah = (int) $this->rekap['kehadiran'];
                 $this->izin_nominal = 0;
