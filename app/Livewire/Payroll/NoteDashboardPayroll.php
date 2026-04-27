@@ -187,6 +187,14 @@ class NoteDashboardPayroll extends Component
                     ->whereBetween('periode', [$start, $end])
                     ->sum('tunjangan_kebudayaan'),
             ],
+            [
+                'label' => 'Insentif',
+                'query' => fn($start, $end) => DB::table('payroll')
+                    ->where('entitas_id', $branch_id)
+                    ->where('titip', $titip)
+                    ->whereBetween('periode', [$start, $end])
+                    ->sum('insentif'),
+            ],
         ];
     }
 
