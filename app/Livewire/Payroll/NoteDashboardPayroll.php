@@ -600,8 +600,8 @@ class NoteDashboardPayroll extends Component
         $entitasAktif = M_Entitas::where('nama', $entitasNama)->first();
         $entitasIdAktif = $entitasAktif?->id;
         $note = DB::table('notes_payroll')
-            ->where('date', '>=', $this->cutoffStart)
-            ->where('date', '<=', $this->cutoffEnd)
+            ->whereYear('date', $this->selectedYear)
+            ->whereMonth('date', $this->selectedMonth)
             ->where('branch_id', $entitasIdAktif)
             ->orderBy('date', 'desc')
             ->get();
