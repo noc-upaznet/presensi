@@ -286,7 +286,10 @@ class EditPayroll extends Component
 
     public function loadData($id)
     {
-        $sharingData = M_Sharing::where('karyawan_id', $this->karyawan->id)
+        $payroll = PayrollModel::findOrFail($id);
+        // dd($payroll);
+
+        $sharingData = M_Sharing::where('karyawan_id', $payroll->karyawan_id)
             ->whereBetween('date', [
                 $this->cutoffStart->toDateString(),
                 $this->cutoffEnd->toDateString(),
@@ -294,11 +297,7 @@ class EditPayroll extends Component
             ->where('status', 1)
             ->get();
 
-        // Set nominal (jumlah data * 100.000)
         $this->fee_sharing = $sharingData->count() * 100000;
-
-        $payroll = PayrollModel::findOrFail($id);
-        // dd($payroll);
 
         $this->karyawan = M_DataKaryawan::findOrFail($payroll->karyawan_id);
         // Data umum
@@ -325,7 +324,7 @@ class EditPayroll extends Component
         $this->uang_makan = 15000;
         $this->uang_makan_jumlah = $payroll->jml_uang_makan;
         $this->transport_jumlah = $payroll->jml_transport;
-        $this->fee_sharing = $payroll->fee_sharing;
+        // $this->fee_sharing = $payroll->fee_sharing;
         $this->kasbon = $payroll->kasbon;
         $this->churn = $payroll->churn;
 
