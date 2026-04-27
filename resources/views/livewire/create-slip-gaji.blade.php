@@ -273,7 +273,7 @@
                                 <div class="input-group mb-2">
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" id="fee_sharing_nominal" class="form-control"
-                                        wire:model.lazy="fee_sharing_nominal">
+                                        wire:model.live="fee_sharing_nominal">
                                 </div>
                             </div>
                         </div>
