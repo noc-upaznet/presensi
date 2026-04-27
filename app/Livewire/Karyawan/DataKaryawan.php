@@ -100,7 +100,7 @@ class DataKaryawan extends Component
                 // Hapus data yang berelasi dengan karyawan_id
                 M_Jadwal::where('karyawan_id', $karyawan->id)->delete();
                 M_Pengajuan::where('karyawan_id', $karyawan->id)->delete();
-                PayrollModel::where('karyawan_id', $karyawan->id)->delete();
+                // PayrollModel::where('karyawan_id', $karyawan->id)->delete();
                 M_Lembur::where('karyawan_id', $karyawan->id)->delete();
                 M_Presensi::where('user_id', $karyawan->id)->delete();
                 User::where('id', $karyawan->user_id)->delete();
