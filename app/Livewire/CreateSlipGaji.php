@@ -245,6 +245,7 @@ class CreateSlipGaji extends Component
                     ])
                     ->where('status', 1)
                     ->get();
+                dd($this->fee_sharing);
 
                 $this->fee_sharing_nominal = $this->fee_sharing->count() * 100000;
 
