@@ -367,7 +367,8 @@
                                     accept=".jpg,.jpeg,.png">
 
                                 @if ($file && is_object($file))
-                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
+                                    <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file->getFilename()) }}"
+                                        wire:key="temp-preview-{{ $file->getFilename() }}"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
                                     <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @elseif ($existingFile)
