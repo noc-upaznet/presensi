@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Traits\CutoffPayrollTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Livewire\WithoutUrlPagination;
 
 class RiwayatPresensiStaff extends Component
@@ -220,6 +221,7 @@ class RiwayatPresensiStaff extends Component
         $karyawanId = $karyawan->id;
         $divisi     = $karyawan->divisi;
         $entitas    = $karyawan->entitas;
+        $jabatan    = $karyawan->jabatan;
 
         // =========================================
         // Resolve Tahun & Bulan (untuk cutoff)
@@ -262,6 +264,12 @@ class RiwayatPresensiStaff extends Component
             if ($divisi === 'NOC') {
                 $query->whereHas('getUser', function ($q) use ($divisi) {
                     $q->where('divisi', $divisi);
+                });
+            } elseif ($divisi === 'Sales Marketing') {
+                // dd($jabatan);
+                $query->whereHas('getUser', function ($q) use ($entitas, $jabatan) {
+                    $q->whereRaw('UPPER(entitas) = ?', [strtoupper($entitas)])
+                        ->whereIn(DB::raw('UPPER(jabatan)'), ['SALES MARKETING', 'GO']);
                 });
             } else {
                 $query->whereHas('getUser', function ($q) use ($divisi, $entitas) {
