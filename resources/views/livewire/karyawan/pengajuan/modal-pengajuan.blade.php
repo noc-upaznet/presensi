@@ -32,14 +32,6 @@
                             @enderror
                         </div>
 
-                        {{-- <div class="mb-3">
-                            <label for="waktu" class="form-label">Waktu</label>
-                            <select class="form-select" id="waktu">
-                                <option value="full">Sehari Penuh</option>
-                                <option value="half">Setengah Hari</option>
-                            </select>
-                        </div> --}}
-
                         <div class="mb-3">
                             <label for="keterangan" class="form-label fw-semibold">Keterangan <small
                                     class="text-danger">*</small></label>
@@ -72,7 +64,8 @@
 
                                 @if ($file && is_object($file))
                                     {{-- Preview file yang dipilih --}}
-                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
+                                    <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file->getFilename()) }}"
+                                        wire:key="temp-preview-{{ $file->getFilename() }}"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
                                     <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @else
@@ -146,14 +139,6 @@
                             @enderror
                         </div>
 
-                        {{-- <div class="mb-3">
-                            <label for="waktu" class="form-label">Waktu</label>
-                            <select class="form-select" id="waktu">
-                                <option value="full">Sehari Penuh</option>
-                                <option value="half">Setengah Hari</option>
-                            </select>
-                        </div> --}}
-
                         <div class="mb-3">
                             <label for="keterangan" class="form-label fw-semibold">Keterangan <small
                                     class="text-danger">*</small></label>
@@ -184,29 +169,16 @@
                                 <input type="file" class="d-none" id="file" wire:model="file"
                                     accept=".jpg,.jpeg,.png">
 
-                                {{-- @if ($file && is_object($file))
-                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
-                                        style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
-                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
-                                @elseif ($existingFile)
-                                    <img src="{{ Storage::disk('s3')->temporaryUrl($existingFile, now()->addMinutes(30)) }}"
-                                        alt="File saat ini"
-                                        style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
-                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
-                                @else
-                                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
-                                    <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
-                                    <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
-                                @endif --}}
-
                                 @if ($file && is_object($file))
                                     {{-- Preview file baru --}}
-                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
+                                    <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file->getFilename()) }}"
+                                        wire:key="temp-preview-{{ $file->getFilename() }}"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
                                     <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @elseif ($existingFile)
                                     {{-- Preview file lama dari public storage --}}
-                                    <img src="{{ asset('storage/' . $existingFile) }}" alt="File saat ini"
+                                    <img src="{{ Storage::disk('s3')->temporaryUrl($existingFile, now()->addMinutes(30)) }}"
+                                        alt="File saat ini"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
                                     <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @else

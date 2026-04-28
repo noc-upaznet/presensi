@@ -172,16 +172,6 @@
                                             @endif
                                         </td>
 
-                                        {{-- <td style="color: var(--bs-body-color);">
-                                            @if ($key->file)
-                                                <img src="{{ asset('storage/' . $key->file) }}" alt="Bukti Dispensasi"
-                                                    style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
-                                                    data-bs-target="#modalGambar"
-                                                    onclick="setModalImage('{{ asset('storage/' . $key->file) }}')">
-                                            @else
-                                                -
-                                            @endif
-                                        </td> --}}
                                         <td style="color: var(--bs-body-color);">
                                             @if ($key->approve_hr == 1)
                                                 <span class="badge bg-success">HRD</span>
@@ -295,7 +285,8 @@
 
                                 @if ($file && is_object($file))
                                     {{-- Preview file yang dipilih --}}
-                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
+                                    <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file->getFilename()) }}"
+                                        wire:key="temp-preview-{{ $file->getFilename() }}"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
                                     <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @else
@@ -388,7 +379,8 @@
                                     accept=".jpg,.jpeg,.png">
 
                                 @if ($file && is_object($file))
-                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
+                                    <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file->getFilename()) }}"
+                                        wire:key="temp-preview-{{ $file->getFilename() }}"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
                                     <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @elseif ($existingFile)
