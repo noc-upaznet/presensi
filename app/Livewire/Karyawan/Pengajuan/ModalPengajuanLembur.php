@@ -2,19 +2,14 @@
 
 namespace App\Livewire\Karyawan\Pengajuan;
 
-use App\Models\User;
 use Livewire\Component;
-use App\Models\M_Jadwal;
 use App\Models\M_Lembur;
-use App\Models\M_Pengajuan;
 use Livewire\WithFileUploads;
 use App\Models\M_DataKaryawan;
 use Illuminate\Support\Carbon;
-use App\Events\PengajuanBaruEvent;
 use App\Livewire\Forms\LemburForm;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ModalPengajuanLembur extends Component
 {
