@@ -22,7 +22,7 @@ class ModalPayroll extends Component
 
             if ($karyawanId) {
                 // Simpan karyawan ID di property Livewire
-                $this->karyawan_id = decrypt($karyawanId); // jika dikirim terenkripsi
+                $this->karyawan_id = decrypt($karyawanId);
 
                 // Load data karyawan langsung
                 $this->loadDataKaryawan($this->karyawan_id);
@@ -56,7 +56,7 @@ class ModalPayroll extends Component
             'year'  => $year,
         ]);
     }
-    
+
     public function render()
     {
         $periode = $this->periode ?? Carbon::now()->format('Y-m');
@@ -67,6 +67,7 @@ class ModalPayroll extends Component
 
         $data = M_DataKaryawan::where('entitas', $selectedEntitas)
             ->whereNotIn('id', $existingKaryawanIds)
+            ->where('status_karyawan', '!=', 'NONAKTIF')
             ->when($this->search, function ($query) {
                 $query->where('nama_karyawan', 'like', '%' . $this->search . '%');
             })
@@ -75,6 +76,7 @@ class ModalPayroll extends Component
 
         $dataEks = M_DataKaryawan::where('entitas', '!=', $selectedEntitas)
             ->whereNotIn('id', $existingKaryawanIds)
+            ->where('status_karyawan', '!=', 'NONAKTIF')
             ->when($this->search, function ($query) {
                 $query->where('nama_karyawan', 'like', '%' . $this->search . '%');
             })
