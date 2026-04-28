@@ -35,11 +35,8 @@
                     <input type="file" class="d-none" id="file" wire:model="photo" accept=".jpg,.jpeg,.png">
 
                     @if ($photo && is_object($photo))
-                        @php
-                            $fileUrl = route('file.profile', encrypt(basename($existingPhoto)));
-                        @endphp
-
-                        <img src="{{ $fileUrl }}"
+                        <img src="{{ asset('storage/livewire-tmp/' . $photo->getFilename()) }}" class="upload-preview"
+                            wire:key="temp-preview-{{ $photo->getFilename() }}"
                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
                         <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                     @elseif ($existingPhoto)
