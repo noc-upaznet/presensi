@@ -366,26 +366,58 @@
                                     accept=".jpg,.jpeg,.png">
 
                                 @if ($file && is_object($file))
-                                    {{-- Preview file yang dipilih --}}
                                     <img src="{{ $file->temporaryUrl() }}" alt="Preview"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
                                     <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+                                @elseif ($existingFile)
+                                    <img src="{{ Storage::disk('s3')->temporaryUrl($existingFile, now()->addMinutes(30)) }}"
+                                        alt="File saat ini"
+                                        style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
+                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @else
-                                    {{-- Belum ada file --}}
                                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
                                     <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
                                     <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
                                 @endif
+
+                                {{-- @if ($file && is_object($file))
+                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
+                                        style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
+                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+                                @elseif ($existingFile)
+                                    <img src="{{ asset('storage/' . $existingFile) }}" alt="File saat ini"
+                                        style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
+                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+                                @else
+                                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
+                                    <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
+                                    <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
+                                @endif --}}
                             </label>
+
+                            {{-- Tombol remove --}}
+                            @if (($file && is_object($file)) || $existingFile)
+                                <button type="button" wire:click="removeFile"
+                                    style="
+                                        margin-top: 8px;
+                                        padding: 4px 12px;
+                                        font-size: 12px;
+                                        border-radius: 8px;
+                                        border: 1px solid #fca5a5;
+                                        background: #fff1f2;
+                                        color: #dc2626;
+                                        cursor: pointer;
+                                    ">
+                                    🗑️ Hapus file
+                                </button>
+                            @endif
 
                             @if (session()->has('error'))
                                 <small class="text-danger">{{ session('error') }}</small>
-                            @else
-                                <small class="text-muted">Ukuran maksimal file: 2MB</small>
                             @endif
 
                             @error('file')
-                                <small class="text-danger d-block">{{ $message }}</small>
+                                <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                     </div>
