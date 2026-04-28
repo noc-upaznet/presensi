@@ -275,7 +275,8 @@
 
                                 @if ($file && is_object($file))
                                     {{-- Preview file yang dipilih --}}
-                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
+                                    <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file->getFilename()) }}"
+                                        wire:key="temp-preview-{{ $file->getFilename() }}"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
                                     <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @else
@@ -379,20 +380,6 @@
                                     <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
                                     <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
                                 @endif
-
-                                {{-- @if ($file && is_object($file))
-                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
-                                        style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
-                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
-                                @elseif ($existingFile)
-                                    <img src="{{ asset('storage/' . $existingFile) }}" alt="File saat ini"
-                                        style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
-                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
-                                @else
-                                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
-                                    <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
-                                    <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
-                                @endif --}}
                             </label>
 
                             {{-- Tombol remove --}}
