@@ -80,7 +80,7 @@ class ModalPengajuan extends Component
         $path = null;
         if ($this->file && is_object($this->file)) {
             $filename = md5(uniqid()) . '.' . $this->file->extension();
-            $path = $this->file->storeAs('file-pengajuan', $filename, 'public');
+            $path = $this->file->storeAs('presensi/file-pengajuan', $filename, 's3');
         }
 
         $data = [
