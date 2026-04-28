@@ -4,17 +4,11 @@ namespace App\Livewire\Karyawan\Pengajuan;
 
 use App\Livewire\Forms\DispensasiForm;
 use App\Models\M_DataKaryawan;
-use App\Models\M_Dispensation;
-use App\Models\M_Presensi;
 use App\Models\M_Sharing;
 use App\Traits\CutoffPayrollTrait;
 use Carbon\Carbon;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 use Livewire\WithoutUrlPagination;
@@ -31,6 +25,10 @@ class Sharing extends Component
     public $filterPengajuan;
     public $filterBulan;
     public $search;
+    public $pengajuanId;
+    public $existingFile;
+    public $editId;
+    public $oldFile;
 
     public function mount()
     {
@@ -71,25 +69,9 @@ class Sharing extends Component
         }
 
         $path = null;
-        // if ($this->file) {
-        //     $filename = md5(uniqid()) . '.' . $this->file->extension();
-        //     $path = $this->file->storeAs('presensi/file-sharing', $filename, 's3');
-        // }
-
         if ($this->file) {
             $filename = md5(uniqid()) . '.' . $this->file->extension();
-
-            $fullPath = 'presensi/file-sharing/' . $filename;
-            $uploaded = Storage::disk('s3')->put(
-                $fullPath,
-                fopen($this->file->getRealPath(), 'r')
-            );
-
-            if (!$uploaded) {
-                throw new \Exception('Upload ke Garage gagal');
-            }
-
-            $path = $fullPath;
+            $path = $this->file->storeAs('presensi/file-sharing', $filename, 's3');
         }
 
         $data = [
@@ -151,6 +133,87 @@ class Sharing extends Component
 
         $pengajuan->save();
 
+        $this->dispatch('refresh');
+    }
+
+    public function showEdit($id)
+    {
+        $pengajuan = M_Sharing::find(decrypt($id));
+        $this->editId = $id;
+        $this->existingFile = $pengajuan->file;
+
+
+        if (!$pengajuan) {
+            return;
+        }
+
+        $user = Auth::user();
+        $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
+
+        if ($dataKaryawan && $pengajuan->karyawan_id == $dataKaryawan->id) {
+            $this->form->date        = Carbon::parse($pengajuan->date)->format('Y-m-d');
+            $this->form->description = $pengajuan->description;
+
+            $this->file = null;
+            $this->oldFile = $pengajuan->file;
+
+            $this->dispatch('modalEditPengajuan', action: 'show');
+        }
+    }
+
+    public function removeFile()
+    {
+        $this->file = null;
+        $this->existingFile = null;
+    }
+
+    public function saveEdit()
+    {
+        $dataPengajuan = M_Sharing::find(decrypt($this->editId));
+        // dd($dataPengajuan);
+        if (!$dataPengajuan) {
+            session()->flash('error', 'Data pengajuan tidak ditemukan!');
+            return;
+        }
+
+        if ($this->file) {
+            // dd($this->file);
+            $this->validate([
+                'file' => 'nullable|max:2048',
+            ], [
+                'file.max' => 'Ukuran file maksimal 2MB.',
+            ]);
+        }
+
+        $path = null;
+        $path = null;
+        if ($this->file) {
+            $filename = md5(uniqid()) . '.' . $this->file->extension();
+            $path = $this->file->storeAs('presensi/file-sharing', $filename, 's3');
+        }
+
+        $data = [
+            'karyawan_id' => M_DataKaryawan::where('user_id', Auth::id())->value('id'),
+            'date'        => $this->form->date,
+            'description' => $this->form->description,
+            'file'        => $path,
+        ];
+        // dd($data);
+
+        $dataPengajuan->update($data);
+        // M_Pengajuan::where('id', Crypt::decrypt($this->form->id))->update($data);
+
+        // Reset input
+        $this->form->reset();
+
+        $this->dispatch('swal', params: [
+            'title' => 'Data Updated',
+            'icon' => 'success',
+            'text' => 'Data has been updated successfully'
+        ]);
+
+        // Tutup modal
+        $this->dispatch('modalEditPengajuan', action: 'hide');
         $this->dispatch('refresh');
     }
 
@@ -225,7 +288,7 @@ class Sharing extends Component
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('id', 'like', '%' . $this->search . '%')
-                    ->orWhere('tanggal', 'like', '%' . $this->search . '%');
+                    ->orWhere('date', 'like', '%' . $this->search . '%');
             });
         }
 
