@@ -254,18 +254,47 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="file" class="form-label fw-semibold">File</label>
-                            <input type="file" wire:model="file" class="form-control" accept="image/*">
-                            @error('file')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                            <small class="text-danger">
-                                @if (session()->has('error'))
-                                    {{ session('error') }}
+                            <label class="form-label fw-semibold">File Bukti</label>
+
+                            <label for="file"
+                                style="
+                                    display: block;
+                                    border: 2px dashed #cbd5e1;
+                                    border-radius: 12px;
+                                    padding: 1.5rem;
+                                    text-align: center;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                    background: #f8fafc;
+                                "
+                                onmouseover="this.style.borderColor='#6366f1';this.style.background='#f5f3ff'"
+                                onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#f8fafc'">
+
+                                <input type="file" class="d-none" id="file" wire:model="file"
+                                    accept=".jpg,.jpeg,.png">
+
+                                @if ($file && is_object($file))
+                                    {{-- Preview file yang dipilih --}}
+                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
+                                        style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
+                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @else
-                                    Ukuran maksimal file: 2MB
+                                    {{-- Belum ada file --}}
+                                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
+                                    <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
+                                    <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
                                 @endif
-                            </small>
+                            </label>
+
+                            @if (session()->has('error'))
+                                <small class="text-danger">{{ session('error') }}</small>
+                            @else
+                                <small class="text-muted">Ukuran maksimal file: 2MB</small>
+                            @endif
+
+                            @error('file')
+                                <small class="text-danger d-block">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
 
@@ -278,6 +307,98 @@
                             </div>
                             <span wire:loading.remove wire:target="store"><i class="fa fa-save"></i> Simpan</span>
                             <span wire:loading wire:target="store">Loading...</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary w-100 w-md-auto"
+                            data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div wire:ignore.self class="modal fade" id="modalEditPengajuan" tabindex="-1"
+        aria-labelledby="modalEditPengajuanLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-info">
+                    <h5 class="modal-title text-white" id="modalEditPengajuanLabel">Pengajuan Fee Sharing</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+
+                <form>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label for="tanggal" class="form-label fw-semibold">Tanggal <small
+                                    class="text-danger">*</small></label>
+                            <input type="date" class="form-control" id="tanggal" wire:model="form.date">
+                            @error('form.date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="keterangan" class="form-label fw-semibold">Keterangan <small
+                                    class="text-danger">*</small></label>
+                            <input type="text" class="form-control" id="keterangan"
+                                placeholder="Contoh: Materi Marketing" wire:model="form.description">
+                            @error('form.description')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">File Bukti</label>
+
+                            <label for="file"
+                                style="
+                                    display: block;
+                                    border: 2px dashed #cbd5e1;
+                                    border-radius: 12px;
+                                    padding: 1.5rem;
+                                    text-align: center;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                    background: #f8fafc;
+                                "
+                                onmouseover="this.style.borderColor='#6366f1';this.style.background='#f5f3ff'"
+                                onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#f8fafc'">
+
+                                <input type="file" class="d-none" id="file" wire:model="file"
+                                    accept=".jpg,.jpeg,.png">
+
+                                @if ($file && is_object($file))
+                                    {{-- Preview file yang dipilih --}}
+                                    <img src="{{ $file->temporaryUrl() }}" alt="Preview"
+                                        style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
+                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+                                @else
+                                    {{-- Belum ada file --}}
+                                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
+                                    <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
+                                    <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
+                                @endif
+                            </label>
+
+                            @if (session()->has('error'))
+                                <small class="text-danger">{{ session('error') }}</small>
+                            @else
+                                <small class="text-muted">Ukuran maksimal file: 2MB</small>
+                            @endif
+
+                            @error('file')
+                                <small class="text-danger d-block">{{ $message }}</small>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary  w-100 w-md-auto" wire:click='saveEdit'
+                            wire:loading.attr="disabled" wire:target="saveEdit">
+                            <div wire:loading wire:target="saveEdit" class="spinner-border spinner-border-sm"
+                                role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <span wire:loading.remove wire:target="saveEdit"><i class="fa fa-save"></i> Simpan</span>
+                            <span wire:loading wire:target="saveEdit">Loading...</span>
                         </button>
                         <button type="button" class="btn btn-secondary w-100 w-md-auto"
                             data-bs-dismiss="modal">Cancel</button>
@@ -334,8 +455,8 @@
             $('#modalTambahPengajuan').modal(event.action);
         });
 
-        Livewire.on('modalEditPengajuanLembur', (event) => {
-            $('#modalEditPengajuanLembur').modal(event.action);
+        Livewire.on('modalEditPengajuan', (event) => {
+            $('#modalEditPengajuan').modal(event.action);
         });
 
         // Livewire.on('modalEditJadwal', (event) => {
