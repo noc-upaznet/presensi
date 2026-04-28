@@ -516,7 +516,7 @@ class NoteDashboardPayroll extends Component
     public function saveNote()
     {
         $this->validate([
-            'note'   => 'required|string|max:255',
+            'note'   => 'required|string',
             'tittle' => 'nullable|string|max:255',
         ]);
 
