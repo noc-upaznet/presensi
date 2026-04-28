@@ -216,7 +216,7 @@
                                             <tr>
                                                 <th>No. Slip</th>
                                                 <th>Nama</th>
-                                                <th>NIP Karyawan</th>
+                                                {{-- <th>NIP Karyawan</th> --}}
                                                 <th>Departemen</th>
                                                 <th>Bulan</th>
                                                 <th>Grand Total</th>
@@ -237,7 +237,7 @@
                                                     <tr>
                                                         <td>{{ $payroll->no_slip }}</td>
                                                         <td>{{ $payroll->getKaryawan->nama_karyawan }}</td>
-                                                        <td>{{ $payroll->nip_karyawan }}</td>
+                                                        {{-- <td>{{ $payroll->nip_karyawan }}</td> --}}
                                                         <td>{{ $payroll->divisi }}</td>
                                                         <td>{{ $payroll->periode }}</td>
                                                         <td>Rp.
