@@ -65,7 +65,7 @@ class ModalJadwalShift extends Component
             ->toArray();
         // dd($jadwalId);
 
-        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk|spv-sales')) {
+        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
@@ -74,6 +74,21 @@ class ModalJadwalShift extends Component
                 ->whereNotIn('id', $jadwalId)
                 ->orderBy('nama_karyawan')
                 ->get();
+        } elseif ($user->hasRole('spv-sales')) {
+            $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+
+            $divisi  = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+            $jabatan = $karyawan->jabatan;
+
+            $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
+                ->whereIn('divisi', [$divisi, 'Support'])
+                ->whereIn('jabatan', [$jabatan, 'GO'])
+                ->whereNotIn('id', $jadwalId)
+                ->orderBy('nama_karyawan')
+                ->get();
+
+            // dd($this->karyawans);
         } elseif ($user->hasAnyRole('admin|hr')) {
             $entitas = session('selected_entitas', 'UHO');
             $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
@@ -325,13 +340,27 @@ class ModalJadwalShift extends Component
 
     public function mount(IndonesiaHolidayService $holidayService)
     {
-        $this->bulan_tahun = now()->format('Y-m');
+
+        $today = Carbon::today();
+
+        $year  = $today->year;
+        $month = $today->month;
+
+        if ($today->day >= 26) {
+            $month++;
+            if ($month > 12) {
+                $month = 1;
+                $year++;
+            }
+        }
+        $this->bulan_tahun = sprintf('%04d-%02d', $year, $month);
+        // $this->filterBulan = sprintf('%04d-%02d', $year, $month);
         $user = Auth::user();
         $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
         $jadwalId = M_Jadwal::where('bulan_tahun', $this->bulan_tahun)
             ->pluck('karyawan_id')
             ->toArray();
-        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk|spv-sales')) {
+        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
 
@@ -340,6 +369,21 @@ class ModalJadwalShift extends Component
                 ->whereNotIn('id', $jadwalId) // filter
                 ->orderBy('nama_karyawan')
                 ->get();
+        } elseif ($user->hasRole('spv-sales')) {
+            $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+
+            $divisi  = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+            $jabatan = $karyawan->jabatan;
+
+            $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
+                ->whereIn('divisi', [$divisi, 'Support'])
+                ->whereIn('jabatan', [$jabatan, 'GO'])
+                ->whereNotIn('id', $jadwalId)
+                ->orderBy('nama_karyawan')
+                ->get();
+
+            // dd($this->karyawans);
         } elseif ($user->hasRole('branch-manager')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $entitasUser = M_DataKaryawan::where('user_id', $user->id)->first()->entitas;
