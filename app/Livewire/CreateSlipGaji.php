@@ -275,9 +275,13 @@ class CreateSlipGaji extends Component
 
             if (!empty($this->bpjsKaryawan->no_bpjs)) {
                 $this->bpjs_digunakan = true;
+                $this->bpjs_perusahaan_digunakan = true;
+                $this->updatedBpjsPerusahaanDigunakan();
             }
             if (!empty($this->bpjsKaryawan->no_bpjs_tk)) {
                 $this->bpjs_jht_digunakan = true;
+                $this->bpjs_jht_perusahaan_digunakan = true;
+                $this->updatedBpjsJhtPerusahaanDigunakan();
             }
 
             // $currentBranch = session('selected_entitas', 'UHO');
