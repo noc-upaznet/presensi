@@ -792,13 +792,13 @@ class EditPayroll extends Component
                 - $churn
                 - $this->bpjs_jht_nominal
         );
-        if (
-            isset($this->entitas, $this->jabatan) &&
-            strtoupper(trim($this->entitas)) === 'UNB' &&
-            strtolower(trim($this->jabatan)) === 'branch manager'
-        ) {
-            $totalGaji -= ($this->bpjs_perusahaan + $this->bpjs_jht_perusahaan);
-        }
+        // if (
+        //     isset($this->entitas, $this->jabatan) &&
+        //     strtoupper(trim($this->entitas)) === 'UNB' &&
+        //     strtolower(trim($this->jabatan)) === 'branch manager'
+        // ) {
+        //     $totalGaji -= ($this->bpjs_perusahaan + $this->bpjs_jht_perusahaan);
+        // }
         $this->total_gaji = $totalGaji;
         // dd($this->total_gaji);
     }
