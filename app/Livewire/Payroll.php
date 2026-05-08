@@ -69,6 +69,7 @@ class Payroll extends Component
     public $note;
     public $tittle;
     public $noteId;
+    public $kasbon;
 
     public $year;
     public $month;
@@ -273,6 +274,9 @@ class Payroll extends Component
             ->where('periode', $this->periode)
             ->where('titip', 1)
             ->sum('churn');
+        $this->kasbon = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', $this->periode)
+            ->sum('kasbon');
     }
 
     public function createSlipGaji($month, $year)

@@ -15,14 +15,15 @@ class DashboardPayroll extends Component
 
     public $periode;
 
-    public $total_gaji = 0;
-    public $total_gaji_titip = 0;
-    public $bpjs_kes_pt = 0;
-    public $bpjs_jht_pt = 0;
-    public $potongan_terlambat = 0;
-    public $potongan_terlambat_titip = 0;
-    public $churn = 0;
-    public $churn_titip = 0;
+    public $total_gaji;
+    public $total_gaji_titip;
+    public $bpjs_kes_pt;
+    public $bpjs_jht_pt;
+    public $potongan_terlambat;
+    public $potongan_terlambat_titip;
+    public $churn;
+    public $churn_titip;
+    public $kasbon;
 
     public $currentEntitas;
 
@@ -123,6 +124,10 @@ class DashboardPayroll extends Component
             ->where('periode', $this->periode)
             ->where('titip', 1)
             ->sum('churn');
+
+        $this->kasbon = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            ->where('periode', $this->periode)
+            ->sum('kasbon');
     }
 
     public function render()
