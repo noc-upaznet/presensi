@@ -310,7 +310,7 @@
                                     oninput="this.value = this.value.toUpperCase()" /> --}}
                                 <select name="" class="form-select" id="tax-status"
                                     wire:model="form.tax_status">
-                                    <option value="">-- Pilih Status Pajak --</option>
+                                    <option value="" disabled>-- Pilih Status Pajak --</option>
                                     <option value="TK/0">TK/0</option>
                                     <option value="K/0">K/0</option>
                                     <option value="K/1">K/1</option>
