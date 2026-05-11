@@ -305,9 +305,18 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="tax-status" class="form-label">Status Pajak</label>
-                                <input class="form-control" id="tax-status" wire:model="form.tax_status"
+                                {{-- <input class="form-control" id="tax-status" wire:model="form.tax_status"
                                     placeholder="Masukkan Status Pajak (PTKP)"
-                                    oninput="this.value = this.value.toUpperCase()" />
+                                    oninput="this.value = this.value.toUpperCase()" /> --}}
+                                <select name="" class="form-select" id="tax-status"
+                                    wire:model="form.tax_status">
+                                    <option value="">-- Pilih Status Pajak --</option>
+                                    <option value="TK/0">TK/0</option>
+                                    <option value="K/0">K/0</option>
+                                    <option value="K/1">K/1</option>
+                                    <option value="K/2">K/2</option>
+                                    <option value="K/3">K/3</option>
+                                </select>
                                 @error('form.tax_status')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
