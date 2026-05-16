@@ -209,7 +209,22 @@
                                         <i class="fas fa-square-check"></i> Publish All
                                     </button>
                                 </div>
-                                <h5 class="text-secondary mb-3">Data Slip Karyawan {{ $currentEntitas }}</h5>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="text-secondary mb-3">Data Slip Karyawan {{ $currentEntitas }}</h5>
+                                    @can('payroll-create')
+                                        <button type="button" wire:click="generateMassal" class="btn btn-primary mb-3"
+                                            wire:loading.attr="disabled" wire:target="generateMassal">
+                                            <div wire:loading wire:target="generateMassal"
+                                                class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <span wire:loading.remove wire:target="generateMassal">
+                                                <i class="fas fa-cogs"></i> GENERATE SLIP MASSAL
+                                            </span>
+                                            <span wire:loading wire:target="generateMassal">Loading...</span>
+                                        </button>
+                                    @endcan
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-bordered">
                                         <thead>

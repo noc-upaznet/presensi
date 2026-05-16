@@ -11,6 +11,7 @@ use App\Exports\PayrollExport;
 use App\Models\M_DataKaryawan;
 use App\Models\JenisPotonganModel;
 use App\Models\JenisTunjanganModel;
+use App\Services\PayrollService;
 use App\Traits\CutoffPayrollTrait;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
@@ -104,11 +105,15 @@ class Payroll extends Component
         $this->periode  = $this->selectedYear . '-' . $bulanFormatted;
 
         // Hitung tanggal cutoff
-        $cutoffEnd   = \Carbon\Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 25);
-        $cutoffStart = $cutoffEnd->copy()->subMonthNoOverflow()->setDay(26);
+        $cutoff = $this->resolveCutoff(
+            $this->selectedYear,
+            $this->selectedMonth,
+            'cutoff_25'
+        );
 
-        $this->cutoffStart = $cutoffStart->format('Y-m-d');
-        $this->cutoffEnd   = $cutoffEnd->format('Y-m-d');
+        $this->cutoffStart = $cutoff['start'];
+        $this->cutoffEnd   = $cutoff['end'];
+        $this->periode     = $cutoff['bulanTahun'];
 
         $this->jenis_tunjangan = JenisTunjanganModel::all();
         $this->jenis_potongan  = JenisPotonganModel::all();
@@ -509,6 +514,54 @@ class Payroll extends Component
         $this->periode = $this->selectedYear . '-' . str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
         // dd($this->periode);
         $this->dispatch('modalPayrollEks', action: 'show', periode: $this->periode);
+    }
+
+    public function generateMassal()
+    {
+        $service = new PayrollService();
+
+        // 🔥 ambil cutoff dari trait (INI YANG BENAR)
+        $cutoff = $this->resolveCutoff(
+            $this->selectedYear,
+            $this->selectedMonth,
+            'cutoff_25' // atau pakai property kalau dinamis
+        );
+
+        $cutoffStart = $cutoff['start'];
+        $cutoffEnd   = $cutoff['end'];
+        $periode     = $cutoff['bulanTahun'];
+
+        $karyawans = M_DataKaryawan::where('entitas', session('selected_entitas', 'UHO'))
+            ->where('status_karyawan', '!=', 'NONAKTIF')
+            ->get();
+        // dd($cutoffStart, $cutoffEnd, $periode, $karyawans->count());
+        foreach ($karyawans as $karyawan) {
+
+            // ❗ anti duplicate
+            $exists = PayrollModel::where('karyawan_id', $karyawan->id)
+                ->where('periode', $periode)
+                ->exists();
+
+            if ($exists) continue;
+
+            $service->generate(
+                $karyawan->id,
+                $cutoffStart,
+                $cutoffEnd,
+                $periode
+            );
+        }
+
+        $this->dispatch(
+            'swal',
+            params: [
+                'title' => 'Data Saved',
+                'icon' => 'success',
+                'text' => 'Payroll has been generated successfully',
+                'showConfirmButton' => false,
+                'timer' => 1500
+            ]
+        );
     }
 
     public function render()
