@@ -57,6 +57,8 @@ class M_DataKaryawan extends Model
         'penanggung',
         'poin',
         'tax_status',
+        'tunjangan_coc',
+        'tunjangan_kinerja',
     ];
 
     public function getJadwal()
@@ -106,9 +108,4 @@ class M_DataKaryawan extends Model
             ->whereIn('status', [0, 1])
             ->whereNull('deleted_at');
     }
-
-    // public function jadwal()
-    // {
-    //     return $this->hasOne(M_Jadwal::class, 'id_karyawan', 'id');
-    // }
 }
