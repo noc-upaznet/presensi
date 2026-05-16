@@ -108,6 +108,8 @@ class ModalKaryawan extends Component
             'tgl_aktif_bpjs' => $this->form->tgl_aktif_bpjs,
             'penanggung' => $this->form->penanggung,
             'tax_status' => $this->form->tax_status,
+            'tunjangan_coc' => $this->form->tunjangan_coc,
+            'tunjangan_kinerja' => $this->form->tunjangan_kinerja,
         ];
         // dd($data);
         User::where('id', $ticket->user_id)->update([

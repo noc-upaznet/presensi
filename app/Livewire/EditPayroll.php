@@ -121,6 +121,8 @@ class EditPayroll extends Component
     public $churn = 0;
     public $entitas;
     public $voucher;
+    public $tunjangan_coc;
+    public $tunjangan_kinerja;
 
 
     public function mount($id)
@@ -309,6 +311,9 @@ class EditPayroll extends Component
         // $this->nama_karyawan = $this->karyawan->nama_karyawan ?? '';
         $this->nip_karyawan = $payroll->nip_karyawan;
         $this->divisi = $payroll->divisi;
+
+        $this->tunjangan_coc = $this->karyawan->tunjangan_coc ?? 0;
+        $this->tunjangan_kinerja = $this->karyawan->tunjangan_kinerja ?? 0;
 
         // Komponen gaji
         $this->gaji_pokok = $payroll->gaji_pokok;
@@ -726,6 +731,8 @@ class EditPayroll extends Component
         $kasbon            = $this->numericValue($this->kasbon ?? 0);
         $voucher            = $this->numericValue($this->voucher ?? 0);
         $churn            = $this->numericValue($this->churn ?? 0);
+        $tunjanganCoc      = $this->numericValue($this->tunjangan_coc ?? 0);
+        $tunjanganKinerja  = $this->numericValue($this->tunjangan_kinerja ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -783,6 +790,8 @@ class EditPayroll extends Component
                 + $transport
                 + $uangMakan
                 + $inovationReward
+                + $tunjanganCoc
+                + $tunjanganKinerja
                 - $totalPotonganManual
                 - $this->izin_nominal
                 - $this->terlambat_nominal
@@ -929,6 +938,8 @@ class EditPayroll extends Component
             'bpjs_jht' => $this->bpjs_jht_nominal,
             'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
             'total_gaji' => $this->total_gaji,
+            'tunjangan_coc' => $this->tunjangan_coc,
+            'tunjangan_kinerja' => $this->tunjangan_kinerja,
         ];
         // dd($data);
         $payroll->update($data);

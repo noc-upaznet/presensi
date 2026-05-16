@@ -90,6 +90,8 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
             'Insentif',
             'Churn',
             'Uang Makan',
+            'Tunjangan Standar Coc',
+            'Tunjangan Kinerja',
         ];
 
         $header = array_merge(
@@ -134,6 +136,8 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 $item->insentif,
                 $item->churn,
                 $item->uang_makan,
+                $item->tunjangan_coc,
+                $item->tunjangan_kinerja,
             ];
 
             foreach ($this->uniqueTunjangan as $nama) {
@@ -156,6 +160,8 @@ class PayrollSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize, 
                 + ($item->uang_makan ?? 0)
                 + ($item->fee_sharing ?? 0)
                 + ($item->insentif ?? 0)
+                + (intval($item->tunjangan_coc) ?? 0)
+                + (intval($item->tunjangan_kinerja) ?? 0)
                 + ($item->inov_reward ?? 0);
             // dd($pendapatan);
 

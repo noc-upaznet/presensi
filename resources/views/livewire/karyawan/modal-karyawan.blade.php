@@ -413,6 +413,30 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
+                                <label for="tunjangan_coc" class="form-label">Tunjangan COC Standar</label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="tunjangan_coc">Rp.</span>
+                                    <input type="text" class="form-control" id="tunjangan_coc"
+                                        oninput="formatRupiah(this)" wire:model.lazy="form.tunjangan_coc" />
+                                </div>
+                                @error('form.tunjangan_coc')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tunjangan_kinerja" class="form-label">Tunjangan Kinerja</label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="tunjangan_kinerja">Rp.</span>
+                                    <input type="text" class="form-control" id="tunjangan_kinerja"
+                                        oninput="formatRupiah(this)" wire:model.lazy="form.tunjangan_kinerja" />
+                                </div>
+                                @error('form.tunjangan_kinerja')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
                                 <label for="voucher" class="form-label">Voucher</label>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text" id="voucher">Rp.</span>

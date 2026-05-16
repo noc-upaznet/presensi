@@ -247,7 +247,7 @@
             $tunjangan = json_decode($data->tunjangan, true);
             $potongan = json_decode($data->potongan, true);
         @endphp
-        @php
+        {{-- @php
             use Carbon\Carbon;
 
             $rekap = json_decode($data->rekap, true);
@@ -281,7 +281,7 @@
             // POTONGAN MIGRASI CUT-OFF
             // ===============================
             $selisihProrata = round($hariMigrasi * $gajiPerHari);
-        @endphp
+        @endphp --}}
 
         <table style="width: calc(100% - 40px); margin: 10px 20px 0 20px; border-collapse: collapse;">
             <thead>
@@ -300,6 +300,8 @@
                     $data->transport +
                     $data->fee_sharing +
                     $data->insentif +
+                    intVal($data->tunjangan_coc) +
+                    intVal($data->tunjangan_kinerja) +
                     $data->inov_reward;
             @endphp
 
@@ -357,6 +359,17 @@
                     </tr>
                 @endif
 
+                @if ($data->divisi == 'Teknisi')
+                    <tr>
+                        <td>Tunjangan Standar Coc</td>
+                        <td class="text-right">Rp. {{ number_format(intVal($data->tunjangan_coc)) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tunjangan Kinerja</td>
+                        <td class="text-right">Rp. {{ number_format(intVal($data->tunjangan_kinerja)) }}</td>
+                    </tr>
+                @endif
+
                 <tr style="border-bottom: 1px solid blue;">
                     <th>Total Pendapatan</th>
                     <th class="text-right">Rp. {{ number_format($totalPendapatan) }}</th>
@@ -373,13 +386,7 @@
             </thead>
             @if ($data->getKaryawan->jabatan == 'Branch Manager' || $data->getkaryawan->entitas == 'UNB')
                 @php
-                    $totalPotongan =
-                        $data->bpjs_jht +
-                        $data->bpjs +
-                        $data->izin +
-                        $data->terlambat +
-                        $data->kasbon +
-                        $data->bpjs_jht_perusahaan;
+                    $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon;
                 @endphp
             @else
                 @php
@@ -432,20 +439,10 @@
                     <td>Kesehatan</td>
                     <td class="text-right">Rp. {{ number_format($data->bpjs) }}</td>
                 </tr>
-                @if ($data->getKaryawan->jabatan == 'Branch Manager' || $data->getkaryawan->entitas == 'UNB')
+                {{-- @if ($data->getKaryawan->jabatan == 'Branch Manager' || $data->getkaryawan->entitas == 'UNB')
                     <tr>
                         <td>JHT PT</td>
                         <td class="text-right">Rp. {{ number_format($data->bpjs_jht_perusahaan) }}</td>
-                    </tr>
-                @endif
-                {{-- @if ($selisihProrata > 0)
-                    <tr style="background-color: rgba(255, 235, 59, 0.5);">
-                        <td>
-                            Potongan Migrasi Cut-Off
-                        </td>
-                        <td class="text-right">
-                            (Rp. {{ number_format($selisihProrata) }})
-                        </td>
                     </tr>
                 @endif --}}
                 <tr style="border-bottom: 1px solid red;">

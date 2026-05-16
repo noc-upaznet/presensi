@@ -257,6 +257,8 @@
                     $data->transport +
                     $data->fee_sharing +
                     $data->insentif +
+                    intVal($data->tunjangan_coc) +
+                    intVal($data->tunjangan_kinerja) +
                     $data->inov_reward;
             @endphp
             {{-- @php
@@ -347,7 +349,16 @@
                         <td class="text-right">Rp. {{ number_format($data->insentif) }}</td>
                     </tr>
                 @endif
-
+                @if ($data->divisi == 'Teknisi')
+                    <tr>
+                        <td>Tunjangan Standar Coc</td>
+                        <td class="text-right">Rp. {{ number_format(intVal($data->tunjangan_coc)) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tunjangan Kinerja</td>
+                        <td class="text-right">Rp. {{ number_format(intVal($data->tunjangan_kinerja)) }}</td>
+                    </tr>
+                @endif
                 <tr style="border-bottom: 1px solid blue;">
                     <th>Total Pendapatan</th>
                     <th class="text-right">Rp. {{ number_format($totalPendapatan) }}</th>
@@ -364,14 +375,7 @@
             </thead>
             @if ($data->getKaryawan->jabatan == 'Branch Manager' || $data->getkaryawan->entitas == 'UNB')
                 @php
-                    $totalPotongan =
-                        $data->bpjs_jht +
-                        $data->bpjs +
-                        $data->izin +
-                        $data->terlambat +
-                        $data->kasbon +
-                        $data->bpjs_jht_perusahaan +
-                        $data->bpjs_perusahaan;
+                    $totalPotongan = $data->bpjs_jht + $data->bpjs + $data->izin + $data->terlambat + $data->kasbon;
                 @endphp
             @else
                 @php
@@ -429,7 +433,7 @@
                     <td>Kesehatan</td>
                     <td class="text-right">Rp. {{ number_format($data->bpjs) }}</td>
                 </tr>
-                @if ($data->getKaryawan->jabatan == 'Branch Manager' || $data->getkaryawan->entitas == 'UNB')
+                {{-- @if ($data->getKaryawan->jabatan == 'Branch Manager' || $data->getkaryawan->entitas == 'UNB')
                     <tr>
                         <td>JHT PT</td>
                         <td class="text-right">Rp. {{ number_format($data->bpjs_jht_perusahaan) }}</td>
@@ -438,7 +442,7 @@
                         <td>Kesehatan PT</td>
                         <td class="text-right">Rp. {{ number_format($data->bpjs_perusahaan) }}</td>
                     </tr>
-                @endif
+                @endif --}}
                 <tr style="border-bottom: 1px solid red;">
                     <th>Total Potongan</th>
                     <th class="text-right">Rp. {{ number_format($totalPotongan) }}</th>

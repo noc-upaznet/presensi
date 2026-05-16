@@ -131,6 +131,8 @@ class CreateSlipGaji extends Component
 
     public $kasbonAktif = null;
     public $kasbonPotong = 0;
+    public $tunjangan_coc;
+    public $tunjangan_kinerja;
 
     public function mount($id = null, $month = null, $year = null)
     {
@@ -361,6 +363,8 @@ class CreateSlipGaji extends Component
             });
 
             $this->kasbon = $this->kasbonPotong;
+            $this->tunjangan_coc = $dataKaryawan->tunjangan_coc ?? 0;
+            $this->tunjangan_kinerja = $dataKaryawan->tunjangan_kinerja ?? 0;
         }
 
         $this->hitungInovationReward();
@@ -995,6 +999,8 @@ class CreateSlipGaji extends Component
         $churn             = $this->numericValue($this->churn ?? 0);
         $bpjsJhtPT         = $this->numericValue($this->bpjs_jht_perusahaan_nominal ?? 0);
         $bpjsPT            = $this->numericValue($this->bpjs_perusahaan_nominal ?? 0);
+        $tunjanganCoc      = $this->numericValue($this->tunjangan_coc ?? 0);
+        $tunjanganKinerja      = $this->numericValue($this->tunjangan_kinerja ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -1082,6 +1088,8 @@ class CreateSlipGaji extends Component
                 - $potonganTerlambat
                 - $this->bpjs_nominal
                 - $this->bpjs_jht_nominal
+                + $tunjanganCoc
+                + $tunjanganKinerja
         );
         // dd(strtoupper($this->entitas), strtolower($this->jabatan));
         // if (
@@ -1132,7 +1140,6 @@ class CreateSlipGaji extends Component
             'jml_psb' => $this->jml_psb,
             'churn' => $this->churn,
             'kasbon' => $this->kasbon,
-            'tunjangan_kebudayaan' => $this->kebudayaan,
             'voucher' => $this->voucher,
             'rekap' => json_encode($this->rekap),
             'total_gaji' => (int) $this->total_gaji,
@@ -1140,6 +1147,8 @@ class CreateSlipGaji extends Component
             'bpjs_perusahaan' => $this->bpjs_perusahaan_nominal,
             'bpjs_jht_perusahaan' => $this->bpjs_jht_perusahaan_nominal,
             'tunjangan_kebudayaan' => $this->numericValue($this->kebudayaan),
+            'tunjangan_coc' => $this->numericValue($this->tunjangan_coc),
+            'tunjangan_kinerja' => $this->numericValue($this->tunjangan_kinerja),
         ];
         // dd($data);
         // dd($this->kasbonAktif);

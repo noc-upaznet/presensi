@@ -278,6 +278,25 @@
                             </div>
                         </div>
 
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="tunjangan_coc" class="form-label fw-semibold">Tunjangan Coc</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input name="tunjangan_coc" class="form-control" wire:model.lazy="tunjangan_coc">
+                                </div>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="tunjangan_kinerja" class="form-label fw-semibold">Tunjangan
+                                    Kinerja</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="tunjangan_kinerja" class="form-control"
+                                        wire:model.lazy="tunjangan_kinerja">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label for="potongan" class="form-label fw-semibold">Tunjangan</label>
                             @foreach ($tunjangan as $index => $item)

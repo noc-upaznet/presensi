@@ -44,6 +44,8 @@ class PayrollModel extends Model
         'rekap',
         'total_gaji',
         'periode',
+        'tunjangan_coc',
+        'tunjangan_kinerja',
     ];
 
     public function getKaryawan()
