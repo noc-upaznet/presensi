@@ -133,6 +133,7 @@ class CreateSlipGaji extends Component
     public $kasbonPotong = 0;
     public $tunjangan_coc;
     public $tunjangan_kinerja;
+    public $insentif_tot;
 
     public function mount($id = null, $month = null, $year = null)
     {
@@ -1001,6 +1002,7 @@ class CreateSlipGaji extends Component
         $bpjsPT            = $this->numericValue($this->bpjs_perusahaan_nominal ?? 0);
         $tunjanganCoc      = $this->numericValue($this->tunjangan_coc ?? 0);
         $tunjanganKinerja      = $this->numericValue($this->tunjangan_kinerja ?? 0);
+        $insentifTot      = $this->numericValue($this->insentif_tot ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -1090,6 +1092,7 @@ class CreateSlipGaji extends Component
                 - $this->bpjs_jht_nominal
                 + $tunjanganCoc
                 + $tunjanganKinerja
+                + $insentifTot
         );
         // dd(strtoupper($this->entitas), strtolower($this->jabatan));
         // if (
@@ -1149,6 +1152,7 @@ class CreateSlipGaji extends Component
             'tunjangan_kebudayaan' => $this->numericValue($this->kebudayaan),
             'tunjangan_coc' => $this->numericValue($this->tunjangan_coc),
             'tunjangan_kinerja' => $this->numericValue($this->tunjangan_kinerja),
+            'insentif_tot' => $this->numericValue($this->insentif_tot),
         ];
         // dd($data);
         // dd($this->kasbonAktif);
