@@ -435,6 +435,17 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="insentif_tot" class="form-label">Insentif Tim Of Tim</label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="insentif_tot">Rp.</span>
+                                <input type="text" class="form-control" id="insentif_tot"
+                                    oninput="formatRupiah(this)" wire:model.lazy="form.insentif_tot" />
+                            </div>
+                            @error('form.insentif_tot')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="voucher" class="form-label">Voucher</label>

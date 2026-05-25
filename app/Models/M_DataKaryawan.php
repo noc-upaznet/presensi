@@ -59,6 +59,7 @@ class M_DataKaryawan extends Model
         'tax_status',
         'tunjangan_coc',
         'tunjangan_kinerja',
+        'insentif_tot',
     ];
 
     public function getJadwal()

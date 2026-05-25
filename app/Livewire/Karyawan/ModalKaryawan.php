@@ -110,6 +110,7 @@ class ModalKaryawan extends Component
             'tax_status' => $this->form->tax_status,
             'tunjangan_coc' => $this->form->tunjangan_coc,
             'tunjangan_kinerja' => $this->form->tunjangan_kinerja,
+            'insentif_tot' => $this->form->insentif_tot,
         ];
         // dd($data);
         User::where('id', $ticket->user_id)->update([

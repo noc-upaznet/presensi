@@ -125,6 +125,7 @@ class TambahDataKaryawanForm extends Form
     public $nomorVISA;
     public $tunjangan_coc;
     public $tunjangan_kinerja;
+    public $insentif_tot;
 
     public bool $gunakanAlamatKTP = false;
 
