@@ -366,6 +366,7 @@ class CreateSlipGaji extends Component
             $this->kasbon = $this->kasbonPotong;
             $this->tunjangan_coc = $dataKaryawan->tunjangan_coc ?? 0;
             $this->tunjangan_kinerja = $dataKaryawan->tunjangan_kinerja ?? 0;
+            $this->insentif_tot = $dataKaryawan->insentif_tot ?? 0;
         }
 
         $this->hitungInovationReward();

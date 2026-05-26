@@ -276,6 +276,14 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="insentif_tot" class="form-label fw-semibold">Insentif Tim Of Tim</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" id="insentif_tot" class="form-control"
+                                    wire:model.lazy="insentif_tot">
+                            </div>
+                        </div>
 
                         <div class="mb-3">
                             <label for="potongan" class="form-label fw-semibold">Tunjangan</label>

@@ -123,6 +123,7 @@ class EditPayroll extends Component
     public $voucher;
     public $tunjangan_coc;
     public $tunjangan_kinerja;
+    public $insentif_tot;
 
 
     public function mount($id)
@@ -314,6 +315,7 @@ class EditPayroll extends Component
 
         $this->tunjangan_coc = $this->karyawan->tunjangan_coc ?? 0;
         $this->tunjangan_kinerja = $this->karyawan->tunjangan_kinerja ?? 0;
+        $this->insentif_tot = $this->karyawan->insentif_tot ?? 0;
 
         // Komponen gaji
         $this->gaji_pokok = $payroll->gaji_pokok;
@@ -733,6 +735,7 @@ class EditPayroll extends Component
         $churn            = $this->numericValue($this->churn ?? 0);
         $tunjanganCoc      = $this->numericValue($this->tunjangan_coc ?? 0);
         $tunjanganKinerja  = $this->numericValue($this->tunjangan_kinerja ?? 0);
+        $insentifTot  = $this->numericValue($this->insentif_tot ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -792,6 +795,7 @@ class EditPayroll extends Component
                 + $inovationReward
                 + $tunjanganCoc
                 + $tunjanganKinerja
+                + $insentifTot
                 - $totalPotonganManual
                 - $this->izin_nominal
                 - $this->terlambat_nominal
@@ -940,6 +944,7 @@ class EditPayroll extends Component
             'total_gaji' => $this->total_gaji,
             'tunjangan_coc' => $this->tunjangan_coc,
             'tunjangan_kinerja' => $this->tunjangan_kinerja,
+            'insentif_tot' => $this->insentif_tot,
         ];
         // dd($data);
         $payroll->update($data);

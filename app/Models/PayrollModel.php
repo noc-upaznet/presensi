@@ -46,6 +46,7 @@ class PayrollModel extends Model
         'periode',
         'tunjangan_coc',
         'tunjangan_kinerja',
+        'insentif_tot',
     ];
 
     public function getKaryawan()
