@@ -361,11 +361,14 @@
                                                             : null;
 
                                                         $statusPresensi = $presensiHadir[$tanggalFull] ?? null;
+                                                        $shiftId = $kalender[$tanggalFull] ?? null;
 
-                                                        $cellClass = match ($statusPresensi) {
-                                                            0 => 'bg-success text-white',
-                                                            1 => 'bg-danger text-white',
-                                                            2 => 'bg-primary text-white',
+                                                        $cellClass = match (true) {
+                                                            in_array($shiftId, [8, 22, 23, 29])
+                                                                => 'bg-warning-subtle border border-warning',
+                                                            $statusPresensi === 0 => 'bg-success text-white',
+                                                            $statusPresensi === 1 => 'bg-danger text-white',
+                                                            $statusPresensi === 2 => 'bg-primary text-white',
                                                             default => '',
                                                         };
                                                     @endphp
