@@ -245,19 +245,91 @@ class ModalJadwalShift extends Component
         // dd($this->bulan_tahun);
 
         $this->kalender = $data['kalender'] ?? [];
+        $this->loadRekap($this->selectedKaryawan);
         // dd($this->kalender);
         $this->dispatch('$refresh');
     }
 
     public function loadRekap($id)
     {
-        $presensi = M_Presensi::where('karyawan_id', $id)
-            ->whereMonth('tanggal', now()->month)
+        $carbon = Carbon::parse($this->bulan_tahun);
+
+        $cutoff = $this->getCutoff2625(
+            $carbon->year,
+            $carbon->month
+        );
+
+        $bulanAwal  = $cutoff['start']->format('Y-m');
+        $bulanAkhir = $cutoff['end']->format('Y-m');
+
+        $jadwalList = M_Jadwal::where('karyawan_id', $id)
+            ->whereIn('bulan_tahun', [$bulanAwal, $bulanAkhir])
+            ->get()
+            ->keyBy('bulan_tahun');
+
+        $izin = 0;
+        $cuti = 0;
+        $izinSetengahHari = 0;
+        $izinSetengahHariPagi = 0;
+        $izinSetengahHariSiang = 0;
+        $konterIzinSetengahHariPagi = 0;
+
+        $tanggal = $cutoff['start']->copy();
+
+        while ($tanggal->lte($cutoff['end'])) {
+
+            $bulanTahun = $tanggal->format('Y-m');
+            $hari       = $tanggal->day;
+
+            $jadwal = $jadwalList[$bulanTahun] ?? null;
+
+            if (!$jadwal) {
+                $tanggal->addDay();
+                continue;
+            }
+
+            $kode = $jadwal->{'d' . $hari} ?? null;
+
+            if ($kode == 3) {
+                $izin++;
+            } elseif ($kode == 2) {
+                $cuti++;
+            } elseif ($kode == 8) {
+                $izinSetengahHari++;
+            } elseif ($kode == 22) {
+                $izinSetengahHariPagi++;
+            } elseif ($kode == 23) {
+                $izinSetengahHariSiang++;
+            } elseif ($kode == 29) {
+                $konterIzinSetengahHariPagi++;
+            }
+
+            $tanggal->addDay();
+        }
+
+        $presensi = M_Presensi::where('user_id', $id)
+            ->whereBetween('tanggal', [
+                $cutoff['start']->toDateString(),
+                $cutoff['end']->toDateString(),
+            ])
             ->get();
-        $this->rekap['izin'] = $presensi->where('status', 3)->count();
-        $this->rekap['cuti'] = $presensi->where('status', 2)->count();
+
+        $this->rekap['izin'] = $izin
+            + ($izinSetengahHari * 0.5)
+            + ($izinSetengahHariPagi * 0.5)
+            + ($izinSetengahHariSiang * 0.5)
+            + ($konterIzinSetengahHariPagi * 0.5);
+
+        $this->rekap['cuti'] = $cuti;
         $this->rekap['terlambat'] = $presensi->where('status', 1)->count();
-        $this->rekap['kehadiran'] = $presensi->where('status', '!=', '')->count();
+
+        $this->rekap['kehadiran'] = 26
+            - $izin
+            - $cuti
+            - ($izinSetengahHari * 0.5)
+            - ($izinSetengahHariPagi * 0.5)
+            - ($izinSetengahHariSiang * 0.5)
+            - ($konterIzinSetengahHariPagi * 0.5);
     }
 
     public function saveEdit()
