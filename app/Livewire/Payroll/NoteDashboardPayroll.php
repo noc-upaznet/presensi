@@ -4,6 +4,7 @@ namespace App\Livewire\Payroll;
 
 use App\Models\M_DataKaryawan;
 use App\Models\M_Entitas;
+use App\Models\PayrollModel;
 use App\Traits\CutoffPayrollTrait;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -144,32 +145,28 @@ class NoteDashboardPayroll extends Component
         return [
             [
                 'label' => 'Lembur Karyawan',
-                'query' => fn($start, $end) => DB::table('payroll')
-                    ->where('entitas_id', $branch_id)
+                'query' => fn($start, $end) => PayrollModel::where('entitas_id', $branch_id)
                     ->where('titip', $titip)
                     ->whereBetween('periode', [$start, $end])
-                    ->sum(DB::raw('lembur + lembur_libur')),
+                    ->sum(DB::raw('lembur + lembur_libur + uang_makan + transport')),
             ],
             [
                 'label' => 'Sodaqoh / Punishment Karyawan',
-                'query' => fn($start, $end) => DB::table('payroll')
-                    ->where('entitas_id', $branch_id)
+                'query' => fn($start, $end) => PayrollModel::where('entitas_id', $branch_id)
                     ->where('titip', $titip)
                     ->whereBetween('periode', [$start, $end])
                     ->sum('terlambat'),
             ],
             [
                 'label' => 'Potongan Izin Karyawan',
-                'query' => fn($start, $end) => DB::table('payroll')
-                    ->where('entitas_id', $branch_id)
+                'query' => fn($start, $end) => PayrollModel::where('entitas_id', $branch_id)
                     ->where('titip', $titip)
                     ->whereBetween('periode', [$start, $end])
                     ->sum('izin'),
             ],
             [
                 'label' => 'Tunjangan Kehadiran',
-                'query' => fn($start, $end) => DB::table('payroll')
-                    ->where('entitas_id', $branch_id)
+                'query' => fn($start, $end) => PayrollModel::where('entitas_id', $branch_id)
                     ->where('titip', $titip)
                     ->whereBetween('periode', [$start, $end])
                     ->get()
@@ -181,16 +178,14 @@ class NoteDashboardPayroll extends Component
             ],
             [
                 'label' => 'Tunjangan Kebudayaan (+-)',
-                'query' => fn($start, $end) => DB::table('payroll')
-                    ->where('entitas_id', $branch_id)
+                'query' => fn($start, $end) => PayrollModel::where('entitas_id', $branch_id)
                     ->where('titip', $titip)
                     ->whereBetween('periode', [$start, $end])
                     ->sum('tunjangan_kebudayaan'),
             ],
             [
                 'label' => 'Insentif',
-                'query' => fn($start, $end) => DB::table('payroll')
-                    ->where('entitas_id', $branch_id)
+                'query' => fn($start, $end) => PayrollModel::where('entitas_id', $branch_id)
                     ->where('titip', $titip)
                     ->whereBetween('periode', [$start, $end])
                     ->sum('insentif'),
@@ -212,8 +207,7 @@ class NoteDashboardPayroll extends Component
 
         $this->totals = $periods->mapWithKeys(function ($period) use ($karyawanIds) {
 
-            $rows = DB::table('payroll')
-                ->whereIn('karyawan_id', $karyawanIds) // 🔥 samakan
+            $rows = PayrollModel::whereIn('karyawan_id', $karyawanIds)
                 ->where('titip', 0)
                 ->where('periode', $period['periode'])
                 ->get();
@@ -268,8 +262,7 @@ class NoteDashboardPayroll extends Component
 
         $this->totalsTitip = $periods->mapWithKeys(function ($period) use ($karyawanIds) {
 
-            $rows = DB::table('payroll')
-                ->whereIn('karyawan_id', $karyawanIds)
+            $rows = PayrollModel::whereIn('karyawan_id', $karyawanIds)
                 ->where('titip', 1)
                 ->where('periode', $period['periode'])
                 ->get();
@@ -327,7 +320,7 @@ class NoteDashboardPayroll extends Component
 
         $notes = DB::table('notes_payroll')
             ->where('date', $currentBulanTahun)
-            ->where('branch_id', $branch_id) // ✅ pakai branch_id bukan nama entitas
+            ->where('branch_id', $branch_id)
             ->pluck('note')
             ->toArray();
 
@@ -405,7 +398,7 @@ class NoteDashboardPayroll extends Component
         DB::table('note_static_rows')->updateOrInsert(
             [
                 'branch_id' => $branch_id,
-                'periode'   => $periode, // 🔥 langsung dari loop
+                'periode'   => $periode,
                 'key'       => $key,
                 'month'     => $month,
                 'titip'     => $titip,
@@ -495,9 +488,9 @@ class NoteDashboardPayroll extends Component
         DB::table('note_static_rows')->updateOrInsert(
             [
                 'branch_id' => $branch_id,
-                'periode'   => $periode, // 🔥 sesuai kolom
+                'periode'   => $periode,
                 'key'       => $key,
-                'month'     => $month,   // label tetap
+                'month'     => $month,
                 'titip'     => $titip,
             ],
             [
