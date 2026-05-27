@@ -259,6 +259,7 @@
                     $data->insentif +
                     intVal($data->tunjangan_coc) +
                     intVal($data->tunjangan_kinerja) +
+                    intVal($data->insentif_tot) +
                     $data->inov_reward;
             @endphp
             {{-- @php
@@ -359,6 +360,10 @@
                         <td class="text-right">Rp. {{ number_format(intVal($data->tunjangan_kinerja)) }}</td>
                     </tr>
                 @endif
+                <tr>
+                    <td>Insentif Tot</td>
+                    <td class="text-right">Rp. {{ number_format(intVal($data->insentif_tot)) }}</td>
+                </tr>
                 <tr style="border-bottom: 1px solid blue;">
                     <th>Total Pendapatan</th>
                     <th class="text-right">Rp. {{ number_format($totalPendapatan) }}</th>
