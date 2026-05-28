@@ -228,6 +228,9 @@ class NoteDashboardPayroll extends Component
                     + ($item->fee_sharing ?? 0)
                     + ($item->insentif ?? 0)
                     + ($item->inov_reward ?? 0)
+                    + ($item->insentif_tot ?? 0)
+                    + ($item->tunjangan_coc ?? 0)
+                    + ($item->tunjangan_kinerja ?? 0)
                     + $tunjanganArray->sum('nominal');
 
                 $excludePotongan = ['pph 21', 'pph21', 'potongan kebudayaan'];
@@ -283,6 +286,9 @@ class NoteDashboardPayroll extends Component
                     + ($item->fee_sharing ?? 0)
                     + ($item->insentif ?? 0)
                     + ($item->inov_reward ?? 0)
+                    + ($item->insentif_tot ?? 0)
+                    + ($item->tunjangan_coc ?? 0)
+                    + ($item->tunjangan_kinerja ?? 0)
                     + $tunjanganArray->sum('nominal');
 
                 $excludePotongan = ['pph 21', 'pph21', 'potongan kebudayaan'];
