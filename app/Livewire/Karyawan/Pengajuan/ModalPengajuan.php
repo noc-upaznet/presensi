@@ -12,7 +12,6 @@ use App\Models\M_DataKaryawan;
 use Illuminate\Support\Facades\Auth;
 use App\Livewire\Forms\PengajuanForm;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Storage;
 
 class ModalPengajuan extends Component
 {
@@ -44,6 +43,23 @@ class ModalPengajuan extends Component
                 '(Konter) Izin Setengah Hari Masuk Pagi',
             ]
         )->orderBy('nama_shift')->get();
+
+        $this->form->dates = [
+            ['tanggal' => null]
+        ];
+    }
+
+    public function addDate()
+    {
+        $this->form->dates[] = [
+            'tanggal' => ''
+        ];
+    }
+    public function removeDate($index)
+    {
+        unset($this->form->dates[$index]);
+
+        $this->form->dates = array_values($this->form->dates);
     }
 
     public function loadData($data)
@@ -117,7 +133,6 @@ class ModalPengajuan extends Component
     public function store()
     {
         $this->form->validate();
-
         if ($this->file) {
             // dd($this->file);
             $this->validate([
@@ -129,34 +144,51 @@ class ModalPengajuan extends Component
         }
 
         $path = null;
+
         if ($this->file) {
             $filename = md5(uniqid()) . '.' . $this->file->extension();
+
             $path = $this->file->storeAs('presensi/file-pengajuan', $filename, 's3');
         }
-        // dd(auth()->id());
-        $data = [
-            'karyawan_id' => M_DataKaryawan::where('user_id', Auth::id())->value('id'),
-            'shift_id' => $this->form->pengajuan,
-            'tanggal' => $this->form->tanggal,
-            'keterangan' => $this->form->keterangan,
-            'file' => $path,
-            'satatus' => 0,
-        ];
-        // dd($data);
 
-        // Simpan data ke database
-        M_Pengajuan::create($data);
+        $karyawanId = M_DataKaryawan::where('user_id', Auth::id())
+            ->value('id');
 
-        // Reset input
+        foreach ($this->form->dates as $item) {
+
+            $tanggal = $item['tanggal'];
+
+            if (!$tanggal) {
+                continue;
+            }
+
+            $exists = M_Pengajuan::where('karyawan_id', $karyawanId)
+                ->whereDate('tanggal', $tanggal)
+                ->exists();
+
+            if ($exists) {
+                continue;
+            }
+
+            M_Pengajuan::create([
+                'karyawan_id' => $karyawanId,
+                'shift_id'    => $this->form->pengajuan,
+                'tanggal'     => $tanggal,
+                'keterangan'  => $this->form->keterangan,
+                'file'        => $path,
+                'status'      => 0,
+            ]);
+        }
+
         $this->form->reset();
+        $this->reset('file');
 
         $this->dispatch('swal', params: [
             'title' => 'Data Saved',
-            'icon' => 'success',
-            'text' => 'Data has been saved successfully'
+            'icon'  => 'success',
+            'text'  => 'Pengajuan berhasil disimpan'
         ]);
 
-        // Tutup modal
         $this->dispatch('modalTambahPengajuan', action: 'hide');
         $this->dispatch('refresh');
     }

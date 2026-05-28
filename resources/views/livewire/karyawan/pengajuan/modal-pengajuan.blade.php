@@ -24,12 +24,45 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="tanggal" class="form-label fw-semibold">Tanggal <small
-                                    class="text-danger">*</small></label>
-                            <input type="date" class="form-control" id="tanggal" wire:model="form.tanggal">
-                            @error('form.tanggal')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+
+                            <label class="form-label fw-semibold">
+                                Tanggal Pengajuan
+                                <small class="text-danger">*</small>
+                            </label>
+
+                            @foreach ($form->dates as $index => $item)
+                                <div class="d-flex gap-2 mb-2">
+
+                                    <input type="date"
+                                        class="form-control @error('form.dates.' . $index . '.tanggal') is-invalid @enderror"
+                                        wire:model="form.dates.{{ $index }}.tanggal">
+
+                                    @if ($index == 0)
+                                        <button type="button" class="btn btn-primary" wire:click="addDate">
+
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    @else
+                                        <button type="button" class="btn btn-danger"
+                                            wire:click="removeDate({{ $index }})">
+
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    @endif
+
+                                </div>
+
+                                @error('form.dates.' . $index . '.tanggal')
+                                    <small class="text-danger d-block mb-3">
+                                        {{ $message }}
+                                    </small>
+                                @enderror
+                            @endforeach
+
+                            <small class="text-muted">
+                                Tambahkan beberapa tanggal pengajuan sesuai kebutuhan.
+                            </small>
+
                         </div>
 
                         <div class="mb-3">
@@ -118,7 +151,8 @@
                 <form>
                     <div class="modal-body p-4">
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Pengajuan <small class="text-danger">*</small></label>
+                            <label class="form-label fw-semibold">Pengajuan <small
+                                    class="text-danger">*</small></label>
                             <select class="form-select" wire:model="form.pengajuan">
                                 <option value="">-- Pilih Pengajuan --</option>
                                 @foreach ($shifts as $shift)
