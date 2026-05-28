@@ -213,6 +213,24 @@ class Pengajuan extends Component
                         'text'  => 'Berhasil menolak pengajuan.'
                     ]);
                 }
+            } elseif ($entitasUser === 'FIZNA') {
+                if ($status == 1) {
+                    $pengajuan->approve_hr = 1;
+                    $pengajuan->status     = 1;
+                    $this->dispatch('swal', params: [
+                        'title' => 'Status Diperbarui',
+                        'icon'  => 'success',
+                        'text'  => 'Status dan jadwal berhasil diperbarui.'
+                    ]);
+                } elseif ($status == 2) {
+                    $pengajuan->approve_hr = 2;
+                    $pengajuan->status     = 2;
+                    $this->dispatch('swal', params: [
+                        'title' => 'Pengajuan Rejected',
+                        'icon'  => 'error',
+                        'text'  => 'Berhasil Menolak Pengajuan ini.'
+                    ]);
+                }
             }
             // Jika bukan kasus di atas → ikuti flow SPV dulu
             else {
