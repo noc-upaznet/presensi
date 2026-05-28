@@ -59,8 +59,8 @@
                                 @enderror
                             @endforeach
 
-                            <small class="text-muted">
-                                Tambahkan beberapa tanggal pengajuan sesuai kebutuhan.
+                            <small class="text-danger">
+                                Note: Tambahkan beberapa tanggal pengajuan sesuai kebutuhan.
                             </small>
 
                         </div>
