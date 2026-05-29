@@ -131,6 +131,9 @@ class Dashboard extends Component
                     + ($item->uang_makan ?? 0)
                     + ($item->fee_sharing ?? 0)
                     + ($item->insentif ?? 0)
+                    + ($item->insentif_tot ?? 0)
+                    + ($item->tunjangan_coc ?? 0)
+                    + ($item->tunjangan_kinerja ?? 0)
                     + ($item->inov_reward ?? 0);
 
                 foreach ($tunjanganArray as $t) {
