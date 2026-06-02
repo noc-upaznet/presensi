@@ -271,6 +271,17 @@ class RiwayatPresensiStaff extends Component
                     $q->whereRaw('UPPER(entitas) = ?', [strtoupper($entitas)])
                         ->whereIn(DB::raw('UPPER(jabatan)'), ['SALES MARKETING', 'GO']);
                 });
+            } elseif (strtoupper($divisi) === 'TEKNISI' && strtoupper($entitas) === 'UNR') {
+
+                $query->whereHas('getUser', function ($q) use ($divisi, $entitas) {
+                    $q->where(function ($sub) {
+                        $sub->whereRaw('UPPER(entitas) = ?', ['UHO'])
+                            ->whereRaw('UPPER(jabatan) = ?', ['TEKNISI']);
+                    })->orWhere(function ($sub) use ($divisi, $entitas) {
+                        $sub->where('divisi', $divisi)
+                            ->where('entitas', $entitas);
+                    });
+                });
             } else {
                 $query->whereHas('getUser', function ($q) use ($divisi, $entitas) {
                     $q->where('divisi', $divisi)
