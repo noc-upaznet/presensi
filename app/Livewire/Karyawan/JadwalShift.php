@@ -66,7 +66,8 @@ class JadwalShift extends Component
             $jabatan = $karyawan->jabatan;
             // $entitas = session('selected_entitas', 'UHO');
 
-            $query = M_DataKaryawan::where('divisi', $divisi);
+            $query = M_DataKaryawan::where('divisi', $divisi)
+                ->where('status_karyawan', '!=', 'NONAKTIF');
 
             if ($entitas == 'UNR') {
                 $query->whereIn('entitas', ['UNR', 'UHO']);
@@ -85,10 +86,17 @@ class JadwalShift extends Component
             $entitas = $karyawan->entitas;
             $jabatan = $karyawan->jabatan;
 
-            $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
-                ->whereIn('divisi', [$divisi, 'Support'])
-                ->whereIn('jabatan', [$jabatan, 'GO'])
-                // ->whereNotIn('id', $jadwalId)
+            $query = M_DataKaryawan::whereIn('divisi', [$divisi, 'Support'])
+                ->where('status_karyawan', '!=', 'NONAKTIF')
+                ->whereIn('jabatan', [$jabatan, 'GO']);
+
+            if ($entitas === 'UNB') {
+                $query->whereIn('entitas', ['UNB', 'UHO']);
+            } else {
+                $query->where('entitas', $entitas);
+            }
+
+            $this->karyawans = $query
                 ->orderBy('nama_karyawan')
                 ->get();
 
@@ -328,10 +336,17 @@ class JadwalShift extends Component
             $divisi  = $karyawan->divisi;
             $entitas = $karyawan->entitas;
 
-            $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitas) {
+            $entitasFilter = [$entitas];
+
+            if (in_array($entitas, ['UNB'])) {
+                $entitasFilter = [$entitas, 'UHO'];
+            }
+
+            $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitasFilter) {
                 $q->whereIn('divisi', [$divisi, 'Support'])
                     ->whereIn('jabatan', ['Sales Marketing', 'GO'])
-                    ->where('entitas', $entitas);
+                    ->where('status_karyawan', '!=', 'NONAKTIF')
+                    ->whereIn('entitas', $entitasFilter);
             });
         } elseif ($user->hasRole('branch-manager')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();

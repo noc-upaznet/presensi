@@ -72,6 +72,7 @@ class ModalJadwalShift extends Component
             $entitas = $karyawan->entitas;
 
             $query = M_DataKaryawan::where('divisi', $divisi)
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->whereNotIn('id', $jadwalId);
 
             if ($entitas === 'UNR') {
@@ -90,14 +91,20 @@ class ModalJadwalShift extends Component
             $entitas = $karyawan->entitas;
             $jabatan = $karyawan->jabatan;
 
-            $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
-                ->whereIn('divisi', [$divisi, 'Support'])
+            $query = M_DataKaryawan::whereIn('divisi', [$divisi, 'Support'])
                 ->whereIn('jabatan', [$jabatan, 'GO'])
-                ->whereNotIn('id', $jadwalId)
+                ->where('status_karyawan', '!=', 'NONAKTIF')
+                ->whereNotIn('id', $jadwalId);
+
+            if ($entitas === 'UNB') {
+                $query->whereIn('entitas', ['UNB', 'UHO']);
+            } else {
+                $query->where('entitas', $entitas);
+            }
+
+            $this->karyawans = $query
                 ->orderBy('nama_karyawan')
                 ->get();
-
-            // dd($this->karyawans);
         } elseif ($user->hasAnyRole('admin|hr')) {
             $entitas = session('selected_entitas', 'UHO');
             $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
@@ -446,6 +453,7 @@ class ModalJadwalShift extends Component
             $entitas = $karyawan->entitas;
 
             $query = M_DataKaryawan::where('divisi', $divisi)
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->whereNotIn('id', $jadwalId);
 
             if ($entitas === 'UNR') {
@@ -464,10 +472,18 @@ class ModalJadwalShift extends Component
             $entitas = $karyawan->entitas;
             $jabatan = $karyawan->jabatan;
 
-            $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
-                ->whereIn('divisi', [$divisi, 'Support'])
+            $query = M_DataKaryawan::whereIn('divisi', [$divisi, 'Support'])
                 ->whereIn('jabatan', [$jabatan, 'GO'])
-                ->whereNotIn('id', $jadwalId)
+                ->where('status_karyawan', '!=', 'NONAKTIF')
+                ->whereNotIn('id', $jadwalId);
+
+            if ($entitas === 'UNB') {
+                $query->whereIn('entitas', ['UNB', 'UHO']);
+            } else {
+                $query->where('entitas', $entitas);
+            }
+
+            $this->karyawans = $query
                 ->orderBy('nama_karyawan')
                 ->get();
 
