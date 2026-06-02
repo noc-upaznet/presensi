@@ -377,10 +377,10 @@ class Pengajuan extends Component
                                     ->where('entitas', $dataKaryawan->entitas);
                             });
                     })->pluck('id');
-                } elseif ($divisi === 'sales marketing' && $entitas === 'UHO') {
-                    $karyawanIdList = M_DataKaryawan::whereRaw('UPPER(entitas) = ?', [strtoupper($dataKaryawan->entitas)])
-                        ->whereIn(DB::raw('UPPER(divisi)'), ['SALES MARKETING', 'TEKNISI'])
-                        ->pluck('id');
+                    // } elseif ($divisi === 'sales marketing' && $entitas === 'UHO') {
+                    //     $karyawanIdList = M_DataKaryawan::whereRaw('UPPER(entitas) = ?', [strtoupper($dataKaryawan->entitas)])
+                    //         ->whereIn(DB::raw('UPPER(divisi)'), ['SALES MARKETING', 'TEKNISI'])
+                    //         ->pluck('id');
                 } elseif ($divisi === 'sales marketing') {
                     $karyawanIdList = M_DataKaryawan::whereRaw('UPPER(entitas) = ?', [strtoupper($dataKaryawan->entitas)])
                         ->whereIn(DB::raw('UPPER(jabatan)'), ['SALES MARKETING', 'GO'])
@@ -390,6 +390,18 @@ class Pengajuan extends Component
                         // 1. Semua karyawan entitas MC
                         $q->whereRaw('UPPER(entitas) = ?', ['UHO'])
                             ->whereIn(DB::raw('UPPER(jabatan)'), ['TEKNISI'])
+
+                            // 2. Divisi & entitas sendiri
+                            ->orWhere(function ($sub) use ($dataKaryawan) {
+                                $sub->where('divisi', $dataKaryawan->divisi)
+                                    ->where('entitas', $dataKaryawan->entitas);
+                            });
+                    })->pluck('id');
+                } elseif ($divisi === 'sales marketing' && $entitas === 'UNB') {
+                    $karyawanIdList = M_DataKaryawan::where(function ($q) use ($dataKaryawan) {
+                        // 1. Semua karyawan entitas MC
+                        $q->whereRaw('UPPER(entitas) = ?', ['UHO'])
+                            ->whereIn(DB::raw('UPPER(jabatan)'), ['SALES MARKETING'])
 
                             // 2. Divisi & entitas sendiri
                             ->orWhere(function ($sub) use ($dataKaryawan) {
