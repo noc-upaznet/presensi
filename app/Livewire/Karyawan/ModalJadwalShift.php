@@ -67,11 +67,20 @@ class ModalJadwalShift extends Component
 
         if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
-            $this->karyawans = M_DataKaryawan::where('divisi', $divisi)
-                ->where('entitas', $entitas)
-                ->whereNotIn('id', $jadwalId)
+
+            $query = M_DataKaryawan::where('divisi', $divisi)
+                ->whereNotIn('id', $jadwalId);
+
+            if ($entitas === 'UNR') {
+                $query->whereIn('entitas', ['UNR', 'UHO']);
+            } else {
+                $query->where('entitas', $entitas);
+            }
+
+            $this->karyawans = $query
                 ->orderBy('nama_karyawan')
                 ->get();
         } elseif ($user->hasRole('spv-sales')) {
@@ -436,9 +445,16 @@ class ModalJadwalShift extends Component
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
 
-            $this->karyawans = M_DataKaryawan::where('divisi', $divisi)
-                ->where('entitas', $entitas)
-                ->whereNotIn('id', $jadwalId) // filter
+            $query = M_DataKaryawan::where('divisi', $divisi)
+                ->whereNotIn('id', $jadwalId);
+
+            if ($entitas === 'UNR') {
+                $query->whereIn('entitas', ['UNR', 'UHO']);
+            } else {
+                $query->where('entitas', $entitas);
+            }
+
+            $this->karyawans = $query
                 ->orderBy('nama_karyawan')
                 ->get();
         } elseif ($user->hasRole('spv-sales')) {
