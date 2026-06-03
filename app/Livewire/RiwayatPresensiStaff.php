@@ -304,8 +304,8 @@ class RiwayatPresensiStaff extends Component
                             ->where('entitas', $entitas);
                     });
                 });
-            } elseif (strtoupper($divisi) === 'Sales Marketing' && strtoupper($entitas) === 'UNB') {
-
+            } elseif ($divisi === 'Sales Marketing' && strtoupper($entitas) === 'UNB') {
+                // dd($divisi, $entitas);
                 $query->whereHas('getUser', function ($q) use ($divisi, $entitas) {
                     $q->where(function ($sub) {
                         $sub->whereRaw('UPPER(entitas) = ?', ['UHO'])
