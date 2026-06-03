@@ -309,7 +309,7 @@ class RiwayatPresensiStaff extends Component
                 $query->whereHas('getUser', function ($q) use ($divisi, $entitas) {
                     $q->where(function ($sub) {
                         $sub->whereRaw('UPPER(entitas) = ?', ['UHO'])
-                            ->whereRaw('UPPER(jabatan) = ?', ['SALES MARKETING']);
+                            ->whereRaw('UPPER(jabatan) = ?', ['Sales Marketing']);
                     })->orWhere(function ($sub) use ($divisi, $entitas) {
                         $sub->where('divisi', $divisi)
                             ->where('entitas', $entitas);
