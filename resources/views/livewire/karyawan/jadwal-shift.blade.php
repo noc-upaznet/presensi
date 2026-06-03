@@ -29,7 +29,7 @@
                 <select class="form-select" style="width: 150px;" wire:model="filterKaryawan"
                     wire:change="filterByKaryawan($event.target.value)">
                     <option value="" selected>Pilih Karyawan</option>
-                    @foreach ($karyawans ?? [] as $karyawan)
+                    @foreach ($karyawans as $karyawan)
                         <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
                     @endforeach
                 </select>

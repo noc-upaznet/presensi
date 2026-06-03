@@ -111,6 +111,19 @@ class ModalJadwalShift extends Component
                 ->whereNotIn('id', $jadwalId)
                 ->orderBy('nama_karyawan')
                 ->get();
+        } elseif ($user->hasRole('spv')) {
+
+            $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+
+            $divisi  = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+
+            $this->karyawans = M_DataKaryawan::where('divisi', $divisi)
+                ->where('entitas', $entitas)
+                ->where('status_karyawan', '!=', 'NONAKTIF')
+                ->whereNotIn('id', $jadwalId)
+                ->orderBy('nama_karyawan')
+                ->get();
         } elseif ($user->hasRole('branch-manager')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $entitasUser = M_DataKaryawan::where('user_id', $user->id)->first()->entitas;

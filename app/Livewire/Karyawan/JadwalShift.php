@@ -101,6 +101,16 @@ class JadwalShift extends Component
                 ->get();
 
             // dd($this->karyawans);
+        } elseif ($user->hasRole('spv')) {
+
+            $divisi  = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+
+            $this->karyawans = M_DataKaryawan::where('divisi', $divisi)
+                ->where('entitas', $entitas)
+                ->where('status_karyawan', '!=', 'NONAKTIF')
+                ->orderBy('nama_karyawan')
+                ->get();
         } elseif ($user->hasRole('branch-manager')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $entitasUser = M_DataKaryawan::where('user_id', $user->id)->first()->entitas;
