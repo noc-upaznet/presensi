@@ -27,7 +27,7 @@ class JadwalShift extends Component
     public $kalender = [];
     public $selectedKaryawan;
     public $namaKaryawan;
-    public $karyawans;
+    public $karyawans = [];
     public $users;
     public $filterJadwals = [];
     public $filterKaryawan;
