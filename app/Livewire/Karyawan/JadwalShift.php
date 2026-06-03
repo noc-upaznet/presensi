@@ -348,6 +348,16 @@ class JadwalShift extends Component
                     ->where('status_karyawan', '!=', 'NONAKTIF')
                     ->whereIn('entitas', $entitasFilter);
             });
+        } elseif ($user->hasRole('spv')) {
+
+            $divisi  = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+
+            $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitas) {
+                $q->where('divisi', $divisi)
+                    ->where('entitas', $entitas)
+                    ->where('status_karyawan', '!=', 'NONAKTIF');
+            });
         } elseif ($user->hasRole('branch-manager')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $entitasUser = M_DataKaryawan::where('user_id', $user->id)->first()->entitas;
@@ -375,10 +385,6 @@ class JadwalShift extends Component
             $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitas) {
                 $q->where('divisi', $divisi)
                     ->where('entitas', $entitas);
-            });
-        } else {
-            $query->whereHas('getKaryawan', function ($q) use ($karyawan) {
-                $q->where('entitas', $karyawan->entitas);
             });
         }
         $jadwals = $query->paginate(25);
