@@ -19,8 +19,10 @@
                         <label class="form-label fw-semibold">Karyawan</label>
                         <select class="form-select" wire:model="selectedKaryawan">
                             <option value="">-- Pilih Karyawan --</option>
-                            @foreach ($karyawans as $key)
-                                <option value="{{ $key->id }}">{{ $key->nama_karyawan }}</option>
+                            @foreach ($karyawans ?? [] as $key)
+                                <option value="{{ $key->id }}">
+                                    {{ $key->nama_karyawan }}
+                                </option>
                             @endforeach
                         </select>
                     </div>

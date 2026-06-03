@@ -20,7 +20,7 @@ class ModalJadwalShift extends Component
 {
     use CutoffPayrollTrait;
     public $holidays = [];
-    public $karyawans;
+    public $karyawans = [];
     public $users;
     public $jadwalShifts;
     public $templateWeeks;
