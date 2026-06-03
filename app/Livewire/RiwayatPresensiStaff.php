@@ -291,7 +291,7 @@ class RiwayatPresensiStaff extends Component
                 // dd($jabatan);
                 $query->whereHas('getUser', function ($q) use ($entitas, $jabatan) {
                     $q->whereRaw('UPPER(entitas) = ?', [strtoupper($entitas)])
-                        ->whereIn(DB::raw('UPPER(jabatan)'), ['SALES MARKETING', 'GO']);
+                        ->whereIn(DB::raw('UPPER(jabatan)'), ['Sales Marketing', 'GO']);
                 });
             } elseif (strtoupper($divisi) === 'TEKNISI' && strtoupper($entitas) === 'UNR') {
 
