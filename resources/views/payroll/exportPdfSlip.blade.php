@@ -418,6 +418,10 @@
                     <td class="text-right">Rp. {{ number_format($data->izin) }}</td>
                 </tr>
                 <tr>
+                    <td>Potongan Kasbon</td>
+                    <td class="text-right">Rp. {{ number_format($data->kasbon) }}</td>
+                </tr>
+                <tr>
                     <td>Potongan Terlambat</td>
                     <td class="text-right">Rp. {{ number_format($data->terlambat) }}</td>
                 </tr>
