@@ -73,13 +73,35 @@ class RiwayatPresensiStaff extends Component
                     ->select('id', 'nama_karyawan')
                     ->get();
             }
+        } elseif ($user->hasRole('spv-sales')) {
+            $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+
+            $divisi  = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+            $jabatan = $karyawan->jabatan;
+
+            $query = M_DataKaryawan::whereIn('divisi', [$divisi, 'Support'])
+                ->where('status_karyawan', '!=', 'NONAKTIF')
+                ->whereIn('jabatan', [$jabatan, 'GO']);
+
+            if ($entitas === 'UNB') {
+                $query->whereIn('entitas', ['UNB', 'UHO']);
+            } else {
+                $query->where('entitas', $entitas);
+            }
+
+            $this->karyawanList = $query
+                ->orderBy('nama_karyawan')
+                ->get();
         } elseif ($divisi === 'NOC') {
             $this->karyawanList = M_DataKaryawan::where('divisi', 'NOC')
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->select('id', 'nama_karyawan')
                 ->get();
         } elseif ($user->hasRole('branch-manager')) {
             $this->karyawanList = M_DataKaryawan::where('entitas', $entitasNama)
                 // ->where('divisi', $divisi)
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->select('id', 'nama_karyawan')
                 ->get();
         } else {
