@@ -376,6 +376,10 @@ class JadwalShift extends Component
                 $q->where('divisi', $divisi)
                     ->where('entitas', $entitas);
             });
+        } else {
+            $query->whereHas('getKaryawan', function ($q) use ($karyawan) {
+                $q->where('entitas', $karyawan->entitas);
+            });
         }
         $jadwals = $query->paginate(25);
         return view('livewire.karyawan.jadwal-shift', [
