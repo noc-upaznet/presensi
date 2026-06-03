@@ -287,9 +287,15 @@ class RiwayatPresensiStaff extends Component
                 $query->whereHas('getUser', function ($q) use ($divisi) {
                     $q->where('divisi', $divisi);
                 });
+            } elseif ($divisi === 'Sales Marketing' && strtoupper($entitas) === 'UNB') {
+
+                $query->whereHas('getUser', function ($q) {
+                    $q->whereIn(DB::raw('UPPER(entitas)'), ['UNB', 'UHO'])
+                        ->whereIn(DB::raw('UPPER(jabatan)'), ['SALES MARKETING', 'GO']);
+                });
             } elseif ($divisi === 'Sales Marketing') {
                 // dd($jabatan);
-                $query->whereHas('getUser', function ($q) use ($entitas, $jabatan) {
+                $query->whereHas('getUser', function ($q) use ($entitas) {
                     $q->whereRaw('UPPER(entitas) = ?', [strtoupper($entitas)])
                         ->whereIn(DB::raw('UPPER(jabatan)'), ['Sales Marketing', 'GO']);
                 });
@@ -299,17 +305,6 @@ class RiwayatPresensiStaff extends Component
                     $q->where(function ($sub) {
                         $sub->whereRaw('UPPER(entitas) = ?', ['UHO'])
                             ->whereRaw('UPPER(jabatan) = ?', ['TEKNISI']);
-                    })->orWhere(function ($sub) use ($divisi, $entitas) {
-                        $sub->where('divisi', $divisi)
-                            ->where('entitas', $entitas);
-                    });
-                });
-            } elseif ($divisi === 'Sales Marketing' && strtoupper($entitas) === 'UNB') {
-                // dd($divisi, $entitas);
-                $query->whereHas('getUser', function ($q) use ($divisi, $entitas) {
-                    $q->where(function ($sub) {
-                        $sub->whereRaw('UPPER(entitas) = ?', ['UHO'])
-                            ->whereRaw('UPPER(jabatan) = ?', ['Sales Marketing']);
                     })->orWhere(function ($sub) use ($divisi, $entitas) {
                         $sub->where('divisi', $divisi)
                             ->where('entitas', $entitas);
