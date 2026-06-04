@@ -220,6 +220,8 @@ class DataKaryawan extends Component
 
         if (in_array($this->filterStatus, ['PKWT Kontrak', 'Probation', 'OJT', 'NONAKTIF'], true)) {
             $query->where('status_karyawan', $this->filterStatus);
+        } elseif ($this->filterStatus === 'Aktif') {
+            $query->where('status_karyawan', '!=', 'NONAKTIF');
         }
 
         if ($this->search) {

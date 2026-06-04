@@ -47,10 +47,11 @@
                             @endcan
                             <select class="form-select" wire:model.lazy="filterStatus" style="width: 150px;">
                                 <option value="">Pilih Status</option>
+                                <option value="Aktif">Aktif</option>
+                                <option value="NONAKTIF">NONAKTIF</option>
                                 <option value="PKWT Kontrak">PKWT Kontrak</option>
                                 <option value="Probation">Probation</option>
                                 <option value="OJT">OJT</option>
-                                <option value="NONAKTIF">NONAKTIF</option>
                             </select>
                         </div>
                     </div>
