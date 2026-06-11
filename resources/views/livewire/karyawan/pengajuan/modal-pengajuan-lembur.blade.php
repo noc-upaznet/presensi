@@ -266,7 +266,8 @@
 
                             @if ($file_bukti && is_object($file_bukti))
                                 {{-- Preview file baru --}}
-                                <img src="{{ $file_bukti->temporaryUrl() }}"
+                                <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file_bukti->getFilename()) }}"
+                                    wire:key="temp-preview-{{ $file_bukti->getFilename() }}"
                                     style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
                                 <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                             @elseif ($existingFile)
