@@ -37,8 +37,10 @@ use App\Livewire\Karyawan\Pengajuan\Sharing;
 use App\Livewire\Karyawan\Shifts\ManageTim;
 use App\Livewire\Kasbon\Kasbon;
 use App\Livewire\ListNotifikations;
+use App\Livewire\ListTicket;
 use App\Livewire\ManageUser;
 use App\Livewire\QuestionBank\QuestionBank;
+use App\Livewire\ReportTicket;
 use App\Livewire\SlipGaji;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -117,6 +119,7 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     Route::get('/gamifikasi', Gamifikasi::class)->name('gamifikasi');
     Route::get('/employee-absent', EmployeeAbsent::class)->name('employee-absent');
     Route::get('/dashboard-payroll', DashboardPayroll::class)->name('dashboard-payroll');
+    Route::get('/report-ticket', ReportTicket::class)->name('report-ticket');
     // Route::get('/manage-tim', ManageTim::class)->name('manage-tim');
 
     Route::get('/file/sharing/{encrypted}', function ($encrypted) {
