@@ -30,6 +30,7 @@
                     <div class="col-md-3">
                         <label class="form-label">Branch</label>
                         <select class="form-select" wire:model.live="branchId">
+                            <option value="">-- Pilih Branch --</option>
                             @foreach ($branches as $branch)
                                 <option value="{{ $branch->id }}">
                                     {{ $branch->name }}
