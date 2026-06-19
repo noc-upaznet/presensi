@@ -45,10 +45,12 @@ class ReportTicket extends Component
             'ticket.customer',
             'ticket.branch',
         ])
+            ->whereHas('ticket', function ($q) {
+                $q->where('is_gangguan', 1);
+            })
             ->when($this->branchId, function ($query) {
                 $query->whereHas('ticket', function ($q) {
-                    $q->where('branch_id', $this->branchId)
-                        ->where('is_gangguan', 1);
+                    $q->where('branch_id', $this->branchId);
                 });
             })
             ->whereBetween('created_at', [
@@ -63,10 +65,12 @@ class ReportTicket extends Component
             'team',
             'ticket.branch',
         ])
+            ->whereHas('ticket', function ($q) {
+                $q->where('is_gangguan', 1);
+            })
             ->when($this->branchId, function ($query) {
                 $query->whereHas('ticket', function ($q) {
-                    $q->where('branch_id', $this->branchId)
-                        ->where('is_gangguan', 1);
+                    $q->where('branch_id', $this->branchId);
                 });
             })
             ->whereBetween('created_at', [
