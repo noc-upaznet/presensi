@@ -135,8 +135,8 @@
                                     <td>
                                         {{ $report->team->name ?? '-' }}
                                         <br>
-                                        <small class="text-muted">
-                                            {{ $report->teknisi }}
+                                        <small>
+                                            ({{ ' ' . $report->teknisi . ' ' }})
                                         </small>
                                     </td>
 
@@ -269,8 +269,8 @@
                                         <td>
                                             {{ $report->team->name ?? '-' }}
                                             <br>
-                                            <small class="text-muted">
-                                                {{ $report->teknisi }}
+                                            <small>
+                                                ({{ ' ' . $report->teknisi . ' ' }})
                                             </small>
                                         </td>
 
