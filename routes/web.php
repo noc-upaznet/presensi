@@ -130,22 +130,33 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
         }
 
         $newPath = 'presensi/file-sharing/' . $filename;
-
         $oldPath = 'file-sharing/' . $filename;
 
-        if (Storage::disk('s3')->exists($newPath)) {
-            $path = $newPath;
-        } elseif (Storage::disk('s3')->exists($oldPath)) {
-            $path = $oldPath;
-        } else {
+        $path = null;
+        $file = null;
+
+        foreach ([$newPath, $oldPath] as $p) {
+            try {
+                $contents = Storage::disk('s3')->get($p);
+                if ($contents) {
+                    $path = $p;
+                    $file = $contents;
+                    break;
+                }
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
+
+        if (!$file) {
             abort(404);
         }
 
-        $file = Storage::disk('s3')->get($path);
         $mime = Storage::disk('s3')->mimeType($path);
 
         return response($file, 200)
-            ->header('Content-Type', $mime);
+            ->header('Content-Type', $mime)
+            ->header('Content-Disposition', 'inline; filename="' . basename($path) . '"');
     })->middleware('auth')->name('file.sharing');
 
     Route::get('/file/dispensasi/{encrypted}', function ($encrypted) {
@@ -156,22 +167,33 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
         }
 
         $newPath = 'presensi/file-pengajuan-dispensasi/' . $filename;
-
         $oldPath = 'file-pengajuan-dispensasi/' . $filename;
 
-        if (Storage::disk('s3')->exists($newPath)) {
-            $path = $newPath;
-        } elseif (Storage::disk('s3')->exists($oldPath)) {
-            $path = $oldPath;
-        } else {
+        $path = null;
+        $file = null;
+
+        foreach ([$newPath, $oldPath] as $p) {
+            try {
+                $contents = Storage::disk('s3')->get($p);
+                if ($contents) {
+                    $path = $p;
+                    $file = $contents;
+                    break;
+                }
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
+
+        if (!$file) {
             abort(404);
         }
 
-        $file = Storage::disk('s3')->get($path);
         $mime = Storage::disk('s3')->mimeType($path);
 
         return response($file, 200)
-            ->header('Content-Type', $mime);
+            ->header('Content-Type', $mime)
+            ->header('Content-Disposition', 'inline; filename="' . basename($path) . '"');
     })->middleware('auth')->name('file.dispensasi');
 
     Route::get('/file/lembur/{encrypted}', function ($encrypted) {
@@ -220,22 +242,33 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
         }
 
         $newPath = 'presensi/file-pengajuan/' . $filename;
-
         $oldPath = 'file-pengajuan/' . $filename;
 
-        if (Storage::disk('s3')->exists($newPath)) {
-            $path = $newPath;
-        } elseif (Storage::disk('s3')->exists($oldPath)) {
-            $path = $oldPath;
-        } else {
+        $path = null;
+        $file = null;
+
+        foreach ([$newPath, $oldPath] as $p) {
+            try {
+                $contents = Storage::disk('s3')->get($p);
+                if ($contents) {
+                    $path = $p;
+                    $file = $contents;
+                    break;
+                }
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
+
+        if (!$file) {
             abort(404);
         }
 
-        $file = Storage::disk('s3')->get($path);
         $mime = Storage::disk('s3')->mimeType($path);
 
         return response($file, 200)
-            ->header('Content-Type', $mime);
+            ->header('Content-Type', $mime)
+            ->header('Content-Disposition', 'inline; filename="' . basename($path) . '"');
     })->middleware('auth')->name('file.pengajuan');
 
     Route::get('/file/profile/{encrypted}', function ($encrypted) {
@@ -272,22 +305,33 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
         }
 
         $newPath = 'presensi/selfies/' . $filename;
-
         $oldPath = 'selfies/' . $filename;
 
-        if (Storage::disk('s3')->exists($newPath)) {
-            $path = $newPath;
-        } elseif (Storage::disk('s3')->exists($oldPath)) {
-            $path = $oldPath;
-        } else {
+        $path = null;
+        $file = null;
+
+        foreach ([$newPath, $oldPath] as $p) {
+            try {
+                $contents = Storage::disk('s3')->get($p);
+                if ($contents) {
+                    $path = $p;
+                    $file = $contents;
+                    break;
+                }
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
+
+        if (!$file) {
             abort(404);
         }
 
-        $file = Storage::disk('s3')->get($path);
         $mime = Storage::disk('s3')->mimeType($path);
 
         return response($file, 200)
-            ->header('Content-Type', $mime);
+            ->header('Content-Type', $mime)
+            ->header('Content-Disposition', 'inline; filename="' . basename($path) . '"');
     })->middleware('auth')->name('file.selfies');
 
     Route::get('/secure-file/{file}', function ($file) {

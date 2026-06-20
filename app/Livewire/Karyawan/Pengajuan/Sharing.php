@@ -9,6 +9,7 @@ use App\Traits\CutoffPayrollTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 use Livewire\WithoutUrlPagination;
@@ -61,7 +62,7 @@ class Sharing extends Component
         if ($this->file) {
             // dd($this->file);
             $this->validate([
-                'file' => 'nullable|mimes:jpg,jpeg,png|max:2048',
+                'file' => 'nullable',
             ], [
                 'file.max' => 'Ukuran file maksimal 2MB.',
                 'file.mimes' => 'Format file harus JPG, JPEG, PNG.',
@@ -69,9 +70,42 @@ class Sharing extends Component
         }
 
         $path = null;
+        // if ($this->file) {
+        //     $filename = md5(uniqid()) . '.' . $this->file->extension();
+        //     $path = $this->file->storeAs('presensi/file-sharing', $filename, 's3');
+        // }
+
         if ($this->file) {
-            $filename = md5(uniqid()) . '.' . $this->file->extension();
-            $path = $this->file->storeAs('presensi/file-sharing', $filename, 's3');
+            try {
+                $filename = md5(uniqid()) . '.' . $this->file->extension();
+                $destination = 'presensi/file-sharing/' . $filename;
+
+                // Baca file tmp dari S3
+                $tmpPath = $this->file->getRealPath();
+                // dd($tmpPath);
+                $fileContents = Storage::disk('s3')->get($tmpPath);
+
+                if (!$fileContents) {
+                    $this->addError('file', 'File tmp tidak ditemukan di storage.');
+                    return;
+                }
+
+                // Tulis ke path final di S3
+                $uploaded = Storage::disk('s3')->put($destination, $fileContents);
+
+                if (!$uploaded) {
+                    $this->addError('file', 'Gagal mengunggah file.');
+                    return;
+                }
+
+                // Hapus tmp
+                Storage::disk('s3')->delete($tmpPath);
+
+                $path = $destination;
+            } catch (\Exception $e) {
+                $this->addError('file', 'Gagal mengunggah file: ' . $e->getMessage());
+                return;
+            }
         }
 
         $data = [
@@ -179,7 +213,7 @@ class Sharing extends Component
         if ($this->file) {
             // dd($this->file);
             $this->validate([
-                'file' => 'nullable|max:2048',
+                'file' => 'nullable',
             ], [
                 'file.max' => 'Ukuran file maksimal 2MB.',
             ]);
@@ -187,9 +221,37 @@ class Sharing extends Component
 
         $path = null;
         $path = null;
-        if ($this->file) {
-            $filename = md5(uniqid()) . '.' . $this->file->extension();
-            $path = $this->file->storeAs('presensi/file-sharing', $filename, 's3');
+        // if ($this->file) {
+        //     $filename = md5(uniqid()) . '.' . $this->file->extension();
+        //     $path = $this->file->storeAs('presensi/file-sharing', $filename, 's3');
+        // }
+        if ($this->file && is_object($this->file)) {
+            try {
+                $filename = md5(uniqid()) . '.' . $this->file->extension();
+                $destination = 'presensi/file-sharing/' . $filename;
+
+                $tmpPath = $this->file->getRealPath();
+                $fileContents = Storage::disk('s3')->get($tmpPath);
+
+                if (!$fileContents) {
+                    $this->addError('file', 'File tmp tidak ditemukan di storage.');
+                    return;
+                }
+
+                $uploaded = Storage::disk('s3')->put($destination, $fileContents);
+
+                if (!$uploaded) {
+                    $this->addError('file', 'Gagal mengunggah file.');
+                    return;
+                }
+
+                Storage::disk('s3')->delete($tmpPath);
+
+                $path = $destination;
+            } catch (\Exception $e) {
+                $this->addError('file', 'Gagal mengunggah file: ' . $e->getMessage());
+                return;
+            }
         }
 
         $data = [
