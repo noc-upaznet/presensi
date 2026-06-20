@@ -175,33 +175,41 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
     })->middleware('auth')->name('file.dispensasi');
 
     Route::get('/file/lembur/{encrypted}', function ($encrypted) {
-
         try {
             $filename = decrypt($encrypted);
         } catch (\Exception $e) {
             abort(403);
         }
 
-        $paths = [
-            'presensi/file-lembur/' . $filename,
-            'file-lembur/' . $filename,
-        ];
+        $newPath = 'presensi/file-lembur/' . $filename;
+        $oldPath = 'file-lembur/' . $filename;
 
-        foreach ($paths as $path) {
+        // Coba baca file langsung (bypass exists() yang bermasalah)
+        $path = null;
+        $file = null;
+
+        foreach ([$newPath, $oldPath] as $p) {
             try {
-
-                return redirect(
-                    Storage::disk('s3')->temporaryUrl(
-                        $path,
-                        now()->addMinutes(1)
-                    )
-                );
+                $contents = Storage::disk('s3')->get($p);
+                if ($contents) {
+                    $path = $p;
+                    $file = $contents;
+                    break;
+                }
             } catch (\Throwable $e) {
-                // lanjut cek path berikutnya
+                continue;
             }
         }
 
-        abort(404);
+        if (!$file) {
+            abort(404);
+        }
+
+        $mime = Storage::disk('s3')->mimeType($path);
+
+        return response($file, 200)
+            ->header('Content-Type', $mime)
+            ->header('Content-Disposition', 'inline; filename="' . basename($path) . '"');
     })->middleware('auth')->name('file.lembur');
 
     Route::get('/file/pengajuan/{encrypted}', function ($encrypted) {
