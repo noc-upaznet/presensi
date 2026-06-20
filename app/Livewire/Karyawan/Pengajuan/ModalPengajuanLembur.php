@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use App\Livewire\Forms\LemburForm;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 
 class ModalPengajuanLembur extends Component
 {
@@ -50,7 +51,7 @@ class ModalPengajuanLembur extends Component
         $this->form->validate();
 
         $this->validate([
-            'file_bukti' => 'required|file|mimes:jpg,jpeg,png|max:2048',
+            'file_bukti' => 'required',
         ], [
             'file_bukti.required' => 'File bukti harus diunggah.',
             'file_bukti.max' => 'Ukuran file maksimal 2MB.',
@@ -58,9 +59,41 @@ class ModalPengajuanLembur extends Component
         ]);
 
         $path = null;
+        // if ($this->file_bukti) {
+        //     $filename = md5(uniqid()) . '.' . $this->file_bukti->extension();
+        //     $path = $this->file_bukti->storeAs('presensi/file-lembur', $filename, 's3');
+        // }
         if ($this->file_bukti) {
-            $filename = md5(uniqid()) . '.' . $this->file_bukti->extension();
-            $path = $this->file_bukti->storeAs('presensi/file-lembur', $filename, 's3');
+            try {
+                $filename = md5(uniqid()) . '.' . $this->file_bukti->extension();
+                $destination = 'presensi/file-lembur/' . $filename;
+
+                // Baca file tmp dari S3
+                $tmpPath = $this->file_bukti->getRealPath();
+                // dd($tmpPath);
+                $fileContents = Storage::disk('s3')->get($tmpPath);
+
+                if (!$fileContents) {
+                    $this->addError('file_bukti', 'File tmp tidak ditemukan di storage.');
+                    return;
+                }
+
+                // Tulis ke path final di S3
+                $uploaded = Storage::disk('s3')->put($destination, $fileContents);
+
+                if (!$uploaded) {
+                    $this->addError('file_bukti', 'Gagal mengunggah file.');
+                    return;
+                }
+
+                // Hapus tmp
+                Storage::disk('s3')->delete($tmpPath);
+
+                $path = $destination;
+            } catch (\Exception $e) {
+                $this->addError('file_bukti', 'Gagal mengunggah file: ' . $e->getMessage());
+                return;
+            }
         }
 
         $data = [
@@ -120,16 +153,45 @@ class ModalPengajuanLembur extends Component
         $this->form->validate();
 
         $this->validate([
-            'file_bukti' => $this->existingFile ? 'nullable|max:2048' : 'required|max:2048',
+            'file_bukti' => $this->existingFile ? 'nullable' : 'required',
         ], [
             'file_bukti.required' => 'File bukti harus diunggah.',
-            'file_bukti.max' => 'Ukuran file maksimal 2MB.',
         ]);
 
+
         $path = null;
+        // if ($this->file_bukti && is_object($this->file_bukti)) {
+        //     $filename = md5(uniqid()) . '.' . $this->file_bukti->extension();
+        //     $path = $this->file_bukti->storeAs('presensi/file-lembur', $filename, 's3');
+        // }
+
         if ($this->file_bukti && is_object($this->file_bukti)) {
-            $filename = md5(uniqid()) . '.' . $this->file_bukti->extension();
-            $path = $this->file_bukti->storeAs('presensi/file-lembur', $filename, 's3');
+            try {
+                $filename = md5(uniqid()) . '.' . $this->file_bukti->extension();
+                $destination = 'presensi/file-lembur/' . $filename;
+
+                $tmpPath = $this->file_bukti->getRealPath();
+                $fileContents = Storage::disk('s3')->get($tmpPath);
+
+                if (!$fileContents) {
+                    $this->addError('file_bukti', 'File tmp tidak ditemukan di storage.');
+                    return;
+                }
+
+                $uploaded = Storage::disk('s3')->put($destination, $fileContents);
+
+                if (!$uploaded) {
+                    $this->addError('file_bukti', 'Gagal mengunggah file.');
+                    return;
+                }
+
+                Storage::disk('s3')->delete($tmpPath);
+
+                $path = $destination;
+            } catch (\Exception $e) {
+                $this->addError('file_bukti', 'Gagal mengunggah file: ' . $e->getMessage());
+                return;
+            }
         }
 
 

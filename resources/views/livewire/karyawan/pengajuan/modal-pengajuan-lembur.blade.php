@@ -276,14 +276,12 @@
                                 <p class="mt-2 mb-0 text-muted small">
                                     Klik untuk ganti file
                                 </p>
-                            @elseif (is_string($existingFile) && $existingFile)
-                                {{-- Preview file lama --}}
-                                <img src="{{ route('file.lembur', encrypt($existingFile)) }}" alt="File saat ini"
+                            @elseif ($existingFile)
+                                {{-- Preview file lama dari public storage --}}
+                                <img src="{{ Storage::disk('s3')->temporaryUrl($existingFile, now()->addMinutes(30)) }}"
+                                    alt="File saat ini"
                                     style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
-
-                                <p class="mt-2 mb-0 text-muted small">
-                                    Klik untuk ganti file
-                                </p>
+                                <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                             @else
                                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
                                 <p class="mb-1 fw-semibold text-secondary">

@@ -59,10 +59,8 @@ return [
             'throw' => false,
             'report' => false,
 
-            'options' => [
-                'http' => [
-                    'verify' => false,
-                ],
+            'http' => [
+                'verify' => false,
             ],
         ],
 
