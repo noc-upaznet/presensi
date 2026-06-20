@@ -283,12 +283,15 @@
                                 <input type="file" class="d-none" id="file" wire:model="file"
                                     accept=".jpg,.jpeg,.png">
 
-                                @if ($file && is_object($file))
-                                    {{-- Preview file yang dipilih --}}
-                                    <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file->getFilename()) }}"
+                                @if ($file instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                                    {{-- Preview file baru --}}
+                                    <img src="{{ route('secure.file', encrypt('livewire-tmp/' . $file->getFilename())) }}"
                                         wire:key="temp-preview-{{ $file->getFilename() }}"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
-                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+
+                                    <p class="mt-2 mb-0 text-muted small">
+                                        Klik untuk ganti file
+                                    </p>
                                 @else
                                     {{-- Belum ada file --}}
                                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
@@ -378,11 +381,15 @@
                                 <input type="file" class="d-none" id="file" wire:model="file"
                                     accept=".jpg,.jpeg,.png">
 
-                                @if ($file && is_object($file))
-                                    <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file->getFilename()) }}"
+                                @if ($file instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                                    {{-- Preview file baru --}}
+                                    <img src="{{ route('secure.file', encrypt('livewire-tmp/' . $file->getFilename())) }}"
                                         wire:key="temp-preview-{{ $file->getFilename() }}"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
-                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+
+                                    <p class="mt-2 mb-0 text-muted small">
+                                        Klik untuk ganti file
+                                    </p>
                                 @elseif ($existingFile)
                                     <img src="{{ Storage::disk('s3')->temporaryUrl($existingFile, now()->addMinutes(30)) }}"
                                         alt="File saat ini"

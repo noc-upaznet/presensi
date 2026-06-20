@@ -277,4 +277,21 @@ Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], 
         return response($file, 200)
             ->header('Content-Type', $mime);
     })->middleware('auth')->name('file.selfies');
+
+    Route::get('/secure-file/{file}', function ($file) {
+
+        $path = decrypt($file);
+
+        try {
+
+            return redirect(
+                Storage::disk('s3')->temporaryUrl(
+                    $path,
+                    now()->addMinutes(1)
+                )
+            );
+        } catch (\Throwable $e) {
+            abort(404);
+        }
+    })->middleware('auth')->name('secure.file');
 });

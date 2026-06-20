@@ -112,12 +112,15 @@
                             <input type="file" class="d-none" id="file_bukti" wire:model="file_bukti"
                                 accept=".jpg,.jpeg,.png">
 
-                            @if ($file_bukti && is_object($file_bukti))
-                                {{-- Preview file yang dipilih --}}
-                                <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file_bukti->getFilename()) }}"
+                            @if ($file_bukti instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                                {{-- Preview file baru --}}
+                                <img src="{{ route('secure.file', encrypt('livewire-tmp/' . $file_bukti->getFilename())) }}"
                                     wire:key="temp-preview-{{ $file_bukti->getFilename() }}"
                                     style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
-                                <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+
+                                <p class="mt-2 mb-0 text-muted small">
+                                    Klik untuk ganti file
+                                </p>
                             @else
                                 {{-- Belum ada file --}}
                                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
@@ -264,23 +267,31 @@
                             <input type="file" class="d-none" id="file" wire:model="file_bukti"
                                 accept=".jpg,.jpeg,.png">
 
-                            @if ($file_bukti && is_object($file_bukti))
+                            @if ($file_bukti instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
                                 {{-- Preview file baru --}}
-                                <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file_bukti->getFilename()) }}"
+                                <img src="{{ route('secure.file', encrypt('livewire-tmp/' . $file_bukti->getFilename())) }}"
                                     wire:key="temp-preview-{{ $file_bukti->getFilename() }}"
                                     style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
-                                <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
-                            @elseif ($existingFile)
-                                {{-- Preview file lama dari public storage --}}
-                                <img src="{{ Storage::disk('s3')->temporaryUrl($existingFile, now()->addMinutes(30)) }}"
-                                    alt="File saat ini"
+
+                                <p class="mt-2 mb-0 text-muted small">
+                                    Klik untuk ganti file
+                                </p>
+                            @elseif (is_string($existingFile) && $existingFile)
+                                {{-- Preview file lama --}}
+                                <img src="{{ route('file.lembur', encrypt($existingFile)) }}" alt="File saat ini"
                                     style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
-                                <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
+
+                                <p class="mt-2 mb-0 text-muted small">
+                                    Klik untuk ganti file
+                                </p>
                             @else
-                                {{-- Belum ada file --}}
                                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
-                                <p class="mb-1 fw-semibold text-secondary">Klik atau drag file ke sini</p>
-                                <p class="mb-0 text-muted small">JPG, JPEG, PNG — maks. 2MB</p>
+                                <p class="mb-1 fw-semibold text-secondary">
+                                    Klik atau drag file ke sini
+                                </p>
+                                <p class="mb-0 text-muted small">
+                                    JPG, JPEG, PNG — maks. 2MB
+                                </p>
                             @endif
                         </label>
 
