@@ -46,7 +46,7 @@ class ReportTicket extends Component
 
     public function mount()
     {
-        $this->branches = Branch::orderBy('name')->get();
+        $this->branches = Branch::orderBy('name')->where('id', '!=', 10)->get();
 
         $this->filterEndDate = date('Y-m-d');
         $this->filterStartDate = date('Y-m-d');
