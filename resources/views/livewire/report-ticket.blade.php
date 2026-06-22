@@ -40,6 +40,15 @@
                     </div>
 
                     <div class="col-md-3">
+                        <label class="form-label">Lama Pengerjaan</label>
+                        <select class="form-select" wire:model.live="workDuration">
+                            <option value="">-- Pilih --</option>
+                            <option value="1">Lebih Dari 4 Jam</option>
+                            <option value="2">Kurang Dari 4 Jam</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
                         <label class="form-label">Tanggal Awal</label>
                         <input type="date" class="form-control" wire:model.live="filterStartDate">
                     </div>

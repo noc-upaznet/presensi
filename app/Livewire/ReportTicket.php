@@ -25,6 +25,7 @@ class ReportTicket extends Component
     public $branchId = '';
     public $branches;
     public $tableLength = 10;
+    public $workDuration = '';
     public function resetSearch()
     {
         $this->filterStartDate = date('Y-m-d');
@@ -60,6 +61,17 @@ class ReportTicket extends Component
             ->latest()
             ->limit($this->tableLength)
             ->get();
+        if ($this->workDuration == 1) {
+
+            $this->reportKunjungan = $this->reportKunjungan->filter(function ($item) {
+                return $item->ticket->created_at->diffInHours($item->created_at) > 4;
+            });
+        } elseif ($this->workDuration == 2) {
+
+            $this->reportKunjungan = $this->reportKunjungan->filter(function ($item) {
+                return $item->ticket->created_at->diffInHours($item->created_at) <= 4;
+            });
+        }
 
         $this->reportTm = ReportTm::with([
             'team',
@@ -80,6 +92,17 @@ class ReportTicket extends Component
             ->latest()
             ->limit($this->tableLength)
             ->get();
+        if ($this->workDuration == 1) {
+
+            $this->reportTm = $this->reportTm->filter(function ($item) {
+                return $item->ticket->created_at->diffInHours($item->created_at) > 4;
+            });
+        } elseif ($this->workDuration == 2) {
+
+            $this->reportTm = $this->reportTm->filter(function ($item) {
+                return $item->ticket->created_at->diffInHours($item->created_at) <= 4;
+            });
+        }
 
         return view('livewire.report-ticket');
     }
