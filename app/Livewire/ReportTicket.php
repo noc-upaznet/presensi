@@ -8,9 +8,13 @@ use App\Models\Tickets\ReportTm;
 use App\Models\Tickets\TicketKunjungan;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithoutUrlPagination;
+use Livewire\WithPagination;
 
 class ReportTicket extends Component
 {
+    use WithPagination, WithoutUrlPagination;
+    protected $paginationTheme = 'bootstrap';
     public $filterStartDate = '';
     public $filterEndDate = '';
     public $filterStatus = '';
@@ -19,8 +23,8 @@ class ReportTicket extends Component
     public $table = [];
 
     // public $tableDetail =[];
-    public $reportKunjungan = [];
-    public $reportTm = [];
+    // public $reportKunjungan = [];
+    // public $reportTm = [];
     public $ticketKunjungan = [];
 
     public $team;
@@ -38,12 +42,6 @@ class ReportTicket extends Component
     public function setTab($tab)
     {
         $this->tab = $tab;
-    }
-
-    public function resetSearch()
-    {
-        $this->filterStartDate = date('Y-m-d');
-        $this->filterEndDate = date('Y-m-d');
     }
 
     public function mount()
@@ -82,68 +80,94 @@ class ReportTicket extends Component
 
     public function render()
     {
-        $this->reportKunjungan = ReportKunjungan::with([
+        $queryReportKunjungan = ReportKunjungan::with([
             'team',
             'ticket.customer',
             'ticket.branch',
         ])
-            ->whereHas('ticket', function ($q) {
-                $q->where('is_gangguan', 1);
-            })
+            ->join(
+                'ticket_kunjungan',
+                'ticket_kunjungan.id',
+                '=',
+                'report_kunjungan.ticket_id'
+            )
+            ->where('ticket_kunjungan.is_gangguan', 1)
             ->when($this->branchId, function ($query) {
-                $query->whereHas('ticket', function ($q) {
-                    $q->where('branch_id', $this->branchId);
-                });
+                $query->where('ticket_kunjungan.branch_id', $this->branchId);
             })
-            ->whereBetween('created_at', [
+            ->whereBetween('report_kunjungan.created_at', [
                 $this->filterStartDate . ' 00:00:00',
                 $this->filterEndDate . ' 23:59:59',
-            ])
-            ->latest()
-            ->limit($this->tableLength)
-            ->get();
+            ]);
+
         if ($this->workDuration == 1) {
-
-            $this->reportKunjungan = $this->reportKunjungan->filter(function ($item) {
-                return $item->ticket->created_at->diffInHours($item->created_at) > 4;
-            });
-        } elseif ($this->workDuration == 2) {
-
-            $this->reportKunjungan = $this->reportKunjungan->filter(function ($item) {
-                return $item->ticket->created_at->diffInHours($item->created_at) <= 4;
-            });
+            $queryReportKunjungan->whereRaw("
+                TIMESTAMPDIFF(
+                    HOUR,
+                    ticket_kunjungan.created_at,
+                    report_kunjungan.created_at
+                ) > 4
+            ");
         }
 
-        $this->reportTm = ReportTm::with([
+        if ($this->workDuration == 2) {
+            $queryReportKunjungan->whereRaw("
+                TIMESTAMPDIFF(
+                    HOUR,
+                    ticket_kunjungan.created_at,
+                    report_kunjungan.created_at
+                ) <= 4
+            ");
+        }
+
+        $reportKunjungan = $queryReportKunjungan
+            ->select('report_kunjungan.*')
+            ->latest('report_kunjungan.created_at')
+            ->paginate($this->tableLength, ['*'], 'kunjunganPage');
+
+        $queryReportTm = ReportTm::with([
             'team',
             'ticket.branch',
         ])
-            ->whereHas('ticket', function ($q) {
-                $q->where('is_gangguan', 1);
-            })
+            ->join(
+                'ticket_tm',
+                'ticket_tm.id',
+                '=',
+                'report_tm.ticket_id'
+            )
+            ->where('ticket_tm.is_gangguan', 1)
             ->when($this->branchId, function ($query) {
-                $query->whereHas('ticket', function ($q) {
-                    $q->where('branch_id', $this->branchId);
-                });
+                $query->where('ticket_tm.branch_id', $this->branchId);
             })
-            ->whereBetween('created_at', [
+            ->whereBetween('report_tm.created_at', [
                 $this->filterStartDate . ' 00:00:00',
                 $this->filterEndDate . ' 23:59:59',
-            ])
-            ->latest()
-            ->limit($this->tableLength)
-            ->get();
+            ]);
+
         if ($this->workDuration == 1) {
-
-            $this->reportTm = $this->reportTm->filter(function ($item) {
-                return $item->ticket->created_at->diffInHours($item->created_at) > 4;
-            });
-        } elseif ($this->workDuration == 2) {
-
-            $this->reportTm = $this->reportTm->filter(function ($item) {
-                return $item->ticket->created_at->diffInHours($item->created_at) <= 4;
-            });
+            $queryReportTm->whereRaw("
+                TIMESTAMPDIFF(
+                    HOUR,
+                    ticket_tm.created_at,
+                    report_tm.created_at
+                ) > 4
+            ");
         }
+
+        if ($this->workDuration == 2) {
+            $queryReportTm->whereRaw("
+                TIMESTAMPDIFF(
+                    HOUR,
+                    ticket_tm.created_at,
+                    report_tm.created_at
+                ) <= 4
+            ");
+        }
+
+        $reportTm = $queryReportTm
+            ->select('report_tm.*')
+            ->latest('report_tm.created_at')
+            ->paginate($this->tableLength, ['*'], 'tmPage');
 
         $this->ticketKunjungan = TicketKunjungan::query()
             ->join(
@@ -211,14 +235,12 @@ class ReportTicket extends Component
 
         $this->ticketKunjungan->addSelect([
 
-            // Total gangguan
             'repeat_count' => TicketKunjungan::from('ticket_kunjungan as tk2')
                 ->selectRaw('COUNT(*)')
                 ->whereColumn('tk2.customer_id', 'ticket_kunjungan.customer_id')
                 ->where('tk2.is_gangguan', 1)
                 ->whereNull('tk2.deleted_at'),
 
-            // Gangguan 1 bulan terakhir
             'repeat_month' => TicketKunjungan::from('ticket_kunjungan as tk2')
                 ->selectRaw('COUNT(*)')
                 ->whereColumn('tk2.customer_id', 'ticket_kunjungan.customer_id')
@@ -226,7 +248,6 @@ class ReportTicket extends Component
                 ->whereNull('tk2.deleted_at')
                 ->where('tk2.created_at', '>=', now()->subMonth()),
 
-            // Gangguan 1 minggu terakhir
             'repeat_week' => TicketKunjungan::from('ticket_kunjungan as tk2')
                 ->selectRaw('COUNT(*)')
                 ->whereColumn('tk2.customer_id', 'ticket_kunjungan.customer_id')
@@ -235,11 +256,16 @@ class ReportTicket extends Component
                 ->where('tk2.created_at', '>=', now()->subWeek()),
         ]);
 
+        $this->ticketKunjungan->havingRaw('repeat_count > 1');
+
         $this->ticketKunjungan = $this->ticketKunjungan
             ->with(['customer', 'team'])
             ->limit($this->tableLength)
             ->get();
 
-        return view('livewire.report-ticket');
+        return view('livewire.report-ticket', [
+            'reportKunjungan' => $reportKunjungan,
+            'reportTm' => $reportTm,
+        ]);
     }
 }

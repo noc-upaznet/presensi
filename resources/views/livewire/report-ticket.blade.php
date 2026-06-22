@@ -225,6 +225,9 @@
                                         </table>
                                     </div>
                                 </div>
+                                <div class="mt-3 p-2">
+                                    {{ $reportKunjungan->links() }}
+                                </div>
                             </div>
 
                             {{-- T&M --}}
@@ -354,6 +357,9 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                    </div>
+                                    <div class="mt-3 p-2">
+                                        {{ $reportTm->links() }}
                                     </div>
                                 </div>
                         </div>
