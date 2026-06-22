@@ -25,7 +25,7 @@ class ReportTicket extends Component
     // public $tableDetail =[];
     // public $reportKunjungan = [];
     // public $reportTm = [];
-    public $ticketKunjungan = [];
+    // public $ticketKunjungan = [];
 
     public $team;
     public $branchId = '';
@@ -169,7 +169,7 @@ class ReportTicket extends Component
             ->latest('report_tm.created_at')
             ->paginate($this->tableLength, ['*'], 'tmPage');
 
-        $this->ticketKunjungan = TicketKunjungan::query()
+        $queryTicketKunjungan = TicketKunjungan::query()
             ->join(
                 'customers',
                 'ticket_kunjungan.customer_id',
@@ -188,14 +188,15 @@ class ReportTicket extends Component
             ->where('ticket_kunjungan.is_gangguan', 1);
 
 
+
         if ($this->branchId) {
-            $this->ticketKunjungan->where(
+            $queryTicketKunjungan->where(
                 'ticket_kunjungan.branch_id',
                 $this->branchId
             );
         }
 
-        $this->ticketKunjungan->whereBetween(
+        $queryTicketKunjungan->whereBetween(
             'ticket_kunjungan.created_at',
             [
                 $this->filterStartDate . ' 00:00:00',
@@ -204,7 +205,7 @@ class ReportTicket extends Component
         );
 
         if ($this->tableSearch) {
-            $this->ticketKunjungan->where(function ($query) {
+            $queryTicketKunjungan->where(function ($query) {
                 $query->where(
                     'ticket_kunjungan.ticket_number',
                     'like',
@@ -233,7 +234,7 @@ class ReportTicket extends Component
             });
         }
 
-        $this->ticketKunjungan->addSelect([
+        $queryTicketKunjungan->addSelect([
 
             'repeat_count' => TicketKunjungan::from('ticket_kunjungan as tk2')
                 ->selectRaw('COUNT(*)')
@@ -256,16 +257,20 @@ class ReportTicket extends Component
                 ->where('tk2.created_at', '>=', now()->subWeek()),
         ]);
 
-        $this->ticketKunjungan->havingRaw('repeat_count > 1');
+        $queryTicketKunjungan->havingRaw('repeat_count > 1');
 
-        $this->ticketKunjungan = $this->ticketKunjungan
+        $ticketKunjungan = $queryTicketKunjungan
             ->with(['customer', 'team'])
-            ->limit($this->tableLength)
-            ->get();
+            ->paginate(
+                $this->tableLength,
+                ['*'],
+                'ticketPage'
+            );
 
         return view('livewire.report-ticket', [
             'reportKunjungan' => $reportKunjungan,
             'reportTm' => $reportTm,
+            'ticketKunjungan' => $ticketKunjungan,
         ]);
     }
 }

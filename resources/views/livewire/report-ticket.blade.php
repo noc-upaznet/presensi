@@ -599,6 +599,9 @@
                                         @endforeach
                                 </table>
                             </div>
+                            <div class="mt-3 p-2">
+                                {{ $ticketKunjungan->links() }}
+                            </div>
                         </div>
                     </div>
 
