@@ -73,10 +73,6 @@ class ReportTicket extends Component
             $this->repeatTitle = 'Riwayat Gangguan 1 Minggu';
         }
 
-        if ($type == 'all') {
-            $this->repeatTitle = 'Seluruh Riwayat Gangguan';
-        }
-
         $this->repeatDetails = $query
             ->orderBy('created_at', 'desc')
             ->get();

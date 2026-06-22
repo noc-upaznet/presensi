@@ -423,18 +423,24 @@
                                 <table class="table table-bordered table-hover align-middle mb-0">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>No. Tiket</th>
-                                            <th>Waktu</th>
-                                            <th>ID Pelanggan</th>
-                                            <th>Nama Pelanggan</th>
-                                            <th>Keterangan</th>
-                                            <th>Keterangan Tambahan</th>
-                                            <th>Team</th>
-                                            <th>Status</th>
-                                            <th>Approval</th>
-                                            <th>Total</th>
-                                            <th>1 Bulan</th>
-                                            <th>1 Minggu</th>
+                                            <th rowspan="2">No. Tiket</th>
+                                            <th rowspan="2">Waktu</th>
+                                            <th rowspan="2">ID Pelanggan</th>
+                                            <th rowspan="2">Nama Pelanggan</th>
+                                            <th rowspan="2">Keterangan</th>
+                                            <th rowspan="2">Keterangan Tambahan</th>
+                                            <th rowspan="2">Team</th>
+                                            <th rowspan="2">Status</th>
+                                            <th rowspan="2">Approval</th>
+
+                                            <th colspan="2" class="text-center">
+                                                Kunjungan Berulang
+                                            </th>
+                                        </tr>
+
+                                        <tr>
+                                            <th class="text-center">1 Bulan</th>
+                                            <th class="text-center">1 Minggu</th>
                                         </tr>
                                     </thead>
 
@@ -554,19 +560,6 @@
                                                         @endphp
                                                         Laporan: {!! $approve['report'] !!}
                                                     @endif
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center gap-1">
-                                                        <span class="fw-bold">
-                                                            {{ $ticket->repeat_count }}
-                                                        </span>
-
-                                                        <button class="btn btn-sm btn-info"
-                                                            wire:click="showRepeatDetail({{ $ticket->customer_id }}, 'all')"
-                                                            title="Lihat Detail">
-                                                            <i class="bi bi-list-task"></i>
-                                                        </button>
-                                                    </div>
                                                 </td>
 
                                                 <td>
