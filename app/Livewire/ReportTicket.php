@@ -48,8 +48,8 @@ class ReportTicket extends Component
     {
         $this->branches = Branch::orderBy('name')->get();
 
-        $this->filterEndDate = ($this->filterEndDate != '') ? $this->filterEndDate : date('Y-m-d');
-        $this->filterStartDate = ($this->filterStartDate != '') ? $this->filterStartDate : date('Y-m') . '-01';
+        $this->filterEndDate = date('Y-m-d');
+        $this->filterStartDate = date('Y-m-d');
     }
 
     public function showRepeatDetail($customerId, $type)
