@@ -19,315 +19,555 @@
             </div>
         </div>
     </div>
+    <div class="app-content">
+        <div class="container-fluid">
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist" style="background-color: var(--bs-body-bg);">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold @if ($tab == 'ReportTicket') active @endif"
+                        wire:click='setTab("ReportTicket")' id="ReportTicket-tab" data-bs-toggle="tab"
+                        data-bs-target="#ReportTicket" data-tab-name="ReportTicket" type="button" role="tab"
+                        aria-controls="ReportTicket" aria-selected="true">Laporan Tiket</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold @if ($tab == 'TicketKunjunganRepeat') active @endif"
+                        wire:click='setTab("TicketKunjunganRepeat")' id="TicketKunjunganRepeat-tab" data-bs-toggle="tab"
+                        data-bs-target="#TicketKunjunganRepeat" data-tab-name="TicketKunjunganRepeat" type="button"
+                        role="tab" aria-controls="TicketKunjunganRepeat" aria-selected="true">Tiket Kunjungan
+                        Berulang</button>
+                </li>
+            </ul>
 
-    <div class="container-fluid">
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade @if ($tab == 'ReportTicket') active show @endif " id="ReportTicket"
+                    role="tabpanel" aria-labelledby="ReportTicket-tab">
 
-        {{-- Filter --}}
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="row">
+                    @if ($tab == 'ReportTicket')
+                        {{-- Filter --}}
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row">
 
-                    <div class="col-md-3">
-                        <label class="form-label">Branch</label>
-                        <select class="form-select" wire:model.live="branchId">
-                            <option value="">-- Pilih Branch --</option>
-                            @foreach ($branches as $branch)
-                                <option value="{{ $branch->id }}">
-                                    {{ $branch->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Branch</label>
+                                        <select class="form-select" wire:model.live="branchId">
+                                            <option value="">-- Pilih Branch --</option>
+                                            @foreach ($branches as $branch)
+                                                <option value="{{ $branch->id }}">
+                                                    {{ $branch->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
 
-                    <div class="col-md-3">
-                        <label class="form-label">Lama Pengerjaan</label>
-                        <select class="form-select" wire:model.live="workDuration">
-                            <option value="">-- Pilih --</option>
-                            <option value="1">Lebih Dari 4 Jam</option>
-                            <option value="2">Kurang Dari 4 Jam</option>
-                        </select>
-                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Lama Pengerjaan</label>
+                                        <select class="form-select" wire:model.live="workDuration">
+                                            <option value="">-- Pilih --</option>
+                                            <option value="1">Lebih Dari 4 Jam</option>
+                                            <option value="2">Kurang Dari 4 Jam</option>
+                                        </select>
+                                    </div>
 
-                    <div class="col-md-3">
-                        <label class="form-label">Tanggal Awal</label>
-                        <input type="date" class="form-control" wire:model.live="filterStartDate">
-                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Tanggal Awal</label>
+                                        <input type="date" class="form-control" wire:model.live="filterStartDate">
+                                    </div>
 
-                    <div class="col-md-3">
-                        <label class="form-label">Tanggal Akhir</label>
-                        <input type="date" class="form-control" wire:model.live="filterEndDate">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Tanggal Akhir</label>
+                                        <input type="date" class="form-control" wire:model.live="filterEndDate">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- KUNJUNGAN --}}
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Kunjungan</h5>
+                            </div>
+
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <label>Show
+                                            <select class="form-select form-select-sm d-inline-block w-auto"
+                                                wire:model.live="tableLength">
+                                                <option value="10">10</option>
+                                                <option value="25">25</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                                <option value="250">250</option>
+                                            </select> entries per page</label>
+                                    </div>
+                                    <div>
+                                        <input type="search" class="form-control form-control-sm"
+                                            placeholder="Search..." wire:model.live="search">
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>No. Tiket</th>
+                                                <th>ID | Nama Pelanggan</th>
+                                                <th>Tiket Dibuat</th>
+                                                <th>Waktu</th>
+                                                <th>Lama Pengerjaan</th>
+                                                <th>Team</th>
+                                                <th>Detail Pengerjaan</th>
+                                                <th>Data Yang Berubah</th>
+                                                <th>Barang Yang Digunakan</th>
+                                                <th>Biaya</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            @forelse ($reportKunjungan as $report)
+                                                <tr>
+                                                    <td>
+                                                        {{ $report->ticket->ticket_number ?? '-' }}
+
+                                                        @if (($report->ticket->is_gangguan ?? 0) == 1)
+                                                            <span class="badge bg-danger">
+                                                                Gangguan
+                                                            </span>
+                                                        @endif
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $report->ticket->customer->registration_number ?? '-' }}
+                                                        |
+                                                        {{ $report->ticket->customer->name ?? '-' }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $report->ticket->created_at }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $report->created_at }}
+                                                    </td>
+                                                    <td>
+                                                        @php
+                                                            $ticketCreated = \Carbon\Carbon::parse(
+                                                                $report->ticket->created_at,
+                                                            );
+                                                            $reportCreated = \Carbon\Carbon::parse($report->created_at);
+
+                                                            $diff = $ticketCreated->diff($reportCreated);
+                                                        @endphp
+
+                                                        {{ $diff->format('%a Hari %h Jam %i Menit') }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $report->team->name ?? '-' }}
+                                                        <br>
+                                                        <small>
+                                                            ({{ ' ' . $report->teknisi . ' ' }})
+                                                        </small>
+                                                    </td>
+
+                                                    <td>
+                                                        {!! nl2br(e($report->detail_report)) !!}
+                                                    </td>
+
+                                                    <td>
+                                                        {!! nl2br(e($report->changed_data)) !!}
+                                                    </td>
+
+                                                    <td>
+                                                        {!! nl2br(e($report->goods)) !!}
+                                                    </td>
+
+                                                    <td class="text-end">
+                                                        Rp {{ number_format($report->bill ?? 0, 0, ',', '.') }}
+                                                    </td>
+
+                                                    <td>
+                                                        @switch($report->status)
+                                                            @case(1)
+                                                                <span class="badge bg-success">
+                                                                    Done
+                                                                </span>
+                                                            @break
+
+                                                            @case(2)
+                                                                <span class="badge bg-warning">
+                                                                    Lost Time
+                                                                </span>
+                                                            @break
+
+                                                            @case(3)
+                                                                <span class="badge bg-secondary">
+                                                                    Pending
+                                                                </span>
+                                                            @break
+
+                                                            @default
+                                                                <span class="badge bg-dark">
+                                                                    Unknown
+                                                                </span>
+                                                        @endswitch
+                                                    </td>
+                                                </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="11" class="text-center text-muted">
+                                                            Tidak ada data kunjungan
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- T&M --}}
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">T&M</h5>
+                                </div>
+
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <label>Show
+                                                <select class="form-select form-select-sm d-inline-block w-auto"
+                                                    wire:model.live="tableLength">
+                                                    <option value="10">10</option>
+                                                    <option value="25">25</option>
+                                                    <option value="50">50</option>
+                                                    <option value="100">100</option>
+                                                    <option value="250">250</option>
+                                                </select> entries per page</label>
+                                        </div>
+                                        <div>
+                                            <input type="search" class="form-control form-control-sm"
+                                                placeholder="Search..." wire:model.live="search">
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover align-middle mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>No. Tiket</th>
+                                                    <th>Tiket Dibuat</th>
+                                                    <th>Waktu</th>
+                                                    <th>Lama Pengerjaan</th>
+                                                    <th>Team</th>
+                                                    <th>Detail Pengerjaan</th>
+                                                    <th>Barang Yang Digunakan</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @forelse ($reportTm as $report)
+                                                    <tr>
+                                                        <td>
+                                                            {{ $report->ticket->ticket_number ?? '-' }}
+
+                                                            @if (($report->ticket->is_gangguan ?? 0) == 1)
+                                                                <span class="badge bg-danger">
+                                                                    Gangguan
+                                                                </span>
+                                                            @endif
+                                                        </td>
+
+                                                        <td>
+                                                            {{ $report->ticket->created_at }}
+                                                        </td>
+
+                                                        <td>
+                                                            {{ $report->created_at }}
+                                                        </td>
+                                                        <td>
+                                                            @php
+                                                                $ticketCreated = \Carbon\Carbon::parse(
+                                                                    $report->ticket->created_at,
+                                                                );
+                                                                $reportCreated = \Carbon\Carbon::parse(
+                                                                    $report->created_at,
+                                                                );
+
+                                                                $diff = $ticketCreated->diff($reportCreated);
+                                                            @endphp
+
+                                                            {{ $diff->format('%a Hari %h Jam %i Menit') }}
+                                                        </td>
+
+                                                        <td>
+                                                            {{ $report->team->name ?? '-' }}
+                                                            <br>
+                                                            <small>
+                                                                ({{ ' ' . $report->teknisi . ' ' }})
+                                                            </small>
+                                                        </td>
+
+                                                        <td>
+                                                            {!! nl2br(e($report->detail_report)) !!}
+                                                        </td>
+
+                                                        <td>
+                                                            {!! nl2br(e($report->goods)) !!}
+                                                        </td>
+
+                                                        <td>
+                                                            @switch($report->status)
+                                                                @case(1)
+                                                                    <span class="badge bg-success">
+                                                                        Done
+                                                                    </span>
+                                                                @break
+
+                                                                @case(2)
+                                                                    <span class="badge bg-warning">
+                                                                        Lost Time
+                                                                    </span>
+                                                                @break
+
+                                                                @case(3)
+                                                                    <span class="badge bg-secondary">
+                                                                        Pending
+                                                                    </span>
+                                                                @break
+
+                                                                @default
+                                                                    <span class="badge bg-dark">
+                                                                        Unknown
+                                                                    </span>
+                                                            @endswitch
+                                                        </td>
+                                                    </tr>
+                                                    @empty
+                                                        <tr>
+                                                            <td colspan="8" class="text-center text-muted">
+                                                                Tidak ada data T&M
+                                                            </td>
+                                                        </tr>
+                                                    @endforelse
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                        @endif
                     </div>
 
                 </div>
+
+                <div class="tab-pane fade @if ($tab == 'TicketKunjunganRepeat') active show @endif " id="TicketKunjunganRepeat"
+                    role="tabpanel" aria-labelledby="TicketKunjunganRepeat-tab">
+
+                    {{-- Filter --}}
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row">
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Branch</label>
+                                    <select class="form-select" wire:model.live="branchId">
+                                        <option value="">-- Pilih Branch --</option>
+                                        @foreach ($branches as $branch)
+                                            <option value="{{ $branch->id }}">
+                                                {{ $branch->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Tanggal Awal</label>
+                                    <input type="date" class="form-control" wire:model.live="filterStartDate">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Tanggal Akhir</label>
+                                    <input type="date" class="form-control" wire:model.live="filterEndDate">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Kunjungan</h5>
+                        </div>
+
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <label>Show
+                                        <select class="form-select form-select-sm d-inline-block w-auto"
+                                            wire:model.live="tableLength">
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                            <option value="250">250</option>
+                                        </select> entries per page</label>
+                                </div>
+                                <div>
+                                    <input type="search" class="form-control form-control-sm" placeholder="Search..."
+                                        wire:model.live="search">
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>No. Tiket</th>
+                                            <th>Waktu</th>
+                                            <th>ID Pelanggan</th>
+                                            <th>Nama Pelanggan</th>
+                                            <th>Keterangan</th>
+                                            <th>Keterangan Tambahan</th>
+                                            <th>Team</th>
+                                            <th>Status</th>
+                                            <th>Approval</th>
+                                            <th>Total</th>
+                                            <th>1 Bulan</th>
+                                            <th>1 Minggu</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @foreach ($ticketKunjungan as $ticket)
+                                            @php
+                                                $id = Crypt::encrypt($ticket->id);
+                                                $status = [
+                                                    '0' => '',
+                                                    '1' => 'ON-PROGRESS',
+                                                    '2' => 'PENDING',
+                                                    '3' => 'CANCEL',
+                                                    '4' => 'REPORTED',
+                                                    '5' => 'LOST-TIME',
+                                                    '6' => 'CHECK',
+                                                    '7' => 'RESCHEDULE',
+                                                    '8' => 'CONFIRM',
+                                                    '9' => 'DONE',
+                                                ];
+
+                                                $approve_role = [
+                                                    'approve_teknis' => 'SPV Teknisi',
+                                                    'approve_noc' => 'NOC',
+                                                    'approve_stock' => 'ASL',
+                                                    'approve_billing' => 'Billing',
+                                                    'approve_data' => 'CS',
+                                                ];
+                                                $user = Auth::user();
+                                            @endphp
+                                            <tr wire:key='{{ $id }}'>
+                                                <td>{{ $ticket->ticket_number }}
+                                                    @if ($ticket->is_gangguan)
+                                                        <span class="badge bg-danger">
+                                                            Gangguan
+                                                        </span>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $ticket->created_at }}</td>
+                                                <td>{{ $ticket->customer->registration_number ?? 'Terhapus' }}
+                                                    @if ($ticket->customer->media_connection ?? 'Terhapus')
+                                                        @switch($ticket->customer->media_connection?? 'Terhapus')
+                                                            @case('1')
+                                                                <span class="badge bg-info">GPON</span>
+                                                            @break
+
+                                                            @case('2')
+                                                                <span class="badge bg-info">Wireless</span>
+                                                            @break
+
+                                                            @case('3')
+                                                                <span class="badge bg-info">Tarik</span>
+                                                            @break
+
+                                                            @case('4')
+                                                                <span class="badge bg-info">Titip</span>
+                                                            @break
+
+                                                            @default
+                                                        @endswitch
+                                                    @endif
+                                                </td>
+                                                <td>{{ $ticket->customer->name ?? 'Terhapus' }}</td>
+                                                <td>{!! nl2br($ticket->description) !!}</td>
+                                                <td>{!! nl2br($ticket->additional) !!}</td>
+                                                <td>{{ $ticket->team->name ?? '' }}</td>
+                                                <td>{{ $status[$ticket->status] }}</td>
+                                                <td>
+
+                                                    @php
+                                                        $approve['ticket'] =
+                                                            '<span class="badge rounded-pill bg-warning text-dark">Menunggu Di-Approve</span>';
+                                                        if ($ticket->approve_billing) {
+                                                            $approve['ticket'] =
+                                                                '<span class="badge rounded-pill bg-success">Sudah Di-Approve</span>';
+                                                        } else {
+                                                            if ($user->hasRole(['Billing'])) {
+                                                                if (!$ticket->approve_data) {
+                                                                    if ($user->hasRole('CS')) {
+                                                                        $approve['ticket'] =
+                                                                            '<span class="badge rounded-pill bg-danger">Butuh Di-Approve</span>';
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+
+                                                    @endphp
+                                                    Ticket: {!! $approve['ticket'] !!}<br />
+                                                    @if ($ticket->hasReport())
+                                                        @php
+                                                            $approve['report'] =
+                                                                '<span class="badge rounded-pill bg-warning text-dark">Menunggu Di-Approve</span>';
+                                                            if ($ticket->allReportApproved()) {
+                                                                $approve['report'] =
+                                                                    '<span class="badge rounded-pill bg-success">Sudah Di-Approve</span>';
+                                                            } else {
+                                                                if (
+                                                                    $user->hasRole([
+                                                                        'SPV Teknisi',
+                                                                        'Billing',
+                                                                        'CS',
+                                                                        'NOC',
+                                                                        'ASL',
+                                                                    ])
+                                                                ) {
+                                                                    $report_approve = $ticket->checkApprovalReport();
+
+                                                                    foreach ($report_approve as $key => $value) {
+                                                                        if (!$value) {
+                                                                            if ($user->hasRole($approve_role[$key])) {
+                                                                                $approve['report'] =
+                                                                                    '<span class="badge rounded-pill bg-danger">Butuh Di-Approve</span>';
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        @endphp
+                                                        Laporan: {!! $approve['report'] !!}
+                                                    @endif
+                                                </td>
+                                                <td>{{ $ticket->repeat_count }}</td>
+                                                <td>{{ $ticket->repeat_month }}</td>
+                                                <td>{{ $ticket->repeat_week }}</td>
+                                            </tr>
+                                        @endforeach
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
             </div>
         </div>
-
-        {{-- KUNJUNGAN --}}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">Kunjungan</h5>
-            </div>
-
-            <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <label>Show
-                            <select class="form-select form-select-sm d-inline-block w-auto"
-                                wire:model.live="tableLength">
-                                <option value="10">10</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                                <option value="250">250</option>
-                            </select> entries per page</label>
-                    </div>
-                    <div>
-                        <input type="search" class="form-control form-control-sm" placeholder="Search..."
-                            wire:model.live="search">
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>No. Tiket</th>
-                                <th>ID | Nama Pelanggan</th>
-                                <th>Tiket Dibuat</th>
-                                <th>Waktu</th>
-                                <th>Lama Pengerjaan</th>
-                                <th>Team</th>
-                                <th>Detail Pengerjaan</th>
-                                <th>Data Yang Berubah</th>
-                                <th>Barang Yang Digunakan</th>
-                                <th>Biaya</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @forelse ($reportKunjungan as $report)
-                                <tr>
-                                    <td>
-                                        {{ $report->ticket->ticket_number ?? '-' }}
-
-                                        @if (($report->ticket->is_gangguan ?? 0) == 1)
-                                            <span class="badge bg-danger">
-                                                Gangguan
-                                            </span>
-                                        @endif
-                                    </td>
-
-                                    <td>
-                                        {{ $report->ticket->customer->registration_number ?? '-' }}
-                                        |
-                                        {{ $report->ticket->customer->name ?? '-' }}
-                                    </td>
-
-                                    <td>
-                                        {{ $report->ticket->created_at }}
-                                    </td>
-
-                                    <td>
-                                        {{ $report->created_at }}
-                                    </td>
-                                    <td>
-                                        @php
-                                            $ticketCreated = \Carbon\Carbon::parse($report->ticket->created_at);
-                                            $reportCreated = \Carbon\Carbon::parse($report->created_at);
-
-                                            $diff = $ticketCreated->diff($reportCreated);
-                                        @endphp
-
-                                        {{ $diff->format('%a Hari %h Jam %i Menit') }}
-                                    </td>
-
-                                    <td>
-                                        {{ $report->team->name ?? '-' }}
-                                        <br>
-                                        <small>
-                                            ({{ ' ' . $report->teknisi . ' ' }})
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        {!! nl2br(e($report->detail_report)) !!}
-                                    </td>
-
-                                    <td>
-                                        {!! nl2br(e($report->changed_data)) !!}
-                                    </td>
-
-                                    <td>
-                                        {!! nl2br(e($report->goods)) !!}
-                                    </td>
-
-                                    <td class="text-end">
-                                        Rp {{ number_format($report->bill ?? 0, 0, ',', '.') }}
-                                    </td>
-
-                                    <td>
-                                        @switch($report->status)
-                                            @case(1)
-                                                <span class="badge bg-success">
-                                                    Done
-                                                </span>
-                                            @break
-
-                                            @case(2)
-                                                <span class="badge bg-warning">
-                                                    Lost Time
-                                                </span>
-                                            @break
-
-                                            @case(3)
-                                                <span class="badge bg-secondary">
-                                                    Pending
-                                                </span>
-                                            @break
-
-                                            @default
-                                                <span class="badge bg-dark">
-                                                    Unknown
-                                                </span>
-                                        @endswitch
-                                    </td>
-                                </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="11" class="text-center text-muted">
-                                            Tidak ada data kunjungan
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            {{-- T&M --}}
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">T&M</h5>
-                </div>
-
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <label>Show
-                                <select class="form-select form-select-sm d-inline-block w-auto"
-                                    wire:model.live="tableLength">
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                    <option value="250">250</option>
-                                </select> entries per page</label>
-                        </div>
-                        <div>
-                            <input type="search" class="form-control form-control-sm" placeholder="Search..."
-                                wire:model.live="search">
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>No. Tiket</th>
-                                    <th>Tiket Dibuat</th>
-                                    <th>Waktu</th>
-                                    <th>Lama Pengerjaan</th>
-                                    <th>Team</th>
-                                    <th>Detail Pengerjaan</th>
-                                    <th>Barang Yang Digunakan</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @forelse ($reportTm as $report)
-                                    <tr>
-                                        <td>
-                                            {{ $report->ticket->ticket_number ?? '-' }}
-
-                                            @if (($report->ticket->is_gangguan ?? 0) == 1)
-                                                <span class="badge bg-danger">
-                                                    Gangguan
-                                                </span>
-                                            @endif
-                                        </td>
-
-                                        <td>
-                                            {{ $report->ticket->created_at }}
-                                        </td>
-
-                                        <td>
-                                            {{ $report->created_at }}
-                                        </td>
-                                        <td>
-                                            @php
-                                                $ticketCreated = \Carbon\Carbon::parse($report->ticket->created_at);
-                                                $reportCreated = \Carbon\Carbon::parse($report->created_at);
-
-                                                $diff = $ticketCreated->diff($reportCreated);
-                                            @endphp
-
-                                            {{ $diff->format('%a Hari %h Jam %i Menit') }}
-                                        </td>
-
-                                        <td>
-                                            {{ $report->team->name ?? '-' }}
-                                            <br>
-                                            <small>
-                                                ({{ ' ' . $report->teknisi . ' ' }})
-                                            </small>
-                                        </td>
-
-                                        <td>
-                                            {!! nl2br(e($report->detail_report)) !!}
-                                        </td>
-
-                                        <td>
-                                            {!! nl2br(e($report->goods)) !!}
-                                        </td>
-
-                                        <td>
-                                            @switch($report->status)
-                                                @case(1)
-                                                    <span class="badge bg-success">
-                                                        Done
-                                                    </span>
-                                                @break
-
-                                                @case(2)
-                                                    <span class="badge bg-warning">
-                                                        Lost Time
-                                                    </span>
-                                                @break
-
-                                                @case(3)
-                                                    <span class="badge bg-secondary">
-                                                        Pending
-                                                    </span>
-                                                @break
-
-                                                @default
-                                                    <span class="badge bg-dark">
-                                                        Unknown
-                                                    </span>
-                                            @endswitch
-                                        </td>
-                                    </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="8" class="text-center text-muted">
-                                                Tidak ada data T&M
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
