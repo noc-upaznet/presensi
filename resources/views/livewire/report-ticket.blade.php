@@ -555,9 +555,47 @@
                                                         Laporan: {!! $approve['report'] !!}
                                                     @endif
                                                 </td>
-                                                <td>{{ $ticket->repeat_count }}</td>
-                                                <td>{{ $ticket->repeat_month }}</td>
-                                                <td>{{ $ticket->repeat_week }}</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <span class="fw-bold">
+                                                            {{ $ticket->repeat_count }}
+                                                        </span>
+
+                                                        <button class="btn btn-sm btn-info"
+                                                            wire:click="showRepeatDetail({{ $ticket->customer_id }}, 'all')"
+                                                            title="Lihat Detail">
+                                                            <i class="bi bi-list-task"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+
+                                                <td>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <span class="fw-bold">
+                                                            {{ $ticket->repeat_month }}
+                                                        </span>
+
+                                                        <button class="btn btn-sm btn-info"
+                                                            wire:click="showRepeatDetail({{ $ticket->customer_id }}, 'month')"
+                                                            title="Lihat Detail">
+                                                            <i class="bi bi-list-task"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+
+                                                <td>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <span class="fw-bold">
+                                                            {{ $ticket->repeat_week }}
+                                                        </span>
+
+                                                        <button class="btn btn-sm btn-info"
+                                                            wire:click="showRepeatDetail({{ $ticket->customer_id }}, 'week')"
+                                                            title="Lihat Detail">
+                                                            <i class="bi bi-list-task"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         @endforeach
                                 </table>
@@ -566,8 +604,116 @@
                     </div>
 
                 </div>
+            </div>
+            <div wire:ignore.self class="modal fade" id="repeatDetailModal" tabindex="-1">
 
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
 
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                {{ $repeatTitle }}
+                            </h5>
 
+                            <button type="button" class="btn-close" data-bs-dismiss="modal">
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+
+                            <table class="table table-bordered">
+                                <thead>
+                                    @php
+                                        $status = [
+                                            '0' => '',
+                                            '1' => 'ON-PROGRESS',
+                                            '2' => 'PENDING',
+                                            '3' => 'CANCEL',
+                                            '4' => 'REPORTED',
+                                            '5' => 'LOST-TIME',
+                                            '6' => 'CHECK',
+                                            '7' => 'RESCHEDULE',
+                                            '8' => 'CONFIRM',
+                                            '9' => 'DONE',
+                                        ];
+                                    @endphp
+                                    <tr>
+                                        <th>No Tiket</th>
+                                        <th>Tanggal</th>
+                                        <th>ID Pelanggan</th>
+                                        <th>Nama Pelanggan</th>
+                                        <th>Keterangan</th>
+                                        <th>Keterangan Tambahan</th>
+                                        <th>Team</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach ($repeatDetails as $item)
+                                        <tr>
+                                            <td>{{ $item->ticket_number }}</td>
+
+                                            <td>{{ $item->created_at }}</td>
+
+                                            <td>
+                                                {{ $item->customer->registration_number ?? 'Terhapus' }}
+
+                                                @if ($item->customer?->media_connection)
+                                                    @switch($item->customer->media_connection)
+                                                        @case('1')
+                                                            <span class="badge bg-info">GPON</span>
+                                                        @break
+
+                                                        @case('2')
+                                                            <span class="badge bg-info">Wireless</span>
+                                                        @break
+
+                                                        @case('3')
+                                                            <span class="badge bg-info">Tarik</span>
+                                                        @break
+
+                                                        @case('4')
+                                                            <span class="badge bg-info">Titip</span>
+                                                        @break
+                                                    @endswitch
+                                                @endif
+                                            </td>
+
+                                            <td>
+                                                {{ $item->customer->name ?? 'Terhapus' }}
+                                            </td>
+
+                                            <td>
+                                                {!! nl2br(e($item->description)) !!}
+                                            </td>
+
+                                            <td>
+                                                {!! nl2br(e($item->additional)) !!}
+                                            </td>
+
+                                            <td>
+                                                {{ $item->team->name ?? '-' }}
+                                            </td>
+
+                                            <td>
+                                                {{ $status[$item->status] ?? '-' }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    </div>
+                </div>
             </div>
         </div>
+        @push('scripts')
+            <script>
+                window.addEventListener('show-repeat-detail', () => {
+                    $('#repeatDetailModal').modal('show');
+                });
+            </script>
+        @endpush

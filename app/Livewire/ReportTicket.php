@@ -29,6 +29,9 @@ class ReportTicket extends Component
     public $tableLength = 10;
     public $workDuration = '';
 
+    public $repeatDetails = [];
+    public $repeatTitle = '';
+
     #[Url(as: 'tab')]
     public $tab = 'ReportTicket';
 
@@ -50,6 +53,37 @@ class ReportTicket extends Component
         $this->filterEndDate = ($this->filterEndDate != '') ? $this->filterEndDate : date('Y-m-d');
         $this->filterStartDate = ($this->filterStartDate != '') ? $this->filterStartDate : date('Y-m') . '-01';
     }
+
+    public function showRepeatDetail($customerId, $type)
+    {
+        $query = TicketKunjungan::with([
+            'customer',
+            'team'
+        ])
+            ->where('customer_id', $customerId)
+            ->where('is_gangguan', 1);
+
+        if ($type == 'month') {
+            $query->where('created_at', '>=', now()->subMonth());
+            $this->repeatTitle = 'Riwayat Gangguan 1 Bulan';
+        }
+
+        if ($type == 'week') {
+            $query->where('created_at', '>=', now()->subWeek());
+            $this->repeatTitle = 'Riwayat Gangguan 1 Minggu';
+        }
+
+        if ($type == 'all') {
+            $this->repeatTitle = 'Seluruh Riwayat Gangguan';
+        }
+
+        $this->repeatDetails = $query
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $this->dispatch('show-repeat-detail');
+    }
+
     public function render()
     {
         $this->reportKunjungan = ReportKunjungan::with([
