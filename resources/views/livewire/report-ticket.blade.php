@@ -42,6 +42,9 @@
                     role="tabpanel" aria-labelledby="ReportTicket-tab">
 
                     @if ($tab == 'ReportTicket')
+                        <button wire:click="exportReportTicket" class="btn btn-danger mb-3"><i
+                                class="fa-solid fa-file-excel"></i>
+                            Export</button>
                         {{-- Filter --}}
                         <div class="card mb-4">
                             <div class="card-body">
@@ -370,7 +373,9 @@
 
                 <div class="tab-pane fade @if ($tab == 'TicketKunjunganRepeat') active show @endif " id="TicketKunjunganRepeat"
                     role="tabpanel" aria-labelledby="TicketKunjunganRepeat-tab">
-
+                    <button wire:click="exportTicketKunjunganRepeat" class="btn btn-danger mb-3"><i
+                            class="fa-solid fa-file-excel"></i>
+                        Export</button>
                     {{-- Filter --}}
                     <div class="card mb-4">
                         <div class="card-body">

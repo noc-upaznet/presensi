@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Exports\ReportTicketExport;
+use App\Exports\TicketKunjunganRepeatExport;
 use App\Models\Branch;
 use App\Models\Tickets\ReportKunjungan;
 use App\Models\Tickets\ReportTm;
@@ -10,6 +12,7 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportTicket extends Component
 {
@@ -78,9 +81,37 @@ class ReportTicket extends Component
         $this->dispatch('show-repeat-detail');
     }
 
-    public function render()
+    public function exportReportTicket()
     {
-        $queryReportKunjungan = ReportKunjungan::with([
+        $reportKunjungan = $this->getReportKunjunganQuery()->get();
+
+        $reportTm = $this->getReportTmQuery()->get();
+
+        return Excel::download(
+            new ReportTicketExport(
+                $reportKunjungan,
+                $reportTm
+            ),
+            'Report_Ticket_' . now()->format('Ymd_His') . '.xlsx'
+        );
+    }
+
+    public function exportTicketKunjunganRepeat()
+    {
+        $tickets = $this->getTicketKunjunganRepeatQuery()
+            ->get();
+
+        return Excel::download(
+            new TicketKunjunganRepeatExport($tickets),
+            'Ticket_Kunjungan_Berulang_' .
+                now()->format('Ymd_His') .
+                '.xlsx'
+        );
+    }
+
+    private function getReportKunjunganQuery()
+    {
+        $query = ReportKunjungan::with([
             'team',
             'ticket.customer',
             'ticket.branch',
@@ -101,31 +132,32 @@ class ReportTicket extends Component
             ]);
 
         if ($this->workDuration == 1) {
-            $queryReportKunjungan->whereRaw("
-                TIMESTAMPDIFF(
-                    HOUR,
-                    ticket_kunjungan.created_at,
-                    report_kunjungan.created_at
-                ) > 4
-            ");
+            $query->whereRaw("
+            TIMESTAMPDIFF(
+                HOUR,
+                ticket_kunjungan.created_at,
+                report_kunjungan.created_at
+            ) > 4
+        ");
         }
 
         if ($this->workDuration == 2) {
-            $queryReportKunjungan->whereRaw("
-                TIMESTAMPDIFF(
-                    HOUR,
-                    ticket_kunjungan.created_at,
-                    report_kunjungan.created_at
-                ) <= 4
-            ");
+            $query->whereRaw("
+            TIMESTAMPDIFF(
+                HOUR,
+                ticket_kunjungan.created_at,
+                report_kunjungan.created_at
+            ) <= 4
+        ");
         }
 
-        $reportKunjungan = $queryReportKunjungan
+        return $query
             ->select('report_kunjungan.*')
-            ->latest('report_kunjungan.created_at')
-            ->paginate($this->tableLength, ['*'], 'kunjunganPage');
-
-        $queryReportTm = ReportTm::with([
+            ->latest('report_kunjungan.created_at');
+    }
+    private function getReportTmQuery()
+    {
+        $query = ReportTm::with([
             'team',
             'ticket.branch',
         ])
@@ -145,31 +177,32 @@ class ReportTicket extends Component
             ]);
 
         if ($this->workDuration == 1) {
-            $queryReportTm->whereRaw("
-                TIMESTAMPDIFF(
-                    HOUR,
-                    ticket_tm.created_at,
-                    report_tm.created_at
-                ) > 4
-            ");
+            $query->whereRaw("
+            TIMESTAMPDIFF(
+                HOUR,
+                ticket_tm.created_at,
+                report_tm.created_at
+            ) > 4
+        ");
         }
 
         if ($this->workDuration == 2) {
-            $queryReportTm->whereRaw("
-                TIMESTAMPDIFF(
-                    HOUR,
-                    ticket_tm.created_at,
-                    report_tm.created_at
-                ) <= 4
-            ");
+            $query->whereRaw("
+            TIMESTAMPDIFF(
+                HOUR,
+                ticket_tm.created_at,
+                report_tm.created_at
+            ) <= 4
+        ");
         }
 
-        $reportTm = $queryReportTm
+        return $query
             ->select('report_tm.*')
-            ->latest('report_tm.created_at')
-            ->paginate($this->tableLength, ['*'], 'tmPage');
-
-        $queryTicketKunjungan = TicketKunjungan::query()
+            ->latest('report_tm.created_at');
+    }
+    private function getTicketKunjunganRepeatQuery()
+    {
+        $query = TicketKunjungan::query()
             ->join(
                 'customers',
                 'ticket_kunjungan.customer_id',
@@ -183,20 +216,25 @@ class ReportTicket extends Component
                 'report_kunjungan.ticket_id'
             )
             ->select('ticket_kunjungan.*')
-            ->distinct()
-            ->where('ticket_kunjungan.deleted_at', null)
-            ->where('ticket_kunjungan.is_gangguan', 1);
+            ->whereNull('ticket_kunjungan.deleted_at')
+            ->where('ticket_kunjungan.is_gangguan', 1)
 
-
+            ->whereIn('ticket_kunjungan.id', function ($sub) {
+                $sub->selectRaw('MAX(id)')
+                    ->from('ticket_kunjungan')
+                    ->whereNull('deleted_at')
+                    ->where('is_gangguan', 1)
+                    ->groupBy('customer_id');
+            });
 
         if ($this->branchId) {
-            $queryTicketKunjungan->where(
+            $query->where(
                 'ticket_kunjungan.branch_id',
                 $this->branchId
             );
         }
 
-        $queryTicketKunjungan->whereBetween(
+        $query->whereBetween(
             'ticket_kunjungan.created_at',
             [
                 $this->filterStartDate . ' 00:00:00',
@@ -205,22 +243,12 @@ class ReportTicket extends Component
         );
 
         if ($this->tableSearch) {
-            $queryTicketKunjungan->where(function ($query) {
+            $query->where(function ($query) {
                 $query->where(
                     'ticket_kunjungan.ticket_number',
                     'like',
                     '%' . $this->tableSearch . '%'
                 )
-                    ->orWhere(
-                        'ticket_kunjungan.description',
-                        'like',
-                        '%' . $this->tableSearch . '%'
-                    )
-                    ->orWhere(
-                        'ticket_kunjungan.additional',
-                        'like',
-                        '%' . $this->tableSearch . '%'
-                    )
                     ->orWhere(
                         'customers.name',
                         'like',
@@ -234,8 +262,7 @@ class ReportTicket extends Component
             });
         }
 
-        $queryTicketKunjungan->addSelect([
-
+        $query->addSelect([
             'repeat_count' => TicketKunjungan::from('ticket_kunjungan as tk2')
                 ->selectRaw('COUNT(*)')
                 ->whereColumn('tk2.customer_id', 'ticket_kunjungan.customer_id')
@@ -257,10 +284,20 @@ class ReportTicket extends Component
                 ->where('tk2.created_at', '>=', now()->subWeek()),
         ]);
 
-        $queryTicketKunjungan->havingRaw('repeat_count > 1');
+        return $query
+            ->havingRaw('repeat_count > 1')
+            ->with(['customer', 'team']);
+    }
 
-        $ticketKunjungan = $queryTicketKunjungan
-            ->with(['customer', 'team'])
+    public function render()
+    {
+        $reportKunjungan = $this->getReportKunjunganQuery()
+            ->paginate($this->tableLength, ['*'], 'kunjunganPage');
+
+        $reportTm = $this->getReportTmQuery()
+            ->paginate($this->tableLength, ['*'], 'tmPage');
+
+        $ticketKunjungan = $this->getTicketKunjunganRepeatQuery()
             ->paginate(
                 $this->tableLength,
                 ['*'],
