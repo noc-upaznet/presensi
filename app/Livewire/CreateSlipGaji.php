@@ -321,7 +321,7 @@ class CreateSlipGaji extends Component
                     'nama' => '',
                     'nominal' => 0,
                 ];
-            } elseif (in_array($currentBranch, ['UHO', 'UNR'])) {
+            } elseif (in_array($currentBranch, ['UHO', 'UNR', 'MC'])) {
                 $this->kebudayaan = $dataKaryawan->kebudayaan;
                 $this->voucher = $dataKaryawan->voucher;
 
