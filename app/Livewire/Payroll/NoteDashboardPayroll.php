@@ -33,6 +33,7 @@ class NoteDashboardPayroll extends Component
     public $indicatorsTitip = [];
 
     public $branchUHO = false;
+    public $entitasId;
 
     public $staticRows = [
         'non_titip' => [
@@ -204,10 +205,12 @@ class NoteDashboardPayroll extends Component
         $entitas = $this->currentEntitas;
 
         $karyawanIds = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
+        $this->entitasId = M_Entitas::where('nama', session('selected_entitas'))->value('id');
+
 
         $this->totals = $periods->mapWithKeys(function ($period) use ($karyawanIds) {
 
-            $rows = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            $rows = PayrollModel::where('entitas_id', $this->entitasId)
                 ->where('titip', 0)
                 ->where('periode', $period['periode'])
                 ->get();
@@ -265,7 +268,7 @@ class NoteDashboardPayroll extends Component
 
         $this->totalsTitip = $periods->mapWithKeys(function ($period) use ($karyawanIds) {
 
-            $rows = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+            $rows = PayrollModel::where('entitas_id', $this->entitasId)
                 ->where('titip', 1)
                 ->where('periode', $period['periode'])
                 ->get();

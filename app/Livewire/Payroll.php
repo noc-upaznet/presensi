@@ -156,10 +156,10 @@ class Payroll extends Component
         $this->periode = $this->selectedYear . '-' . $bulanFormatted;
 
         $entitas = session('selected_entitas', 'UHO');
-
+        $entitasId = M_Entitas::where('nama', session('selected_entitas'))->value('id');
         $karyawanIds = M_DataKaryawan::where('entitas', $entitas)->pluck('id');
 
-        $this->total_gaji = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+        $this->total_gaji = PayrollModel::where('entitas_id', $entitasId)
             ->where('periode', $this->periode)
             ->where('titip', 0)
             ->get()
@@ -209,7 +209,7 @@ class Payroll extends Component
             });
 
 
-        $this->total_gaji_titip = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+        $this->total_gaji_titip = PayrollModel::where('entitas_id', $entitasId)
             ->where('periode', $this->periode)
             ->where('titip', 1)
             ->get()
