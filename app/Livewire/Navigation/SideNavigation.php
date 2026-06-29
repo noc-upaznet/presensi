@@ -93,7 +93,6 @@ class SideNavigation extends Component
                                 })->orWhere('entitas', 'MC');
                             })
                             ->count();
-                    }
                         // dd($countLembur);
                     } else {
                         $countLembur = M_Lembur::whereNull('approve_spv')
