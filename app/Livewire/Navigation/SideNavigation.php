@@ -49,6 +49,7 @@ class SideNavigation extends Component
                         $countPengajuan = M_Pengajuan::whereNull('approve_spv')
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
+                            ->where('deleted_at', null)
                             ->whereHas('getKaryawan', function ($q) use ($divisi, $cutoff) {
                                 $q->where('divisi', $divisi);
                             })
@@ -57,6 +58,7 @@ class SideNavigation extends Component
                         $countPengajuan = M_Pengajuan::whereNull('approve_spv')
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
+                            ->where('deleted_at', null)
                             ->whereHas('getKaryawan', function ($q) use ($divisi, $cutoff) {
                                 $q->where(function ($subQ) use ($divisi) {
                                     $subQ->where('divisi', $divisi)
@@ -69,6 +71,7 @@ class SideNavigation extends Component
                             ->where('status', 0)
                             ->whereIn('karyawan_id', $karyawanIds)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
+                            ->where('deleted_at', null)
                             ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
                             ->count();
                     }
@@ -78,6 +81,7 @@ class SideNavigation extends Component
                         $countLembur = M_Lembur::where('approve_spv', 0)
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
+                            ->where('deleted_at', null)
                             ->whereHas('getKaryawan', function ($q) use ($divisi) {
                                 $q->where('divisi', $divisi);
                             })
@@ -86,6 +90,7 @@ class SideNavigation extends Component
                         $countLembur = M_Lembur::whereNull('approve_spv')
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
+                            ->where('deleted_at', null)
                             ->whereHas('getKaryawan', function ($q) use ($divisi) {
                                 $q->where(function ($subQ) use ($divisi) {
                                     $subQ->where('divisi', $divisi)
@@ -99,6 +104,7 @@ class SideNavigation extends Component
                             ->where('status', 0)
                             ->whereIn('karyawan_id', $karyawanIds)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
+                            ->where('deleted_at', null)
                             ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
                             ->count();
                     }
@@ -108,6 +114,7 @@ class SideNavigation extends Component
                         $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
                             ->where('approve', 0)
                             ->where('user_id', '!=', $dataKaryawan->id)
+                            ->where('deleted_at', null)
                             ->whereHas('getKaryawan', function ($q) use ($divisi) {
                                 $q->where('divisi', $divisi);
                             })
@@ -116,6 +123,7 @@ class SideNavigation extends Component
                         $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
                             ->where('approve', 0)
                             ->where('user_id', '!=', $dataKaryawan->id)
+                            ->where('deleted_at', null)
                             ->whereHas(
                                 'getKaryawan',
                                 fn($q) =>
@@ -147,6 +155,7 @@ class SideNavigation extends Component
                         ->whereNull('approve_hr')
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->where('deleted_at', null)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
                         ->count();
                     // dd($countPengajuan);
@@ -159,6 +168,7 @@ class SideNavigation extends Component
                         ->whereNull('approve_hr')
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->where('deleted_at', null)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
                         ->count();
 
@@ -171,6 +181,7 @@ class SideNavigation extends Component
                     $countFeeSharing = M_Sharing::where('approve_hr', 0)
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
+                        ->where('deleted_at', null)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
                         ->count();
                     // dd($countDispensasi);
@@ -187,16 +198,18 @@ class SideNavigation extends Component
                 $entitasModel = M_Entitas::where('nama', $entitas)->first();
                 $entitasIdSaatIni = $entitasModel?->nama;
 
-                $countPengajuan = M_Pengajuan::whereNull('approve_admin')
-                    ->where('status', 0)
+                $countPengajuan = M_Pengajuan::where('status', 0)
+                    ->whereNull('approve_admin')
+                    ->where('deleted_at', null)
                     ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
                         $q->where('entitas', $entitasIdSaatIni);
                     })
                     ->count();
                 // dump('pengajuan:' . $countPengajuan);
 
-                $countLembur = M_Lembur::whereNull('approve_admin')
-                    ->where('status', 0)
+                $countLembur = M_Lembur::where('status', 0)
+                    ->whereNull('approve_admin')
+                    ->where('deleted_at', null)
                     ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
                         $q->where('entitas', $entitasIdSaatIni);
                     })
