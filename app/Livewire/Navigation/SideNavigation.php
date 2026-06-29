@@ -50,11 +50,7 @@ class SideNavigation extends Component
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
                             ->whereHas('getKaryawan', function ($q) use ($divisi, $cutoff) {
-                                $q->where('divisi', $divisi)
-                                    ->whereBetween('tanggal', [
-                                        $cutoff['start'],
-                                        $cutoff['end'],
-                                    ]);
+                                $q->where('divisi', $divisi);
                             })
                             ->count();
                     } else if ($divisi == 'Finance' && $entitasIdSaatIni == 'UNR') {
@@ -66,10 +62,6 @@ class SideNavigation extends Component
                                     $subQ->where('divisi', $divisi)
                                         ->where('entitas', 'UNR');
                                 })->orWhere('entitas', 'MC');
-                                $q->whereBetween('tanggal', [
-                                    $cutoff['start'],
-                                    $cutoff['end'],
-                                ]);
                             })
                             ->count();
                     } else {
@@ -78,10 +70,6 @@ class SideNavigation extends Component
                             ->whereIn('karyawan_id', $karyawanIds)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
                             ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
-                            ->whereBetween('tanggal', [
-                                $cutoff['start'],
-                                $cutoff['end'],
-                            ])
                             ->count();
                     }
 
@@ -90,29 +78,22 @@ class SideNavigation extends Component
                         $countLembur = M_Lembur::where('approve_spv', 0)
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
-                            ->whereHas('getKaryawan', function ($q) use ($divisi, $cutoff) {
-                                $q->where('divisi', $divisi)
-                                    ->whereBetween('tanggal', [
-                                        $cutoff['start'],
-                                        $cutoff['end'],
-                                    ]);
+                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
+                                $q->where('divisi', $divisi);
                             })
                             ->count();
                     } else if ($divisi == 'Finance' && $entitasIdSaatIni == 'UNR') {
                         $countLembur = M_Lembur::whereNull('approve_spv')
                             ->where('status', 0)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
-                            ->whereHas('getKaryawan', function ($q) use ($divisi, $cutoff) {
-                                $q->where(function ($subQ) use ($divisi, $cutoff) {
+                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
+                                $q->where(function ($subQ) use ($divisi) {
                                     $subQ->where('divisi', $divisi)
                                         ->where('entitas', 'UNR');
                                 })->orWhere('entitas', 'MC');
-                                $q->whereBetween('tanggal', [
-                                    $cutoff['start'],
-                                    $cutoff['end'],
-                                ]);
                             })
                             ->count();
+                    }
                         // dd($countLembur);
                     } else {
                         $countLembur = M_Lembur::whereNull('approve_spv')
@@ -120,10 +101,6 @@ class SideNavigation extends Component
                             ->whereIn('karyawan_id', $karyawanIds)
                             ->where('karyawan_id', '!=', $dataKaryawan->id)
                             ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitasIdSaatIni))
-                            ->whereBetween('tanggal', [
-                                $cutoff['start'],
-                                $cutoff['end'],
-                            ])
                             ->count();
                     }
 
@@ -146,10 +123,6 @@ class SideNavigation extends Component
                                 $q->where('entitas', $entitasIdSaatIni)
                                     ->where('divisi', $dataKaryawan->divisi)
                             )
-                            ->whereBetween('tanggal', [
-                                $cutoff['start'],
-                                $cutoff['end'],
-                            ])
                             ->count();
                     }
                     // dd($countPresensiStaff);
@@ -176,10 +149,6 @@ class SideNavigation extends Component
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
-                        ->whereBetween('tanggal', [
-                            $cutoff['start'],
-                            $cutoff['end'],
-                        ])
                         ->count();
                     // dd($countPengajuan);
 
@@ -192,30 +161,18 @@ class SideNavigation extends Component
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
-                        ->whereBetween('tanggal', [
-                            $cutoff['start'],
-                            $cutoff['end'],
-                        ])
                         ->count();
 
                     $countDispensasi = M_Dispensation::where('approve_hr', 0)
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
-                        ->whereBetween('date', [
-                            $cutoff['start'],
-                            $cutoff['end'],
-                        ])
                         ->count();
 
                     $countFeeSharing = M_Sharing::where('approve_hr', 0)
                         ->where('status', 0)
                         ->where('karyawan_id', '!=', $dataKaryawan->id)
                         ->whereHas('getKaryawan', fn($q) => $q->where('entitas', $entitas))
-                        ->whereBetween('date', [
-                            $cutoff['start'],
-                            $cutoff['end'],
-                        ])
                         ->count();
                     // dd($countDispensasi);
                 } else {
@@ -233,22 +190,14 @@ class SideNavigation extends Component
 
                 $countPengajuan = M_Pengajuan::whereNull('approve_admin')
                     ->where('status', 0)
-                    ->whereBetween('tanggal', [
-                        $cutoff['start'],
-                        $cutoff['end'],
-                    ])
                     ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
                         $q->where('entitas', $entitasIdSaatIni);
                     })
                     ->count();
-                // dd($countPengajuan);
+                // dump('pengajuan:' . $countPengajuan);
 
                 $countLembur = M_Lembur::whereNull('approve_admin')
                     ->where('status', 0)
-                    ->whereBetween('tanggal', [
-                        $cutoff['start'],
-                        $cutoff['end'],
-                    ])
                     ->whereHas('getKaryawan', function ($q) use ($entitasIdSaatIni) {
                         $q->where('entitas', $entitasIdSaatIni);
                     })
