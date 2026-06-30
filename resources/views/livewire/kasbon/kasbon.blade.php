@@ -44,6 +44,7 @@
                     <tr>
                         <th>Mulai Potong</th>
                         <th>Nama</th>
+                        <th>Nominal Potong</th>
                         <th>Total & Sisa</th>
                         <th>Progress Angsuran</th>
                         <th>Status</th>
@@ -61,6 +62,9 @@
                             <!-- NAMA KARYAWAN -->
                             <td style="color: var(--bs-body-color);">
                                 {{ $item->karyawan->nama_karyawan ?? '-' }}
+                            </td>
+                            <td style="color: var(--bs-body-color);">
+                                Rp. {{ number_format($item->kasbon_perbulan, 0, ',', '.') ?? '-' }}
                             </td>
 
                             <!-- TOTAL & SISA -->
