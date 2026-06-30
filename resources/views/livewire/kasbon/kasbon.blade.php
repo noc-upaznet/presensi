@@ -51,15 +51,16 @@
                         <th class="text-center">Action</th>
                     </tr>
                 </thead>
+                @php
+                    $totalNominalPotong = $kasbons->sum('kasbon_perbulan');
+                @endphp
                 <tbody>
                     @forelse ($kasbons as $item)
                         <tr wire:key="kasbon-{{ $item->id }}">
-                            <!-- BULAN MULAI -->
                             <td style="color: var(--bs-body-color);">
                                 {{ \Carbon\Carbon::parse($item->mulai_potong)->translatedFormat('M Y') }}
                             </td>
 
-                            <!-- NAMA KARYAWAN -->
                             <td style="color: var(--bs-body-color);">
                                 {{ $item->karyawan->nama_karyawan ?? '-' }}
                             </td>
@@ -67,7 +68,6 @@
                                 Rp. {{ number_format($item->kasbon_perbulan, 0, ',', '.') ?? '-' }}
                             </td>
 
-                            <!-- TOTAL & SISA -->
                             <td>
                                 <div class="small text-muted">
                                     Total: Rp {{ number_format($item->total_kasbon, 0, ',', '.') }}
@@ -77,7 +77,6 @@
                                 </div>
                             </td>
 
-                            <!-- PROGRESS ANGSURAN -->
                             <td style="width:200px;">
                                 @php
                                     $persen =
@@ -96,7 +95,6 @@
                                 </small>
                             </td>
 
-                            <!-- STATUS -->
                             <td>
                                 @if ($item->status === 'lunas')
                                     <span class="badge bg-success">Lunas</span>
@@ -105,7 +103,6 @@
                                 @endif
                             </td>
 
-                            <!-- ACTION -->
                             <td class="text-center">
                                 <button class="btn btn-sm btn-info text-white"
                                     wire:click="showDetail({{ $item->id }})">
@@ -129,6 +126,17 @@
                         </tr>
                     @endforelse
                 </tbody>
+                <tfoot>
+                    <tr class="table-light fw-bold">
+                        <td colspan="2">
+                            Total Nominal Potong
+                        </td>
+                        <td>
+                            Rp. {{ number_format($totalNominalPotong, 0, ',', '.') }}
+                        </td>
+                        <td colspan="4"></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
         <div class="mt-3">

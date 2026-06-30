@@ -124,6 +124,7 @@ class JadwalShift extends Component
 
             $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
                 // ->whereNotIn('id', $jadwalId)
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->orderBy('nama_karyawan')
                 ->get();
         } elseif ($user->hasRole('user')) {

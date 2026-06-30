@@ -82,6 +82,7 @@ class ModalJadwalShift extends Component
             }
 
             $this->karyawans = $query
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->orderBy('nama_karyawan')
                 ->get();
         } elseif ($user->hasRole('spv-sales')) {
@@ -103,12 +104,14 @@ class ModalJadwalShift extends Component
             }
 
             $this->karyawans = $query
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->orderBy('nama_karyawan')
                 ->get();
         } elseif ($user->hasAnyRole('admin|hr')) {
             $entitas = session('selected_entitas', 'UHO');
             $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
                 ->whereNotIn('id', $jadwalId)
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->orderBy('nama_karyawan')
                 ->get();
         } elseif ($user->hasRole('spv')) {
@@ -129,6 +132,7 @@ class ModalJadwalShift extends Component
             $entitasUser = M_DataKaryawan::where('user_id', $user->id)->first()->entitas;
             $this->karyawans = M_DataKaryawan::where('entitas', $entitasUser)
                 ->whereNotIn('id', $jadwalId)
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->orderBy('nama_karyawan')
                 ->get();
         }
@@ -476,6 +480,7 @@ class ModalJadwalShift extends Component
             }
 
             $this->karyawans = $query
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->orderBy('nama_karyawan')
                 ->get();
         } elseif ($user->hasRole('spv-sales')) {
@@ -497,6 +502,7 @@ class ModalJadwalShift extends Component
             }
 
             $this->karyawans = $query
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->orderBy('nama_karyawan')
                 ->get();
 
@@ -506,6 +512,7 @@ class ModalJadwalShift extends Component
             $entitasUser = M_DataKaryawan::where('user_id', $user->id)->first()->entitas;
             $this->karyawans = M_DataKaryawan::where('entitas', $entitasUser)
                 ->whereNotIn('id', $jadwalId)
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->orderBy('nama_karyawan')
                 ->get();
         } elseif ($user->hasAnyRole('admin|hr')) {
@@ -513,6 +520,7 @@ class ModalJadwalShift extends Component
 
             $this->karyawans = M_DataKaryawan::where('entitas', $entitas)
                 ->whereNotIn('id', $jadwalId)
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->orderBy('nama_karyawan')
                 ->get();
         } elseif ($user->hasRole('user')) {
