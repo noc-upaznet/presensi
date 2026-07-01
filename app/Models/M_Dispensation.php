@@ -9,6 +9,7 @@ class M_Dispensation extends Model
     protected $table = 'dispensation';
     protected $fillable = [
         'karyawan_id',
+        'type',
         'date',
         'description',
         'file',

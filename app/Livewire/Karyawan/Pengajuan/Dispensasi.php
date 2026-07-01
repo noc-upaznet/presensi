@@ -27,6 +27,7 @@ class Dispensasi extends Component
     public DispensasiForm $form;
     public $file;
     public $filterPengajuan;
+    public $filterType;
     public $filterBulan;
     public $search;
     public $editId;
@@ -112,6 +113,7 @@ class Dispensasi extends Component
 
         $data = [
             'karyawan_id' => M_DataKaryawan::where('user_id', Auth::id())->value('id'),
+            'type'        => $this->form->type,
             'date'        => $this->form->date,
             'description' => $this->form->description,
             'file'        => $path,
@@ -150,6 +152,7 @@ class Dispensasi extends Component
 
         if ($dataKaryawan && $pengajuan->karyawan_id == $dataKaryawan->id) {
             $this->form->date        = Carbon::parse($pengajuan->date)->format('Y-m-d');
+            $this->form->type = $pengajuan->type;
             $this->form->description = $pengajuan->description;
 
             $this->file = null;
@@ -207,6 +210,7 @@ class Dispensasi extends Component
         }
 
         $data = [
+            'type'        => $this->form->type,
             'date'        => $this->form->date,
             'description' => $this->form->description,
             'file' => $path ?? ($this->existingFile ?? null),
@@ -322,6 +326,9 @@ class Dispensasi extends Component
         // Filter Status
         if (in_array($this->filterPengajuan, ['0', '1', '2'], true)) {
             $query->where('status', (int) $this->filterPengajuan);
+        }
+        if (in_array($this->filterType, ['1', '2'], true)) {
+            $query->where('type', (int) $this->filterType);
         }
 
         if (!empty($this->filterBulan)) {

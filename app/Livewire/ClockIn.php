@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Karyawan\Pengajuan\Dispensasi;
 use Carbon\Carbon;
 use App\Models\Lokasi;
 use Livewire\Component;
@@ -11,6 +12,7 @@ use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use App\Models\M_JadwalShift;
 use App\Models\M_DataKaryawan;
+use App\Models\M_Dispensation;
 use App\Models\M_ListQuestion;
 use App\Models\RoleLokasiModel;
 use Illuminate\Support\Facades\DB;
@@ -52,6 +54,8 @@ class ClockIn extends Component
     public $usedQuestionIds = [];
     public $questionId = null;
     public array $questionSlots = [];
+    public $canClockOut;
+    public $hasDispensation;
 
 
     protected $listeners = ['photoTaken' => 'handlePhoto', 'refreshTable' => 'refresh'];
@@ -83,6 +87,24 @@ class ClockIn extends Component
         $now = now();
         $hari = 'd' . $now->day;
         $bulanTahun = $now->format('Y-m');
+
+        $hasDispensation = M_Dispensation::where('karyawan_id', $karyawanId)
+            ->where('type', 2)
+            ->where('status', 1)
+            ->exists();
+
+        $this->canClockOut = $hasDispensation;
+
+        if (
+            $this->jamKeluar !== '-' &&
+            !empty($this->jamKeluar)
+        ) {
+            $this->canClockOut = $hasDispensation || now()->greaterThanOrEqualTo(
+                \Carbon\Carbon::today()->setTimeFromTimeString($this->jamKeluar)
+            );
+        }
+
+        $this->hasDispensation = $hasDispensation;
 
         // 🔹 Jadwal + shift
         $jadwal = M_Jadwal::where('karyawan_id', $karyawanId)
@@ -365,16 +387,28 @@ class ClockIn extends Component
         $shiftId = $jadwal?->{$days};
         $shift = $shiftId ? M_JadwalShift::find($shiftId) : null;
 
-        if (!$isPending) {
-            // if ($shift && $shift->jam_pulang) {
-            //     $jamPulangShift = \Carbon\Carbon::parse($shift->jam_pulang);
-            //     $jamSekarang = \Carbon\Carbon::now();
+        $hasDispensation = M_Dispensation::where('karyawan_id', $karyawanId)
+            ->where('type', 2)
+            ->where('status', 1)
+            ->exists();
 
-            //     if ($jamSekarang->lt($jamPulangShift)) {
-            //         session()->flash('error', 'Belum waktu pulang. Anda baru bisa clock-out setelah jam ' . $jamPulangShift->format('H:i') . '.');
-            //         return;
-            //     }
-            // }
+        if (!$isPending && !$hasDispensation) {
+            if (
+                $shift &&
+                !empty($shift->jam_pulang) &&
+                $shift->jam_pulang !== '-'
+            ) {
+                $jamPulangShift = \Carbon\Carbon::today()->setTimeFromTimeString($shift->jam_pulang);
+
+                if (now()->lt($jamPulangShift)) {
+                    session()->flash(
+                        'error',
+                        'Belum waktu pulang. Anda baru bisa clock-out setelah jam ' .
+                            $jamPulangShift->format('H:i') . '.'
+                    );
+                    return;
+                }
+            }
         } else {
             $selisihHari = $tanggalPresensi->startOfDay()->diffInDays(now()->startOfDay());
             // dd($selisihHari);

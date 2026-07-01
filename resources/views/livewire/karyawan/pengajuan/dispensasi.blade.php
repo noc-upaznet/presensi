@@ -77,6 +77,11 @@
                     <i class="bi bi-plus"></i> Tambah
                 </button>
                 <div class="d-flex gap-2" align="right">
+                    <select class="form-select" wire:model.lazy="filterType" style="width: 150px;">
+                        <option value="">Pilih Jenis</option>
+                        <option value="1">Datang Telat</option>
+                        <option value="2">Pulang Cepat</option>
+                    </select>
                     <select class="form-select" wire:model.lazy="filterPengajuan" style="width: 150px;">
                         <option value="">Pilih Status</option>
                         <option value="0">Menunggu</option>
@@ -130,6 +135,7 @@
                                 @hasanyrole('admin|hr')
                                     <th>Nama Karyawan</th>
                                 @endhasanyrole
+                                <th>Jenis</th>
                                 <th>Keterangan</th>
                                 <th>Clock-in</th>
                                 <th>File</th>
@@ -152,6 +158,13 @@
                                             <td style="color: var(--bs-body-color);">{{ $key->getKaryawan->nama_karyawan }}
                                             </td>
                                         @endhasanyrole
+                                        <td style="color: var(--bs-body-color);">
+                                            @if ($key->type == 1)
+                                                Datang Telat
+                                            @elseif($key->type == 2)
+                                                Pulang Cepat
+                                            @endif
+                                        </td>
                                         <td style="color: var(--bs-body-color);">{{ $key->description }}</td>
                                         @php
                                             $keyPresensi = $key->karyawan_id . '-' . $key->date;
@@ -237,13 +250,24 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-danger">
-                    <h5 class="modal-title text-white" id="modalTambahPengajuanLabel">Pengajuan Dispensasi
-                        Keterlambatan</h5>
+                    <h5 class="modal-title text-white" id="modalTambahPengajuanLabel">Pengajuan Dispensasi</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
 
                 <form>
                     <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label for="type" class="form-label fw-semibold">Jenis <small
+                                    class="text-danger">*</small></label>
+                            <select class="form-select" name="type" id="type" wire:model="form.type">
+                                <option value="">-- Pilih Jenis --</option>
+                                <option value="1">Datang Terlambat</option>
+                                <option value="2">Pulang Cepat</option>
+                            </select>
+                            @error('form.type')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
                         <div class="mb-3">
                             <label for="tanggal" class="form-label fw-semibold">Tanggal <small
                                     class="text-danger">*</small></label>
@@ -283,15 +307,12 @@
                                 <input type="file" class="d-none" id="file" wire:model="file"
                                     accept=".jpg,.jpeg,.png">
 
-                                @if ($file instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
-                                    {{-- Preview file baru --}}
-                                    <img src="{{ route('secure.file', encrypt('livewire-tmp/' . $file->getFilename())) }}"
+                                @if ($file && is_object($file))
+                                    {{-- Preview file yang dipilih --}}
+                                    <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file->getFilename()) }}"
                                         wire:key="temp-preview-{{ $file->getFilename() }}"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
-
-                                    <p class="mt-2 mb-0 text-muted small">
-                                        Klik untuk ganti file
-                                    </p>
+                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @else
                                     {{-- Belum ada file --}}
                                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">🖼️</div>
@@ -335,13 +356,24 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-danger">
-                    <h5 class="modal-title text-white" id="modalEditPengajuanLabel">Pengajuan Dispensasi
-                        Keterlambatan</h5>
+                    <h5 class="modal-title text-white" id="modalEditPengajuanLabel">Pengajuan Dispensasi</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
 
                 <form>
                     <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label for="type" class="form-label fw-semibold">Jenis <small
+                                    class="text-danger">*</small></label>
+                            <select class="form-select" name="type" id="type" wire:model="form.type">
+                                <option value="">-- Pilih Jenis --</option>
+                                <option value="1">Datang Terlambat</option>
+                                <option value="2">Pulang Cepat</option>
+                            </select>
+                            @error('form.type')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
                         <div class="mb-3">
                             <label for="tanggal" class="form-label fw-semibold">Tanggal <small
                                     class="text-danger">*</small></label>
@@ -381,15 +413,11 @@
                                 <input type="file" class="d-none" id="file" wire:model="file"
                                     accept=".jpg,.jpeg,.png">
 
-                                @if ($file instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
-                                    {{-- Preview file baru --}}
-                                    <img src="{{ route('secure.file', encrypt('livewire-tmp/' . $file->getFilename())) }}"
+                                @if ($file && is_object($file))
+                                    <img src="{{ Storage::disk('public')->url('livewire-tmp/' . $file->getFilename()) }}"
                                         wire:key="temp-preview-{{ $file->getFilename() }}"
                                         style="max-height: 180px; max-width: 100%; border-radius: 8px; object-fit: cover;">
-
-                                    <p class="mt-2 mb-0 text-muted small">
-                                        Klik untuk ganti file
-                                    </p>
+                                    <p class="mt-2 mb-0 text-muted small">Klik untuk ganti file</p>
                                 @elseif ($existingFile)
                                     <img src="{{ Storage::disk('s3')->temporaryUrl($existingFile, now()->addMinutes(30)) }}"
                                         alt="File saat ini"

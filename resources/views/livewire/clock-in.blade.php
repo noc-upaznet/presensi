@@ -132,10 +132,14 @@
                 <h6 class="text-white mb-3">Live Attendance</h6>
                 <h1 class="fw-bold" id="live-clock">--:--:--</h1>
                 <p class="mb-4" id="live-date">Tanggal</p>
+
                 <div class="clock-inner">
                     <div class="fw-semibold mb-2">Normal</div>
-                    <div class="fw-bold fs-5 mb-3">{{ \Carbon\Carbon::parse($jamMasuk)->format('H:i') }} -
-                        {{ \Carbon\Carbon::parse($jamKeluar)->format('H:i') }}</div>
+                    <div class="fw-bold fs-5 mb-3">
+                        {{ \Carbon\Carbon::parse($jamMasuk)->format('H:i') }} -
+                        {{ \Carbon\Carbon::parse($jamKeluar)->format('H:i') }}
+                    </div>
+
                     <div class="d-flex justify-content-center flex-wrap">
                         @if ($hasPendingClockOut)
                             <button class="btn btn-primary px-4 me-2" wire:click="showClockOutModal">
@@ -150,9 +154,36 @@
                                 <i class="fas fa-arrow-right-to-bracket me-2"></i> Clock In
                             </button>
                         @elseif (!$hasClockedOut)
-                            <button class="btn btn-primary px-4 me-2" wire:click="showClockOutModal">
+                            <button class="btn btn-primary px-4 me-2" wire:click="showClockOutModal"
+                                @disabled(!$canClockOut)>
                                 <i class="fas fa-arrow-right-from-bracket me-2"></i> Clock Out
                             </button>
+
+                            @if (!$canClockOut)
+                                <div class="w-100 mt-2 text-muted small">
+                                    Clock Out dapat dilakukan mulai pukul
+                                    {{ \Carbon\Carbon::parse($jamKeluar)->format('H:i') }}
+                                </div>
+                            @endif
+                        @elseif (!$hasClockedOut)
+                            <button class="btn btn-primary px-4 me-2" wire:click="showClockOutModal"
+                                @disabled(!$canClockOut)>
+                                <i class="fas fa-arrow-right-from-bracket me-2"></i>
+                                Clock Out
+                            </button>
+
+                            @if ($hasDispensation)
+                                <div class="w-100 mt-2 text-success small">
+                                    <i class="fas fa-circle-check me-1"></i>
+                                    Dispensasi pulang disetujui. Anda dapat melakukan Clock Out sebelum jam pulang.
+                                </div>
+                            @elseif (!$canClockOut)
+                                <div class="w-100 mt-2 text-muted small">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Clock Out dapat dilakukan mulai pukul
+                                    <strong>{{ \Carbon\Carbon::parse($jamKeluar)->format('H:i') }}</strong>
+                                </div>
+                            @endif
                         @else
                             <span class="badge bg-primary text-light me-2 px-2" style="font-size: 20px;">
                                 Presensi selesai
