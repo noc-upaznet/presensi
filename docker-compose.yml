@@ -1,0 +1,42 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+
+    container_name: presensi-php
+
+    volumes:
+      - .:/var/www
+
+  nginx:
+    image: nginx:latest
+
+    container_name: presensi-nginx
+
+    ports:
+      - "8080:80"
+
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+    depends_on:
+      - php
+
+  mysql:
+    image: mysql:8.4
+
+    container_name: presensi-mysql
+
+    environment:
+      MYSQL_DATABASE: presensi
+      MYSQL_ROOT_PASSWORD: root
+
+    ports:
+      - "3306:3306"
+
+  redis:
+    image: redis:alpine
+
+    container_name: presensi-redis
