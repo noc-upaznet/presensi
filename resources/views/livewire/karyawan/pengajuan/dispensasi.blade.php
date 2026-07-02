@@ -95,6 +95,11 @@
             @endhasanyrole
             @role('admin')
                 <div class="d-flex gap-2">
+                    <select class="form-select" wire:model.lazy="filterType" style="width: 150px;">
+                        <option value="">Pilih Jenis</option>
+                        <option value="1">Datang Telat</option>
+                        <option value="2">Pulang Cepat</option>
+                    </select>
                     <select class="form-select" wire:model.lazy="filterPengajuan" style="width: 150px;">
                         <option value="">Pilih Status</option>
                         <option value="0">Menunggu</option>
@@ -261,7 +266,7 @@
                                     class="text-danger">*</small></label>
                             <select class="form-select" name="type" id="type" wire:model="form.type">
                                 <option value="">-- Pilih Jenis --</option>
-                                <option value="1">Datang Terlambat</option>
+                                <option value="1">Datang Telat</option>
                                 <option value="2">Pulang Cepat</option>
                             </select>
                             @error('form.type')
@@ -367,7 +372,7 @@
                                     class="text-danger">*</small></label>
                             <select class="form-select" name="type" id="type" wire:model="form.type">
                                 <option value="">-- Pilih Jenis --</option>
-                                <option value="1">Datang Terlambat</option>
+                                <option value="1">Datang Telat</option>
                                 <option value="2">Pulang Cepat</option>
                             </select>
                             @error('form.type')

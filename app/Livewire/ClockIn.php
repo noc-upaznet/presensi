@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Karyawan\Pengajuan\Dispensasi;
 use Carbon\Carbon;
 use App\Models\Lokasi;
 use Livewire\Component;
@@ -11,6 +12,7 @@ use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use App\Models\M_JadwalShift;
 use App\Models\M_DataKaryawan;
+use App\Models\M_Dispensation;
 use App\Models\M_ListQuestion;
 use App\Models\RoleLokasiModel;
 use Illuminate\Support\Facades\DB;
@@ -52,6 +54,8 @@ class ClockIn extends Component
     public $usedQuestionIds = [];
     public $questionId = null;
     public array $questionSlots = [];
+    public $canClockOut;
+    public $hasDispensation;
 
 
     protected $listeners = ['photoTaken' => 'handlePhoto', 'refreshTable' => 'refresh'];
@@ -94,6 +98,8 @@ class ClockIn extends Component
         $this->jamMasuk  = $shift?->jam_masuk ?? '00:00:00';
         $this->jamKeluar = $shift?->jam_pulang ?? '00:00:00';
 
+        $this->refreshClockStatus();
+
         $today = $now->toDateString();
         $yesterday = $now->copy()->subDay()->toDateString();
 
@@ -122,6 +128,32 @@ class ClockIn extends Component
 
         if ($this->jamMasuk === '00:00:00' && $this->jamKeluar === '00:00:00') {
             session()->flash('error', 'Jadwal hari ini libur.');
+        }
+    }
+
+    private function refreshClockStatus()
+    {
+        $userId = Auth::id();
+
+        $karyawanId = M_DataKaryawan::where('user_id', $userId)->value('id');
+
+        $hasDispensation = M_Dispensation::where('karyawan_id', $karyawanId)
+            ->where('type', 2)
+            ->whereDate('date', today())
+            ->where('status', 1)
+            ->exists();
+
+        $this->hasDispensation = $hasDispensation;
+        $this->canClockOut = $hasDispensation;
+
+        if (
+            !empty($this->jamKeluar) &&
+            $this->jamKeluar !== '-' &&
+            $this->jamKeluar !== '00:00:00'
+        ) {
+            $jamPulang = Carbon::today()->setTimeFromTimeString($this->jamKeluar);
+
+            $this->canClockOut = $hasDispensation || now()->gte($jamPulang);
         }
     }
 
@@ -365,21 +397,38 @@ class ClockIn extends Component
         $shiftId = $jadwal?->{$days};
         $shift = $shiftId ? M_JadwalShift::find($shiftId) : null;
 
-        if (!$isPending) {
-            // if ($shift && $shift->jam_pulang) {
-            //     $jamPulangShift = \Carbon\Carbon::parse($shift->jam_pulang);
-            //     $jamSekarang = \Carbon\Carbon::now();
+        $hasDispensation = M_Dispensation::where('karyawan_id', $karyawanId)
+            ->where('type', 2)
+            ->where('status', 1)
+            ->whereDate('date', $tanggalPresensi->toDateString())
+            ->exists();
 
-            //     if ($jamSekarang->lt($jamPulangShift)) {
-            //         session()->flash('error', 'Belum waktu pulang. Anda baru bisa clock-out setelah jam ' . $jamPulangShift->format('H:i') . '.');
-            //         return;
-            //     }
-            // }
-        } else {
-            $selisihHari = $tanggalPresensi->startOfDay()->diffInDays(now()->startOfDay());
-            // dd($selisihHari);
-            if ($selisihHari > 1) {
-                session()->flash('error', 'Clock-out tertunda maksimal 1 hari setelah tanggal presensi.');
+        // Clock-out tertunda maksimal H+1
+        $selisihHari = $tanggalPresensi->copy()->startOfDay()->diffInDays(now()->startOfDay());
+
+        if ($selisihHari > 1) {
+            session()->flash('error', 'Clock-out tertunda maksimal 1 hari setelah tanggal presensi.');
+            return;
+        }
+
+        if (
+            !$isPending &&
+            !$hasDispensation &&
+            $shift &&
+            !empty($shift->jam_pulang) &&
+            $shift->jam_pulang !== '00:00:00' &&
+            $shift->jam_pulang !== '-'
+        ) {
+            $jamPulangShift = Carbon::parse(
+                $tanggalPresensi->format('Y-m-d') . ' ' . $shift->jam_pulang
+            );
+
+            if (now()->lt($jamPulangShift)) {
+                session()->flash(
+                    'error',
+                    'Belum waktu pulang. Anda baru bisa clock-out setelah jam ' .
+                        $jamPulangShift->format('H:i') . '.'
+                );
                 return;
             }
         }
@@ -449,6 +498,7 @@ class ClockIn extends Component
 
     public function render()
     {
+        $this->refreshClockStatus();
         $datas = M_Presensi::where('user_id', Auth::id())->orderBy('created_at', 'desc')->get();
         return view('livewire.clock-in', [
             'datas' => $datas,
