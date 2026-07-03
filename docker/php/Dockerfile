@@ -29,16 +29,25 @@ WORKDIR /var/www
 
 COPY . .
 
+# Pastikan .env ada
+RUN cp .env.example .env
+
+# Pastikan folder Laravel ada
+RUN mkdir -p \
+    storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache
+
+RUN chmod -R 775 storage bootstrap/cache
+
+RUN chown -R www-data:www-data storage bootstrap/cache
+
 RUN composer install \
     --no-dev \
     --optimize-autoloader \
     --no-interaction
-
-RUN mkdir -p storage bootstrap/cache
-
-RUN chmod -R 775 storage bootstrap/cache
-
-RUN chown -R www-data:www-data /var/www
 
 EXPOSE 9000
 
