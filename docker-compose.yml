@@ -21,20 +21,3 @@ services:
 
     depends_on:
       - php
-
-  mysql:
-    image: mysql:8.4
-
-    container_name: presensi-mysql
-
-    environment:
-      MYSQL_DATABASE: presensi
-      MYSQL_ROOT_PASSWORD: root
-
-    ports:
-      - "3306:3306"
-
-  redis:
-    image: redis:alpine
-
-    container_name: presensi-redis
