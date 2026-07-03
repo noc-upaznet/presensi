@@ -1,8 +1,6 @@
 services:
   php:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile
+    image: presensi-php:latest
 
     container_name: presensi-php
 
