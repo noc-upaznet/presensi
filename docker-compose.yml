@@ -1,15 +1,11 @@
 services:
   php:
-    image: presensi-php:latest
-    volumes:
-      - /www/wwwroot/presensi:/var/www
+    image: aziz/presensi-php:latest
 
   nginx:
     image: nginx:latest
     ports:
       - "8080:80"
-    volumes:
-      - /www/wwwroot/presensi:/var/www
-      - /www/wwwroot/presensi/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - php
+
+  redis:
+    image: redis:alpine
