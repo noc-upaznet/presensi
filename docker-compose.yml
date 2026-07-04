@@ -11,14 +11,11 @@ services:
       - presensi
 
   nginx:
-    image: nginx:latest
+    image: repo.container.upaz.net.id/presensi-nginx:latest
     ports:
-      - "8084:80"
+      - "8083:80"
     depends_on:
       - php
-    configs:
-      - source: nginx_conf
-        target: /etc/nginx/conf.d/default.conf
     networks:
       - presensi
 
