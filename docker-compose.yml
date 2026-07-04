@@ -13,7 +13,7 @@ services:
   nginx:
     image: nginx:latest
     ports:
-      - "8083:80"
+      - "8084:80"
     depends_on:
       - php
     configs:
