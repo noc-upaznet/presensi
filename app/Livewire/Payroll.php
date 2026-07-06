@@ -258,34 +258,34 @@ class Payroll extends Component
                 return $pendapatan - $potongan;
             });
 
-        $this->bpjs_kes_pt = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+        $this->bpjs_kes_pt = PayrollModel::where('entitas_id', $entitasId)
             ->where('periode', $this->periode)
             ->sum('bpjs_perusahaan');
 
 
-        $this->bpjs_jht_pt = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+        $this->bpjs_jht_pt = PayrollModel::where('entitas_id', $entitasId)
             ->where('periode', $this->periode)
             ->sum('bpjs_jht_perusahaan');
 
-        $this->potongan_terlambat = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+        $this->potongan_terlambat = PayrollModel::where('entitas_id', $entitasId)
             ->where('periode', $this->periode)
             ->sum('terlambat');
 
-        $this->potongan_terlambat_titip = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+        $this->potongan_terlambat_titip = PayrollModel::where('entitas_id', $entitasId)
             ->where('periode', $this->periode)
             ->where('titip', 1)
             ->sum('terlambat');
 
-        $this->churn = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+        $this->churn = PayrollModel::where('entitas_id', $entitasId)
             ->where('periode', $this->periode)
             ->where('titip', 0)
             ->sum('churn');
 
-        $this->churn_titip = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+        $this->churn_titip = PayrollModel::where('entitas_id', $entitasId)
             ->where('periode', $this->periode)
             ->where('titip', 1)
             ->sum('churn');
-        $this->kasbon = PayrollModel::whereIn('karyawan_id', $karyawanIds)
+        $this->kasbon = PayrollModel::where('entitas_id', $entitasId)
             ->where('periode', $this->periode)
             ->sum('kasbon');
     }
