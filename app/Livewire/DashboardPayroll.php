@@ -44,9 +44,14 @@ class DashboardPayroll extends Component
 
     public function countGaji()
     {
-        $branchId = Auth::user()->branch_id;
-        $entitasName = M_Entitas::find($branchId)?->nama;
-        $karyawanIds = M_DataKaryawan::where('entitas', $entitasName)->pluck('id');
+        $userId = Auth::id();
+        $karyawan = M_DataKaryawan::where('user_id', $userId)->first();
+
+        if (!$karyawan) {
+            return;
+        }
+
+        $entitasId = M_Entitas::where('nama', $karyawan->entitas)->value('id');
 
         $hitungGaji = function ($items) {
             return $items->sum(function ($item) {
@@ -86,7 +91,6 @@ class DashboardPayroll extends Component
                 return $pendapatan - $potongan;
             });
         };
-        $entitasId = M_Entitas::where('nama', session('selected_entitas'))->value('id');
 
         $this->total_gaji = $hitungGaji(
             PayrollModel::where('entitas_id', $entitasId)
@@ -94,6 +98,7 @@ class DashboardPayroll extends Component
                 ->where('titip', 0)
                 ->get()
         );
+        // dd($this->total_gaji);
 
         $this->total_gaji_titip = $hitungGaji(
             PayrollModel::where('entitas_id', $entitasId)
