@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.dashboard-view' => \App\Http\Middleware\PermissionPage::class,
             'check.kasbon-view' => \App\Http\Middleware\PermissionPage::class,
         ]);
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // $exceptions->renderable(function (TokenMismatchException $e, $request) {
