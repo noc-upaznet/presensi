@@ -10,17 +10,12 @@ services:
     networks:
       - presensi
 
-  services:
   nginx:
     image: presensi-nginx:latest
     ports:
       - "8083:80"
     depends_on:
       - php
-    deploy:
-      placement:
-        constraints:
-          - node.hostname == docker-node1
     networks:
       - presensi
 
