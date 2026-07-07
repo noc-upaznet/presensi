@@ -101,7 +101,7 @@
 
     <div class="content-wrapper p-4">
         <div class="dashboard-header mb-3">
-            <h3 class="mb-0">Dashboard test</h3>
+            <h3 class="mb-0">Dashboard</h3>
 
             {{-- GAMIFICATION POINT --}}
             @if ($showPoin)
