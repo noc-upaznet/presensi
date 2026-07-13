@@ -9,7 +9,7 @@ class DispensasiForm extends Form
 {
     public $id;
 
-    #[Validate('required', 'type')]
+    // #[Validate('required', 'type')]
     public $type = '';
 
     #[Validate('required', 'date')]
