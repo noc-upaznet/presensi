@@ -283,6 +283,16 @@ class ModalJadwalShift extends Component
         $this->dispatch('$refresh');
     }
 
+    private function getEffectiveDay($id)
+    {
+        $karyawan = M_DataKaryawan::findOrFail($id);
+
+        return in_array(
+            strtolower(trim($karyawan->divisi)),
+            ['teknisi', 'pelayanan']
+        ) ? 22 : 26;
+    }
+
     public function loadRekap($id)
     {
         $carbon = Carbon::parse($this->bulan_tahun);
@@ -347,6 +357,8 @@ class ModalJadwalShift extends Component
             ])
             ->get();
 
+        $effectiveDay = $this->getEffectiveDay($id);
+
         $this->rekap['izin'] = $izin
             + ($izinSetengahHari * 0.5)
             + ($izinSetengahHariPagi * 0.5)
@@ -356,13 +368,16 @@ class ModalJadwalShift extends Component
         $this->rekap['cuti'] = $cuti;
         $this->rekap['terlambat'] = $presensi->where('status', 1)->count();
 
-        $this->rekap['kehadiran'] = 26
-            - $izin
-            - $cuti
-            - ($izinSetengahHari * 0.5)
-            - ($izinSetengahHariPagi * 0.5)
-            - ($izinSetengahHariSiang * 0.5)
-            - ($konterIzinSetengahHariPagi * 0.5);
+        $this->rekap['kehadiran'] = max(
+            0,
+            $effectiveDay
+                - $izin
+                - $cuti
+                - ($izinSetengahHari * 0.5)
+                - ($izinSetengahHariPagi * 0.5)
+                - ($izinSetengahHariSiang * 0.5)
+                - ($konterIzinSetengahHariPagi * 0.5)
+        );
     }
 
     public function saveEdit()
