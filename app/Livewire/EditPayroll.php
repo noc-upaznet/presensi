@@ -125,6 +125,14 @@ class EditPayroll extends Component
     public $tunjangan_kinerja;
     public $insentif_tot;
 
+    private function getEffectiveDay()
+    {
+        return in_array(
+            strtolower(trim($this->divisi)),
+            ['teknisi', 'pelayanan']
+        ) ? 22 : 26;
+    }
+
 
     public function mount($id)
     {
@@ -252,7 +260,7 @@ class EditPayroll extends Component
             ])
             ->sum('total_jam');
 
-        $maxHadir = 26;
+        $maxHadir = $this->getEffectiveDay();
 
         $this->kehadiran = max(
             0,
@@ -426,7 +434,7 @@ class EditPayroll extends Component
         $potonganTerlambat = 0;
 
         if ($this->gaji_pokok > 0 || $this->tunjangan_jabatan > 0) {
-            $perHari = ($this->gaji_pokok + $this->tunjangan_jabatan) / 26;
+            $perHari = ($this->gaji_pokok + $this->tunjangan_jabatan) / $this->getEffectiveDay();
             $totalHariIzin = ($this->rekap['izin'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari pagi'] ?? 0) + 0.5 * ($this->rekap['izin setengah hari siang'] ?? 0);
             $potonganIzin = round($perHari * $totalHariIzin);
             $potonganTerlambat = ($this->rekap['terlambat'] ?? 0) * 25000;
@@ -652,7 +660,7 @@ class EditPayroll extends Component
         }
         // dd($izin_setengah);
         // total kehadiran fix 26 hari - (izin + cuti + 0.5 * izin_setengah)
-        $kehadiran = 26 - ($izin + $cuti
+        $kehadiran = $this->getEffectiveDay() - ($izin + $cuti
             + 0.5 * $izinSetengahHari
             + 0.5 * $izinSetengahHariPagi
             + 0.5 * $izinSetengahHariSiang
@@ -671,7 +679,7 @@ class EditPayroll extends Component
         $this->rekap['kehadiran'] = $kehadiran;
         // dd($kehadiran);
         // hitung inov reward
-        $inovRewardPerHari = $this->inovation_reward / 26;
+        $inovRewardPerHari = $this->inovation_reward / $this->getEffectiveDay();
         $this->inovation_reward_jumlah = $kehadiran;
         $this->inovation_reward = round($inovRewardPerHari * $kehadiran);
     }

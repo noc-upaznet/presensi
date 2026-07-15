@@ -14,6 +14,14 @@ use App\Models\KasbonModel;
 
 class PayrollService
 {
+    private function getEffectiveDay($divisi)
+    {
+        return in_array(
+            strtolower(trim($divisi)),
+            ['teknisi', 'pelayanan']
+        ) ? 22 : 26;
+    }
+
     public function generate($karyawanId, $cutoffStart, $cutoffEnd, $periode)
     {
         $cutoffStart = Carbon::parse($cutoffStart);
@@ -25,6 +33,8 @@ class PayrollService
         $entitasId = $entitas->id ?? null;
         $gajiPokok = $this->num($karyawan->gaji_pokok);
         $tunjanganJabatan = $this->num($karyawan->tunjangan_jabatan);
+
+        $effectiveDay = $this->getEffectiveDay($karyawan->divisi);
 
         // =========================
         // REKAP PRESENSI
@@ -61,7 +71,7 @@ class PayrollService
         // =========================
         // POTONGAN IZIN & TERLAMBAT
         // =========================
-        $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
+        $perHari = ($gajiPokok + $tunjanganJabatan) / $effectiveDay;
 
         $potonganIzin = round($perHari * (
             $rekap['izin']
@@ -195,8 +205,11 @@ class PayrollService
             ->where('status', 1)
             ->count();
 
+        $karyawan = M_DataKaryawan::findOrFail($id);
+        $effectiveDay = $this->getEffectiveDay($karyawan->divisi);
+
         return [
-            'kehadiran' => 26 - $izin - $cuti - (0.5 * $izinSetengah),
+            'kehadiran' => $effectiveDay - $izin - $cuti - (0.5 * $izinSetengah),
             'izin' => $izin,
             'cuti' => $cuti,
             'terlambat' => $terlambat,

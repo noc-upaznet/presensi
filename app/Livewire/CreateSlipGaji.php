@@ -134,6 +134,15 @@ class CreateSlipGaji extends Component
     public $tunjangan_coc;
     public $tunjangan_kinerja;
     public $insentif_tot;
+    public $efectiveDay;
+
+    private function getEffectiveDay()
+    {
+        return in_array(
+            strtolower(trim($this->divisi)),
+            ['teknisi', 'pelayanan']
+        ) ? 22 : 26;
+    }
 
     public function mount($id = null, $month = null, $year = null)
     {
@@ -255,7 +264,7 @@ class CreateSlipGaji extends Component
                 $this->inovation_reward_jumlah = (int) $this->rekap['kehadiran'];
                 $this->izin_nominal = 0;
                 if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
-                    $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
+                    $perHari = ($gajiPokok + $tunjanganJabatan) / $this->getEffectiveDay();
                     $totalHariIzin = ($this->rekap['izin'] ?? 0)
                         + 0.5 * ($this->rekap['izin setengah hari'] ?? 0)
                         + 0.5 * ($this->rekap['izin setengah hari pagi'] ?? 0)
@@ -684,7 +693,7 @@ class CreateSlipGaji extends Component
         $totalJamLembur = $dataLembur->sum('total_jam');
 
         return [
-            'kehadiran' => 26 - $izin - $cuti
+            'kehadiran' => $this->getEffectiveDay() - $izin - $cuti
                 - (0.5 * $izinSetengahHari)
                 - (0.5 * $izinSetengahHariPagi)
                 - (0.5 * $izinSetengahHariSiang)
@@ -722,7 +731,7 @@ class CreateSlipGaji extends Component
         }
 
         // Hitung nilai per hari
-        $inovRewardPerHari = (int) str_replace('.', '', $inovRewardDasar) / 26;
+        $inovRewardPerHari = (int) str_replace('.', '', $inovRewardDasar) / $this->getEffectiveDay();
         // Set jumlah inovation reward sesuai kehadiran
         $this->inovation_reward_jumlah = (int) $this->rekap['kehadiran'];
 
@@ -1028,7 +1037,8 @@ class CreateSlipGaji extends Component
         $potonganTerlambat = 0;
 
         if ($gajiPokok > 0 || $tunjanganJabatan > 0) {
-            $perHari = ($gajiPokok + $tunjanganJabatan) / 26;
+
+            $perHari = ($gajiPokok + $tunjanganJabatan) / $this->getEffectiveDay();
             $totalHariIzin = ($this->rekap['izin'] ?? 0)
                 + 0.5 * ($this->rekap['izin setengah hari'] ?? 0)
                 + 0.5 * ($this->rekap['izin setengah hari pagi'] ?? 0)
