@@ -132,10 +132,16 @@
                                                 <tr>
                                                     <td>
                                                         {{ $report->ticket->ticket_number ?? '-' }}
+                                                        <br>
 
                                                         @if (($report->ticket->is_gangguan ?? 0) == 1)
                                                             <span class="badge bg-danger">
                                                                 Gangguan
+                                                            </span>
+                                                        @endif
+                                                        @if (($report->is_dispensation ?? 0) == 1)
+                                                            <span class="badge bg-success">
+                                                                Dispensasi
                                                             </span>
                                                         @endif
                                                     </td>
@@ -277,10 +283,16 @@
                                                     <tr>
                                                         <td>
                                                             {{ $report->ticket->ticket_number ?? '-' }}
-
+                                                            <br>
                                                             @if (($report->ticket->is_gangguan ?? 0) == 1)
                                                                 <span class="badge bg-danger">
                                                                     Gangguan
+                                                                </span>
+                                                            @endif
+
+                                                            @if (($report->is_dispensation ?? 0) == 1)
+                                                                <span class="badge bg-success">
+                                                                    Dispensasi
                                                                 </span>
                                                             @endif
                                                         </td>

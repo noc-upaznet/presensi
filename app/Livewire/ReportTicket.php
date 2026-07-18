@@ -123,6 +123,7 @@ class ReportTicket extends Component
                 'report_kunjungan.ticket_id'
             )
             ->where('ticket_kunjungan.is_gangguan', 1)
+            ->where('ticket_kunjungan.deleted_at', null)
             ->when($this->branchId, function ($query) {
                 $query->where('ticket_kunjungan.branch_id', $this->branchId);
             })
@@ -132,27 +133,36 @@ class ReportTicket extends Component
             ]);
 
         if ($this->workDuration == 1) {
+            // > 4 jam dan BELUM dispensasi
             $query->whereRaw("
-            TIMESTAMPDIFF(
-                HOUR,
-                ticket_kunjungan.created_at,
-                report_kunjungan.created_at
-            ) > 4
-        ");
+                    TIMESTAMPDIFF(
+                        HOUR,
+                        ticket_kunjungan.created_at,
+                        report_kunjungan.created_at
+                    ) >= 4
+                ")
+                ->where(function ($q) {
+                    $q->whereNull('report_kunjungan.is_dispensation')
+                        ->orWhere('report_kunjungan.is_dispensation', 0);
+                });
         }
 
         if ($this->workDuration == 2) {
-            $query->whereRaw("
-            TIMESTAMPDIFF(
-                HOUR,
-                ticket_kunjungan.created_at,
-                report_kunjungan.created_at
-            ) <= 4
-        ");
+            // < 4 jam ATAU sudah dispensasi
+            $query->where(function ($q) {
+                $q->whereRaw("
+                    TIMESTAMPDIFF(
+                        HOUR,
+                        ticket_kunjungan.created_at,
+                        report_kunjungan.created_at
+                    ) < 4
+                ")
+                    ->orWhere('report_kunjungan.is_dispensation', 1);
+            });
         }
 
         return $query
-            ->select('report_kunjungan.*')
+            ->select('report_kunjungan.*')->distinct()
             ->latest('report_kunjungan.created_at');
     }
     private function getReportTmQuery()
@@ -168,6 +178,7 @@ class ReportTicket extends Component
                 'report_tm.ticket_id'
             )
             ->where('ticket_tm.is_gangguan', 1)
+            ->where('ticket_tm.deleted_at', null)
             ->when($this->branchId, function ($query) {
                 $query->where('ticket_tm.branch_id', $this->branchId);
             })
@@ -178,26 +189,33 @@ class ReportTicket extends Component
 
         if ($this->workDuration == 1) {
             $query->whereRaw("
-            TIMESTAMPDIFF(
-                HOUR,
-                ticket_tm.created_at,
-                report_tm.created_at
-            ) > 4
-        ");
+                    TIMESTAMPDIFF(
+                        HOUR,
+                        ticket_tm.created_at,
+                        report_tm.created_at
+                    ) >= 4
+                ")
+                ->where(function ($q) {
+                    $q->whereNull('report_tm.is_dispensation')
+                        ->orWhere('report_tm.is_dispensation', 0);
+                });
         }
 
         if ($this->workDuration == 2) {
-            $query->whereRaw("
-            TIMESTAMPDIFF(
-                HOUR,
-                ticket_tm.created_at,
-                report_tm.created_at
-            ) <= 4
-        ");
+            $query->where(function ($q) {
+                $q->whereRaw("
+                        TIMESTAMPDIFF(
+                            HOUR,
+                            ticket_tm.created_at,
+                            report_tm.created_at
+                        ) < 4
+                    ")
+                    ->orWhere('report_tm.is_dispensation', 1);
+            });
         }
 
         return $query
-            ->select('report_tm.*')
+            ->select('report_tm.*')->distinct()
             ->latest('report_tm.created_at');
     }
     private function getTicketKunjunganRepeatQuery()
@@ -215,7 +233,7 @@ class ReportTicket extends Component
                 '=',
                 'report_kunjungan.ticket_id'
             )
-            ->select('ticket_kunjungan.*')
+            ->select('ticket_kunjungan.*')->distinct()
             ->whereNull('ticket_kunjungan.deleted_at')
             ->where('ticket_kunjungan.is_gangguan', 1)
 
