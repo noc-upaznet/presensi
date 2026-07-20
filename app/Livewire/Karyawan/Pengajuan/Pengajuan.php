@@ -342,7 +342,8 @@ class Pengajuan extends Component
     {
         $query = M_Pengajuan::with(['getKaryawan', 'getShift']);
         $user = Auth::user();
-        $entitas = session('selected_entitas', 'UHO');
+        $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
+        $entitas = session('selected_entitas', $dataKaryawan->entitas);
 
         if ($user->hasRole('user')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
@@ -354,7 +355,6 @@ class Pengajuan extends Component
             $query->whereIn('karyawan_id', $karyawanIdList);
         } elseif ($user->hasRole('spv')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
-
             if ($dataKaryawan) {
 
                 $divisi  = strtolower($dataKaryawan->divisi);
@@ -377,14 +377,6 @@ class Pengajuan extends Component
                                     ->where('entitas', $dataKaryawan->entitas);
                             });
                     })->pluck('id');
-                    // } elseif ($divisi === 'sales marketing' && $entitas === 'UHO') {
-                    //     $karyawanIdList = M_DataKaryawan::whereRaw('UPPER(entitas) = ?', [strtoupper($dataKaryawan->entitas)])
-                    //         ->whereIn(DB::raw('UPPER(divisi)'), ['SALES MARKETING', 'TEKNISI'])
-                    //         ->pluck('id');
-                } elseif ($divisi === 'sales marketing') {
-                    $karyawanIdList = M_DataKaryawan::whereRaw('UPPER(entitas) = ?', [strtoupper($dataKaryawan->entitas)])
-                        ->whereIn(DB::raw('UPPER(jabatan)'), ['SALES MARKETING', 'GO'])
-                        ->pluck('id');
                 } elseif ($divisi === 'teknisi' && $entitas === 'UNR') {
                     $karyawanIdList = M_DataKaryawan::where(function ($q) use ($dataKaryawan) {
                         // 1. Semua karyawan entitas MC
@@ -398,17 +390,23 @@ class Pengajuan extends Component
                             });
                     })->pluck('id');
                 } elseif ($divisi === 'sales marketing' && $entitas === 'UNB') {
+
                     $karyawanIdList = M_DataKaryawan::where(function ($q) use ($dataKaryawan) {
-                        // 1. Semua karyawan entitas MC
                         $q->whereRaw('UPPER(entitas) = ?', ['UHO'])
                             ->whereIn(DB::raw('UPPER(jabatan)'), ['SALES MARKETING'])
-
-                            // 2. Divisi & entitas sendiri
                             ->orWhere(function ($sub) use ($dataKaryawan) {
                                 $sub->where('divisi', $dataKaryawan->divisi)
                                     ->where('entitas', $dataKaryawan->entitas);
                             });
                     })->pluck('id');
+                } elseif ($divisi === 'sales marketing') {
+
+                    $karyawanIdList = M_DataKaryawan::whereRaw(
+                        'UPPER(entitas) = ?',
+                        [$entitas]
+                    )
+                        ->whereIn(DB::raw('UPPER(jabatan)'), ['SALES MARKETING', 'GO'])
+                        ->pluck('id');
                 } else {
                     $karyawanIdList = M_DataKaryawan::where('divisi', $dataKaryawan->divisi)
                         ->where('entitas', $dataKaryawan->entitas)
