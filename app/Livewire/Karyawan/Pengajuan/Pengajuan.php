@@ -343,7 +343,7 @@ class Pengajuan extends Component
         $query = M_Pengajuan::with(['getKaryawan', 'getShift']);
         $user = Auth::user();
         $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
-        $entitas = session('selected_entitas', $dataKaryawan->entitas);
+        $entitas = session('selected_entitas') ?? $dataKaryawan?->entitas;
 
         if ($user->hasRole('user')) {
             $dataKaryawan = M_DataKaryawan::where('user_id', $user->id)->first();
