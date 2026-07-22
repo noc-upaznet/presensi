@@ -411,23 +411,56 @@
                         </div>
                     </div>
 
-                    <div>
-                        <strong>Rekap</strong>
-                        <div class="row">
-                            <div class="col-md-2"><strong>Izin</strong></div>
-                            <div class="col-md-1">{{ $rekap['izin'] ?? 0 }}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-2"><strong>Cuti</strong></div>
-                            <div class="col-md-1">{{ $rekap['cuti'] ?? 0 }}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-2"><strong>Terlambat</strong></div>
-                            <div class="col-md-1">{{ $rekap['terlambat'] ?? 0 }}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-2"><strong>Kehadiran</strong></div>
-                            <div class="col-md-1">{{ $rekap['kehadiran'] ?? 0 }}</div>
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">Rekap</h6>
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3">
+                                <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
+                                    <div class="card-body d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="text-muted small">Izin</div>
+                                            <div class="fs-4 fw-semibold">{{ $rekap['izin'] ?? 0 }}</div>
+                                        </div>
+                                        <i class="bi bi-file-earmark-text fs-4 text-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6 col-md-3">
+                                <div class="card border-0 shadow-sm h-100 border-start border-4 border-info">
+                                    <div class="card-body d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="text-muted small">Cuti</div>
+                                            <div class="fs-4 fw-semibold">{{ $rekap['cuti'] ?? 0 }}</div>
+                                        </div>
+                                        <i class="bi bi-calendar-event fs-4 text-info"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6 col-md-3">
+                                <div class="card border-0 shadow-sm h-100 border-start border-4 border-danger">
+                                    <div class="card-body d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="text-muted small">Terlambat</div>
+                                            <div class="fs-4 fw-semibold">{{ $rekap['terlambat'] ?? 0 }}</div>
+                                        </div>
+                                        <i class="bi bi-clock-history fs-4 text-danger"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6 col-md-3">
+                                <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
+                                    <div class="card-body d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="text-muted small">Kehadiran</div>
+                                            <div class="fs-4 fw-semibold">{{ $rekap['kehadiran'] ?? 0 }}</div>
+                                        </div>
+                                        <i class="bi bi-check-circle fs-4 text-success"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
