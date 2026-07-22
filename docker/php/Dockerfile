@@ -50,10 +50,14 @@ RUN composer install \
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# nginx config
+# Hapus konfigurasi bawaan nginx Debian
+RUN rm -f /etc/nginx/sites-enabled/default \
+    && rm -f /etc/nginx/conf.d/default.conf
+
+# Copy konfigurasi Laravel
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 
-# supervisor config
+# Supervisor
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 80
