@@ -1,16 +1,44 @@
+# name: Deploy ke Upaznet
+# on:
+#   push:
+#     branches:
+#       - main
+#     #tags:
+#      #- '*'
+# jobs:
+#   deploy_tigori:
+#     name: Deploy ke upaznet
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v1
+#       - name: Executing remote command
+#         uses: appleboy/ssh-action@master
+#         with:
+#           HOST: ${{ secrets.HOST }}
+#           USERNAME: ${{ secrets.USERNAME }}
+#           PORT: ${{ secrets.PORT }}
+#           KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+#           passphrase: ${{ secrets.PASSPHRASE }}
+#           script: |
+#             cd /www/wwwroot/presensi.sandbox.upaz.net.id
+#             git reset --hard
+#             git pull origin main
+
 name: Deploy ke Upaznet
+
 on:
-  push:
-    branches:
-      - main
-    #tags:
-     #- '*'
+  workflow_run:
+    workflows:
+      - Build Laravel Image
+    types:
+      - completed
+
 jobs:
-  deploy_tigori:
-    name: Deploy ke upaznet
+  deploy:
+    name: Deploy ke Upaznet
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v1
       - name: Executing remote command
         uses: appleboy/ssh-action@master
         with:
@@ -20,6 +48,12 @@ jobs:
           KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            cd /www/wwwroot/presensi.sandbox.upaz.net.id
-            git reset --hard
-            git pull origin main
+            docker login repo.container.upaz.net.id \
+              -u "${{ secrets.REGISTRY_USERNAME }}" \
+              -p "${{ secrets.REGISTRY_PASSWORD }}"
+
+            docker service update \
+              --image repo.container.upaz.net.id/presensi:latest \
+              --with-registry-auth \
+              --force \
+              presensi-docker_presensi
