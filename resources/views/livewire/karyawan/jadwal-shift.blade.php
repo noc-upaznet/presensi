@@ -36,8 +36,6 @@
 
                 <input type="month" class="form-control" style="width: 150px;" id="bulanPicker" placeholder="Bulan"
                     wire:model.lazy="filterBulan">
-
-                <button class="btn btn-light" disabled>Pilih Waktu</button>
             </div>
         </div>
 
