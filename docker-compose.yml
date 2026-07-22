@@ -1,35 +1,15 @@
 version: "3.9"
 
 services:
-
-  php:
+  presensi:
     image: ghcr.io/noc-upaznet/presensi:latest
+    ports:
+      - "8083:80"
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
     networks:
       - presensi
 
-  nginx:
-    image: presensi-nginx:latest
-    ports:
-      - "8083:80"
-    depends_on:
-      - php
-    networks:
-      - presensi
-
-  redis:
-    image: redis:alpine
-    networks:
-      - presensi
-
 networks:
   presensi:
-
-volumes:
-  mysql-data:
-
-configs:
-  nginx_conf:
-    file: docker/nginx/default.conf

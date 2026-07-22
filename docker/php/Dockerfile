@@ -1,6 +1,8 @@
 FROM php:8.3-fpm
 
 RUN apt-get update && apt-get install -y \
+    nginx \
+    supervisor \
     git \
     curl \
     unzip \
@@ -21,7 +23,9 @@ RUN apt-get update && apt-get install -y \
     zip \
     exif \
     gd \
-    intl
+    intl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -29,10 +33,8 @@ WORKDIR /var/www
 
 COPY . .
 
-# Pastikan .env ada
 RUN cp .env.example .env
 
-# Pastikan folder Laravel ada
 RUN mkdir -p \
     storage/framework/cache \
     storage/framework/sessions \
@@ -40,15 +42,20 @@ RUN mkdir -p \
     storage/logs \
     bootstrap/cache
 
-RUN chmod -R 775 storage bootstrap/cache
-
-RUN chown -R www-data:www-data storage bootstrap/cache
-
 RUN composer install \
     --no-dev \
     --optimize-autoloader \
     --no-interaction
 
-EXPOSE 9000
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
-CMD ["php-fpm"]
+# nginx config
+COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+
+# supervisor config
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+EXPOSE 80
+
+CMD ["/usr/bin/supervisord","-n"]
