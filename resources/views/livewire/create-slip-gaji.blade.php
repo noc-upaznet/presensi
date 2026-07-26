@@ -126,7 +126,7 @@
                                 </div>
                             </div>
                         @endif
-                        @if ($this->isSalesPositionSpvUGR())
+                        {{-- @if ($this->isSalesPositionSpvUGR())
                             <div class="row">
                                 <div class="mb-3 col-md-6">
                                     <label for="jumlah-psb-spv-ugr" class="form-label fw-semibold">Jumlah PSB</label>
@@ -142,7 +142,7 @@
                                     </div>
                                 </div>
                             </div>
-                        @endif
+                        @endif --}}
                         <div class="mb-3">
                             <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
                             <div class="input-group mb-2">

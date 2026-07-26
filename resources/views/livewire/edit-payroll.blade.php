@@ -105,8 +105,7 @@
                                     </div>
                                 </div>
                             </div>
-                        @elseif ($this->isSalesPositionSpvUGR())
-                            {{-- FORM UNTUK SALES SPV UGR --}}
+                            {{-- @elseif ($this->isSalesPositionSpvUGR())
                             <div class="row">
                                 <div class="mb-3 col-md-6">
                                     <label for="jumlah-psb-spv-ugr" class="form-label fw-semibold">Jumlah PSB</label>
@@ -121,7 +120,7 @@
                                             wire:model="insentif">
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                         @endif
                         <div class="mb-3">
                             <label for="gaji_pokok" class="form-label fw-semibold">Gaji Pokok</label>
@@ -132,7 +131,8 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="tunjangan_jabatan" class="form-label fw-semibold">Tunjangan Jabatan</label>
+                            <label for="tunjangan_jabatan" class="form-label fw-semibold">Tunjangan
+                                Jabatan</label>
                             <div class="input-group mb-2">
                                 <span class="input-group-text">Rp</span>
                                 <input type="text" id="tunjangan_jabatan" class="form-control" disabled
@@ -173,7 +173,8 @@
                                                 <strong>Waktu:</strong> {{ $l['waktu_mulai'] }} -
                                                 {{ $l['waktu_akhir'] }}
                                             </div>
-                                            <span class="badge bg-primary rounded-pill">{{ $l['jam'] }} jam</span>
+                                            <span class="badge bg-primary rounded-pill">{{ $l['jam'] }}
+                                                jam</span>
                                         </li>
                                     @endforeach
                                 </ul>
@@ -190,7 +191,8 @@
                                                 <strong>Waktu:</strong> {{ $l['waktu_mulai'] }} -
                                                 {{ $l['waktu_akhir'] }}
                                             </div>
-                                            <span class="badge bg-success rounded-pill">{{ $l['jam'] }} jam</span>
+                                            <span class="badge bg-success rounded-pill">{{ $l['jam'] }}
+                                                jam</span>
                                         </li>
                                     @endforeach
                                 </ul>
@@ -225,7 +227,8 @@
                                 </div>
                             </div>
                             <div class="mb-3 col-md-6">
-                                <label for="inovation_reward" class="form-label fw-semibold">Uang Transport</label>
+                                <label for="inovation_reward" class="form-label fw-semibold">Uang
+                                    Transport</label>
                                 <div class="input-group mb-2">
                                     <input name="transport" id="transport" class="form-control"
                                         wire:model.lazy="transport">
@@ -310,7 +313,8 @@
                                         wire:click="removeTunjangan({{ $index }})">Hapus</button>
                                 </div>
                             @endforeach
-                            <button type="button" class="btn btn-success mb-2" wire:click="addTunjangan">+ Tambah
+                            <button type="button" class="btn btn-success mb-2" wire:click="addTunjangan">+
+                                Tambah
                                 Tunjangan</button>
                         </div>
 
@@ -424,7 +428,8 @@
                         <div class="form-check">
                             <input type="checkbox" wire:model.lazy="bpjs_perusahaan_digunakan"
                                 class="form-check-input" id="bpjsPCheckbox">
-                            <label class="form-check-label" for="bpjsPCheckbox">BPJS Kesehatan (Perusahaan)</label>
+                            <label class="form-check-label" for="bpjsPCheckbox">BPJS Kesehatan
+                                (Perusahaan)</label>
                         </div>
 
                         @if ($bpjs_perusahaan_digunakan)

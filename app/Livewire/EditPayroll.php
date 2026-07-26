@@ -488,16 +488,16 @@ class EditPayroll extends Component
         return false;
     }
 
-    public function isSalesPositionSpvUGR()
-    {
-        if ($this->karyawan) {
-            return $this->karyawan->level === 'SPV'
-                && $this->karyawan->divisi === 'Sales & Marketing'
-                && $this->karyawan->jabatan === 'Sales Marketing'
-                && $this->karyawan->entitas === 'UGR';
-        }
-        return false;
-    }
+    // public function isSalesPositionSpvUGR()
+    // {
+    //     if ($this->karyawan) {
+    //         return $this->karyawan->level === 'SPV'
+    //             && $this->karyawan->divisi === 'Sales & Marketing'
+    //             && $this->karyawan->jabatan === 'Sales Marketing'
+    //             && $this->karyawan->entitas === 'UGR';
+    //     }
+    //     return false;
+    // }
 
     public function updatedJmlPsb()
     {
@@ -556,9 +556,9 @@ class EditPayroll extends Component
             $this->insentif = $nominalPerPsb * ((int) ($this->jml_psb ?? 0));
         }
         // SPV UGR
-        elseif ($this->isSalesPositionSpvUGR()) {
-            $this->insentif = 50000 * ((int) ($this->jml_psb ?? 0));
-        }
+        // elseif ($this->isSalesPositionSpvUGR()) {
+        //     $this->insentif = 50000 * ((int) ($this->jml_psb ?? 0));
+        // }
 
         $this->hitungTotalGaji();
     }

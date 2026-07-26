@@ -495,21 +495,20 @@ class CreateSlipGaji extends Component
         // dd($this->karyawan);
         if ($this->karyawan) {
             return $this->level === 'SPV'
-                && $this->jabatan === 'Sales Marketing'
-                && in_array($this->entitas, ['UNR', 'UHO', 'UNB']);
+                && $this->jabatan === 'Sales Marketing';
         }
     }
 
-    public function isSalesPositionSpvUGR()
-    {
-        // dd($this->karyawan);
-        if ($this->karyawan) {
-            return $this->level === 'SPV'
-                && $this->divisi === 'Sales Marketing'
-                && $this->entitas === 'UGR';
-            // dd($this->entitas);
-        }
-    }
+    // public function isSalesPositionSpvUGR()
+    // {
+    //     // dd($this->karyawan);
+    //     if ($this->karyawan) {
+    //         return $this->level === 'SPV'
+    //             && $this->divisi === 'Sales Marketing'
+    //             && $this->entitas === 'UGR';
+    //         // dd($this->entitas);
+    //     }
+    // }
 
     public function updatedJmlPsb()
     {
@@ -568,9 +567,9 @@ class CreateSlipGaji extends Component
             $this->insentif = $nominalPerPsb * ((int) ($this->jml_psb ?? 0));
         }
         // SPV UGR
-        elseif ($this->isSalesPositionSpvUGR()) {
-            $this->insentif = 50000 * ((int) ($this->jml_psb ?? 0));
-        }
+        // elseif ($this->isSalesPositionSpvUGR()) {
+        //     $this->insentif = 50000 * ((int) ($this->jml_psb ?? 0));
+        // }
 
         $this->hitungTotalGaji();
     }
