@@ -105,6 +105,14 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="mb-3">
+                                <label for="churn" class="form-label fw-semibold">Churn</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="churn" class="form-control"
+                                        wire:model.lazy="churn">
+                                </div>
+                            </div>
                             {{-- @elseif ($this->isSalesPositionSpvUGR())
                             <div class="row">
                                 <div class="mb-3 col-md-6">
