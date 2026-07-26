@@ -127,7 +127,7 @@ class EditPayroll extends Component
 
     private function getEffectiveDay()
     {
-        if (strtolower(trim($this->level)) === 'spv') {
+        if (strtolower(trim($this->karyawan->level)) === 'spv') {
             return 26;
         }
 
