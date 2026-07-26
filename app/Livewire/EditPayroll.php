@@ -132,8 +132,8 @@ class EditPayroll extends Component
         }
 
         return in_array(
-            strtolower(trim($this->divisi)),
-            ['teknisi', 'pelayanan']
+            strtolower(trim($this->jabatan)),
+            ['teknisi', 'helpdesk']
         ) ? 22 : 26;
     }
 
