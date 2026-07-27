@@ -242,6 +242,14 @@
                                     <p>Jadwal Shift</p>
                                 </a>
                             </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('planner-jadwal') }}"
+                                    class="nav-link {{ request()->routeIs('planner-jadwal') ? 'active' : '' }}">
+                                    <i class="bi bi-calendar-range"></i>
+                                    <p>Planner Jadwal</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
 
@@ -354,6 +362,15 @@
                                     <p>Jadwal Shift</p>
                                 </a>
                             </li>
+                            @role('spv-teknisi')
+                                <li class="nav-item">
+                                    <a href="{{ route('planner-jadwal') }}"
+                                        class="nav-link {{ request()->routeIs('planner-jadwal') ? 'active' : '' }}">
+                                        <i class="bi bi-calendar-range"></i>
+                                        <p>Planner Jadwal</p>
+                                    </a>
+                                </li>
+                            @endrole
                         </ul>
                     </li>
                 @endcan

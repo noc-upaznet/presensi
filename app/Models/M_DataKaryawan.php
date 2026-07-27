@@ -12,6 +12,7 @@ class M_DataKaryawan extends Model
     protected $fillable = [
         'user_id',
         'nama_karyawan',
+        'planner_order',
         'email',
         'no_hp',
         'tempat_lahir',
