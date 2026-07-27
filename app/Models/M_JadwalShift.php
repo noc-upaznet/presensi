@@ -8,6 +8,7 @@ class M_JadwalShift extends Model
 {
     protected $table = 'shift';
     protected $fillable = [
+        'kode_shift',
         'nama_shift',
         'jam_masuk',
         'jam_pulang',
