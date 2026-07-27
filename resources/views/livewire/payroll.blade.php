@@ -329,7 +329,7 @@
                                             <tr>
                                                 <th>No. Slip</th>
                                                 <th>Nama</th>
-                                                <th>NIP Karyawan</th>
+                                                {{-- <th>NIP Karyawan</th> --}}
                                                 <th>Departemen</th>
                                                 <th>Bulan</th>
                                                 <th>Grand Total</th>
@@ -350,7 +350,7 @@
                                                     <tr>
                                                         <td>{{ $key->no_slip }}</td>
                                                         <td>{{ $key->getKaryawan->nama_karyawan }}</td>
-                                                        <td>{{ $key->nip_karyawan }}</td>
+                                                        {{-- <td>{{ $key->nip_karyawan }}</td> --}}
                                                         <td>{{ $key->divisi }}</td>
                                                         <td>{{ $key->periode }}</td>
                                                         <td>Rp. {{ number_format($key->total_gaji, 0, ',', '.') }}

@@ -47,7 +47,7 @@
                         {{-- ================= BIAYA TAMBAHAN NON TITIP ================= --}}
                         <tr>
                             <td class="text-center px-3 py-2">{{ count($indicators) + 1 }}</td>
-                            <td class="px-3 py-2">Biaya Tambahan Baru</td>
+                            <td class="px-3 py-2">Biaya Tambahan Karyawan Baru</td>
 
                             @foreach ($months as $month)
                                 <td class="text-end px-3 py-2">
