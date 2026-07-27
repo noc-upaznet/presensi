@@ -392,6 +392,10 @@
 </div>
 @script
     <script>
+        Livewire.on('swal', (e) => {
+            Swal.fire(e.params);
+        });
+
         const sortable = new Sortable(
             document.getElementById('planner-body'), {
 

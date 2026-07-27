@@ -344,17 +344,20 @@ class PlannerJadwal extends Component
 
         $this->loadPlanner();
 
-        session()->flash(
-            'success',
-            'Import jadwal berhasil.'
-        );
+        $this->reset('file');
+
+        $this->dispatch('swal', params: [
+            'title' => 'Import Berhasil',
+            'icon' => 'success',
+            'text' => 'Jadwal berhasil diimport.'
+        ]);
     }
 
     public function exportTemplate()
     {
         return Excel::download(
             new PlannerJadwalExport($this->bulan),
-            'Template Planner ' . $this->bulan . '.xlsx'
+            'Template Planner.xlsx'
         );
     }
 
