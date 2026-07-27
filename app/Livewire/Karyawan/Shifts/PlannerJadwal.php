@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Karyawan\Shifts;
 
+use App\Exports\Planner\GuideExport;
 use App\Exports\Planner\PlannerJadwalExport;
 use App\Models\M_DataKaryawan;
 use App\Models\M_Jadwal;
@@ -360,8 +361,8 @@ class PlannerJadwal extends Component
     public function exportGuide()
     {
         return Excel::download(
-            new PlannerJadwalExport($this->bulan),
-            'planner-jadwal.xlsx'
+            new GuideExport(),
+            'Panduan Import Jadwal.xlsx'
         );
     }
 
