@@ -283,7 +283,7 @@
 
                             <thead>
                                 <tr>
-                                    <th width="40"></th>
+                                    <th width="40">Drag & Drop untuk Urut</th>
                                     <th style="width:55px">No</th>
 
                                     <th style="width:240px" class="text-center">
@@ -339,11 +339,11 @@
 
                                                 <select class="form-select form-select-sm"
                                                     wire:change="updateShift(
-                {{ $item->id }},
-                '{{ $tanggal['ym'] }}',
-                '{{ $tanggal['column'] }}',
-                $event.target.value
-            )">
+                                                        {{ $item->id }},
+                                                        '{{ $tanggal['ym'] }}',
+                                                        '{{ $tanggal['column'] }}',
+                                                        $event.target.value
+                                                    )">
 
                                                     <option value="">-</option>
 
