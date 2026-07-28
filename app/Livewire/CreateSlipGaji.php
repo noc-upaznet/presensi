@@ -309,7 +309,7 @@ class CreateSlipGaji extends Component
             $terlambat  = $this->rekap['terlambat'] ?? 0;
 
             $tunjanganKehadiran = JenisTunjanganModel::where('nama_tunjangan', 'Tunjangan Kehadiran')->first();
-
+            $currentBranch = session('selected_entitas');
             if (is_array($currentBranch)) {
                 $currentBranch = $currentBranch[0] ?? null;
             }
