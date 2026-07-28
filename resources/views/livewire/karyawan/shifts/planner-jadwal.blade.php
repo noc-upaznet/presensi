@@ -189,6 +189,19 @@
         .planner-table .week-divider {
             border-right: 3px solid #374151 !important;
         }
+
+        /* panduan */
+        .transition-icon {
+            transition: transform .25s ease;
+        }
+
+        .card-header[aria-expanded="true"] .transition-icon {
+            transform: rotate(180deg);
+        }
+
+        .card-header:hover {
+            background: #f8f9fa;
+        }
     </style>
     <!-- Header -->
     <div class="app-content-header">
@@ -259,12 +272,121 @@
                             Download Template
 
                         </button>
-                        <button class="btn btn-outline-success" wire:click="exportGuide">
+                        {{-- <button class="btn btn-outline-success" wire:click="exportGuide">
 
                             <i class="fas fa-file-excel me-1"></i>
                             Download Panduan
 
-                        </button>
+                        </button> --}}
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="card shadow-sm mb-3">
+
+                <div class="card-header d-flex justify-content-between align-items-center
+                user-select-none"
+                    data-bs-toggle="collapse" data-bs-target="#panduanImport" aria-expanded="false"
+                    style="cursor:pointer;">
+
+                    <div>
+                        <i class="bi bi-info-circle-fill text-info me-2"></i>
+                        <strong>Panduan Import Jadwal</strong>
+                    </div>
+
+                    <i class="bi bi-chevron-down transition-icon"></i>
+
+                </div>
+
+                <div class="collapse" id="panduanImport">
+
+                    <div class="card-body">
+
+                        <!-- PANDUAN -->
+                        <div class="card border-info shadow-sm mb-3">
+                            <div class="card-body">
+
+                                <div class="row">
+
+                                    <!-- Panduan -->
+                                    <div class="col-lg-7">
+                                        <h6 class="fw-bold text-primary mb-3">
+                                            Sebelum Melakukan Import
+                                        </h6>
+
+                                        <ol class="mb-0 ps-3">
+                                            <li>Jangan mengubah nama kolom pada template.</li>
+                                            <li>Pastikan <strong>Shift</strong> sudah diatur pada menu <strong>Pembagian
+                                                    Shift</strong>.</li>
+                                            <li>Urutan karyawan dapat diubah sebelum template diexport.</li>
+                                            <li>Urutan karyawan dapat diatur menggunakan <strong>Drag & Drop</strong>.
+                                            </li>
+                                            <li>Jangan menghapus baris karyawan yang sudah tersedia.</li>
+                                            <li>Kolom tanggal hanya boleh diisi dengan kode shift.</li>
+                                            <li>Pastikan tidak ada sel yang digabung (<strong>Merge Cell</strong>).</li>
+                                            <li>Simpan file dalam format <strong>.xlsx</strong>.</li>
+                                            <li>Sebelum import pastikan <strong>filter setting bulan</strong> sudah
+                                                diatur ke bulan yang ingin diimport.</li>
+                                            <li>Apabila format tidak sesuai maka proses import akan gagal.</li>
+                                        </ol>
+                                    </div>
+
+                                    <!-- Format Kode -->
+                                    <div class="col-lg-5 border-start">
+
+                                        <h6 class="fw-bold text-success mb-3">
+                                            Contoh Format Kode Jam Kerja
+                                        </h6>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered align-middle mb-3">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Jam Kerja</th>
+                                                        <th width="120">Kode</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>08.00 - 16.00</td>
+                                                        <td><code>0816</code></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>07.30 - 12.30</td>
+                                                        <td><code>07301230</code></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>13.00 - 21.00</td>
+                                                        <td><code>1321</code></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>20.00 - 08.00</td>
+                                                        <td><code>2008</code></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="alert alert-warning mb-0 py-2">
+                                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                            Semua kode jam ditulis <strong>tanpa titik (.)</strong>,
+                                            <strong>tanpa tanda minus (-)</strong>,
+                                            <strong>tanpa spasi</strong>,
+                                            dan <strong>tanpa tanda kutip</strong>.
+                                            <br><br>
+                                            Jika mengalami kendala saat import, silakan hubungi
+                                            <strong>Administrator</strong>.
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
                     </div>
 
                 </div>
@@ -388,44 +510,55 @@
         </div>
 
     </div>
+    @script
+        <script>
+            Livewire.on('swal', (e) => {
+                Swal.fire(e.params);
+            });
 
-</div>
-@script
-    <script>
-        Livewire.on('swal', (e) => {
-            Swal.fire(e.params);
-        });
+            const sortable = new Sortable(
+                document.getElementById('planner-body'), {
 
-        const sortable = new Sortable(
-            document.getElementById('planner-body'), {
+                    animation: 150,
 
-                animation: 150,
+                    handle: '.drag-handle',
 
-                handle: '.drag-handle',
+                    ghostClass: 'table-warning',
 
-                ghostClass: 'table-warning',
+                    onEnd() {
 
-                onEnd() {
+                        let order = [];
 
-                    let order = [];
+                        document.querySelectorAll('#planner-body tr').forEach(function(row, index) {
 
-                    document.querySelectorAll('#planner-body tr').forEach(function(row, index) {
+                            order.push({
 
-                        order.push({
+                                id: row.dataset.id,
 
-                            id: row.dataset.id,
+                                order: index + 1
 
-                            order: index + 1
+                            });
 
                         });
 
-                    });
+                        $wire.updateOrder(order);
 
-                    $wire.updateOrder(order);
+                    }
 
                 }
+            );
 
-            }
-        );
-    </script>
-@endscript
+            document.addEventListener('DOMContentLoaded', () => {
+                const collapse = document.getElementById('panduanImport');
+                const header = collapse.previousElementSibling;
+
+                collapse.addEventListener('show.bs.collapse', () => {
+                    header.setAttribute('aria-expanded', 'true');
+                });
+
+                collapse.addEventListener('hide.bs.collapse', () => {
+                    header.setAttribute('aria-expanded', 'false');
+                });
+            });
+        </script>
+    @endscript
