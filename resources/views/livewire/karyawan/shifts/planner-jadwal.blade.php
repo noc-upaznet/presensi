@@ -343,26 +343,30 @@
                                             <table class="table table-sm table-bordered align-middle mb-3">
                                                 <thead class="table-light">
                                                     <tr>
-                                                        <th>Jam Kerja</th>
+                                                        <th>Nama Shift/Jam Kerja</th>
                                                         <th width="120">Kode</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr>
-                                                        <td>08.00 - 16.00</td>
+                                                        <td>08.00-16.00</td>
                                                         <td><code>0816</code></td>
                                                     </tr>
                                                     <tr>
-                                                        <td>07.30 - 12.30</td>
+                                                        <td>07.30-12.30</td>
                                                         <td><code>07301230</code></td>
                                                     </tr>
                                                     <tr>
-                                                        <td>13.00 - 21.00</td>
+                                                        <td>13.00-21.00</td>
                                                         <td><code>1321</code></td>
                                                     </tr>
                                                     <tr>
-                                                        <td>20.00 - 08.00</td>
+                                                        <td>20.00-08.00</td>
                                                         <td><code>2008</code></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>LIBUR</td>
+                                                        <td><code>LIB</code></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
