@@ -362,7 +362,7 @@
                                     <p>Jadwal Shift</p>
                                 </a>
                             </li>
-                            @role('spv-teknisi')
+                            @role('spv-teknisi|spv-helpdesk')
                                 <li class="nav-item">
                                     <a href="{{ route('planner-jadwal') }}"
                                         class="nav-link {{ request()->routeIs('planner-jadwal') ? 'active' : '' }}">
