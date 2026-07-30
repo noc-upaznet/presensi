@@ -139,9 +139,14 @@
                                                                 Gangguan
                                                             </span>
                                                         @endif
+                                                        <br>
                                                         @if (($report->is_dispensation ?? 0) == 1)
                                                             <span class="badge bg-success">
                                                                 Dispensasi
+                                                            </span>
+                                                            <span class="mb-2">
+                                                                <strong>Keterangan:</strong>
+                                                                {{ $report->dispensation_desc ?? '-' }}
                                                             </span>
                                                         @endif
                                                     </td>
@@ -289,10 +294,14 @@
                                                                     Gangguan
                                                                 </span>
                                                             @endif
-
+                                                            <br>
                                                             @if (($report->is_dispensation ?? 0) == 1)
                                                                 <span class="badge bg-success">
                                                                     Dispensasi
+                                                                </span>
+                                                                <span class="mb-2">
+                                                                    <strong>Keterangan:</strong>
+                                                                    {{ $report->dispensation_desc ?? '-' }}
                                                                 </span>
                                                             @endif
                                                         </td>

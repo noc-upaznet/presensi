@@ -52,7 +52,7 @@ class ReportTicket extends Component
         $this->branches = Branch::orderBy('name')->where('id', '!=', 10)->get();
 
         $this->filterEndDate = date('Y-m-d');
-        $this->filterStartDate = date('Y-m-d');
+        $this->filterStartDate = date('Y-m-01');
     }
 
     public function showRepeatDetail($customerId, $type)
