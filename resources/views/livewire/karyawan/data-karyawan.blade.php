@@ -99,7 +99,20 @@
                                             <i class="fas fa-sort text-muted"></i>
                                         @endif
                                     </th>
-                                    <th>Status</th>
+                                    <th wire:click="sortBy('status_karyawan')"
+                                        style="cursor:pointer; user-select:none;">
+                                        Status
+
+                                        @if ($sortField == 'status_karyawan')
+                                            @if ($sortDirection == 'asc')
+                                                <i class="fas fa-sort-up"></i>
+                                            @else
+                                                <i class="fas fa-sort-down"></i>
+                                            @endif
+                                        @else
+                                            <i class="fas fa-sort text-muted"></i>
+                                        @endif
+                                    </th>
                                     <th>Email</th>
                                     <th>Action</th>
                                     @hasrole('admin')
