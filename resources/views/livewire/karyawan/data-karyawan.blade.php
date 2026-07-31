@@ -86,7 +86,19 @@
                                     <th>Entitas</th>
                                     <th>Divisi</th>
                                     <th>Tanggal Masuk</th>
-                                    <th>Tanggal Keluar (PKWT)</th>
+                                    <th wire:click="sortBy('tgl_keluar')" style="cursor:pointer; user-select:none;">
+                                        Tanggal Keluar (PKWT)
+
+                                        @if ($sortField == 'tgl_keluar')
+                                            @if ($sortDirection == 'asc')
+                                                <i class="fas fa-sort-up"></i>
+                                            @else
+                                                <i class="fas fa-sort-down"></i>
+                                            @endif
+                                        @else
+                                            <i class="fas fa-sort text-muted"></i>
+                                        @endif
+                                    </th>
                                     <th>Status</th>
                                     <th>Email</th>
                                     <th>Action</th>

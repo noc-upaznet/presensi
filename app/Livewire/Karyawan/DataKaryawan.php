@@ -32,6 +32,8 @@ class DataKaryawan extends Component
     public TambahDataKaryawanForm $form;
     public $deleteKaryawan;
     public $deletePermanent;
+    public $sortField = 'tgl_keluar';
+    public $sortDirection = 'asc';
 
     protected $listeners = [
         'entitasUpdated' => '$refresh',
@@ -39,6 +41,16 @@ class DataKaryawan extends Component
     ];
 
     public $filterStatus = '';
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
 
     public function showEdit($id)
     {
@@ -234,7 +246,7 @@ class DataKaryawan extends Component
         }
 
         $datas = $query
-            ->orderBy('nip_karyawan', 'asc')
+            ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
 
         return view('livewire.karyawan.data-karyawan', [
