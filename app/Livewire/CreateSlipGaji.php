@@ -240,7 +240,7 @@ class CreateSlipGaji extends Component
                     }
 
                     if (
-                        $l->waktu_akhir >= '18:00:00'
+                        $l->waktu_akhir >= '18:01:00'
                         || $l->waktu_akhir < $l->waktu_mulai
                     ) {
                         $this->uang_makan_jumlah++;

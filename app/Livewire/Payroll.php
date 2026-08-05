@@ -526,7 +526,6 @@ class Payroll extends Component
     {
         $service = new PayrollService();
 
-        // 🔥 ambil cutoff dari trait (INI YANG BENAR)
         $cutoff = $this->resolveCutoff(
             $this->selectedYear,
             $this->selectedMonth,

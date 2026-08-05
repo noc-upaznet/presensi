@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\JenisTunjanganModel;
+use App\Models\KasbonDetails;
 use Carbon\Carbon;
 use App\Models\M_Jadwal;
 use App\Models\M_Lembur;
@@ -33,6 +35,7 @@ class PayrollService
         $entitasId = $entitas->id ?? null;
         $gajiPokok = $this->num($karyawan->gaji_pokok);
         $tunjanganJabatan = $this->num($karyawan->tunjangan_jabatan);
+        $tunjanganKebudayaan = $this->num($karyawan->kebudayaan);
 
         $effectiveDay = $this->getEffectiveDay($karyawan->divisi);
 
@@ -54,6 +57,8 @@ class PayrollService
 
         $tunjangan_coc = $karyawan->tunjangan_coc ?? 0;
         $tunjangan_kinerja = $karyawan->tunjangan_kinerja ?? 0;
+        $achievement = $this->num($karyawan->bonus ?? 0);
+        $insentifTot = $this->num($karyawan->insentif_tot);
 
         // =========================
         // FEE SHARING
@@ -81,12 +86,33 @@ class PayrollService
             + 0.5 * $rekap['konter izin setengah hari masuk pagi']
         ));
 
-        $potonganTerlambat = $rekap['terlambat'] * 25000;
+        $currentBranch = session('selected_entitas');
+
+        if ($currentBranch === 'MC') {
+            $potonganTerlambat = $rekap['terlambat'] * 15000;
+        } else {
+            $potonganTerlambat = $rekap['terlambat'] * 25000;
+        }
+        $tunjanganKehadiran = 0;
+
+        $masterTunjanganKehadiran = JenisTunjanganModel::where(
+            'nama_tunjangan',
+            'Tunjangan Kehadiran'
+        )->first();
+
+        if ($masterTunjanganKehadiran && $rekap['terlambat'] == 0) {
+            $tunjanganKehadiran = $rekap['kehadiran'] * (int) $masterTunjanganKehadiran->deskripsi;
+        }
 
         // =========================
         // BPJS
         // =========================
-        $bpjs = $this->hitungBpjs($gajiPokok, $tunjanganJabatan);
+        $bpjs = $this->hitungBpjs(
+            $gajiPokok,
+            $tunjanganJabatan,
+            !empty($karyawan->no_bpjs),
+            !empty($karyawan->no_bpjs_tk)
+        );
         $rekap['lembur'] = $this->totalJamLembur($karyawanId, $cutoffStart, $cutoffEnd);
 
         $rekap['cutoff_start'] = $cutoffStart->format('Y-m-d');
@@ -102,21 +128,41 @@ class PayrollService
             $lemburLibur +
             $feeSharing +
             $transport +
+            $tunjanganKebudayaan +
             $tunjangan_coc +
             $tunjangan_kinerja +
+            $achievement +
+            $insentifTot +
+            $tunjanganKehadiran +
             $uangMakan
             - $kasbon
             - $potonganIzin
             - $potonganTerlambat
-            - $bpjs['jht']
-            - $bpjs['kesehatan'];
+            - ($bpjs['jht'] ?? 0)
+            - ($bpjs['kesehatan'] ?? 0);
 
         // =========================
         // SIMPAN
         // =========================
         $noSlip = $this->generateNoSlip($periode, $entitasId);
 
-        return PayrollModel::create([
+        $tunjangan = [];
+
+        if ($achievement > 0) {
+            $tunjangan[] = [
+                'nama' => 'Achievement',
+                'nominal' => $achievement,
+            ];
+        }
+
+        if ($tunjanganKehadiran > 0) {
+            $tunjangan[] = [
+                'nama' => 'Tunjangan Kehadiran',
+                'nominal' => $tunjanganKehadiran,
+            ];
+        }
+
+        $payroll = PayrollModel::create([
             'karyawan_id' => $karyawanId,
             'entitas_id' => $entitasId,
             'titip' => 0,
@@ -130,12 +176,12 @@ class PayrollService
             'lembur' => $lembur,
             'lembur_libur' => $lemburLibur,
 
-            'tunjangan_kebudayaan' => 0,
+            'tunjangan_kebudayaan' => $tunjanganKebudayaan,
 
             'izin' => $potonganIzin,
             'terlambat' => $potonganTerlambat,
 
-            'tunjangan' => json_encode([]),
+            'tunjangan' => json_encode($tunjangan),
             'potongan' => json_encode([]),
 
             'bpjs' => $bpjs['kesehatan'],
@@ -153,6 +199,7 @@ class PayrollService
             'fee_sharing' => $feeSharing,
             'inov_reward' => 0,
             'insentif' => 0,
+            'insentif_tot' => $insentifTot,
             'jml_psb' => 0,
             'churn' => 0,
 
@@ -166,6 +213,36 @@ class PayrollService
             'total_gaji' => $total,
             'periode' => $periode,
         ]);
+
+        $kasbons = KasbonModel::where('karyawan_id', $karyawanId)
+            ->where('status', 'aktif')
+            ->where('sisa_kasbon', '>', 0)
+            ->whereDate('mulai_potong', '<=', $cutoffEnd)
+            ->get();
+
+        foreach ($kasbons as $kasbon) {
+
+            $potong = min($kasbon->kasbon_perbulan, $kasbon->sisa_kasbon);
+
+            KasbonDetails::create([
+                'kasbon_id'      => $kasbon->id,
+                'periode'        => $periode . '-01',
+                'nominal_potong' => $potong,
+            ]);
+
+            $kasbon->sisa_kasbon -= $potong;
+            $kasbon->angsuran_ke++;
+
+            if ($kasbon->sisa_kasbon <= 0) {
+                $kasbon->sisa_kasbon = 0;
+                $kasbon->status = 'lunas';
+                $kasbon->tanggal_lunas = now();
+            }
+
+            $kasbon->save();
+        }
+
+        return $payroll;
     }
 
     // =========================
@@ -264,7 +341,13 @@ class PayrollService
         $count = 0;
 
         foreach ($lembur as $l) {
-            if ($l->waktu_akhir >= '18:00:00') $count++;
+
+            if (
+                $l->waktu_akhir >= '18:01:00'
+                || $l->waktu_akhir < $l->waktu_mulai
+            ) {
+                $count++;
+            }
         }
 
         return $count * 15000;
@@ -279,23 +362,27 @@ class PayrollService
             ->count();
     }
 
-    public function hitungKasbon($id, $cutoffEnd)
+    public function hitungKasbon($karyawanId, $cutoffEnd)
     {
-        return KasbonModel::where('karyawan_id', $id)
+        $kasbons = KasbonModel::where('karyawan_id', $karyawanId)
             ->where('status', 'aktif')
             ->where('sisa_kasbon', '>', 0)
             ->whereDate('mulai_potong', '<=', $cutoffEnd)
-            ->sum('kasbon_perbulan');
+            ->get();
+
+        return $kasbons->sum(function ($kasbon) {
+            return min($kasbon->kasbon_perbulan, $kasbon->sisa_kasbon);
+        });
     }
 
-    public function hitungBpjs($gaji, $tunjangan)
+    public function hitungBpjs($gaji, $tunjangan, $hasBpjs = false, $hasJht = false)
     {
         $umk = 2628190;
         $dasar = max($gaji + $tunjangan, $umk);
 
         return [
-            'kesehatan' => round($dasar * 0.01),
-            'jht' => round($dasar * 0.02),
+            'kesehatan' => $hasBpjs ? round($dasar * 0.01) : 0,
+            'jht'        => $hasJht ? round($dasar * 0.02) : 0,
         ];
     }
 
