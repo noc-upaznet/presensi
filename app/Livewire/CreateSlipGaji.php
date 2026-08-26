@@ -922,38 +922,38 @@ class CreateSlipGaji extends Component
         $entitasNama = session('selected_entitas', 'UHO');
 
         $entitasModel = M_Entitas::where('nama', $entitasNama)->first();
-        $entitasId = $entitasModel?->id;
 
         // Jika tidak ditemukan, fallback ke default UHO
         $entitasKode = $entitasModel?->nama ?? 'UHO';
 
-        // Ambil periode
-
+        // Periode saat ini
         $periode = now()->format('Y-m');
-        $tahun = Carbon::createFromFormat('Y-m', $periode)->format('Y'); // "25"
-        $bulanAngka = Carbon::createFromFormat('Y-m', $periode)->format('n'); // "6"
-        $bulanRomawi = $this->toRoman($bulanAngka); // "VI"
 
-        // Hitung jumlah slip yang sudah dicetak untuk periode tersebut (per entitas)
-        // $lastSlip = PayrollModel::where('periode', $periode)
-        //     ->when($entitasModel, function ($query) use ($entitasModel) {
-        //         return $query->where('entitas_id', $entitasModel->id);
-        //     })
-        //     ->orderByDesc('id')
-        //     ->first();
+        $carbonPeriode = Carbon::createFromFormat('Y-m', $periode);
 
-        $lastSlip = PayrollModel::when($entitasModel, function ($query) use ($entitasModel) {
-            return $query->where('entitas_id', $entitasModel->id);
-        })
+        $tahun = $carbonPeriode->format('Y');
+        $bulanAngka = $carbonPeriode->format('n');
+        $bulanRomawi = $this->toRoman($bulanAngka);
+
+        // Ambil slip TERAKHIR pada periode dan entitas yang sama
+        $lastSlip = PayrollModel::where('periode', $periode)
+            ->when($entitasModel, function ($query) use ($entitasModel) {
+                return $query->where('entitas_id', $entitasModel->id);
+            })
             ->orderByDesc('id')
             ->first();
 
         if ($lastSlip) {
             // Ambil angka terakhir dari nomor slip
             preg_match('/(\d+)$/', $lastSlip->no_slip, $matches);
-            $lastNumber = isset($matches[1]) ? (int)$matches[1] : 0;
+
+            $lastNumber = isset($matches[1])
+                ? (int) $matches[1]
+                : 0;
+
             $nextNumber = $lastNumber + 1;
         } else {
+            // Jika belum ada slip pada bulan tersebut, mulai dari 001
             $nextNumber = 1;
         }
 
@@ -963,12 +963,16 @@ class CreateSlipGaji extends Component
         switch (strtoupper($entitasKode)) {
             case 'UHO':
                 return "006/DJB-UHO/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+
             case 'UNR':
                 return "006/DJB-UNR/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+
             case 'UNB':
                 return "006/DJB-UNB/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+
             case 'UGR':
                 return "006/DJB-UGR/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
+
             default:
                 return "006/DJB-{$entitasKode}/HR/{$tahun}/{$bulanRomawi}/{$nomorUrut}";
         }
