@@ -16,6 +16,7 @@ use App\Traits\CutoffPayrollTrait;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\WithoutUrlPagination;
 
@@ -327,7 +328,8 @@ class Payroll extends Component
         // $this->loadTotals();
     }
 
-    private function hitungSlip()
+    #[On('refresh-slip')]
+    public function hitungSlip()
     {
         // Format periode (YYYY-MM) dari bulan yang dipilih
         $bulanFormatted = str_pad($this->selectedMonth, 2, '0', STR_PAD_LEFT);
@@ -538,6 +540,7 @@ class Payroll extends Component
 
         $karyawans = M_DataKaryawan::where('entitas', session('selected_entitas', 'UHO'))
             ->where('status_karyawan', '!=', 'NONAKTIF')
+            ->where('divisi', '!=', 'SALES MARKETING')
             ->get();
         // dd($cutoffStart, $cutoffEnd, $periode, $karyawans->count());
         foreach ($karyawans as $karyawan) {
@@ -556,7 +559,7 @@ class Payroll extends Component
                 $periode
             );
         }
-
+        $this->dispatch('refresh-slip');
         $this->dispatch(
             'swal',
             params: [
