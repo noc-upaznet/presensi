@@ -346,10 +346,13 @@ class PayrollService
         $count = 0;
 
         foreach ($lembur as $l) {
+            $waktuAkhir = Carbon::parse($l->waktu_akhir)->format('H:i:s');
 
+            // Uang makan hanya jika lembur selesai:
+            // 18:01 s/d 23:59 ATAU 00:00 s/d 05:00
             if (
-                $l->waktu_akhir >= '18:01:00'
-                || $l->waktu_akhir < $l->waktu_mulai
+                $waktuAkhir >= '18:01:00' ||
+                $waktuAkhir <= '05:00:00'
             ) {
                 $count++;
             }
