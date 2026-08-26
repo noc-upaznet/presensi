@@ -16,6 +16,9 @@ use App\Models\KasbonModel;
 
 class PayrollService
 {
+    public $persentase_bpjs_perusahaan = 4;
+    public $persentase_bpjs_jht_perusahaan = 4.24;
+
     private function getEffectiveDay($divisi)
     {
         return in_array(
@@ -36,6 +39,7 @@ class PayrollService
         $gajiPokok = $this->num($karyawan->gaji_pokok);
         $tunjanganJabatan = $this->num($karyawan->tunjangan_jabatan);
         $tunjanganKebudayaan = $this->num($karyawan->kebudayaan);
+        $voucher = $this->num($karyawan->voucher);
 
         $effectiveDay = $this->getEffectiveDay($karyawan->divisi);
 
@@ -136,6 +140,7 @@ class PayrollService
             $tunjanganKehadiran +
             $uangMakan
             - $kasbon
+            - $voucher
             - $potonganIzin
             - $potonganTerlambat
             - ($bpjs['jht'] ?? 0)
@@ -381,8 +386,23 @@ class PayrollService
         $dasar = max($gaji + $tunjangan, $umk);
 
         return [
-            'kesehatan' => $hasBpjs ? round($dasar * 0.01) : 0,
-            'jht'        => $hasJht ? round($dasar * 0.02) : 0,
+            // Potongan karyawan
+            'kesehatan' => $hasBpjs
+                ? round($dasar * 0.01)
+                : 0,
+
+            'jht' => $hasJht
+                ? round($dasar * 0.02)
+                : 0,
+
+            // Tanggungan perusahaan
+            'kesehatan_perusahaan' => $hasBpjs
+                ? round($dasar * ($this->persentase_bpjs_perusahaan / 100))
+                : 0,
+
+            'jht_perusahaan' => $hasJht
+                ? round($dasar * ($this->persentase_bpjs_jht_perusahaan / 100))
+                : 0,
         ];
     }
 
