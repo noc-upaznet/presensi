@@ -231,6 +231,8 @@ class CreateSlipGaji extends Component
                     }
                 }
                 $this->transport_jumlah = $lembur->where('jenis', 2)->where('status', 1)->count();
+
+                //HITUNG UANG MAKAN
                 $this->uang_makan_jumlah = 0;
 
                 foreach ($lembur as $l) {
@@ -239,15 +241,21 @@ class CreateSlipGaji extends Component
                         continue;
                     }
 
+                    $waktuAkhir = Carbon::parse($l->waktu_akhir)->format('H:i:s');
+
+                    // Uang makan hanya untuk lembur yang berakhir
+                    // antara 18:01 sampai 05:00
                     if (
-                        $l->waktu_akhir >= '18:01:00'
-                        || $l->waktu_akhir < $l->waktu_mulai
+                        $waktuAkhir >= '18:01:00' ||
+                        $waktuAkhir <= '05:00:00'
                     ) {
                         $this->uang_makan_jumlah++;
                     }
                 }
-                // dd($this->uang_makan_jumlah);
-                $this->uang_makan_total = (float)$this->uang_makan * (float)$this->uang_makan_jumlah;
+
+                $this->uang_makan_total =
+                    (float) $this->uang_makan *
+                    (float) $this->uang_makan_jumlah;
 
 
                 $this->transport = $dataKaryawan->transport ?? 0;
