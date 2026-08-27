@@ -360,6 +360,12 @@
                         <td class="text-right">Rp. {{ number_format(intVal($data->tunjangan_kinerja)) }}</td>
                     </tr>
                 @endif
+                @if ($data->tunjangan_kinerja)
+                    <tr>
+                        <td>Tunjangan Kinerja</td>
+                        <td class="text-right">Rp. {{ number_format(intVal($data->tunjangan_kinerja)) }}</td>
+                    </tr>
+                @endif
                 <tr>
                     <td>Insentif Tot</td>
                     <td class="text-right">Rp. {{ number_format(intVal($data->insentif_tot)) }}</td>
