@@ -287,9 +287,13 @@ class ModalJadwalShift extends Component
     {
         $karyawan = M_DataKaryawan::findOrFail($id);
 
+        if (strtolower(trim($karyawan->level)) === 'spv') {
+            return 26;
+        }
+
         return in_array(
-            strtolower(trim($karyawan->divisi)),
-            ['teknisi', 'pelayanan']
+            strtolower(trim($karyawan->jabatan)),
+            ['teknisi', 'helpdesk']
         ) ? 22 : 26;
     }
 
