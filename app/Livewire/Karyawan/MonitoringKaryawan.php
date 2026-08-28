@@ -189,11 +189,20 @@ class MonitoringKaryawan extends Component
             $query->orderBy(
                 'data_karyawan.nama_karyawan',
                 $this->sortDirection
+            )->orderBy(
+                'data_karyawan.id',
+                'asc'
             );
         } else {
             $query->orderBy(
                 'jumlah_terlambat',
                 $this->sortDirection
+            )->orderBy(
+                'data_karyawan.nama_karyawan',
+                'asc'
+            )->orderBy(
+                'data_karyawan.id',
+                'asc'
             );
         }
 
