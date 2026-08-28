@@ -124,42 +124,50 @@ class MonitoringKaryawan extends Component
 
     public function render()
     {
-        // $branch = session('selected_entitas', 'UHO');
-
-        $query = M_DataKaryawan::query()
-            ->where('data_karyawan.entitas', $this->branch)
-            ->where('data_karyawan.status_karyawan', '!=', 'NONAKTIF');
-
-        $cutoff = null;
+        $presensiQuery = M_Presensi::query()
+            ->select('user_id')
+            ->selectRaw('COUNT(*) as jumlah_terlambat')
+            ->where('status', 1)
+            ->whereNull('deleted_at');
 
         if ($this->filterBulan) {
-            $tanggal = Carbon::createFromFormat('Y-m', $this->filterBulan);
+            $tanggal = Carbon::createFromFormat(
+                'Y-m',
+                $this->filterBulan
+            );
 
             $cutoff = $this->resolveCutoff(
                 $tanggal->year,
                 $tanggal->month,
                 'cutoff_25'
             );
+
+            $presensiQuery->whereBetween('tanggal', [
+                $cutoff['start'],
+                $cutoff['end'],
+            ]);
         }
 
-        $query->leftJoin('presensi', function ($join) use ($cutoff) {
-            $join->on(
-                'presensi.user_id',
-                '=',
-                'data_karyawan.id'
+        $presensiQuery->groupBy('user_id');
+
+        $query = M_DataKaryawan::query()
+            ->leftJoinSub(
+                $presensiQuery,
+                'rekap_presensi',
+                function ($join) {
+                    $join->on(
+                        'rekap_presensi.user_id',
+                        '=',
+                        'data_karyawan.id'
+                    );
+                }
+            )
+            ->where('data_karyawan.entitas', $this->branch)
+            ->where(
+                'data_karyawan.status_karyawan',
+                '!=',
+                'NONAKTIF'
             );
-
-            $join->where('presensi.status', 1);
-
-            if ($cutoff) {
-                $join->whereBetween('presensi.tanggal', [
-                    $cutoff['start'],
-                    $cutoff['end'],
-                ]);
-            }
-
-            $join->whereNull('presensi.deleted_at');
-        });
 
         if ($this->filterkaryawan) {
             $query->where(
@@ -176,35 +184,35 @@ class MonitoringKaryawan extends Component
             );
         }
 
-        $query->select(
+        $query->select([
             'data_karyawan.id',
-            'data_karyawan.nama_karyawan'
-        )
-            ->selectRaw('COUNT(presensi.id) as jumlah_terlambat')
-            ->groupBy(
-                'data_karyawan.id',
-                'data_karyawan.nama_karyawan'
-            );
+            'data_karyawan.nama_karyawan',
+        ]);
+
+        $query->selectRaw(
+            'COALESCE(rekap_presensi.jumlah_terlambat, 0) AS jumlah_terlambat'
+        );
 
         if ($this->sortField === 'nama_karyawan') {
+
             $query->orderBy(
                 'data_karyawan.nama_karyawan',
                 $this->sortDirection
-            )->orderBy(
-                'data_karyawan.id',
-                'asc'
             );
         } else {
+
             $query->orderBy(
                 'jumlah_terlambat',
                 $this->sortDirection
-            )->orderBy(
-                'data_karyawan.nama_karyawan',
-                'asc'
-            )->orderBy(
-                'data_karyawan.id',
-                'asc'
-            );
+            )
+                ->orderBy(
+                    'data_karyawan.nama_karyawan',
+                    'asc'
+                )
+                ->orderBy(
+                    'data_karyawan.id',
+                    'asc'
+                );
         }
 
         $datas = $query->paginate($this->perPage);
