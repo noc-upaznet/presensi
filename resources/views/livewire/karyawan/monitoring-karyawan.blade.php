@@ -32,34 +32,32 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>
-                                <button type="button" class="btn btn-link p-0 text-decoration-none"
-                                    wire:click="sortBy('nama_karyawan')">
-                                    Nama Karyawan
+                            <th style="cursor: pointer;" wire:click="sortBy('nama_karyawan')">
+                                Nama Karyawan
 
-                                    @if ($sortField === 'nama_karyawan')
-                                        @if ($sortDirection === 'asc')
-                                            <i class="bi bi-arrow-up"></i>
-                                        @else
-                                            <i class="bi bi-arrow-down"></i>
-                                        @endif
+                                @if ($sortField === 'nama_karyawan')
+                                    @if ($sortDirection === 'asc')
+                                        <i class="fas fa-sort-up"></i>
+                                    @else
+                                        <i class="fas fa-sort-down"></i>
                                     @endif
-                                </button>
+                                @else
+                                    <i class="fas fa-sort text-muted"></i>
+                                @endif
                             </th>
 
-                            <th class="text-center">
-                                <button type="button" class="btn btn-link p-0 text-decoration-none"
-                                    wire:click="sortBy('jumlah_terlambat')">
-                                    Terlambat
+                            <th class="text-center" style="cursor: pointer;" wire:click="sortBy('jumlah_terlambat')">
+                                Terlambat
 
-                                    @if ($sortField === 'jumlah_terlambat')
-                                        @if ($sortDirection === 'asc')
-                                            <i class="bi bi-arrow-up"></i>
-                                        @else
-                                            <i class="bi bi-arrow-down"></i>
-                                        @endif
+                                @if ($sortField === 'jumlah_terlambat')
+                                    @if ($sortDirection === 'asc')
+                                        <i class="fas fa-sort-up"></i>
+                                    @else
+                                        <i class="fas fa-sort-down"></i>
                                     @endif
-                                </button>
+                                @else
+                                    <i class="fas fa-sort text-muted"></i>
+                                @endif
                             </th>
 
                             <th class="text-center">
