@@ -121,18 +121,7 @@ class MonitoringKaryawan extends Component
             ->where('data_karyawan.entitas', $branch)
             ->where('data_karyawan.status_karyawan', '!=', 'NONAKTIF');
 
-        /*
-    |--------------------------------------------------------------------------
-    | Hitung keterlambatan
-    |--------------------------------------------------------------------------
-    */
-        $query = M_Presensi::query()
-            ->with(['getKaryawan', 'getUser'])
-            ->whereHas('getKaryawan', function ($q) use ($branch) {
-                $q->where('status_karyawan', '!=', 'NONAKTIF')
-                    ->where('entitas', $branch);
-            })
-            ->where('status', 1);
+        $cutoff = null;
 
         if ($this->filterBulan) {
             $tanggal = Carbon::createFromFormat('Y-m', $this->filterBulan);
@@ -142,27 +131,34 @@ class MonitoringKaryawan extends Component
                 $tanggal->month,
                 'cutoff_25'
             );
-
-            $query->whereBetween('tanggal', [
-                $cutoff['start'],
-                $cutoff['end'],
-            ]);
         }
 
-        /*
-    |--------------------------------------------------------------------------
-    | Filter Karyawan
-    |--------------------------------------------------------------------------
-    */
+        $query->leftJoin('presensi', function ($join) use ($cutoff) {
+            $join->on(
+                'presensi.user_id',
+                '=',
+                'data_karyawan.id'
+            );
+
+            $join->where('presensi.status', 1);
+
+            if ($cutoff) {
+                $join->whereBetween('presensi.tanggal', [
+                    $cutoff['start'],
+                    $cutoff['end'],
+                ]);
+            }
+
+            $join->whereNull('presensi.deleted_at');
+        });
+
         if ($this->filterkaryawan) {
-            $query->where('data_karyawan.id', $this->filterkaryawan);
+            $query->where(
+                'data_karyawan.id',
+                $this->filterkaryawan
+            );
         }
 
-        /*
-    |--------------------------------------------------------------------------
-    | Search
-    |--------------------------------------------------------------------------
-    */
         if ($this->search) {
             $query->where(
                 'data_karyawan.nama_karyawan',
@@ -171,11 +167,6 @@ class MonitoringKaryawan extends Component
             );
         }
 
-        /*
-    |--------------------------------------------------------------------------
-    | Select
-    |--------------------------------------------------------------------------
-    */
         $query->select(
             'data_karyawan.id',
             'data_karyawan.nama_karyawan'
@@ -186,11 +177,6 @@ class MonitoringKaryawan extends Component
                 'data_karyawan.nama_karyawan'
             );
 
-        /*
-    |--------------------------------------------------------------------------
-    | Sorting
-    |--------------------------------------------------------------------------
-    */
         if ($this->sortField === 'nama_karyawan') {
             $query->orderBy(
                 'data_karyawan.nama_karyawan',
