@@ -112,9 +112,9 @@
         aria-labelledby="modalDetailKeterlambatanLabel" aria-hidden="true">
 
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
+            <div class="modal-content" style="background-color: var(--bs-body-bg);">
 
-                <div class="modal-header">
+                <div class="modal-header" style="color: var(--bs-body-color);">
                     <div>
                         <h5 class="modal-title" id="modalDetailKeterlambatanLabel">
                             Detail Keterlambatan
@@ -144,15 +144,15 @@
                             <tbody>
                                 @forelse ($detailData as $data)
                                     <tr>
-                                        <td>
+                                        <td style="color: var(--bs-body-color);">
                                             {{ $data->tanggal }}
                                         </td>
 
-                                        <td>
+                                        <td style="color: var(--bs-body-color);">
                                             {{ $data->clock_in ?? '-' }}
                                         </td>
 
-                                        <td>
+                                        <td style="color: var(--bs-body-color);">
                                             <span class="badge bg-danger">
                                                 Terlambat
                                             </span>
@@ -160,7 +160,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="3" class="text-center">
+                                        <td colspan="3" class="text-center" style="color: var(--bs-body-color);">
                                             Tidak ada data keterlambatan
                                         </td>
                                     </tr>
