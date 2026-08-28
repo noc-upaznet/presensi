@@ -11,6 +11,7 @@ use App\Traits\CutoffPayrollTrait;
 use Livewire\WithoutUrlPagination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Livewire\Attributes\Url;
 
 class RiwayatPresensi extends Component
 {
@@ -33,6 +34,14 @@ class RiwayatPresensi extends Component
     public $karyawanList;
     public $perPage = 25;
 
+    #[Url(as: 'tab')]
+    public $tab = 'riwayat-presensi';
+
+    public function setTab($tab)
+    {
+        $this->tab = $tab;
+    }
+
     public function mount()
     {
         $today = Carbon::today();
@@ -52,6 +61,7 @@ class RiwayatPresensi extends Component
         // $this->statusList = M_Presensi::select('status')->distinct()->pluck('status')->toArray();
         $entitasNama = session('selected_entitas', 'UHO');
         $this->karyawanList = M_DataKaryawan::where('entitas', $entitasNama)
+            ->where('status_karyawan', '!=', 'NONAKTIF')
             ->select('id', 'nama_karyawan')
             ->get();
     }

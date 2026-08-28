@@ -14,151 +14,193 @@
             </div>
         </div>
     </div>
+    <div class="app-content">
+        <div class="container-fluid">
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist" style="background-color: var(--bs-body-bg);">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold @if ($tab == 'riwayat-presensi') active @endif"
+                        wire:click='setTab("riwayat-presensi")' id="riwayat-presensi-tab" data-bs-toggle="tab"
+                        data-bs-target="#riwayat-presensi" data-tab-name="riwayat-presensi" type="button"
+                        role="tab" aria-controls="riwayat-presensi" aria-selected="true">Riwayat Presensi</button>
+                </li>
+                @can('karyawan-terlambat-view')
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold @if ($tab == 'monitoring-karyawan') active @endif"
+                            wire:click='setTab("monitoring-karyawan")' id="monitoring-karyawan-tab" data-bs-toggle="tab"
+                            data-bs-target="#monitoring-karyawan" data-tab-name="monitoring-karyawan" type="button"
+                            role="tab" aria-controls="monitoring-karyawan" aria-selected="true">Karyawan
+                            Terlambat</button>
+                    </li>
+                @endcan
+            </ul>
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade @if ($tab == 'riwayat-presensi') active show @endif " id="riwayat-presensi"
+                    role="tabpanel" aria-labelledby="riwayat-presensi-tab">
 
-    <div class="container">
-        <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
-            <div class="mb-4">
-                <div class="d-flex justify-content gap-2 flex-wrap mb-4">
-                    @role('admin')
-                        <select class="form-select" wire:model.lazy="filterkaryawan" style="width: 150px;">
-                            <option value="">Pilih Karyawan</option>
-                            @foreach ($karyawanList as $karyawan)
-                                <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
-                            @endforeach
-                        </select>
-                    @endrole
+                    <div class="card shadow-sm p-4 rounded" style="background-color: var(--bs-body-bg);">
+                        <div class="mb-4">
+                            <div class="d-flex justify-content gap-2 flex-wrap mb-4">
+                                @role('admin')
+                                    <select class="form-select" wire:model.lazy="filterkaryawan" style="width: 150px;">
+                                        <option value="">Pilih Karyawan</option>
+                                        @foreach ($karyawanList as $karyawan)
+                                            <option value="{{ $karyawan->id }}">{{ $karyawan->nama_karyawan }}</option>
+                                        @endforeach
+                                    </select>
+                                @endrole
 
-                    <input type="month" class="form-control" style="width: 150px;" placeholder="Bulan"
-                        wire:model.lazy="filterBulan">
+                                <input type="month" class="form-control" style="width: 150px;" placeholder="Bulan"
+                                    wire:model.lazy="filterBulan">
 
-                    <input type="date" class="form-control" style="width: 150px;" id="bulanPicker"
-                        placeholder="Tanggal" wire:model.lazy="filterTanggal">
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <label>Show
-                            <select class="form-select form-select-sm d-inline-block w-auto" wire:model.live="perPage">
-                                <option>25</option>
-                                <option>50</option>
-                                <option>100</option>
-                            </select> entries per page</label>
+                                <input type="date" class="form-control" style="width: 150px;" id="bulanPicker"
+                                    placeholder="Tanggal" wire:model.lazy="filterTanggal">
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <label>Show
+                                        <select class="form-select form-select-sm d-inline-block w-auto"
+                                            wire:model.live="perPage">
+                                            <option>25</option>
+                                            <option>50</option>
+                                            <option>100</option>
+                                        </select> entries per page</label>
+                                </div>
+                                <div>
+                                    <input type="search" class="form-control form-control-sm" placeholder="Search..."
+                                        wire:model.live="search">
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Tanggal</th>
+                                            @role('admin')
+                                                <th>Nama Karyawan</th>
+                                            @endrole
+                                            <th>Clock In</th>
+                                            <th>Clock Out</th>
+                                            @role('admin')
+                                                <th>Lokasi</th>
+                                                <th>Old Status</th>
+                                            @endrole
+                                            <th>File</th>
+                                            <th>Status</th>
+                                            @role('admin')
+                                                <th>Action</th>
+                                            @endrole
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if ($datas->isEmpty())
+                                            <tr>
+                                                <td colspan="9" class="text-center"
+                                                    style="color: var(--bs-body-color);">Data
+                                                    tidak ditemukan</td>
+                                            </tr>
+                                        @else
+                                            @foreach ($datas as $key)
+                                                <tr>
+                                                    <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
+                                                    @role('admin')
+                                                        <td style="color: var(--bs-body-color);">
+                                                            {{ $key->getUser->nama_karyawan }}</td>
+                                                    @endrole
+                                                    <td style="color: var(--bs-body-color);">{{ $key->clock_in }}</td>
+                                                    <td style="color: var(--bs-body-color);">{{ $key->clock_out }}</td>
+                                                    @role('admin')
+                                                        <td>
+                                                            <span>Clock-In :</span>
+                                                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($key->lokasi_final) }}"
+                                                                target="_blank"
+                                                                class="badge bg-primary text-decoration-none">
+                                                                {{ $key->lokasi_final }}
+                                                            </a>
+                                                            <br>
+                                                            <span>Clock-Out :</span>
+                                                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($key->lokasi_clock_out_final) }}"
+                                                                target="_blank"
+                                                                class="badge bg-danger text-decoration-none">
+                                                                {{ $key->lokasi_clock_out_final }}
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            @if ($key->previous_status == '0')
+                                                                <span class="badge bg-success">Tepat Waktu</span>
+                                                            @elseif ($key->previous_status == '1')
+                                                                <span class="badge bg-danger">Terlambat</span>
+                                                            @elseif ($key->previous_status == '2')
+                                                                <span class="badge bg-primary">Dispensasi</span>
+                                                            @else
+                                                                <span class="badge bg-secondary">Unknown</span>
+                                                            @endif
+                                                        </td>
+                                                    @endrole
+                                                    <td style="color: var(--bs-body-color);">
+                                                        @if ($key->file)
+                                                            @php
+                                                                $fileUrl = route(
+                                                                    'file.selfies',
+                                                                    encrypt(basename($key->file)),
+                                                                );
+                                                            @endphp
+                                                            <img src="{{ $fileUrl }}" alt="Bukti"
+                                                                style="max-width: 100px; cursor: pointer;"
+                                                                data-bs-toggle="modal" data-bs-target="#modalGambar"
+                                                                onclick="setModalImage('{{ $fileUrl }}')">
+                                                        @else
+                                                            -
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if ($key->status == '0')
+                                                            <span class="badge bg-success">Tepat Waktu</span>
+                                                        @elseif ($key->status == '1')
+                                                            <span class="badge bg-danger">Terlambat</span>
+                                                        @elseif ($key->status == '2')
+                                                            <span class="badge bg-primary">Dispensasi</span>
+                                                        @else
+                                                            <span class="badge bg-secondary">Unknown</span>
+                                                        @endif
+                                                    </td>
+                                                    @role('admin')
+                                                        <td>
+                                                            @can('presensi-edit')
+                                                                <button class="btn btn-warning btn-sm"
+                                                                    wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </button>
+                                                            @endcan
+                                                            <button class="btn btn-sm btn-danger btn-sm  mt-1"
+                                                                wire:click="$dispatch('modal-confirm-delete', {id:'{{ Crypt::encrypt($key->id) }}' ,action: 'show'})">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    @endrole
+                                                </tr>
+                                            @endforeach
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3">
+                                {{ $datas->links() }}
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <input type="search" class="form-control form-control-sm" placeholder="Search..."
-                            wire:model.live="search">
+                </div>
+                @can('karyawan-terlambat-view')
+                    {{-- monitoring --}}
+                    <div class="tab-pane fade @if ($tab == 'monitoring-karyawan') active show @endif "
+                        id="monitoring-karyawan" role="tabpanel" aria-labelledby="monitoring-karyawan-tab">
+                        <livewire:karyawan.monitoring-karyawan />
                     </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                @role('admin')
-                                    <th>Nama Karyawan</th>
-                                @endrole
-                                <th>Clock In</th>
-                                <th>Clock Out</th>
-                                @role('admin')
-                                    <th>Lokasi</th>
-                                    <th>Old Status</th>
-                                @endrole
-                                <th>File</th>
-                                <th>Status</th>
-                                @role('admin')
-                                    <th>Action</th>
-                                @endrole
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if ($datas->isEmpty())
-                                <tr>
-                                    <td colspan="9" class="text-center" style="color: var(--bs-body-color);">Data
-                                        tidak ditemukan</td>
-                                </tr>
-                            @else
-                                @foreach ($datas as $key)
-                                    <tr>
-                                        <td style="color: var(--bs-body-color);">{{ $key->tanggal }}</td>
-                                        @role('admin')
-                                            <td style="color: var(--bs-body-color);">{{ $key->getUser->nama_karyawan }}</td>
-                                        @endrole
-                                        <td style="color: var(--bs-body-color);">{{ $key->clock_in }}</td>
-                                        <td style="color: var(--bs-body-color);">{{ $key->clock_out }}</td>
-                                        @role('admin')
-                                            <td>
-                                                <span>Clock-In :</span>
-                                                <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($key->lokasi_final) }}"
-                                                    target="_blank" class="badge bg-primary text-decoration-none">
-                                                    {{ $key->lokasi_final }}
-                                                </a>
-                                                <br>
-                                                <span>Clock-Out :</span>
-                                                <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($key->lokasi_clock_out_final) }}"
-                                                    target="_blank" class="badge bg-danger text-decoration-none">
-                                                    {{ $key->lokasi_clock_out_final }}
-                                                </a>
-                                            </td>
-                                            <td>
-                                                @if ($key->previous_status == '0')
-                                                    <span class="badge bg-success">Tepat Waktu</span>
-                                                @elseif ($key->previous_status == '1')
-                                                    <span class="badge bg-danger">Terlambat</span>
-                                                @elseif ($key->previous_status == '2')
-                                                    <span class="badge bg-primary">Dispensasi</span>
-                                                @else
-                                                    <span class="badge bg-secondary">Unknown</span>
-                                                @endif
-                                            </td>
-                                        @endrole
-                                        <td style="color: var(--bs-body-color);">
-                                            @if ($key->file)
-                                                @php
-                                                    $fileUrl = route('file.selfies', encrypt(basename($key->file)));
-                                                @endphp
-                                                <img src="{{ $fileUrl }}" alt="Bukti"
-                                                    style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
-                                                    data-bs-target="#modalGambar"
-                                                    onclick="setModalImage('{{ $fileUrl }}')">
-                                            @else
-                                                -
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if ($key->status == '0')
-                                                <span class="badge bg-success">Tepat Waktu</span>
-                                            @elseif ($key->status == '1')
-                                                <span class="badge bg-danger">Terlambat</span>
-                                            @elseif ($key->status == '2')
-                                                <span class="badge bg-primary">Dispensasi</span>
-                                            @else
-                                                <span class="badge bg-secondary">Unknown</span>
-                                            @endif
-                                        </td>
-                                        @role('admin')
-                                            <td>
-                                                @can('presensi-edit')
-                                                    <button class="btn btn-warning btn-sm"
-                                                        wire:click="showModal('{{ Crypt::encrypt($key->id) }}')">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                @endcan
-                                                <button class="btn btn-sm btn-danger btn-sm  mt-1"
-                                                    wire:click="$dispatch('modal-confirm-delete', {id:'{{ Crypt::encrypt($key->id) }}' ,action: 'show'})">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        @endrole
-                                    </tr>
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-3">
-                    {{ $datas->links() }}
-                </div>
+                @endcan
             </div>
         </div>
+    </div>
+    <div class="container">
+
     </div>
 
     <!-- Modal Edit -->
