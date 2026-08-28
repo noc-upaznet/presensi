@@ -27,6 +27,7 @@ class MonitoringKaryawan extends Component
     public $namaKaryawan = '';
     public $sortField = 'jumlah_terlambat';
     public $sortDirection = 'desc';
+    public $branch = [];
 
     public function mount()
     {
@@ -44,6 +45,11 @@ class MonitoringKaryawan extends Component
         }
 
         $this->filterBulan = sprintf('%04d-%02d', $year, $month);
+        $this->branch = session('selected_entitas', 'UHO');
+        $this->karyawanList = M_DataKaryawan::where('entitas', $this->branch)
+            ->where('status_karyawan', '!=', 'NONAKTIF')
+            ->select('id', 'nama_karyawan')
+            ->get();
     }
 
     public function detail($id)
@@ -118,15 +124,10 @@ class MonitoringKaryawan extends Component
 
     public function render()
     {
-        $branch = session('selected_entitas', 'UHO');
-
-        $this->karyawanList = M_DataKaryawan::where('entitas', $branch)
-            ->where('status_karyawan', '!=', 'NONAKTIF')
-            ->select('id', 'nama_karyawan')
-            ->get();
+        // $branch = session('selected_entitas', 'UHO');
 
         $query = M_DataKaryawan::query()
-            ->where('data_karyawan.entitas', $branch)
+            ->where('data_karyawan.entitas', $this->branch)
             ->where('data_karyawan.status_karyawan', '!=', 'NONAKTIF');
 
         $cutoff = null;
