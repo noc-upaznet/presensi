@@ -77,13 +77,21 @@ class MonitoringKaryawan extends Component
                 });
 
             if ($this->filterBulan) {
-                $query->whereYear(
-                    'tanggal',
-                    substr($this->filterBulan, 0, 4)
-                )->whereMonth(
-                    'tanggal',
-                    substr($this->filterBulan, 5, 2)
+                $tanggal = Carbon::createFromFormat(
+                    'Y-m',
+                    $this->filterBulan
                 );
+
+                $cutoff = $this->resolveCutoff(
+                    $tanggal->year,
+                    $tanggal->month,
+                    'cutoff_25'
+                );
+
+                $query->whereBetween('tanggal', [
+                    $cutoff['start'],
+                    $cutoff['end'],
+                ]);
             }
 
             $this->detailData = $query
