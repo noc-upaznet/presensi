@@ -4,6 +4,7 @@ namespace App\Livewire\Karyawan;
 
 use App\Models\M_DataKaryawan;
 use App\Models\M_Presensi;
+use App\Traits\CutoffPayrollTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Crypt;
 use Livewire\Component;
@@ -11,6 +12,7 @@ use Livewire\WithPagination;
 
 class MonitoringKaryawan extends Component
 {
+    use CutoffPayrollTrait;
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
 
@@ -124,20 +126,28 @@ class MonitoringKaryawan extends Component
     | Hitung keterlambatan
     |--------------------------------------------------------------------------
     */
-        $query->leftJoin('presensi', function ($join) {
-            $join->on('presensi.user_id', '=', 'data_karyawan.id')
-                ->where('presensi.status', 1);
+        $query = M_Presensi::query()
+            ->with(['getKaryawan', 'getUser'])
+            ->whereHas('getKaryawan', function ($q) use ($branch) {
+                $q->where('status_karyawan', '!=', 'NONAKTIF')
+                    ->where('entitas', $branch);
+            })
+            ->where('status', 1);
 
-            if ($this->filterBulan) {
-                $join->whereYear(
-                    'presensi.tanggal',
-                    substr($this->filterBulan, 0, 4)
-                )->whereMonth(
-                    'presensi.tanggal',
-                    substr($this->filterBulan, 5, 2)
-                );
-            }
-        });
+        if ($this->filterBulan) {
+            $tanggal = Carbon::createFromFormat('Y-m', $this->filterBulan);
+
+            $cutoff = $this->resolveCutoff(
+                $tanggal->year,
+                $tanggal->month,
+                'cutoff_25'
+            );
+
+            $query->whereBetween('tanggal', [
+                $cutoff['start'],
+                $cutoff['end'],
+            ]);
+        }
 
         /*
     |--------------------------------------------------------------------------
