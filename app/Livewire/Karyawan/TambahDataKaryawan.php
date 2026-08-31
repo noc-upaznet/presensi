@@ -198,30 +198,37 @@ class TambahDataKaryawan extends Component
         ];
 
         // Ambil kode entitas
-        $kode = $kodeEntitas[$currentBranch];
+        $kode = $kodeEntitas[$currentBranch] ?? null;
+
+        if (!$kode) {
+            return;
+        }
 
         // Ambil tahun & bulan dari tanggal masuk
         $tanggalMasuk = Carbon::parse($this->form->tgl_masuk);
 
-        $tahun = $tanggalMasuk->format('y');   // 2026 -> 26
-        $bulan = $tanggalMasuk->format('m');   // Agustus -> 08
+        $tahun = $tanggalMasuk->format('y');
+        $bulan = $tanggalMasuk->format('m');
 
-        $prefix = "{$tahun}{$bulan}{$kode}";
-
-        // Cari NIP terakhir pada entitas yang sama
+        /*
+        * Cari NIP terakhir berdasarkan ENTITAS saja.
+        */
         $lastKaryawan = M_DataKaryawan::where('entitas', $currentBranch)
-            ->where('nip_karyawan', 'like', "{$prefix}%")
-            ->orderBy('nip_karyawan', 'desc')
+            ->whereNotNull('nip_karyawan')
+            ->where('nip_karyawan', '!=', '')
+            ->orderByRaw('CAST(RIGHT(nip_karyawan, 3) AS UNSIGNED) DESC')
             ->first();
 
-        // Ambil 3 digit terakhir
+        // Nomor urut terakhir per entitas
         $lastNumber = $lastKaryawan
             ? (int) substr($lastKaryawan->nip_karyawan, -3)
             : 0;
 
+        // Tambahkan 1
         $noUrutBaru = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
 
-        $this->form->nip_karyawan = "{$prefix}{$noUrutBaru}";
+        // Bentuk NIP
+        $this->form->nip_karyawan = "{$tahun}{$bulan}{$kode}{$noUrutBaru}";
     }
 
     public function render()
