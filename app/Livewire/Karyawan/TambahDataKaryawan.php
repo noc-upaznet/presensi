@@ -188,23 +188,38 @@ class TambahDataKaryawan extends Component
     public function generateNip()
     {
         $currentBranch = session('selected_entitas', 'UHO');
-        $branch = M_Entitas::where('nama', $currentBranch)->first();
 
-        $year = substr(Carbon::now()->year, -2);
-        $month = str_pad(Carbon::now()->month, 2, '0', STR_PAD_LEFT);
+        // Mapping kode entitas
+        $kodeEntitas = [
+            'UHO' => '01',
+            'UNR' => '02',
+            'UNB' => '03',
+            'UGR' => '04',
+        ];
 
-        $kodeEntitas = str_pad($branch->id, 2, '0', STR_PAD_LEFT);
+        // Ambil kode entitas
+        $kode = $kodeEntitas[$currentBranch];
 
-        $prefix = "{$year}{$month}{$kodeEntitas}";
-        $lastKaryawan = M_DataKaryawan::where('entitas', $branch->nama)
+        // Ambil tahun & bulan dari tanggal masuk
+        $tanggalMasuk = Carbon::parse($this->form->tgl_masuk);
+
+        $tahun = $tanggalMasuk->format('y');   // 2026 -> 26
+        $bulan = $tanggalMasuk->format('m');   // Agustus -> 08
+
+        $prefix = "{$tahun}{$bulan}{$kode}";
+
+        // Cari NIP terakhir pada entitas yang sama
+        $lastKaryawan = M_DataKaryawan::where('entitas', $currentBranch)
+            ->where('nip_karyawan', 'like', "{$prefix}%")
             ->orderBy('nip_karyawan', 'desc')
             ->first();
 
-        // Ambil 3 digit terakhir dari NIP, tambahkan 1
-        $lastNumber = $lastKaryawan ? (int) substr($lastKaryawan->nip_karyawan, -3) : 0;
-        $noUrutBaru = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
-        // dd($noUrutBaru);
+        // Ambil 3 digit terakhir
+        $lastNumber = $lastKaryawan
+            ? (int) substr($lastKaryawan->nip_karyawan, -3)
+            : 0;
 
+        $noUrutBaru = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
 
         $this->form->nip_karyawan = "{$prefix}{$noUrutBaru}";
     }
