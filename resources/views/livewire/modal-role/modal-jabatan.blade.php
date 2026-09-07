@@ -82,6 +82,8 @@
                             <option value="Asisten">Asisten</option>
                             <option value="CRM">CRM</option>
                             <option value="Kepala Konter">Kepala Konter</option>
+                            <option value="Staff Teknisi">Staff Teknisi</option>
+                            <option value="Staff Helpdesk">Staff Helpdesk</option>
                         </select>
                     </div>
                     <div class="mb-3">
