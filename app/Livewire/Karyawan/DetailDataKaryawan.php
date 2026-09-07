@@ -592,6 +592,14 @@ class DetailDataKaryawan extends Component
         ]);
     }
 
+    public function modalEditKaryawan($id)
+    {
+        $this->dispatch(
+            'show-modal-edit-karyawan',
+            id: Crypt::encrypt($id)
+        )->to(DataKaryawan::class);
+    }
+
     public function render()
     {
         $this->familys = M_Family::where('karyawan_id', $this->id)->get();

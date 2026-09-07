@@ -117,6 +117,10 @@
             </div>
         @endcan
 
+        <button class="btn btn-warning mb-3" wire:click="modalEditKaryawan({{ $id }})">
+            Edit Data Karyawan
+        </button>
+
         <div class="border rounded-4 p-4">
             <h6 class="fw-bold text-primary">PERSOAL DATA (DATA DIRI KARYAWAN)</h6>
             <div class="row align-items-start mt-3">
@@ -1507,6 +1511,9 @@
             </div>
         </div>
     </div>
+    <livewire:karyawan.data-karyawan />
+    <livewire:karyawan.modal-karyawan />
+
 </div>
 @push('scripts')
     <script>

@@ -20,6 +20,7 @@ use App\Models\M_Presensi;
 use App\Models\M_WorkExperience;
 use App\Models\PayrollModel;
 use App\Models\User;
+use Livewire\Attributes\On;
 use Livewire\WithoutUrlPagination;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -52,6 +53,7 @@ class DataKaryawan extends Component
         }
     }
 
+    #[On('show-modal-edit-karyawan')]
     public function showEdit($id)
     {
         $this->form->resetValidation();
