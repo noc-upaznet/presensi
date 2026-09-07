@@ -75,6 +75,48 @@
             opacity: 0.75;
         }
 
+        .dashboard-user-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 16px 20px;
+            background: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 12px;
+        }
+
+        .dashboard-user-role {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .dashboard-user-role>div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--bs-body-color);
+            font-size: 14px;
+        }
+
+        .dashboard-user-role i {
+            color: #0d6efd;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-user-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .dashboard-user-role {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+        }
+
         @media (max-width: 576px) {
             .content-wrapper {
                 padding: 2rem 1rem;
@@ -113,8 +155,32 @@
             @endif
         </div>
 
-        <div class="text mb-4" style="color: var(--bs-body-color); justify-content: center; align-items: center;">
+        {{-- <div class="text mb-4" style="color: var(--bs-body-color); justify-content: center; align-items: center;">
             <p class="fs-5">Halo, {{ $userName }}</p>
+        </div> --}}
+
+        <div class="dashboard-user-info mb-4">
+            <div>
+                <p class="fs-5 mb-1">
+                    Halo, <strong>{{ $userName }}</strong>
+                </p>
+
+                <small class="text-muted">
+                    Selamat datang di dashboard Anda
+                </small>
+            </div>
+
+            <div class="dashboard-user-role">
+                <div>
+                    <i class="fas fa-user-tie"></i>
+                    <span>{{ $level }}</span>
+                </div>
+
+                <div>
+                    <i class="fas fa-building"></i>
+                    <span>{{ $divisi }}</span>
+                </div>
+            </div>
         </div>
 
         <div class="d-flex flex-column justify-content-center" style="justify-content: center; align-items: center;">
