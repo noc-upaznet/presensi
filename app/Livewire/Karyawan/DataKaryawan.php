@@ -7,7 +7,6 @@ use Livewire\Component;
 use App\Models\M_Jadwal;
 use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
-use Illuminate\Support\Facades\Crypt;
 use App\Livewire\Forms\TambahDataKaryawanForm;
 use App\Models\M_AdditionalDataEmployee;
 use App\Models\M_Dependents;
@@ -18,9 +17,8 @@ use App\Models\M_Lembur;
 use App\Models\M_Pengajuan;
 use App\Models\M_Presensi;
 use App\Models\M_WorkExperience;
-use App\Models\PayrollModel;
 use App\Models\User;
-use Livewire\Attributes\On;
+use Illuminate\Support\Facades\Crypt;
 use Livewire\WithoutUrlPagination;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -51,6 +49,20 @@ class DataKaryawan extends Component
             $this->sortField = $field;
             $this->sortDirection = 'asc';
         }
+    }
+
+    public function showEdit($id)
+    {
+        $this->form->resetValidation();
+        $dataKaryawan = M_DataKaryawan::find(Crypt::decrypt($id));
+        if (!$dataKaryawan) {
+            session()->flash('error', 'Data tiket tidak ditemukan!');
+            return;
+        }
+
+        $this->dispatch('edit-ticket', data: $dataKaryawan->toArray());
+
+        $this->dispatch('modal-edit-data-karyawan', action: 'show');
     }
 
     public function showModalImport()
