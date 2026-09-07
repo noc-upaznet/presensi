@@ -539,9 +539,9 @@
                 </table>
             </div>
 
-            <hr class="my-4">
+            {{-- <hr class="my-4"> --}}
 
-            <h6 class="fw-bold text-primary">Data Gamifikasi</h6>
+            {{-- <h6 class="fw-bold text-primary">Data Gamifikasi</h6>
             <div style="color: var(--bs-body-color);">
                 <span>Jumlah Poin</span>
                 <span>: {{ $karyawan->poin ?? '-' }}</span>
@@ -557,7 +557,7 @@
                             Simpan</button>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
         <div align="right" class="mt-3">
             <a href="/data-karyawan" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Kembali</a>
@@ -1378,8 +1378,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="level_of_education" class="form-label">Jenjang</label>
                             <input type="text" class="form-control" id="level_of_education"
-                                wire:model="level_of_education" name="level_of_education"
-                                placeholder="SMA/STRATA 1">
+                                wire:model="level_of_education" name="level_of_education" placeholder="SMA/STRATA 1">
                             @error('form.level_of_education')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
