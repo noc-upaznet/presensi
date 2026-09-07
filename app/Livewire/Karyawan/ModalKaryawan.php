@@ -12,6 +12,8 @@ use App\Imports\KaryawanImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Livewire\Forms\TambahDataKaryawanForm;
 use App\Models\User;
+use Illuminate\Support\Facades\Crypt;
+use Livewire\Attributes\On;
 
 class ModalKaryawan extends Component
 {
@@ -150,6 +152,26 @@ class ModalKaryawan extends Component
 
         $this->dispatch('modal-import', action: 'hide');
         $this->dispatch('refresh');
+    }
+
+    #[On('show-modal-edit-karyawan')]
+    public function showEdit($id)
+    {
+        $dataKaryawan = M_DataKaryawan::find(Crypt::decrypt($id));
+
+        if (!$dataKaryawan) {
+            return;
+        }
+
+        $this->dispatch(
+            'edit-ticket',
+            data: $dataKaryawan->toArray()
+        );
+
+        $this->dispatch(
+            'modal-edit-data-karyawan',
+            action: 'show'
+        );
     }
 
     public function render()

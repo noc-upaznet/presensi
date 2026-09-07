@@ -597,7 +597,7 @@ class DetailDataKaryawan extends Component
         $this->dispatch(
             'show-modal-edit-karyawan',
             id: Crypt::encrypt($id)
-        )->to(DataKaryawan::class);
+        )->to(ModalKaryawan::class);
     }
 
     public function render()

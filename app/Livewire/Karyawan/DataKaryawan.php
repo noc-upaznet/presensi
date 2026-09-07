@@ -53,21 +53,6 @@ class DataKaryawan extends Component
         }
     }
 
-    #[On('show-modal-edit-karyawan')]
-    public function showEdit($id)
-    {
-        $this->form->resetValidation();
-        $dataKaryawan = M_DataKaryawan::find(Crypt::decrypt($id));
-        if (!$dataKaryawan) {
-            session()->flash('error', 'Data tiket tidak ditemukan!');
-            return;
-        }
-
-        $this->dispatch('edit-ticket', data: $dataKaryawan->toArray());
-
-        $this->dispatch('modal-edit-data-karyawan', action: 'show');
-    }
-
     public function showModalImport()
     {
         $this->dispatch('modal-import', action: 'show');

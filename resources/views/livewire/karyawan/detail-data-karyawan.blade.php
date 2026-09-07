@@ -1511,7 +1511,6 @@
             </div>
         </div>
     </div>
-    <livewire:karyawan.data-karyawan />
     <livewire:karyawan.modal-karyawan />
 
 </div>
@@ -1555,6 +1554,10 @@
 
         Livewire.on('modalEditExperience', (event) => {
             $('#modalEditExperience').modal(event.action);
+        });
+
+        Livewire.on('modal-edit-data-karyawan', (event) => {
+            $('#modal-edit-data-karyawan').modal(event.action);
         });
 
         document.addEventListener('DOMContentLoaded', function() {
