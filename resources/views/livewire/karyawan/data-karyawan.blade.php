@@ -83,8 +83,9 @@
                                 <tr class="users-table-info">
                                     <th>Nama Karyawan</th>
                                     <th>Jenis Kelamin</th>
-                                    <th>Entitas</th>
+                                    <th>Branch</th>
                                     <th>Divisi</th>
+                                    <th>Jabatan</th>
                                     <th>Tanggal Masuk</th>
                                     <th wire:click="sortBy('tgl_keluar')" style="cursor:pointer; user-select:none;">
                                         Tanggal Keluar (PKWT)
@@ -136,6 +137,7 @@
                                         </td>
                                         <td style="color: var(--bs-body-color);">{{ $key->entitas }}</td>
                                         <td style="color: var(--bs-body-color);">{{ $key->divisi }}</td>
+                                        <td style="color: var(--bs-body-color);">{{ $key->jabatan }}</td>
                                         <td style="color: var(--bs-body-color);">
                                             {{ \Carbon\Carbon::parse($key->tgl_masuk)->locale('id')->isoFormat('D MMMM YYYY') }}
                                         </td>
