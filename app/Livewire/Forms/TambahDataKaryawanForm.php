@@ -88,6 +88,7 @@ class TambahDataKaryawanForm extends Form
 
     #[Validate('required', 'Nama Bank')]
     public $nama_bank = '';
+    public $nama_bank_lainnya;
 
     #[Validate('required', 'No Rek')]
     public $no_rek = '';

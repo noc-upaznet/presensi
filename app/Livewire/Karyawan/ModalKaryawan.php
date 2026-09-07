@@ -64,6 +64,10 @@ class ModalKaryawan extends Component
             return;
         }
 
+        $namaBank = $this->form->nama_bank === 'Lainnya'
+            ? $this->form->nama_bank_lainnya
+            : $this->form->nama_bank;
+
         $data = [
             'nama_karyawan' => $this->form->nama_karyawan,
             'email' => $this->form->email,
@@ -99,7 +103,7 @@ class ModalKaryawan extends Component
             'kebudayaan' => $this->form->kebudayaan,
             'transport' => $this->form->transport,
             'jenis_penggajian' => $this->form->jenis_penggajian,
-            'nama_bank' => $this->form->nama_bank,
+            'nama_bank' => $namaBank,
             'no_rek' => $this->form->no_rek,
             'nama_pemilik_rekening' => $this->form->nama_pemilik_rekening,
             'no_bpjs_tk' => $this->form->no_bpjs_tk,

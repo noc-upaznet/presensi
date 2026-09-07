@@ -480,21 +480,74 @@
                         </div>
 
                         <h4 style="color: blue; margin-bottom: 20px;">Rekening Bank</h4>
+                        @php
+                            $bankList = [
+                                'BCA' => 'Bank Central Asia (BCA)',
+                                'BRI' => 'Bank Rakyat Indonesia (BRI)',
+                                'BNI' => 'Bank Negara Indonesia (BNI)',
+                                'BSI' => 'Bank Syariah Indonesia (BSI)',
+                                'Mandiri' => 'Bank Mandiri',
+                            ];
+
+                            $currentBank = $form->nama_bank;
+                        @endphp
+
                         <div class="mb-3">
-                            <label for="nama-bank" class="form-label">Nama Bank <small
-                                    class="text-danger">*</small></label>
-                            <select class="form-select" id="nama-bank" wire:model="form.nama_bank">
-                                <option selected disabled value="">-- Pilih Bank --</option>
-                                <option value="BCA">Bank Central Asia (BCA)</option>
-                                <option value="BRI">Bank Rakyat Indonesia (BRI)</option>
-                                <option value="BNI">Bank Negara Indonesia (BNI)</option>
-                                <option value="BSI">Bank Syariah Indonesia (BSI)</option>
-                                <option value="Mandiri">Bank Mandiri</option>
-                            </select>
+                            <div class="mb-3">
+                                <label for="nama-bank" class="form-label">
+                                    Nama Bank <small class="text-danger">*</small>
+                                </label>
+
+                                <select class="form-select" id="nama-bank" wire:model.live="form.nama_bank"
+                                    wire:key="nama-bank-{{ $currentBank ?? 'empty' }}">
+                                    <option value="" disabled>
+                                        -- Pilih Bank --
+                                    </option>
+
+                                    {{-- BANK YANG ADA DI DB --}}
+                                    @if ($currentBank && !array_key_exists($currentBank, $bankList) && $currentBank !== 'Lainnya')
+                                        <option value="{{ $currentBank }}">
+                                            {{ $currentBank }}
+                                        </option>
+                                    @endif
+
+                                    {{-- BANK DEFAULT --}}
+                                    @foreach ($bankList as $value => $label)
+                                        <option value="{{ $value }}">
+                                            {{ $label }}
+                                        </option>
+                                    @endforeach
+
+                                    <option value="Lainnya">
+                                        Lainnya
+                                    </option>
+                                </select>
+
+                                @error('form.nama_bank')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
                             @error('form.nama_bank')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
+
+                        {{-- INPUT BANK LAINNYA --}}
+                        @if ($form->nama_bank === 'Lainnya')
+                            <div class="mb-3">
+                                <label for="nama-bank-lainnya" class="form-label">
+                                    Nama Bank Lainnya <small class="text-danger">*</small>
+                                </label>
+
+                                <input type="text" class="form-control" id="nama-bank-lainnya"
+                                    wire:model="form.nama_bank_lainnya" placeholder="Masukkan nama bank">
+
+                                @error('form.nama_bank_lainnya')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        @endif
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="no-rek" class="form-label">Nomor Rekening <small
