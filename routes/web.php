@@ -27,6 +27,7 @@ use App\Livewire\EditPayroll;
 use App\Livewire\EmployeeAbsent;
 use App\Livewire\Gamifikasi;
 use App\Livewire\Karyawan\DetailDataKaryawan;
+use App\Livewire\Karyawan\External\FormDataKaryawan;
 use App\Livewire\Karyawan\Pengajuan\Dispensasi;
 use App\Livewire\Karyawan\TambahDataKaryawan;
 use App\Livewire\Karyawan\Pengajuan\Pengajuan;
@@ -45,8 +46,10 @@ use App\Livewire\ReportTicket;
 use App\Livewire\SlipGaji;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 // Route::redirect('/', '/login');
@@ -79,6 +82,55 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/ganti-password', GantiPassword::class)->middleware('auth')->name('ganti-password');
+
+// Route::get('/sso/callback', function (Request $request) {
+
+//     $token = $request->query('token');
+
+//     if (!$token) {
+//         abort(401, 'Token SSO tidak ditemukan.');
+//     }
+
+//     $response = Http::post(
+//         'http://127.0.0.1:8003/api/sso/validate',
+//         [
+//             'token' => $token,
+//         ]
+//     );
+
+//     if (!$response->successful()) {
+//         abort(401, 'Token SSO tidak valid atau sudah expired.');
+//     }
+
+//     $data = $response->json();
+
+//     if (!($data['valid'] ?? false)) {
+//         abort(401, 'Token SSO tidak valid.');
+//     }
+
+//     $userData = $data['user'];
+
+//     $user = \App\Models\User::where(
+//         'email',
+//         $userData['email']
+//     )->first();
+
+//     if (!$user) {
+//         abort(401, 'User tidak ditemukan di aplikasi Presensi.');
+//     }
+
+//     Auth::login($user);
+
+//     $request->session()->regenerate();
+
+//     return redirect('/');
+// });
+
+Route::get(
+    '/form-data-karyawan/{token}',
+    FormDataKaryawan::class
+)->name('public.data-karyawan');
+
 Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], function () {
     Route::get('/', Dashboard::class)->name('dashboard')->middleware('check.dashboard-view');
     Route::get('/clock-in', ClockIn::class)->name('clock-in');
