@@ -121,6 +121,19 @@
             Edit Data Karyawan
         </button>
 
+        <button type="button" class="btn btn-primary mb-3" wire:click="generateDataKaryawanLink"
+            wire:loading.attr="disabled">
+            <span wire:loading.remove wire:target="generateDataKaryawanLink">
+                <i class="bi bi-link-45deg"></i>
+                Generate Link Pengisian
+            </span>
+
+            <span wire:loading wire:target="generateDataKaryawanLink">
+                <span class="spinner-border spinner-border-sm me-1"></span>
+                Generate...
+            </span>
+        </button>
+
         <div class="border rounded-4 p-4">
             <h6 class="fw-bold text-primary">PERSOAL DATA (DATA DIRI KARYAWAN)</h6>
             <div class="row align-items-start mt-3">
@@ -1382,7 +1395,8 @@
                         <div class="col-md-6 mb-3">
                             <label for="level_of_education" class="form-label">Jenjang</label>
                             <input type="text" class="form-control" id="level_of_education"
-                                wire:model="level_of_education" name="level_of_education" placeholder="SMA/STRATA 1">
+                                wire:model="level_of_education" name="level_of_education"
+                                placeholder="SMA/STRATA 1">
                             @error('form.level_of_education')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -1513,6 +1527,69 @@
     </div>
     <livewire:karyawan.modal-karyawan />
 
+    <div wire:ignore.self class="modal fade" id="modalDataKaryawanLink" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Link Pengisian Data Karyawan
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-1"></i>
+
+                        Bagikan link ini kepada karyawan untuk
+                        melengkapi data mereka. Link berlaku selama
+                        <strong>7 hari</strong>.
+                    </div>
+
+                    <label class="form-label fw-semibold">
+                        Link Pengisian
+                    </label>
+
+                    <div class="input-group">
+
+                        <input type="text" class="form-control" value="{{ $dataKaryawanLink }}" readonly
+                            id="dataKaryawanLink">
+
+                        <button type="button" class="btn btn-outline-primary" onclick="copyDataKaryawanLink()">
+                            <i class="bi bi-copy"></i>
+                            Copy
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Tutup
+                    </button>
+
+                    @if ($dataKaryawanLink)
+                        <a href="{{ $dataKaryawanLink }}" target="_blank" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-up-right"></i>
+                            Buka Link
+                        </a>
+                    @endif
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
 </div>
 @push('scripts')
     <script>
@@ -1560,86 +1637,62 @@
             $('#modal-edit-data-karyawan').modal(event.action);
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.btn-edit').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const row = btn.closest('tr');
-                    const cell = row.querySelector('.value-cell');
-                    const field = row.dataset.field; // ambil nama field dari tr
+        // ==========================================
+        // GENERATE LINK DATA KARYAWAN
+        // ==========================================
 
-                    if (!cell.querySelector('input')) {
-                        const currentValue = cell.textContent.trim();
+        Livewire.on('showDataKaryawanLink', () => {
 
-                        // cek apakah field adalah Mulai Masuk → pakai type="month"
-                        if (field === 'start_date') {
-                            // format ke YYYY-MM
-                            let dateValue = currentValue !== '-' ? currentValue : '';
-                            cell.innerHTML =
-                                `<input type="month" class="form-control form-control-sm" value="${dateValue}">`;
-                        } else {
-                            cell.innerHTML =
-                                `<input type="text" class="form-control form-control-sm" value="${currentValue === '-' ? '' : currentValue}">`;
-                        }
+            console.log('EVENT showDataKaryawanLink diterima');
 
-                        btn.innerHTML = '<i class="bi bi-save"></i> Simpan';
-                        btn.classList.remove('btn-warning');
-                        btn.classList.add('btn-success');
-                    } else {
-                        // Mode save → ambil nilai, kirim ke server (ajax/Livewire)
-                        const newValue = cell.querySelector('input').value;
+            const modalElement = document.getElementById('modalDataKaryawanLink');
 
-                        fetch(`/karyawan/additional/update`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector(
-                                        'meta[name="csrf-token"]').content
-                                },
-                                body: JSON.stringify({
-                                    karyawan_id: {{ $karyawan->id }},
-                                    field: field,
-                                    value: newValue
-                                })
-                            })
-                            .then(r => r.json())
-                            .then(res => {
-                                if (res.success) {
-                                    cell.textContent = newValue || '-';
-                                    btn.innerHTML = '<i class="bi bi-pencil-square"></i>';
-                                    btn.classList.remove('btn-success');
-                                    btn.classList.add('btn-warning');
-                                } else {
-                                    alert('Gagal menyimpan data');
-                                }
-                            });
-                    }
-                });
-            });
-        });
-    </script>
-
-    <script>
-        const fileInput = document.getElementById('fileInput');
-        const preview = document.getElementById('preview');
-        const previewImage = document.getElementById('previewImage');
-
-        fileInput.addEventListener('change', function() {
-            const file = this.files[0];
-
-            if (file) {
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    previewImage.src = e.target.result;
-                    preview.style.display = 'block';
-                }
-
-                reader.readAsDataURL(file);
+            if (!modalElement) {
+                console.error('modalDataKaryawanLink tidak ditemukan');
+                return;
             }
+
+            $('#modalDataKaryawanLink').modal('show');
         });
 
-        function setModalImage(src) {
-            document.getElementById('previewImage').src = src;
-        }
+        // ==========================================
+        // COPY LINK DATA KARYAWAN
+        // ==========================================
+
+        window.copyDataKaryawanLink = function() {
+
+            const input = document.getElementById('dataKaryawanLink');
+
+            if (!input || !input.value) {
+                return;
+            }
+
+            navigator.clipboard.writeText(input.value)
+                .then(() => {
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Link berhasil disalin.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
+                })
+                .catch(() => {
+
+                    input.select();
+                    document.execCommand('copy');
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Link berhasil disalin.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
+                });
+        };
     </script>
 @endpush

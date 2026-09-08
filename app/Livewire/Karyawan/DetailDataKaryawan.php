@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Karyawan;
 
+use App\Exports\TemplateDataKaryawanExport;
+use App\Models\EmployeeDataLink;
 use App\Models\M_AdditionalDataEmployee;
 use Livewire\Component;
 use App\Models\M_DataKaryawan;
@@ -11,8 +13,10 @@ use App\Models\M_Family;
 use App\Models\M_WorkExperience;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DetailDataKaryawan extends Component
 {
@@ -59,6 +63,8 @@ class DetailDataKaryawan extends Component
 
     public $photo;
     public $existingPhoto;
+
+    public $dataKaryawanLink = '';
 
     protected $rules = [
         'value' => 'nullable|string|max:255',
@@ -598,6 +604,36 @@ class DetailDataKaryawan extends Component
             'show-modal-edit-karyawan',
             id: Crypt::encrypt($id)
         )->to(ModalKaryawan::class);
+    }
+
+    public function generateDataKaryawanLink()
+    {
+        $token = Str::random(64);
+
+        EmployeeDataLink::updateOrCreate(
+            [
+                'karyawan_id' => $this->id,
+            ],
+            [
+                'token' => $token,
+                'expires_at' => now()->addDays(7),
+                'last_accessed_at' => null,
+                'is_active' => true,
+            ]
+        );
+
+        $this->dataKaryawanLink = route('public.data-karyawan', [
+            'token' => $token,
+        ]);
+
+        // INI yang benar
+        $this->dispatch('showDataKaryawanLink');
+
+        // $this->dispatch('swal', params: [
+        //     'title' => 'Link Berhasil Dibuat',
+        //     'icon' => 'success',
+        //     'text' => 'Link pengisian data karyawan berhasil dibuat.',
+        // ]);
     }
 
     public function render()
