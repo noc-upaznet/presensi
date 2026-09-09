@@ -126,10 +126,9 @@ Route::get('/ganti-password', GantiPassword::class)->middleware('auth')->name('g
 //     return redirect('/');
 // });
 
-Route::get(
-    '/form-data-karyawan/{token}',
-    FormDataKaryawan::class
-)->name('public.data-karyawan');
+Route::get('/data-karyawan/{token}', FormDataKaryawan::class)
+    ->middleware('auth')
+    ->name('public.data-karyawan');
 
 Route::group(['middleware' => ['auth', 'password.expired', 'session.expired']], function () {
     Route::get('/', Dashboard::class)->name('dashboard')->middleware('check.dashboard-view');

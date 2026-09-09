@@ -616,7 +616,7 @@ class DetailDataKaryawan extends Component
             ],
             [
                 'token' => $token,
-                'expires_at' => now()->addDays(7),
+                'expires_at' => now()->addDays(3),
                 'last_accessed_at' => null,
                 'is_active' => true,
             ]
@@ -626,14 +626,7 @@ class DetailDataKaryawan extends Component
             'token' => $token,
         ]);
 
-        // INI yang benar
         $this->dispatch('showDataKaryawanLink');
-
-        // $this->dispatch('swal', params: [
-        //     'title' => 'Link Berhasil Dibuat',
-        //     'icon' => 'success',
-        //     'text' => 'Link pengisian data karyawan berhasil dibuat.',
-        // ]);
     }
 
     public function render()

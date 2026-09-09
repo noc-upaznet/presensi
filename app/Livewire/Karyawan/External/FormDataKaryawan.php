@@ -8,6 +8,7 @@ use App\Models\M_Dependents;
 use App\Models\M_Education;
 use App\Models\M_Family;
 use App\Models\M_WorkExperience;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -35,16 +36,9 @@ class FormDataKaryawan extends Component
             abort(404, 'Link pengisian data tidak ditemukan.');
         }
 
-        if (
-            $link->expires_at &&
-            $link->expires_at->isPast()
-        ) {
+        if ($link->expires_at && $link->expires_at->isPast()) {
             abort(403, 'Link pengisian data sudah kedaluwarsa.');
         }
-
-        $link->update([
-            'last_accessed_at' => now(),
-        ]);
 
         $this->karyawanId = $link->karyawan_id;
 
@@ -53,6 +47,14 @@ class FormDataKaryawan extends Component
         if (!$this->karyawan) {
             abort(404, 'Data karyawan tidak ditemukan.');
         }
+
+        if ((int) Auth::id() !== (int) $this->karyawan->user_id) {
+            abort(403, 'Anda tidak memiliki akses ke data karyawan ini.');
+        }
+
+        $link->update([
+            'last_accessed_at' => now(),
+        ]);
 
         $this->loadData();
     }
