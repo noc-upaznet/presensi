@@ -1549,7 +1549,7 @@
 
                         Bagikan link ini kepada karyawan untuk
                         melengkapi data mereka. Link berlaku selama
-                        <strong>7 hari</strong>.
+                        <strong>3 hari</strong>.
                     </div>
 
                     <label class="form-label fw-semibold">

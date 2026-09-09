@@ -234,6 +234,46 @@
             padding-top: 22px;
         }
 
+        .employee-form .employee-photo-upload {
+            display: block;
+            min-height: 240px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s ease;
+            background: #f8fafc;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .employee-form .employee-photo-preview {
+            width: 180px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .employee-form .employee-photo-delete {
+            margin-top: 8px;
+            padding: 4px 12px;
+            font-size: 12px;
+            border-radius: 8px;
+            border: 1px solid #fca5a5;
+            background: #fff1f2;
+            color: #dc2626;
+            cursor: pointer;
+        }
+
+        .employee-form .employee-photo-delete:hover {
+            background: #fee2e2;
+        }
+
         /* ================= MOBILE ================= */
 
         @media (max-width: 767.98px) {
@@ -294,6 +334,16 @@
             .employee-form .save-area .btn {
                 width: 100%;
             }
+
+            .employee-form .employee-photo-upload {
+                min-height: 210px;
+                padding: 1rem;
+            }
+
+            .employee-form .employee-photo-preview {
+                width: 140px;
+                height: 180px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -336,7 +386,7 @@
 
                     <div class="row">
 
-                        <div class="col-md-6">
+                        <div class="col-md-4">
 
                             <small>
                                 Nama Karyawan
@@ -347,7 +397,18 @@
                             </div>
 
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+
+                            <small>
+                                Level
+                            </small>
+
+                            <div class="fw-semibold">
+                                {{ $karyawan->level ?? '-' }}
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
 
                             <small>
                                 Divisi
@@ -370,7 +431,7 @@
 
         {{-- SUCCESS --}}
         @if (session()->has('success'))
-            <div class="alert alert-success">
+            <div id="success-alert" class="alert alert-success">
                 {{ session('success') }}
             </div>
         @endif
@@ -408,6 +469,13 @@
                         <button type="button" class="nav-link {{ $activeTab === 'experience' ? 'active' : '' }}"
                             wire:click="setTab('experience')">
                             Pengalaman Kerja
+                        </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button type="button" class="nav-link {{ $activeTab === 'additional' ? 'active' : '' }}"
+                            wire:click="setTab('additional')">
+                            Data Tambahan
                         </button>
                     </li>
 
@@ -1013,24 +1081,328 @@
 
                 @endif
 
+                {{-- =====================================================
+                    DATA TAMBAHAN
+                ====================================================== --}}
 
-                {{-- SAVE --}}
-                <div class="save-area text-end">
+                @if ($activeTab === 'additional')
+                    <div class="section-heading mb-3">
 
-                    <button type="button" class="btn btn-success px-4" wire:click="saveAll"
-                        wire:loading.attr="disabled">
+                        <h5 class="fw-bold mb-1">
+                            Data Tambahan Karyawan
+                        </h5>
 
-                        <span wire:loading.remove wire:target="saveAll">
-                            Simpan Semua Data
-                        </span>
+                        <small>
+                            Lengkapi informasi tambahan data pribadi Anda.
+                        </small>
 
-                        <span wire:loading wire:target="saveAll">
-                            Menyimpan...
-                        </span>
+                    </div>
 
-                    </button>
+                    {{-- ================= FOTO KARYAWAN ================= --}}
+                    <div class="data-card">
 
-                </div>
+                        <label for="file" class="employee-photo-upload"
+                            onmouseover="this.style.borderColor='#6366f1';this.style.background='#f5f3ff'"
+                            onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#f8fafc'">
+
+                            <input type="file" class="d-none" id="file" wire:model="photo"
+                                accept=".jpg,.jpeg,.png">
+
+                            @if ($photo && is_object($photo))
+                                {{-- Preview foto yang baru dipilih --}}
+                                <img src="{{ asset('storage/livewire-tmp/' . $photo->getFilename()) }}"
+                                    class="employee-photo-preview"
+                                    wire:key="temp-preview-{{ $photo->getFilename() }}">
+
+                                <p class="mt-2 mb-0 text-muted small">
+                                    Klik untuk ganti foto
+                                </p>
+                            @elseif ($existingPhoto)
+                                {{-- Foto yang sudah tersimpan --}}
+                                @php
+                                    $fileUrl = route('file.profile', encrypt(basename($existingPhoto)));
+                                @endphp
+
+                                <img src="{{ $fileUrl }}" class="employee-photo-preview">
+
+                                <p class="mt-2 mb-0 text-muted small">
+                                    Klik untuk ganti foto
+                                </p>
+                            @else
+                                {{-- Belum ada foto --}}
+                                <div style="font-size: 2rem;">
+                                    🖼️
+                                </div>
+
+                                <p class="mb-1 fw-semibold text-secondary">
+                                    Klik atau drag file ke sini
+                                </p>
+
+                                <p class="mb-0 text-muted small">
+                                    JPG, JPEG, PNG — maks. 2MB
+                                </p>
+                            @endif
+
+                        </label>
+
+                        {{-- Hapus Foto --}}
+                        @if (($photo && is_object($photo)) || $existingPhoto)
+                            <button type="button" wire:click="removePhoto" wire:loading.attr="disabled"
+                                class="employee-photo-delete">
+
+                                🗑️ Hapus Foto
+                            </button>
+                        @endif
+
+                        {{-- Loading --}}
+                        <div wire:loading wire:target="photo" class="text-primary small mt-2">
+
+                            Memproses foto...
+                        </div>
+
+                        {{-- Error --}}
+                        @if (session()->has('error'))
+                            <small class="text-danger d-block mt-1">
+                                {{ session('error') }}
+                            </small>
+                        @endif
+
+                        @error('photo')
+                            <small class="text-danger d-block mt-1">
+                                {{ $message }}
+                            </small>
+                        @enderror
+
+                        <small class="text-muted d-block mt-1">
+                            Ukuran maksimal file: 2MB
+                        </small>
+
+                    </div>
+
+                    <div class="data-card">
+
+                        <div class="row g-3">
+
+                            {{-- NIP --}}
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    NIP
+                                </label>
+
+                                <input type="text" class="form-control" wire:model="additionalData.nip"
+                                    placeholder="Masukkan NIP">
+
+                                @error('additionalData.nip')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+
+                            {{-- Tanggal Mulai --}}
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Tanggal Mulai Kerja
+                                </label>
+
+                                <input type="date" class="form-control" wire:model="additionalData.start_date">
+
+                                @error('additionalData.start_date')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+
+                            {{-- Ukuran Baju --}}
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Ukuran Baju
+                                </label>
+
+                                <select class="form-select" wire:model="additionalData.dress_size">
+                                    <option value="">-- Pilih Ukuran --</option>
+                                    <option value="XS">XS</option>
+                                    <option value="S">S</option>
+                                    <option value="M">M</option>
+                                    <option value="L">L</option>
+                                    <option value="XL">XL</option>
+                                    <option value="XXL">XXL</option>
+                                    <option value="XXXL">XXXL</option>
+                                </select>
+                            </div>
+
+
+                            {{-- Ukuran Sepatu --}}
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Ukuran Sepatu
+                                </label>
+
+                                <input type="number" class="form-control" wire:model="additionalData.shoe_size"
+                                    placeholder="Contoh: 42">
+
+                                @error('additionalData.shoe_size')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+
+                            {{-- Tinggi --}}
+                            <div class="col-md-2">
+                                <label class="form-label">
+                                    Tinggi (cm)
+                                </label>
+
+                                <input type="number" class="form-control" wire:model="additionalData.height"
+                                    placeholder="170">
+
+                                @error('additionalData.height')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+
+                            {{-- Berat --}}
+                            <div class="col-md-2">
+                                <label class="form-label">
+                                    Berat (kg)
+                                </label>
+
+                                <input type="number" class="form-control" wire:model="additionalData.weight"
+                                    placeholder="65">
+
+                                @error('additionalData.weight')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+
+                            {{-- Personality --}}
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Personality
+                                </label>
+
+                                <input type="text" class="form-control" wire:model="additionalData.personality"
+                                    placeholder="Masukkan personality">
+
+                                @error('additionalData.personality')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+
+                            {{-- IQ --}}
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    IQ
+                                </label>
+
+                                <input type="number" class="form-control" wire:model="additionalData.iq"
+                                    placeholder="Masukkan nilai IQ">
+
+                                @error('additionalData.iq')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+
+                            {{-- Nama Ayah Mertua --}}
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Nama Ayah Mertua
+                                </label>
+
+                                <input type="text" class="form-control"
+                                    wire:model="additionalData.name_father_in_law" placeholder="Nama ayah mertua">
+
+                                @error('additionalData.name_father_in_law')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+
+                            {{-- Nama Ibu Mertua --}}
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Nama Ibu Mertua
+                                </label>
+
+                                <input type="text" class="form-control"
+                                    wire:model="additionalData.name_mother_in_law" placeholder="Nama ibu mertua">
+
+                                @error('additionalData.name_mother_in_law')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+
+                            {{-- Alamat Orang Tua --}}
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Alamat Orang Tua
+                                </label>
+
+                                <textarea class="form-control" rows="4" wire:model="additionalData.parent_address"
+                                    placeholder="Alamat lengkap orang tua"></textarea>
+
+                                @error('additionalData.parent_address')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+
+                            {{-- Alamat Mertua --}}
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Alamat Mertua
+                                </label>
+
+                                <textarea class="form-control" rows="4" wire:model="additionalData.inlaw_address"
+                                    placeholder="Alamat lengkap mertua"></textarea>
+
+                                @error('additionalData.inlaw_address')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+
+                            {{-- Riwayat Penyakit --}}
+                            <div class="col-12">
+                                <label class="form-label">
+                                    Riwayat Penyakit
+                                </label>
+
+                                <textarea class="form-control" rows="4" wire:model="additionalData.history_of_illness"
+                                    placeholder="Tuliskan riwayat penyakit jika ada"></textarea>
+
+                                @error('additionalData.history_of_illness')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- SAVE HANYA DI TAB TERAKHIR --}}
+                    <div class="save-area text-end">
+
+                        <button type="button" class="btn btn-success px-4" wire:click="saveAll"
+                            wire:loading.attr="disabled">
+
+                            <span wire:loading.remove wire:target="saveAll">
+                                Simpan Semua Data
+                            </span>
+
+                            <span wire:loading wire:target="saveAll">
+                                Menyimpan...
+                            </span>
+
+                        </button>
+
+                    </div>
+                @endif
 
             </div>
 
@@ -1039,3 +1411,24 @@
     </div>
 
 </div>
+<script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('data-saved', () => {
+            setTimeout(() => {
+                const alert = document.getElementById('success-alert');
+
+                if (alert) {
+                    alert.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                } else {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 100);
+        });
+    });
+</script>

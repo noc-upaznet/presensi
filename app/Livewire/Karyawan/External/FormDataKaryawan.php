@@ -3,6 +3,7 @@
 namespace App\Livewire\Karyawan\External;
 
 use App\Models\EmployeeDataLink;
+use App\Models\M_AdditionalDataEmployee;
 use App\Models\M_DataKaryawan;
 use App\Models\M_Dependents;
 use App\Models\M_Education;
@@ -11,6 +12,7 @@ use App\Models\M_WorkExperience;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class FormDataKaryawan extends Component
 {
@@ -23,6 +25,28 @@ class FormDataKaryawan extends Component
     public $dependents = [];
     public $educations = [];
     public $workExperiences = [];
+    public $additionalData = [
+        'id' => null,
+        'photo' => '',
+        'dress_size' => '',
+        'shoe_size' => '',
+        'height' => '',
+        'weight' => '',
+        'nip' => '',
+        'start_date' => '',
+        'personality' => '',
+        'iq' => '',
+        'parent_address' => '',
+        'inlaw_address' => '',
+        'history_of_illness' => '',
+        'name_father_in_law' => '',
+        'name_mother_in_law' => '',
+    ];
+
+    use WithFileUploads;
+
+    public $photo;
+    public $existingPhoto;
 
     public function mount($token)
     {
@@ -162,6 +186,37 @@ class FormDataKaryawan extends Component
                 ];
             })
             ->toArray();
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADDITIONAL DATA
+        |--------------------------------------------------------------------------
+        */
+
+        $additional = M_AdditionalDataEmployee::where(
+            'karyawan_id',
+            $this->karyawanId
+        )->first();
+
+        $this->additionalData = [
+            'id' => $additional?->id,
+            'photo' => $additional?->photo ?? '',
+            'dress_size' => $additional?->dress_size ?? '',
+            'shoe_size' => $additional?->shoe_size ?? '',
+            'height' => $additional?->height ?? '',
+            'weight' => $additional?->weight ?? '',
+            'nip' => $additional?->nip ?? '',
+            'start_date' => $additional?->start_date ?? '',
+            'personality' => $additional?->personality ?? '',
+            'iq' => $additional?->iq ?? '',
+            'parent_address' => $additional?->parent_address ?? '',
+            'inlaw_address' => $additional?->inlaw_address ?? '',
+            'history_of_illness' => $additional?->history_of_illness ?? '',
+            'name_father_in_law' => $additional?->name_father_in_law ?? '',
+            'name_mother_in_law' => $additional?->name_mother_in_law ?? '',
+        ];
+
+        $this->existingPhoto = $additional?->photo;
     }
 
     /*
@@ -530,14 +585,76 @@ class FormDataKaryawan extends Component
                     M_WorkExperience::create($data);
                 }
             }
+
+            /*
+            |--------------------------------------------------------------------------
+            | ADDITIONAL DATA
+            |--------------------------------------------------------------------------
+            */
+
+            M_AdditionalDataEmployee::updateOrCreate(
+                [
+                    'karyawan_id' => $this->karyawanId,
+                ],
+                [
+                    'dress_size' => $this->additionalData['dress_size'] ?? null,
+                    'shoe_size' => $this->additionalData['shoe_size'] ?? null,
+                    'height' => $this->additionalData['height'] ?? null,
+                    'weight' => $this->additionalData['weight'] ?? null,
+                    'nip' => $this->additionalData['nip'] ?? null,
+                    'start_date' => $this->additionalData['start_date'] ?? null,
+                    'personality' => $this->additionalData['personality'] ?? null,
+                    'iq' => $this->additionalData['iq'] ?? null,
+                    'parent_address' => $this->additionalData['parent_address'] ?? null,
+                    'inlaw_address' => $this->additionalData['inlaw_address'] ?? null,
+                    'history_of_illness' => $this->additionalData['history_of_illness'] ?? null,
+                    'name_father_in_law' => $this->additionalData['name_father_in_law'] ?? null,
+                    'name_mother_in_law' => $this->additionalData['name_mother_in_law'] ?? null,
+                ]
+            );
         });
 
         $this->loadData();
 
-        session()->flash(
-            'success',
-            'Data berhasil disimpan.'
+        session()->flash('success', 'Data berhasil disimpan.');
+
+        $this->dispatch('data-saved');
+    }
+
+    public function saveFile()
+    {
+        $this->validate([
+            'photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $path = $this->photo->store(
+            'presensi/profile-photos',
+            's3'
         );
+
+        M_AdditionalDataEmployee::updateOrCreate(
+            ['karyawan_id' => $this->karyawanId],
+            ['photo' => $path]
+        );
+
+        $this->existingPhoto = $path;
+
+        $this->reset('photo');
+
+        $this->dispatch('swal', params: [
+            'title' => 'Tersimpan',
+            'icon'  => 'success',
+            'text'  => 'Foto berhasil diunggah'
+        ]);
+    }
+
+    public function updatedPhoto()
+    {
+        if (!$this->photo) {
+            return;
+        }
+
+        $this->saveFile();
     }
 
     public function render()
