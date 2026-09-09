@@ -11,6 +11,7 @@ use App\Models\M_Family;
 use App\Models\M_WorkExperience;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -655,6 +656,44 @@ class FormDataKaryawan extends Component
         }
 
         $this->saveFile();
+    }
+
+    public function removePhoto()
+    {
+        if ($this->existingPhoto) {
+
+            $filename = basename($this->existingPhoto);
+
+            $newPath = 'presensi/profile-photos/' . $filename;
+
+            $oldPath = 'profile-photos/' . $filename;
+
+            if (Storage::disk('s3')->exists($newPath)) {
+                Storage::disk('s3')->delete($newPath);
+            }
+
+            if (Storage::disk('s3')->exists($oldPath)) {
+                Storage::disk('s3')->delete($oldPath);
+            }
+
+            M_AdditionalDataEmployee::where(
+                'karyawan_id',
+                $this->karyawanId
+            )->update([
+                'photo' => null
+            ]);
+        }
+
+        $this->dispatch('swal', params: [
+            'title' => 'Dihapus',
+            'icon'  => 'success',
+            'text'  => 'Foto berhasil dihapus'
+        ]);
+
+        $this->reset([
+            'photo',
+            'existingPhoto'
+        ]);
     }
 
     public function render()
