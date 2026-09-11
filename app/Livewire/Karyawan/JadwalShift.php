@@ -86,7 +86,7 @@ class JadwalShift extends Component
             $entitas = $karyawan->entitas;
             $jabatan = $karyawan->jabatan;
 
-            $query = M_DataKaryawan::whereIn('divisi', [$divisi, 'Support'])
+            $query = M_DataKaryawan::whereIn('divisi', [$divisi, 'General Operation'])
                 ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->whereIn('jabatan', [$jabatan, 'GO']);
 
@@ -354,7 +354,7 @@ class JadwalShift extends Component
             }
 
             $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitasFilter) {
-                $q->whereIn('divisi', [$divisi, 'Support'])
+                $q->whereIn('divisi', [$divisi, 'General Operation'])
                     ->whereIn('jabatan', ['Sales Marketing', 'GO'])
                     ->where('status_karyawan', '!=', 'NONAKTIF')
                     ->whereIn('entitas', $entitasFilter);
