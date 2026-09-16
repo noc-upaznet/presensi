@@ -213,6 +213,8 @@ class FormDataKaryawan extends Component
             'parent_address' => $additional?->parent_address ?? '',
             'inlaw_address' => $additional?->inlaw_address ?? '',
             'history_of_illness' => $additional?->history_of_illness ?? '',
+            'name_father' => $additional?->name_father ?? '',
+            'name_mother' => $additional?->name_mother ?? '',
             'name_father_in_law' => $additional?->name_father_in_law ?? '',
             'name_mother_in_law' => $additional?->name_mother_in_law ?? '',
         ];
@@ -609,6 +611,8 @@ class FormDataKaryawan extends Component
                     'parent_address' => $this->additionalData['parent_address'] ?? null,
                     'inlaw_address' => $this->additionalData['inlaw_address'] ?? null,
                     'history_of_illness' => $this->additionalData['history_of_illness'] ?? null,
+                    'name_father' => $this->additionalData['name_father'] ?? null,
+                    'name_mother' => $this->additionalData['name_mother'] ?? null,
                     'name_father_in_law' => $this->additionalData['name_father_in_law'] ?? null,
                     'name_mother_in_law' => $this->additionalData['name_mother_in_law'] ?? null,
                 ]

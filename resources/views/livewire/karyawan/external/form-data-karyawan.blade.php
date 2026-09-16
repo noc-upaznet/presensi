@@ -1305,6 +1305,32 @@
                                 @enderror
                             </div>
 
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Nama Ayah
+                                </label>
+
+                                <input type="text" class="form-control" wire:model="additionalData.name_father"
+                                    placeholder="Nama ayah">
+
+                                @error('additionalData.name_father')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Nama Ibu
+                                </label>
+
+                                <input type="text" class="form-control" wire:model="additionalData.name_mother"
+                                    placeholder="Nama ibu">
+
+                                @error('additionalData.name_mother')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
 
                             {{-- Nama Ayah Mertua --}}
                             <div class="col-md-6">
