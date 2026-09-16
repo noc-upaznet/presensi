@@ -130,6 +130,16 @@ class TambahDataKaryawanForm extends Form
 
     public bool $gunakanAlamatKTP = false;
 
+    public $provinsiKTP = null;
+    public $kabupatenKTP = null;
+    public $kecamatanKTP = null;
+    public $desaKTP = null;
+
+    public $provinsiDomisili = null;
+    public $kabupatenDomisili = null;
+    public $kecamatanDomisili = null;
+    public $desaDomisili = null;
+
     public function messages(): array
     {
         return [

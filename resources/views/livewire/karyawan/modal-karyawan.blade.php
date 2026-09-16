@@ -170,21 +170,205 @@
                         </div>
                         <div>
                             <div class="mb-3">
-                                <label for="alamatKTP" class="form-label">Alamat Sesuai KTP <small
-                                        class="text-danger">*</small></label>
-                                <textarea class="form-control" id="alamatKTP" wire:model.defer="form.alamatKTP"></textarea>
-                                @error('form.alamatKTP')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
+
+                                <label class="form-label">
+                                    Alamat Sesuai KTP
+                                    <small class="text-danger">*</small>
+                                </label>
+
+                                <div class="row g-2">
+
+                                    {{-- Provinsi --}}
+                                    <div class="col-md-6">
+                                        <label class="form-label">Provinsi</label>
+
+                                        <select class="form-select" wire:model="form.provinsiKTP"
+                                            wire:key="ktp-provinsi-{{ $karyawanId }}">
+                                            <option value="">-- Pilih Provinsi --</option>
+
+                                            @foreach ($provinces as $province)
+                                                <option value="{{ $province->id }}">
+                                                    {{ $province->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+
+                                    {{-- Kabupaten --}}
+                                    <div class="col-md-6">
+                                        <label class="form-label">Kabupaten / Kota</label>
+
+                                        <select class="form-select" wire:model="form.kabupatenKTP"
+                                            wire:key="ktp-kabupaten-{{ $form->provinsiKTP }}-{{ $karyawanId }}"
+                                            @disabled(!$form->provinsiKTP)>
+                                            <option value="">-- Pilih Kabupaten / Kota --</option>
+
+                                            @foreach ($regenciesKTP as $regency)
+                                                <option value="{{ $regency->id }}">
+                                                    {{ $regency->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+
+                                    {{-- Kecamatan --}}
+                                    <div class="col-md-6">
+                                        <label class="form-label">Kecamatan</label>
+
+                                        <select class="form-select" wire:model="form.kecamatanKTP"
+                                            wire:key="ktp-kecamatan-{{ $form->kabupatenKTP }}-{{ $karyawanId }}"
+                                            @disabled(!$form->kabupatenKTP)>
+                                            <option value="">-- Pilih Kecamatan --</option>
+
+                                            @foreach ($districtsKTP as $district)
+                                                <option value="{{ $district->id }}">
+                                                    {{ $district->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+
+                                    {{-- Desa --}}
+                                    <div class="col-md-6">
+                                        <label class="form-label">Desa / Kelurahan</label>
+
+                                        <select class="form-select" wire:model="form.desaKTP"
+                                            wire:key="ktp-desa-{{ $form->kecamatanKTP }}-{{ $karyawanId }}"
+                                            @disabled(!$form->kecamatanKTP)>
+                                            <option value="">-- Pilih Desa / Kelurahan --</option>
+
+                                            @foreach ($villagesKTP as $village)
+                                                <option value="{{ $village->id }}">
+                                                    {{ $village->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+
+                                    {{-- Detail --}}
+                                    <div class="col-12">
+                                        <label class="form-label">
+                                            Detail Alamat
+                                        </label>
+
+                                        <textarea class="form-control" rows="3" placeholder="Contoh: Jl. Diponegoro No. 10, RT 02/RW 03"
+                                            wire:model.defer="form.alamatKTP"></textarea>
+
+                                        @error('form.alamatKTP')
+                                            <small class="text-danger">
+                                                {{ $message }}
+                                            </small>
+                                        @enderror
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="form-check mt-3">
+                                <input class="form-check-input" type="checkbox" id="copyAlamatEdit"
+                                    wire:click="toggleGunakanAlamatKTP" @checked($form->gunakanAlamatKTP)>
+
+                                <label class="form-check-label" for="copyAlamatEdit">
+                                    Gunakan alamat KTP sebagai alamat domisili
+                                </label>
                             </div>
 
                             <div class="mb-3">
-                                <label for="alamatDomisili" class="form-label">Alamat Domisili <small
-                                        class="text-danger">*</small></label>
-                                <textarea class="form-control" id="alamatDomisili" wire:model.defer="form.alamatDomisili"></textarea>
-                                @error('form.alamatDomisili')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
+
+                                <label class="form-label">
+                                    Alamat Domisili
+                                    <small class="text-danger">*</small>
+                                </label>
+
+                                <div class="row g-2">
+
+                                    {{-- Provinsi --}}
+                                    <div class="col-md-6">
+                                        <label class="form-label">Provinsi</label>
+
+                                        <select class="form-select" wire:model.live="form.provinsiDomisili"
+                                            wire:key="dom-provinsi-{{ $karyawanId }}-{{ $form->provinsiDomisili }}">
+                                            <option value="">-- Pilih Provinsi --</option>
+
+                                            @foreach ($provinces as $province)
+                                                <option value="{{ $province->id }}">
+                                                    {{ $province->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+
+                                    {{-- Kabupaten --}}
+                                    <div class="col-md-6">
+                                        <label class="form-label">Kabupaten / Kota</label>
+
+                                        <select class="form-select" wire:model.live="form.kabupatenDomisili"
+                                            wire:key="dom-kabupaten-{{ $karyawanId }}-{{ $form->provinsiDomisili }}-{{ $form->kabupatenDomisili }}"
+                                            @disabled(!$form->provinsiDomisili || $form->gunakanAlamatKTP)>
+                                            <option value="">-- Pilih Kabupaten / Kota --</option>
+
+                                            @foreach ($regenciesDomisili as $regency)
+                                                <option value="{{ $regency->id }}">
+                                                    {{ $regency->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+
+                                    {{-- Kecamatan --}}
+                                    <div class="col-md-6">
+                                        <label class="form-label">Kecamatan</label>
+
+                                        <select class="form-select" wire:model.live="form.kecamatanDomisili"
+                                            wire:key="dom-kecamatan-{{ $karyawanId }}-{{ $form->kabupatenDomisili }}-{{ $form->kecamatanDomisili }}"
+                                            @disabled(!$form->kabupatenDomisili || $form->gunakanAlamatKTP)>
+                                            <option value="">-- Pilih Kecamatan --</option>
+
+                                            @foreach ($districtsDomisili as $district)
+                                                <option value="{{ $district->id }}">
+                                                    {{ $district->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+
+                                    {{-- Desa --}}
+                                    <div class="col-md-6">
+                                        <label class="form-label">Desa / Kelurahan</label>
+
+                                        <select class="form-select" wire:model.live="form.desaDomisili"
+                                            wire:key="dom-desa-{{ $karyawanId }}-{{ $form->kecamatanDomisili }}-{{ $form->desaDomisili }}"
+                                            @disabled(!$form->kecamatanDomisili || $form->gunakanAlamatKTP)>
+                                            <option value="">-- Pilih Desa / Kelurahan --</option>
+
+                                            @foreach ($villagesDomisili as $village)
+                                                <option value="{{ $village->id }}">
+                                                    {{ $village->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+
+                                    {{-- Detail alamat --}}
+                                    <div class="col-12">
+                                        <label class="form-label">
+                                            Detail Alamat
+                                        </label>
+
+                                        <textarea class="form-control" rows="3" placeholder="Contoh: Jl. Diponegoro No. 10, RT 02/RW 03"
+                                            wire:model.defer="form.alamatDomisili" @disabled($form->gunakanAlamatKTP)></textarea>
+                                    </div>
+
+                                </div>
+
                             </div>
                         </div>
 

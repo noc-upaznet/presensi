@@ -268,40 +268,241 @@
                                             wire:model="form.nomorVISA">
                                     </div>
                                 </div>
-                                <div x-data="{
-                                    syncAlamat() {
-                                        if (this.$wire.form.gunakanAlamatKTP) {
-                                            this.$wire.form.alamatDomisili = this.$wire.form.alamatKTP;
-                                        } else {
-                                            this.$wire.form.alamatDomisili = '';
-                                        }
-                                    }
-                                }" x-init="$watch(() => $wire.form.gunakanAlamatKTP, value => syncAlamat())">
+                                <div>
                                     <div class="mb-3">
-                                        <label for="alamatKTP" class="form-label">Alamat Sesuai KTP <small
-                                                class="text-danger">*</small></label>
-                                        <textarea class="form-control" id="alamatKTP" wire:model.defer="form.alamatKTP"></textarea>
-                                        @error('form.alamatKTP')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
+                                        <label class="form-label">
+                                            Alamat Sesuai KTP
+                                            <small class="text-danger">*</small>
+                                        </label>
 
-                                        <div class="form-check mt-2">
+                                        <div class="row g-2">
+
+                                            {{-- Provinsi --}}
+                                            <div class="col-md-6">
+                                                <label class="form-label">Provinsi</label>
+
+                                                <select class="form-select" wire:model.live="form.provinsiKTP">
+                                                    <option value="">-- Pilih Provinsi --</option>
+
+                                                    @foreach ($provinces as $province)
+                                                        <option value="{{ $province->id }}">
+                                                            {{ $province->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                                @error('form.provinsiKTP')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+
+
+                                            {{-- Kabupaten / Kota --}}
+                                            <div class="col-md-6">
+                                                <label class="form-label">Kabupaten / Kota</label>
+
+                                                <select class="form-select" wire:model.live="form.kabupatenKTP"
+                                                    @disabled(!$form->provinsiKTP)>
+                                                    <option value="">-- Pilih Kabupaten / Kota --</option>
+
+                                                    @foreach ($regenciesKTP as $regency)
+                                                        <option value="{{ $regency->id }}">
+                                                            {{ $regency->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                                @error('form.kabupatenKTP')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+
+
+                                            {{-- Kecamatan --}}
+                                            <div class="col-md-6">
+                                                <label class="form-label">Kecamatan</label>
+
+                                                <select class="form-select" wire:model.live="form.kecamatanKTP"
+                                                    @disabled(!$form->kabupatenKTP)>
+                                                    <option value="">-- Pilih Kecamatan --</option>
+
+                                                    @foreach ($districtsKTP as $district)
+                                                        <option value="{{ $district->id }}">
+                                                            {{ $district->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                                @error('form.kecamatanKTP')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+
+
+                                            {{-- Desa / Kelurahan --}}
+                                            <div class="col-md-6">
+                                                <label class="form-label">Desa / Kelurahan</label>
+
+                                                <select class="form-select" wire:model.live="form.desaKTP"
+                                                    @disabled(!$form->kecamatanKTP)>
+                                                    <option value="">-- Pilih Desa / Kelurahan --</option>
+
+                                                    @foreach ($villagesKTP as $village)
+                                                        <option value="{{ $village->id }}">
+                                                            {{ $village->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                                @error('form.desaKTP')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+
+
+                                            {{-- Detail Alamat --}}
+                                            <div class="col-12">
+                                                <label class="form-label">
+                                                    Detail Alamat
+                                                </label>
+
+                                                <textarea class="form-control" rows="3" placeholder="Contoh: Jl. Diponegoro No. 10, RT 02/RW 03"
+                                                    wire:model.defer="form.alamatKTP"></textarea>
+
+                                                @error('form.alamatKTP')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+
+                                        </div>
+
+
+                                        {{-- Copy alamat KTP --}}
+                                        <div class="form-check mt-3">
                                             <input class="form-check-input" type="checkbox" id="copyAlamat"
-                                                wire:model="form.gunakanAlamatKTP">
+                                                wire:click="toggleGunakanAlamatKTP" @checked($form->gunakanAlamatKTP)>
+
                                             <label class="form-check-label" for="copyAlamat">
                                                 Gunakan alamat KTP sebagai alamat domisili
                                             </label>
                                         </div>
                                     </div>
-
                                     <div class="mb-3">
-                                        <label for="alamatDomisili" class="form-label">Alamat Domisili <small
-                                                class="text-danger">*</small></label>
-                                        <textarea class="form-control" id="alamatDomisili" wire:model.defer="form.alamatDomisili"
-                                            :readonly="$wire.form.gunakanAlamatKTP"></textarea>
-                                        @error('form.alamatDomisili')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
+                                        <label class="form-label">
+                                            Alamat Domisili
+                                            <small class="text-danger">*</small>
+                                        </label>
+
+                                        <div class="row g-2">
+
+                                            {{-- Provinsi --}}
+                                            <div class="col-md-6">
+                                                <label class="form-label">Provinsi</label>
+
+                                                <select class="form-select" wire:model="form.provinsiDomisili"
+                                                    wire:key="domisili-provinsi-{{ $form->provinsiDomisili }}"
+                                                    @disabled($form->gunakanAlamatKTP)>
+                                                    <option value="">-- Pilih Provinsi --</option>
+
+                                                    @foreach ($provinces as $province)
+                                                        <option value="{{ $province->id }}"
+                                                            @selected((string) $form->provinsiDomisili === (string) $province->id)>
+                                                            {{ $province->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                                @error('form.provinsiDomisili')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+
+
+                                            {{-- Kabupaten / Kota --}}
+                                            <div class="col-md-6">
+                                                <label class="form-label">Kabupaten / Kota</label>
+
+                                                <select class="form-select" wire:model="form.kabupatenDomisili"
+                                                    wire:key="domisili-kabupaten-{{ $form->provinsiDomisili }}-{{ $form->kabupatenDomisili }}"
+                                                    @disabled(!$form->provinsiDomisili || $form->gunakanAlamatKTP)>
+                                                    <option value="">-- Pilih Kabupaten / Kota --</option>
+
+                                                    @foreach ($regenciesDomisili as $regency)
+                                                        <option value="{{ $regency->id }}"
+                                                            @selected((string) $form->kabupatenDomisili === (string) $regency->id)>
+                                                            {{ $regency->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                                @error('form.kabupatenDomisili')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+
+
+                                            {{-- Kecamatan --}}
+                                            <div class="col-md-6">
+                                                <label class="form-label">Kecamatan</label>
+
+                                                <select class="form-select" wire:model="form.kecamatanDomisili"
+                                                    wire:key="domisili-kecamatan-{{ $form->kabupatenDomisili }}-{{ $form->kecamatanDomisili }}"
+                                                    @disabled(!$form->kabupatenDomisili || $form->gunakanAlamatKTP)>
+                                                    <option value="">-- Pilih Kecamatan --</option>
+
+                                                    @foreach ($districtsDomisili as $district)
+                                                        <option value="{{ $district->id }}"
+                                                            @selected((string) $form->kecamatanDomisili === (string) $district->id)>
+                                                            {{ $district->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                                @error('form.kecamatanDomisili')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+
+
+                                            {{-- Desa / Kelurahan --}}
+                                            <div class="col-md-6">
+                                                <label class="form-label">Desa / Kelurahan</label>
+
+                                                <select class="form-select" wire:model="form.desaDomisili"
+                                                    wire:key="domisili-desa-{{ $form->kecamatanDomisili }}-{{ $form->desaDomisili }}"
+                                                    @disabled(!$form->kecamatanDomisili || $form->gunakanAlamatKTP)>
+                                                    <option value="">-- Pilih Desa / Kelurahan --</option>
+
+                                                    @foreach ($villagesDomisili as $village)
+                                                        <option value="{{ $village->id }}"
+                                                            @selected((string) $form->desaDomisili === (string) $village->id)>
+                                                            {{ $village->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                                @error('form.desaDomisili')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+
+
+                                            {{-- Detail alamat --}}
+                                            <div class="col-12">
+                                                <label class="form-label">
+                                                    Detail Alamat
+                                                </label>
+
+                                                <textarea class="form-control" id="alamatDomisili" rows="3"
+                                                    placeholder="Contoh: Jl. Diponegoro No. 10, RT 02/RW 03" wire:model.defer="form.alamatDomisili"
+                                                    @disabled($form->gunakanAlamatKTP)></textarea>
+
+                                                @error('form.alamatDomisili')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+
+                                        </div>
                                     </div>
                                 </div>
 

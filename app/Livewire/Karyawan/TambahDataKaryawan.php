@@ -11,6 +11,11 @@ use App\Models\M_DataKaryawan;
 use App\Livewire\Forms\TambahDataKaryawanForm;
 use Carbon\Carbon;
 
+use App\Models\Region\Province;
+use App\Models\Region\Regency;
+use App\Models\Region\District;
+use App\Models\Region\Village;
+
 class TambahDataKaryawan extends Component
 {
     public TambahDataKaryawanForm $form;
@@ -22,41 +27,274 @@ class TambahDataKaryawan extends Component
         'nomorKTP' => '',
         'nomorVISA' => '',
     ];
+
     public $jenis_identitas = '';
     public $entitas;
     public $divisi;
     public $jabatan;
     public $password;
     public $total_upah;
+
     public $keluargas = [];
     public $tanggungans = [];
     public $pendidikans = [];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Data Wilayah
+    |--------------------------------------------------------------------------
+    */
+
+    public $provinces = [];
+
+    public $regenciesKTP = [];
+    public $districtsKTP = [];
+    public $villagesKTP = [];
+
+    public $regenciesDomisili = [];
+    public $districtsDomisili = [];
+    public $villagesDomisili = [];
+
+    public $copyingAlamatKTP = false;
 
     public function mount()
     {
         $this->entitas = M_Entitas::all();
         $this->divisi = M_Divisi::all();
         $this->jabatan = M_Jabatan::all();
+
+        // Load provinsi
+        $this->provinces = Province::orderBy('name')->get();
+
         $this->generateNip();
+
         $entitas = session('selected_entitas', 'UHO');
 
         $this->form->entitas = $entitas;
-        // dd($entitas);
     }
 
-    public function updatedFormGunakanAlamatKTP($value)
+    public function updatedFormProvinsiKTP($value)
     {
+        $this->form->kabupatenKTP = null;
+        $this->form->kecamatanKTP = null;
+        $this->form->desaKTP = null;
+
+        $this->regenciesKTP = [];
+        $this->districtsKTP = [];
+        $this->villagesKTP = [];
+
         if ($value) {
-            $this->form->alamatDomisili = $this->form->alamatKTP;
-        } else {
+            $this->regenciesKTP = Regency::where('province_id', $value)
+                ->orderBy('name')
+                ->get();
+        }
+
+        $this->syncKTPKeDomisili();
+    }
+
+    public function updatedFormKabupatenKTP($value)
+    {
+        $this->form->kecamatanKTP = null;
+        $this->form->desaKTP = null;
+
+        $this->districtsKTP = [];
+        $this->villagesKTP = [];
+
+        if ($value) {
+            $this->districtsKTP = District::where('regency_id', $value)
+                ->orderBy('name')
+                ->get();
+        }
+
+        $this->syncKTPKeDomisili();
+    }
+
+    public function updatedFormAlamatKTP($value)
+    {
+        if ($this->form->gunakanAlamatKTP) {
+            $this->form->alamatDomisili = $value;
+        }
+    }
+
+    public function updatedFormKecamatanKTP($value)
+    {
+        $this->form->desaKTP = null;
+
+        $this->villagesKTP = [];
+
+        if ($value) {
+            $this->villagesKTP = Village::where('district_id', $value)
+                ->orderBy('name')
+                ->get();
+        }
+
+        $this->syncKTPKeDomisili();
+    }
+
+    public function updatedFormProvinsiDomisili($value)
+    {
+        if ($this->copyingAlamatKTP) {
+            return;
+        }
+
+        $this->form->kabupatenDomisili = null;
+        $this->form->kecamatanDomisili = null;
+        $this->form->desaDomisili = null;
+
+        $this->regenciesDomisili = [];
+        $this->districtsDomisili = [];
+        $this->villagesDomisili = [];
+
+        if ($value) {
+            $this->regenciesDomisili = Regency::where('province_id', $value)
+                ->orderBy('name')
+                ->get();
+        }
+    }
+
+    public function updatedFormKabupatenDomisili($value)
+    {
+        if ($this->copyingAlamatKTP) {
+            return;
+        }
+
+        $this->form->kecamatanDomisili = null;
+        $this->form->desaDomisili = null;
+
+        $this->districtsDomisili = [];
+        $this->villagesDomisili = [];
+
+        if ($value) {
+            $this->districtsDomisili = District::where('regency_id', $value)
+                ->orderBy('name')
+                ->get();
+        }
+    }
+
+    public function updatedFormKecamatanDomisili($value)
+    {
+        if ($this->copyingAlamatKTP) {
+            return;
+        }
+
+        $this->form->desaDomisili = null;
+
+        $this->villagesDomisili = [];
+
+        if ($value) {
+            $this->villagesDomisili = Village::where('district_id', $value)
+                ->orderBy('name')
+                ->get();
+        }
+    }
+
+    public function toggleGunakanAlamatKTP()
+    {
+        $this->form->gunakanAlamatKTP = !$this->form->gunakanAlamatKTP;
+
+        // Jika checkbox dilepas
+        if (!$this->form->gunakanAlamatKTP) {
+            $this->form->provinsiDomisili = null;
+            $this->form->kabupatenDomisili = null;
+            $this->form->kecamatanDomisili = null;
+            $this->form->desaDomisili = null;
             $this->form->alamatDomisili = '';
+
+            $this->regenciesDomisili = [];
+            $this->districtsDomisili = [];
+            $this->villagesDomisili = [];
+
+            return;
+        }
+
+        $provinsi = $this->form->provinsiKTP;
+        $kabupaten = $this->form->kabupatenKTP;
+        $kecamatan = $this->form->kecamatanKTP;
+        $desa = $this->form->desaKTP;
+        $alamat = $this->form->alamatKTP;
+
+        $this->regenciesDomisili = collect();
+        $this->districtsDomisili = collect();
+        $this->villagesDomisili = collect();
+
+        if ($provinsi) {
+            $this->regenciesDomisili = Regency::where(
+                'province_id',
+                $provinsi
+            )
+                ->orderBy('name')
+                ->get();
+        }
+
+        if ($kabupaten) {
+            $this->districtsDomisili = District::where(
+                'regency_id',
+                $kabupaten
+            )
+                ->orderBy('name')
+                ->get();
+        }
+
+        if ($kecamatan) {
+            $this->villagesDomisili = Village::where(
+                'district_id',
+                $kecamatan
+            )
+                ->orderBy('name')
+                ->get();
+        }
+
+        $this->form->provinsiDomisili = $provinsi;
+        $this->form->kabupatenDomisili = $kabupaten;
+        $this->form->kecamatanDomisili = $kecamatan;
+        $this->form->desaDomisili = $desa;
+        $this->form->alamatDomisili = $alamat;
+    }
+
+    private function syncKTPKeDomisili()
+    {
+        if (!$this->form->gunakanAlamatKTP) {
+            return;
+        }
+
+        $this->form->provinsiDomisili = $this->form->provinsiKTP;
+        $this->form->kabupatenDomisili = $this->form->kabupatenKTP;
+        $this->form->kecamatanDomisili = $this->form->kecamatanKTP;
+        $this->form->desaDomisili = $this->form->desaKTP;
+        $this->form->alamatDomisili = $this->form->alamatKTP;
+
+        if ($this->form->provinsiKTP) {
+            $this->regenciesDomisili = Regency::where(
+                'province_id',
+                $this->form->provinsiKTP
+            )
+                ->orderBy('name')
+                ->get();
+        }
+
+        if ($this->form->kabupatenKTP) {
+            $this->districtsDomisili = District::where(
+                'regency_id',
+                $this->form->kabupatenKTP
+            )
+                ->orderBy('name')
+                ->get();
+        }
+
+        if ($this->form->kecamatanKTP) {
+            $this->villagesDomisili = Village::where(
+                'district_id',
+                $this->form->kecamatanKTP
+            )
+                ->orderBy('name')
+                ->get();
         }
     }
 
     public function nextStep()
     {
-        // Validasi field yang wajib diisi pada step saat ini
         if ($this->step === 1) {
+
             if (
                 empty($this->form->nama_karyawan) ||
                 empty($this->form->email) ||
@@ -72,9 +310,11 @@ class TambahDataKaryawan extends Component
                 empty($this->form->alamatDomisili)
             ) {
                 $this->validate();
+
                 return;
             }
-        } else if ($this->step === 2) {
+        } elseif ($this->step === 2) {
+
             if (
                 empty($this->form->nip_karyawan) ||
                 empty($this->form->status_karyawan) ||
@@ -87,11 +327,12 @@ class TambahDataKaryawan extends Component
                 empty($this->form->sistem_kerja)
             ) {
                 $this->validate();
+
                 return;
             }
         }
+
         $this->step++;
-        // Tambahkan validasi untuk step lain jika diperlukan
     }
 
     public function prevStep()
@@ -101,8 +342,8 @@ class TambahDataKaryawan extends Component
 
     public function updatedFormTotalUpah($value)
     {
-        // dd($value);
-        $value = (int) str_replace('.', '', $value); // buang titik pemisah ribuan
+        $value = (int) str_replace('.', '', $value);
+
         $this->form->gaji_pokok = $value * 0.75;
         $this->form->tunjangan_jabatan = $value * 0.25;
     }
@@ -112,9 +353,13 @@ class TambahDataKaryawan extends Component
         $this->validate([
             'password' => 'required',
         ]);
+
         $this->form->validate();
 
-        $entitas = M_Entitas::where('nama', $this->form->entitas)->first();
+        $entitas = M_Entitas::where(
+            'nama',
+            $this->form->entitas
+        )->first();
 
         $dataUser = [
             'name' => $this->form->nama_karyawan,
@@ -122,57 +367,72 @@ class TambahDataKaryawan extends Component
             'password' => bcrypt($this->password),
             'branch_id' => $entitas?->id,
         ];
-        // dd($dataUser);
 
         $user = User::create($dataUser);
 
         $data = [
             'user_id' => $user->id,
+
             'nama_karyawan' => $this->form->nama_karyawan,
             'email' => $this->form->email,
             'no_hp' => $this->form->no_hp,
+
             'tempat_lahir' => $this->form->tempat_lahir,
             'tanggal_lahir' => $this->form->tanggal_lahir,
+
             'jenis_kelamin' => $this->form->jenis_kelamin,
             'status_perkawinan' => $this->form->status_perkawinan,
+
             'gol_darah' => $this->form->gol_darah,
             'agama' => $this->form->agama,
+
             'jenis_identitas' => $this->form->jenis_identitas,
+
             'nik' => $this->form->nomorKTP,
             'visa' => $this->form->nomorVISA,
+
             'alamat_ktp' => $this->form->alamatKTP,
+            'village_id_ktp' => $this->form->desaKTP,
+
             'alamat_domisili' => $this->form->alamatDomisili,
+            'village_id_domisili' => $this->form->desaDomisili,
+            'is_same_address' => $this->form->gunakanAlamatKTP,
+
             'nip_karyawan' => $this->form->nip_karyawan,
             'status_karyawan' => $this->form->status_karyawan,
             'tgl_masuk' => $this->form->tgl_masuk,
             'tgl_keluar' => $this->form->tgl_keluar,
+
             'entitas' => $this->form->entitas,
             'divisi' => $this->form->divisi,
             'jabatan' => $this->form->jabatan,
             'level' => $this->form->level,
             'sistem_kerja' => $this->form->sistem_kerja,
+
             'total_upah' => $this->form->total_upah,
             'gaji_pokok' => $this->form->gaji_pokok,
             'tunjangan_jabatan' => $this->form->tunjangan_jabatan,
             'bonus' => $this->form->bonus,
+
             'jenis_penggajian' => $this->form->jenis_penggajian,
+
             'nama_bank' => $this->form->nama_bank,
             'no_rek' => $this->form->no_rek,
             'nama_pemilik_rekening' => $this->form->nama_pemilik_rekening,
+
             'no_bpjs_tk' => $this->form->no_bpjs_tk,
             'npp_bpjs_tk' => $this->form->npp_bpjs_tk,
             'tgl_aktif_bpjstk' => $this->form->tgl_aktif_bpjstk ?: null,
+
             'no_bpjs' => $this->form->no_bpjs,
             'anggota_bpjs' => $this->form->anggota_bpjs,
             'tgl_aktif_bpjs' => $this->form->tgl_aktif_bpjs ?: null,
+
             'penanggung' => $this->form->penanggung,
             'tax_status' => $this->form->tax_status,
         ];
 
-        // dd($data);
-
         M_DataKaryawan::create($data);
-        // dd($dataKaryawan);
 
         $this->form->reset();
 
@@ -189,7 +449,6 @@ class TambahDataKaryawan extends Component
     {
         $currentBranch = session('selected_entitas', 'UHO');
 
-        // Mapping kode entitas
         $kodeEntitas = [
             'UHO' => '01',
             'UNR' => '02',
@@ -197,33 +456,37 @@ class TambahDataKaryawan extends Component
             'UGR' => '04',
         ];
 
-        // Ambil kode entitas
         $kode = $kodeEntitas[$currentBranch] ?? null;
 
         if (!$kode) {
             return;
         }
 
-        // Ambil tahun & bulan dari tanggal masuk
         $tanggalMasuk = Carbon::parse($this->form->tgl_masuk);
 
         $tahun = $tanggalMasuk->format('y');
         $bulan = $tanggalMasuk->format('m');
 
-        $lastKaryawan = M_DataKaryawan::where('entitas', $currentBranch)
+        $lastKaryawan = M_DataKaryawan::where(
+            'entitas',
+            $currentBranch
+        )
             ->whereNotNull('nip_karyawan')
             ->where('nip_karyawan', '!=', '')
-            ->orderByRaw('CAST(RIGHT(nip_karyawan, 3) AS UNSIGNED) DESC')
+            ->orderByRaw(
+                'CAST(RIGHT(nip_karyawan, 3) AS UNSIGNED) DESC'
+            )
             ->first();
 
-        // Nomor urut terakhir khusus entitas
         $lastNumber = 0;
 
         if ($lastKaryawan) {
-            $lastNumber = (int) substr($lastKaryawan->nip_karyawan, -3);
+            $lastNumber = (int) substr(
+                $lastKaryawan->nip_karyawan,
+                -3
+            );
         }
 
-        // Nomor urut berikutnya
         $noUrutBaru = str_pad(
             $lastNumber + 1,
             3,
@@ -231,13 +494,14 @@ class TambahDataKaryawan extends Component
             STR_PAD_LEFT
         );
 
-        // Bentuk NIP
         $this->form->nip_karyawan =
             "{$tahun}{$bulan}{$kode}{$noUrutBaru}";
     }
 
     public function render()
     {
-        return view('livewire.karyawan.tambah-data-karyawan');
+        return view(
+            'livewire.karyawan.tambah-data-karyawan'
+        );
     }
 }
