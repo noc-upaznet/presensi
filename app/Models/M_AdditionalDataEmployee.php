@@ -21,6 +21,8 @@ class M_AdditionalDataEmployee extends Model
         'parent_address',
         'inlaw_address',
         'history_of_illness',
+        'name_father',
+        'name_mother',
         'name_father_in_law',
         'name_mother_in_law',
     ];

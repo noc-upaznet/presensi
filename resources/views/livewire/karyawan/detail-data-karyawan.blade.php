@@ -521,6 +521,8 @@
                                 'parent_address' => 'ALAMAT ORANG TUA',
                                 'inlaw_address' => 'ALAMAT MERTUA',
                                 'history_of_illness' => 'RIWAYAT PENYAKIT',
+                                'name_father' => 'NAMA AYAH',
+                                'name_mother' => 'NAMA IBU',
                                 'name_father_in_law' => 'NAMA MERTUA LAKI-LAKI',
                                 'name_mother_in_law' => 'NAMA MERTUA PEREMPUAN',
                             ];

@@ -96,6 +96,8 @@ class DetailDataKaryawan extends Component
             'parent_address'    => $data->parent_address ?? '',
             'inlaw_address'     => $data->inlaw_address ?? '',
             'history_of_illness' => $data->history_of_illness ?? '',
+            'name_father'       => $data->name_father ?? '',
+            'name_mother'       => $data->name_mother ?? '',
             'name_father_in_law' => $data->name_father_in_law ?? '',
             'name_mother_in_law' => $data->name_mother_in_law ?? '',
         ];
