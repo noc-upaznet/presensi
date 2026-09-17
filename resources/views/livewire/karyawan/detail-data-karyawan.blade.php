@@ -605,6 +605,7 @@
                                 <option value="IBU">IBU</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="SAUDARA">SAUDARA</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                         </div>
@@ -735,6 +736,7 @@
                                 <option value="ORANG TUA">ORANG TUA</option>
                                 <option value="MENANTU">MENANTU</option>
                                 <option value="CUCU">CUCU</option>
+                                <option value="SAUDARA">SAUDARA</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                             @error('form.relationships')
@@ -813,6 +815,7 @@
                                 <option value="IBU">IBU</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="SAUDARA">SAUDARA</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                         </div>
@@ -1061,6 +1064,7 @@
                                 <option value="IBU">IBU</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="SAUDARA">SAUDARA</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                         </div>
@@ -1220,6 +1224,7 @@
                                 <option value="ORANG TUA">ORANG TUA</option>
                                 <option value="MENANTU">MENANTU</option>
                                 <option value="CUCU">CUCU</option>
+                                <option value="SAUDARA">SAUDARA</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                             @error('form.relationships')
@@ -1299,6 +1304,7 @@
                                 <option value="SUAMI">SUAMI</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
+                                <option value="SAUDARA">SAUDARA</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                         </div>
@@ -1401,7 +1407,8 @@
                 <div class="modal-header bg-info">
                     <h5 class="modal-title text-white" id="modalEditPendidikanLabel">RIWAYAT PENDIDIKAN (EDUCATIONAL
                         BACKGROUND)</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Tutup"></button>
                 </div>
                 <div class="mt-3 p-3 mb-3">
                     <div class="row">
