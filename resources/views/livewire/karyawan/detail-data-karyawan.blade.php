@@ -608,6 +608,8 @@
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
                                 <option value="SAUDARA">SAUDARA</option>
+                                <option value="PAMAN">PAMAN</option>
+                                <option value="TANTE">TANTE</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                         </div>
@@ -741,6 +743,8 @@
                                 <option value="MENANTU">MENANTU</option>
                                 <option value="CUCU">CUCU</option>
                                 <option value="SAUDARA">SAUDARA</option>
+                                <option value="PAMAN">PAMAN</option>
+                                <option value="TANTE">TANTE</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                             @error('form.relationships')
@@ -822,6 +826,8 @@
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
                                 <option value="SAUDARA">SAUDARA</option>
+                                <option value="PAMAN">PAMAN</option>
+                                <option value="TANTE">TANTE</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                         </div>
@@ -1073,6 +1079,8 @@
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
                                 <option value="SAUDARA">SAUDARA</option>
+                                <option value="PAMAN">PAMAN</option>
+                                <option value="TANTE">TANTE</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                         </div>
@@ -1235,6 +1243,8 @@
                                 <option value="MENANTU">MENANTU</option>
                                 <option value="CUCU">CUCU</option>
                                 <option value="SAUDARA">SAUDARA</option>
+                                <option value="PAMAN">PAMAN</option>
+                                <option value="TANTE">TANTE</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                             @error('form.relationships')
@@ -1317,6 +1327,8 @@
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="ANAK">ANAK</option>
                                 <option value="SAUDARA">SAUDARA</option>
+                                <option value="PAMAN">PAMAN</option>
+                                <option value="TANTE">TANTE</option>
                                 <option value="LAINNYA">LAINNYA</option>
                             </select>
                         </div>
@@ -1396,8 +1408,8 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary w-md-auto" wire:click='updateTanggungan'
                             wire:loading.attr="disabled" wire:target="updateTanggungan">
-                            <div wire:loading wire:target="updateTanggungan" class="spinner-border spinner-border-sm"
-                                role="status">
+                            <div wire:loading wire:target="updateTanggungan"
+                                class="spinner-border spinner-border-sm" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                             <span wire:loading.remove wire:target="updateTanggungan"><i class="fa fa-save"></i>
