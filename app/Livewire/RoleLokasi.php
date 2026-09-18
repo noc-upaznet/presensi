@@ -9,6 +9,7 @@ use App\Models\M_Entitas;
 use Livewire\WithPagination;
 use App\Models\M_DataKaryawan;
 use App\Models\RoleLokasiModel;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Livewire\WithoutUrlPagination;
 
@@ -102,7 +103,7 @@ class RoleLokasi extends Component
         ];
         // dd($data);
 
-        
+
         $dataId->update($data);
 
         $this->dispatch('swal', params: [
@@ -138,16 +139,34 @@ class RoleLokasi extends Component
 
     public function mount()
     {
-        // Load lokasi saat komponen pertama kali di-mount
-        // $this->users = User::where('role', '!=', 'admin')->orderBy('name')->get();
-        $entitasNama = session('selected_entitas', 'UHO');
+        $user = Auth::user();
 
-        $this->karyawans = M_DataKaryawan::where('entitas', $entitasNama)
-            ->whereNotIn('id', function ($query) {
-                $query->select('karyawan_id')->from('role_lokasi');
-            })
-            ->orderBy('nama_karyawan')
-            ->get();
+        if ($user->hasRole('spv-sales')) {
+
+            // Ambil data karyawan yang login
+            $karyawanLogin = M_DataKaryawan::where('user_id', $user->id)->first();
+
+            // Entitas mengikuti karyawan yang login
+            $entitasId = $user->branch_id;
+            $entitasNama = M_Entitas::where('id', $entitasId)->value('nama');
+
+            $this->karyawans = M_DataKaryawan::where('entitas', $entitasNama)
+                ->where('divisi', 'SALES MARKETING')
+                ->orderBy('nama_karyawan')
+                ->get();
+        } else {
+
+            // Selain spv-sales tetap menggunakan session
+            $entitasNama = session('selected_entitas', 'UHO');
+
+            $this->karyawans = M_DataKaryawan::where('entitas', $entitasNama)
+                ->whereNotIn('id', function ($query) {
+                    $query->select('karyawan_id')->from('role_lokasi');
+                })
+                ->orderBy('nama_karyawan')
+                ->get();
+        }
+
         $this->lokasis = Lokasi::orderBy('nama_lokasi')->get();
         $this->lokasi_list = RoleLokasiModel::all();
 
@@ -156,21 +175,44 @@ class RoleLokasi extends Component
 
     public function render()
     {
-        // $lokasiList = RoleLokasiModel::withwhere('nama_karyawan', 'like', '%' . $this->search . '%')->paginate(10);
-        $entitasNama = session('selected_entitas', 'UHO');
+        $user = Auth::user();
 
-        $lokasiList = RoleLokasiModel::with('getKaryawan')
-            ->whereHas('getKaryawan', function ($query) use ($entitasNama) {
-                $query->where('entitas', $entitasNama);
-            })
-            ->when($this->search, function ($query) {
-                $query->whereHas('getKaryawan', function ($q) {
-                    $q->where('nama_karyawan', 'like', '%' . $this->search . '%');
-                });
-            })
-            ->latest()
-            ->paginate(10);
-        // dd($lokasiList);
+        if ($user->hasRole('spv-sales')) {
+
+            // Entitas mengikuti branch user login
+            $entitasId = $user->branch_id;
+            $entitasNama = M_Entitas::where('id', $entitasId)->value('nama');
+
+            $lokasiList = RoleLokasiModel::with('getKaryawan')
+                ->whereHas('getKaryawan', function ($query) use ($entitasNama) {
+                    $query->where('entitas', $entitasNama)
+                        ->where('divisi', 'SALES MARKETING');
+                })
+                ->when($this->search, function ($query) {
+                    $query->whereHas('getKaryawan', function ($q) {
+                        $q->where('nama_karyawan', 'like', '%' . $this->search . '%');
+                    });
+                })
+                ->latest()
+                ->paginate(10);
+        } else {
+
+            // Selain spv-sales tetap menggunakan entitas dari session
+            $entitasNama = session('selected_entitas', 'UHO');
+
+            $lokasiList = RoleLokasiModel::with('getKaryawan')
+                ->whereHas('getKaryawan', function ($query) use ($entitasNama) {
+                    $query->where('entitas', $entitasNama);
+                })
+                ->when($this->search, function ($query) {
+                    $query->whereHas('getKaryawan', function ($q) {
+                        $q->where('nama_karyawan', 'like', '%' . $this->search . '%');
+                    });
+                })
+                ->latest()
+                ->paginate(10);
+        }
+
         return view('livewire.role-lokasi', [
             'lokasiList' => $lokasiList,
         ]);

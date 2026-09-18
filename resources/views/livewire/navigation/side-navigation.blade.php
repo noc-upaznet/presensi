@@ -175,6 +175,30 @@
                         </a>
                     </li>
                 @endhasanyrole
+                @can('manage-lokasi')
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link active">
+                            <i class="bi bi-map"></i>
+                            <p>Lokasi<i class="nav-arrow bi bi-chevron-right"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview" style="margin-left: 20px;">
+                            <li class="nav-item">
+                                <a href="{{ route('list-lokasi') }}"
+                                    class="nav-link {{ request()->routeIs('list-lokasi') ? 'active' : '' }}">
+                                    <i class="nav-icon bi bi-circle"></i>
+                                    <p>List Lokasi</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('role-lokasi') }}"
+                                    class="nav-link {{ request()->routeIs('role-lokasi') ? 'active' : '' }}">
+                                    <i class="nav-icon bi bi-circle"></i>
+                                    <p>Role Lokasi Presensi</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endcan
                 @hasanyrole('admin|hr')
                     <li class="nav-item menu-open">
                         <a href="#" class="nav-link active">
@@ -248,29 +272,6 @@
                                     class="nav-link {{ request()->routeIs('planner-jadwal') ? 'active' : '' }}">
                                     <i class="bi bi-calendar-range"></i>
                                     <p>Planner Jadwal</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item menu-open">
-                        <a href="#" class="nav-link active">
-                            <i class="bi bi-map"></i>
-                            <p>Lokasi<i class="nav-arrow bi bi-chevron-right"></i></p>
-                        </a>
-                        <ul class="nav nav-treeview" style="margin-left: 20px;">
-                            <li class="nav-item">
-                                <a href="{{ route('list-lokasi') }}"
-                                    class="nav-link {{ request()->routeIs('list-lokasi') ? 'active' : '' }}">
-                                    <i class="nav-icon bi bi-circle"></i>
-                                    <p>List Lokasi</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('role-lokasi') }}"
-                                    class="nav-link {{ request()->routeIs('role-lokasi') ? 'active' : '' }}">
-                                    <i class="nav-icon bi bi-circle"></i>
-                                    <p>Role Lokasi Presensi</p>
                                 </a>
                             </li>
                         </ul>
