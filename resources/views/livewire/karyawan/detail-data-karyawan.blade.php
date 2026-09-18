@@ -600,6 +600,8 @@
                             <select class="form-select" wire:model="relationships">
                                 <option value="">-- Pilih --</option>
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
+                                <option value="KAKEK">KAKEK</option>
+                                <option value="NENEK">NENEK</option>
                                 <option value="SUAMI">SUAMI</option>
                                 <option value="AYAH">AYAH</option>
                                 <option value="IBU">IBU</option>
@@ -729,6 +731,8 @@
                                 name="relationships">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
+                                <option value="KAKEK">KAKEK</option>
+                                <option value="NENEK">NENEK</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="AYAH">AYAH</option>
                                 <option value="IBU">IBU</option>
@@ -811,6 +815,8 @@
                             <select class="form-select" wire:model="relationships">
                                 <option value="">-- Pilih --</option>
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
+                                <option value="KAKEK">KAKEK</option>
+                                <option value="NENEK">NENEK</option>
                                 <option value="AYAH">AYAH</option>
                                 <option value="IBU">IBU</option>
                                 <option value="ISTRI">ISTRI</option>
@@ -1059,6 +1065,8 @@
                             <select class="form-select" wire:model="relationships">
                                 <option value="">-- Pilih --</option>
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
+                                <option value="KAKEK">KAKEK</option>
+                                <option value="NENEK">NENEK</option>
                                 <option value="SUAMI">SUAMI</option>
                                 <option value="AYAH">AYAH</option>
                                 <option value="IBU">IBU</option>
@@ -1217,6 +1225,8 @@
                                 name="relationships">
                                 <option selected value="">-- Pilih --</option>
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
+                                <option value="KAKEK">KAKEK</option>
+                                <option value="NENEK">NENEK</option>
                                 <option value="ISTRI">ISTRI</option>
                                 <option value="AYAH">AYAH</option>
                                 <option value="IBU">IBU</option>
@@ -1299,6 +1309,8 @@
                             <select class="form-select" wire:model="relationships">
                                 <option value="">-- Pilih --</option>
                                 <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
+                                <option value="KAKEK">KAKEK</option>
+                                <option value="NENEK">NENEK</option>
                                 <option value="AYAH">AYAH</option>
                                 <option value="IBU">IBU</option>
                                 <option value="SUAMI">SUAMI</option>
