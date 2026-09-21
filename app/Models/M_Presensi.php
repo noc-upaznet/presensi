@@ -18,6 +18,7 @@ class M_Presensi extends Model
         'lokasi_clock_out',
         'lokasi_lock',
         'file',
+        'file_clock_out',
         'status',
     ];
 

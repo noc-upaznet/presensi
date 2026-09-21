@@ -22,6 +22,7 @@ class ClockInSelfie extends Component
     use WithFileUploads;
     public $photo;
     public $photo1;
+    public $type = 'clock-in';
     public $lokasis;
     public $clockInTime;
     public $tanggal;
@@ -37,6 +38,7 @@ class ClockInSelfie extends Component
     public function mount()
     {
         $this->lokasisTerdekat = collect();
+        $this->type = request()->get('type', 'clock-in');
         $this->photo = session('selfie_path');
     }
 
@@ -188,6 +190,11 @@ class ClockInSelfie extends Component
         $this->longitude = $longitude;
         $this->currentTime = $datetime;
 
+        if ($this->type === 'clock-out') {
+            $this->clockOut();
+            return;
+        }
+
         $this->clockIn();
     }
 
@@ -334,6 +341,48 @@ class ClockInSelfie extends Component
         }
 
         $this->reset(['photo']);
+        return redirect()->route('clock-in');
+    }
+
+    public function clockOut()
+    {
+        $userId = Auth::id();
+
+        $karyawanId = M_DataKaryawan::where('user_id', $userId)
+            ->value('id');
+
+        if (!$karyawanId) {
+            session()->flash('error', 'Data karyawan tidak ditemukan.');
+            return;
+        }
+
+        if (!$this->photo) {
+            session()->flash('error', 'Selfie clock-out tidak ditemukan.');
+            return;
+        }
+
+        if (!$this->latitude || !$this->longitude) {
+            session()->flash('error', 'Lokasi tidak tersedia. Aktifkan GPS.');
+            return;
+        }
+
+        $presensi = M_Presensi::where('user_id', $karyawanId)
+            ->whereDate('tanggal', today())
+            ->where('clock_in', '!=', '00:00:00')
+            ->where('clock_out', '00:00:00')
+            ->first();
+
+        if (!$presensi) {
+            session()->flash('error', 'Presensi yang dapat di-clock-out tidak ditemukan.');
+            return;
+        }
+
+        $presensi->update([
+            'clock_out' => now()->toTimeString(),
+            'lokasi_clock_out' => $this->latitude . ', ' . $this->longitude,
+            'file_clock_out' => $this->photo,
+        ]);
+
         return redirect()->route('clock-in');
     }
 

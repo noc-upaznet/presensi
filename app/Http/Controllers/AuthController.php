@@ -40,22 +40,18 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            // Jika password masih default
+            // Jika password masih default (expired)
             if ($user->password_expired) {
                 session()->flash(
                     'warning',
                     'Password Anda masih default, silakan ganti password terlebih dahulu.'
                 );
-
                 return redirect()->route('ganti-password');
             }
 
-            // Kembalikan ke URL yang sebelumnya ingin diakses
-            if ($user->hasRole('admin')) {
-                return redirect()->intended(route('dashboard'));
-            }
-
-            return redirect()->intended(route('clock-in'));
+            return $user->hasRole('admin')
+                ? redirect()->route('dashboard')
+                : redirect()->route('clock-in');
         }
 
         return back()->withErrors([
@@ -69,6 +65,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect()->away('http://127.0.0.1:8003');
     }
 }

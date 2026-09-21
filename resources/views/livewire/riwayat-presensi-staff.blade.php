@@ -67,7 +67,10 @@
                                 <th>Clock Out</th>
                                 <th>Lokasi</th>
                                 <th>Old Status</th>
-                                <th>File</th>
+                                <th>Foto Clock In</th>
+                                @role('spv-sales')
+                                    <th>Foto Clock Out</th>
+                                @endrole
                                 <th>Status</th>
                                 @role('spv-sales|branch-manager')
                                     <th>Approve</th>
@@ -130,6 +133,24 @@
                                             -
                                         @endif
                                     </td>
+                                    @role('spv-sales')
+                                        <td style="color: var(--bs-body-color);">
+                                            @if ($key->file_clock_out)
+                                                @php
+                                                    $fileClockOutUrl = route(
+                                                        'file.selfies',
+                                                        encrypt(basename($key->file_clock_out)),
+                                                    );
+                                                @endphp
+                                                <img src="{{ $fileClockOutUrl }}" alt="Bukti"
+                                                    style="max-width: 100px; cursor: pointer;" data-bs-toggle="modal"
+                                                    data-bs-target="#modalGambar"
+                                                    onclick="setModalImage('{{ $fileClockOutUrl }}')">
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                    @endrole
                                     <td>
                                         @switch($key->status)
                                             @case('0')
@@ -151,22 +172,22 @@
 
                                     @role('spv-sales|branch-manager')
                                         <td>
-                                            @if ($key->lokasi_lock == 0)
-                                                @if ($key->approve == 0)
-                                                    <button class="btn btn-success btn-sm mt-2 mb-2"
-                                                        wire:click="approve({{ $key->id }})">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button class="btn btn-danger btn-sm"
-                                                        wire:click="reject({{ $key->id }})">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                @elseif ($key->approve == 1)
-                                                    <span class="badge bg-success">Approved</span>
-                                                @elseif ($key->approve == 2)
-                                                    <span class="badge bg-danger">Rejected</span>
-                                                @endif
+                                            {{-- @if ($key->lokasi_lock == 0) --}}
+                                            @if ($key->approve == 0)
+                                                <button class="btn btn-success btn-sm mt-2 mb-2"
+                                                    wire:click="approve({{ $key->id }})">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm"
+                                                    wire:click="reject({{ $key->id }})">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            @elseif ($key->approve == 1)
+                                                <span class="badge bg-success">Approved</span>
+                                            @elseif ($key->approve == 2)
+                                                <span class="badge bg-danger">Rejected</span>
                                             @endif
+                                            {{-- @endif --}}
                                         </td>
                                     @endrole
 

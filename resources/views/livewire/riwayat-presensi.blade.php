@@ -84,7 +84,10 @@
                                                 <th>Lokasi</th>
                                                 <th>Old Status</th>
                                             @endrole
-                                            <th>File</th>
+                                            <th>Foto Clock In</th>
+                                            @role('spv-sales')
+                                                <th>Foto Clock Out</th>
+                                            @endrole
                                             <th>Status</th>
                                             @role('admin')
                                                 <th>Action</th>
@@ -152,6 +155,24 @@
                                                             -
                                                         @endif
                                                     </td>
+                                                    @role('spv-sales')
+                                                        <td style="color: var(--bs-body-color);">
+                                                            @if ($key->file_clock_out)
+                                                                @php
+                                                                    $fileClockOutUrl = route(
+                                                                        'file.selfies',
+                                                                        encrypt(basename($key->file_clock_out)),
+                                                                    );
+                                                                @endphp
+                                                                <img src="{{ $fileClockOutUrl }}" alt="Bukti"
+                                                                    style="max-width: 100px; cursor: pointer;"
+                                                                    data-bs-toggle="modal" data-bs-target="#modalGambar"
+                                                                    onclick="setModalImage('{{ $fileClockOutUrl }}')">
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
+                                                    @endrole
                                                     <td>
                                                         @if ($key->status == '0')
                                                             <span class="badge bg-success">Tepat Waktu</span>

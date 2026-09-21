@@ -357,19 +357,31 @@
                 <div class="modal-footer justify-content-center">
                     <input type="hidden" wire:model.live="latitude">
                     <input type="hidden" wire:model.live="longitude">
-                    <button type="button" id="btnTake" class="btn btn-danger position-relative"
-                        wire:click="clockOut" wire:loading.attr="disabled" wire:target="clockOut"
-                        {{ $correctCount >= $requiredCorrect ? '' : 'disabled' }}>
+                    @if ($correctCount >= $requiredCorrect)
 
-                        <span wire:loading.remove wire:target="clockOut">
-                            Clock Out
-                        </span>
+                        @if ($isSelfieClockOut)
+                            <button type="button" class="btn btn-warning" wire:click="showClockOutSelfie"
+                                wire:loading.attr="disabled">
+                                <i class="fas fa-camera me-2"></i>
+                                Ambil Selfie & Clock Out
+                            </button>
+                        @else
+                            <button type="button" id="btnTake" class="btn btn-danger position-relative"
+                                wire:click="clockOut" wire:loading.attr="disabled" wire:target="clockOut"
+                                {{ $correctCount >= $requiredCorrect ? '' : 'disabled' }}>
 
-                        <span wire:loading wire:target="clockOut">
-                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                            Memproses...
-                        </span>
-                    </button>
+                                <span wire:loading.remove wire:target="clockOut">
+                                    Clock Out
+                                </span>
+
+                                <span wire:loading wire:target="clockOut">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    Memproses...
+                                </span>
+                            </button>
+                        @endif
+
+                    @endif
                 </div>
             </div>
         </div>

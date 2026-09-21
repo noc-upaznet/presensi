@@ -57,6 +57,7 @@ class ClockIn extends Component
     public $canClockOut;
     public $hasDispensation;
 
+    public $isSelfieClockOut = false;
 
     protected $listeners = ['photoTaken' => 'handlePhoto', 'refreshTable' => 'refresh'];
 
@@ -78,6 +79,10 @@ class ClockIn extends Component
         $this->level   = $karyawan?->level;
         $this->poin    = $karyawan?->poin;
         $this->entitas = $karyawan?->entitas;
+
+        $this->isSelfieClockOut =
+            strtoupper(trim($this->entitas ?? '')) === 'UNR'
+            && strtoupper(trim($this->divisi ?? '')) === 'SALES MARKETING';
 
         $this->showPoin =
             in_array(strtolower($this->divisi), ['teknisi'], true) &&
@@ -495,6 +500,12 @@ class ClockIn extends Component
         );
     }
 
+    public function showClockOutSelfie()
+    {
+        return redirect()->route('clock-in-selfie', [
+            'type' => 'clock-out'
+        ]);
+    }
 
     public function render()
     {
