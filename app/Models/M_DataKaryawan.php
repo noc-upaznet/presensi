@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Region\Village;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -112,5 +113,15 @@ class M_DataKaryawan extends Model
             ->whereDate('tanggal', now())
             ->whereIn('status', [0, 1])
             ->whereNull('deleted_at');
+    }
+
+    public function villageKtp()
+    {
+        return $this->belongsTo(Village::class, 'village_id_ktp');
+    }
+
+    public function villageDomisili()
+    {
+        return $this->belongsTo(Village::class, 'village_id_domisili');
     }
 }

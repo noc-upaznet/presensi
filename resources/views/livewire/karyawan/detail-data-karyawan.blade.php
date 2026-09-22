@@ -184,12 +184,45 @@
                             <td>:</td>
                         </tr>
                         <tr>
-                            <td class="bio-label">ALAMAT SESUAI KTP<br><small>(ID CARD ADDRESS)</small></td>
-                            <td colspan="3">: {{ $karyawan->alamat_ktp }}</td>
+                            <td class="bio-label">
+                                ALAMAT SESUAI KTP<br>
+                                <small>(ID CARD ADDRESS)</small>
+                            </td>
+
+                            <td colspan="3">
+                                :
+
+                                @if ($karyawan->villageKtp)
+                                    {{ $karyawan->alamat_ktp }},
+                                    Ds. {{ $karyawan->villageKtp->name }},
+                                    Kec. {{ $karyawan->villageKtp->district?->name }},
+                                    {{ $karyawan->villageKtp->district?->regency?->name }},
+                                    {{ $karyawan->villageKtp->district?->regency?->province?->name }}
+                                @else
+                                    {{ $karyawan->alamat_ktp }}
+                                @endif
+                            </td>
                         </tr>
+
                         <tr>
-                            <td class="bio-label">ALAMAT DOMISILI<br><small>(FULL ADDRESS)</small></td>
-                            <td colspan="3">: {{ $karyawan->alamat_domisili }}</td>
+                            <td class="bio-label">
+                                ALAMAT DOMISILI<br>
+                                <small>(FULL ADDRESS)</small>
+                            </td>
+
+                            <td colspan="3">
+                                :
+
+                                @if ($karyawan->villageDomisili)
+                                    {{ $karyawan->alamat_domisili }},
+                                    Ds. {{ $karyawan->villageDomisili->name }},
+                                    Kec. {{ $karyawan->villageDomisili->district?->name }},
+                                    {{ $karyawan->villageDomisili->district?->regency?->name }},
+                                    {{ $karyawan->villageDomisili->district?->regency?->province?->name }}
+                                @else
+                                    {{ $karyawan->alamat_domisili }}
+                                @endif
+                            </td>
                         </tr>
                     </table>
                     {{-- <div class="row">
