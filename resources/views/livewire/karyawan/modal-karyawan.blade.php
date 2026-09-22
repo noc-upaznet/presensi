@@ -182,7 +182,7 @@
                                     <div class="col-md-6">
                                         <label class="form-label">Provinsi</label>
 
-                                        <select class="form-select" wire:model="form.provinsiKTP"
+                                        <select class="form-select" wire:model.live="form.provinsiKTP"
                                             wire:key="ktp-provinsi-{{ $karyawanId }}">
                                             <option value="">-- Pilih Provinsi --</option>
 
@@ -199,7 +199,7 @@
                                     <div class="col-md-6">
                                         <label class="form-label">Kabupaten / Kota</label>
 
-                                        <select class="form-select" wire:model="form.kabupatenKTP"
+                                        <select class="form-select" wire:model.live="form.kabupatenKTP"
                                             wire:key="ktp-kabupaten-{{ $form->provinsiKTP }}-{{ $karyawanId }}"
                                             @disabled(!$form->provinsiKTP)>
                                             <option value="">-- Pilih Kabupaten / Kota --</option>
@@ -217,7 +217,7 @@
                                     <div class="col-md-6">
                                         <label class="form-label">Kecamatan</label>
 
-                                        <select class="form-select" wire:model="form.kecamatanKTP"
+                                        <select class="form-select" wire:model.live="form.kecamatanKTP"
                                             wire:key="ktp-kecamatan-{{ $form->kabupatenKTP }}-{{ $karyawanId }}"
                                             @disabled(!$form->kabupatenKTP)>
                                             <option value="">-- Pilih Kecamatan --</option>
@@ -235,7 +235,7 @@
                                     <div class="col-md-6">
                                         <label class="form-label">Desa / Kelurahan</label>
 
-                                        <select class="form-select" wire:model="form.desaKTP"
+                                        <select class="form-select" wire:model.live="form.desaKTP"
                                             wire:key="ktp-desa-{{ $form->kecamatanKTP }}-{{ $karyawanId }}"
                                             @disabled(!$form->kecamatanKTP)>
                                             <option value="">-- Pilih Desa / Kelurahan --</option>
