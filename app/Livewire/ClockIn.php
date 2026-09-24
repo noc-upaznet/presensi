@@ -81,7 +81,10 @@ class ClockIn extends Component
         $this->entitas = $karyawan?->entitas;
 
         $this->isSelfieClockOut =
-            strtoupper(trim($this->entitas ?? '')) === 'UNR'
+            in_array(
+                strtoupper(trim($this->entitas ?? '')),
+                ['UNR', 'UGR']
+            )
             && strtoupper(trim($this->divisi ?? '')) === 'SALES MARKETING';
 
         $this->showPoin =
