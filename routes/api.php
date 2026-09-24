@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
-Route::get('/karyawan/ulangtahun', [KaryawanController::class, 'ulangTahun']);
+// Route::get('/karyawan/ulangtahun', [KaryawanController::class, 'ulangTahun']);
 
 Route::post('/login', function (Request $request) {
     $user = User::where('email', $request->email)->first();
