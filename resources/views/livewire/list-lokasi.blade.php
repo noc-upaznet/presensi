@@ -43,7 +43,8 @@
                         <div>
                             <label class="form-label fw-bold">Status</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="status" wire:model="status" checked>
+                                <input class="form-check-input" type="checkbox" id="status" wire:model="status"
+                                    checked>
                                 <label class="form-check-label" for="status">Aktif</label>
                             </div>
                         </div>
@@ -79,31 +80,35 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($lokasi_list as $lokasi)
-                            <tr>
-                                <td style="color: var(--bs-body-color);">{{ $lokasi->nama_lokasi }}</td>
-                                <td style="color: var(--bs-body-color);">{{ $lokasi->alamat }}</td>
-                                <td>
-                                    <span class="badge bg-{{ $lokasi->status ? 'info' : 'secondary' }}">
-                                        {{ $lokasi->status ? 'Aktif' : 'Nonaktif' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button wire:click.prevent="editLokasi({{ $lokasi->id }})"
-                                        class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#editLokasiModal">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
+                            @foreach ($lokasi_list as $lokasi)
+                                <tr>
+                                    <td style="color: var(--bs-body-color);">{{ $lokasi->nama_lokasi }}</td>
+                                    <td style="color: var(--bs-body-color);">{{ $lokasi->alamat }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ $lokasi->status ? 'info' : 'secondary' }}">
+                                            {{ $lokasi->status ? 'Aktif' : 'Nonaktif' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @can('location-update')
+                                            <button wire:click.prevent="editLokasi({{ $lokasi->id }})"
+                                                class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#editLokasiModal">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        @endcan
 
-                                    <!-- Tombol Buka Modal -->
-                                    <button wire:click.prevent="confirmHapusLokasi({{ $lokasi->id }})"
-                                        class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#hapusLokasiModal">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                        @can('location-delete')
+                                            <!-- Tombol Buka Modal -->
+                                            <button wire:click.prevent="confirmHapusLokasi({{ $lokasi->id }})"
+                                                class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#hapusLokasiModal">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        @endcan
 
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -115,7 +120,8 @@
         <div wire:ignore.self class="modal fade" id="editLokasiModal" tabindex="-1"
             aria-labelledby="editLokasiModalLabel" aria-hidden="true">
             <div class="modal-dialog">
-                <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
+                <div class="modal-content"
+                    style="border-radius: 0.375rem; border-top: 4px solid #007bff; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                     <div class="modal-header" style="border-bottom: none; padding: 1rem 1.5rem;">
                         <h5 class="modal-title fw-bold text-primary" id="editLokasiModalLabel">Edit Lokasi Presensi</h5>
@@ -126,8 +132,9 @@
                             <div class="row g-3">
                                 <div class="col-md-12">
                                     <label for="namaLokasi" class="form-label fw-semibold">Nama Lokasi</label>
-                                    <input type="text" id="namaLokasi" wire:model="nama_lokasi" class="form-control"
-                                        placeholder="Head Office (HO)" style="border-radius: 8px;">
+                                    <input type="text" id="namaLokasi" wire:model="nama_lokasi"
+                                        class="form-control" placeholder="Head Office (HO)"
+                                        style="border-radius: 8px;">
                                 </div>
                                 <div class="col-md-6">
                                     <label for="koordinat" class="form-label fw-semibold">Koordinat</label>
@@ -135,17 +142,18 @@
                                         style="font-size: 10px; padding: 4px 8px; border-radius: 4px; margin-left: 8px;">Google
                                         Maps</button>
                                     <div class="input-group">
-                                        <input type="text" id="koordinat" wire:model="koordinat" class="form-control"
-                                            placeholder="-8.3489739" style="border-radius: 8px 0 0 8px;">
+                                        <input type="text" id="koordinat" wire:model="koordinat"
+                                            class="form-control" placeholder="-8.3489739"
+                                            style="border-radius: 8px 0 0 8px;">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">Status</label>
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="status" wire:model="status">
-                                        <label class="form-check-label" for="status">{{ $status ? 'Aktif' :
-                                            'Nonaktif'
-                                            }}</label>
+                                        <input class="form-check-input" type="checkbox" id="status"
+                                            wire:model="status">
+                                        <label class="form-check-label"
+                                            for="status">{{ $status ? 'Aktif' : 'Nonaktif' }}</label>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
@@ -169,10 +177,11 @@
     </div>
 
     <!-- Modal Hapus Lokasi -->
-    <div wire:ignore.self class="modal fade" id="hapusLokasiModal" tabindex="-1" aria-labelledby="hapusLokasiModalLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="hapusLokasiModal" tabindex="-1"
+        aria-labelledby="hapusLokasiModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" style="border-radius: 0.375rem; border-top: 4px solid #d51a1a; border-left: 1px solid #dee2e6;
+            <div class="modal-content"
+                style="border-radius: 0.375rem; border-top: 4px solid #d51a1a; border-left: 1px solid #dee2e6;
                         border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-danger" id="hapusLokasiModalLabel">Hapus Lokasi Presensi
@@ -190,17 +199,17 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                         style="border-radius: 8px;">Batal</button>
-                    <button type="button" class="btn btn-danger" wire:click="deleteLokasi" style="border-radius: 8px;"
-                        data-bs-dismiss="modal">Hapus</button>
+                    <button type="button" class="btn btn-danger" wire:click="deleteLokasi"
+                        style="border-radius: 8px;" data-bs-dismiss="modal">Hapus</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         // SweetAlert2 untuk notifikasi
-        window.addEventListener('lokasiTerupdate', function (event) {
+        window.addEventListener('lokasiTerupdate', function(event) {
             Swal.fire({
                 title: 'Berhasil!',
                 text: event.detail.message,
@@ -217,7 +226,7 @@
         });
 
         // Manual close modal handler
-        window.addEventListener('closeModal', function () {
+        window.addEventListener('closeModal', function() {
             const modalElement = document.getElementById('editLokasiModal');
             const modalInstance = bootstrap.Modal.getInstance(modalElement);
             if (modalInstance) {
