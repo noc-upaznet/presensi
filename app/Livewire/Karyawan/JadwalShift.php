@@ -58,7 +58,7 @@ class JadwalShift extends Component
         //     ->pluck('karyawan_id')
         //     ->toArray();
 
-        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
+        if ($user->hasRole('spv-teknisi')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
             $divisi = $karyawan->divisi;
             // dd($divisi);
@@ -69,16 +69,27 @@ class JadwalShift extends Component
             $query = M_DataKaryawan::where('divisi', $divisi)
                 ->where('status_karyawan', '!=', 'NONAKTIF');
 
-            if ($entitas == 'UNR') {
-                $query->whereIn('entitas', ['UNR', 'UHO']);
-            } else {
-                $query->where('entitas', $entitas);
-            }
+            $query->where('entitas', $entitas);
 
             $this->karyawans = $query
                 ->orderBy('nama_karyawan')
                 ->get();
             // dd($this->karyawans);
+        } elseif ($user->hasRole('spv-helpdesk')) {
+            $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
+            $divisi = $karyawan->divisi;
+            // dd($divisi);
+            $entitas = $karyawan->entitas;
+            $jabatan = $karyawan->jabatan;
+
+            $query = M_DataKaryawan::whereIn('divisi', ['Helpdesk', 'Teknisi'])
+                ->where('status_karyawan', '!=', 'NONAKTIF');
+
+            $query->where('entitas', $entitas);
+
+            $this->karyawans = $query
+                ->orderBy('nama_karyawan')
+                ->get();
         } elseif ($user->hasRole('spv-sales')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
 
@@ -328,18 +339,21 @@ class JadwalShift extends Component
             $query->where('bulan_tahun', 'like', $this->filterBulan . '%');
         }
 
-        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
+        if ($user->hasRole('spv-teknisi')) {
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
 
             $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitas) {
                 $q->where('divisi', $divisi);
+                $q->where('entitas', $entitas);
+            });
+        } elseif ($user->hasRole('spv-helpdesk')) {
+            $divisi = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
 
-                if ($entitas === 'UNR') {
-                    $q->whereIn('entitas', ['UNR', 'UHO']);
-                } else {
-                    $q->where('entitas', $entitas);
-                }
+            $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitas) {
+                $q->whereIn('divisi', ['Helpdesk', 'Teknisi']);
+                $q->where('entitas', $entitas);
             });
         } elseif ($user->hasRole('spv-sales')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();

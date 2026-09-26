@@ -80,7 +80,7 @@ class RiwayatPresensiStaff extends Component
             $entitas = $karyawan->entitas;
             $jabatan = $karyawan->jabatan;
 
-            $query = M_DataKaryawan::whereIn('divisi', [$divisi, 'Support'])
+            $query = M_DataKaryawan::whereIn('divisi', [$divisi, 'General Operation'])
                 ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->whereIn('jabatan', [$jabatan, 'GO']);
 
@@ -92,6 +92,11 @@ class RiwayatPresensiStaff extends Component
 
             $this->karyawanList = $query
                 ->orderBy('nama_karyawan')
+                ->get();
+        } elseif ($user->hasRole('spv-helpdesk')) {
+            $this->karyawanList = M_DataKaryawan::where('entitas', $entitasNama)
+                ->whereIn('divisi', ['Helpdesk', 'Teknisi'])
+                ->select('id', 'nama_karyawan')
                 ->get();
         } elseif ($divisi === 'NOC') {
             $this->karyawanList = M_DataKaryawan::where('divisi', 'NOC')
@@ -302,13 +307,14 @@ class RiwayatPresensiStaff extends Component
             } elseif (strtoupper($divisi) === 'TEKNISI' && strtoupper($entitas) === 'UNR') {
 
                 $query->whereHas('getUser', function ($q) use ($divisi, $entitas) {
-                    $q->where(function ($sub) {
-                        $sub->whereRaw('UPPER(entitas) = ?', ['UHO'])
-                            ->whereRaw('UPPER(jabatan) = ?', ['TEKNISI']);
-                    })->orWhere(function ($sub) use ($divisi, $entitas) {
-                        $sub->where('divisi', $divisi)
-                            ->where('entitas', $entitas);
-                    });
+                    $q->whereRaw('UPPER(jabatan) = ?', ['TEKNISI'])
+                        ->where('divisi', $divisi)
+                        ->where('entitas', $entitas);
+                });
+            } elseif ($divisi === 'Helpdesk') {
+                $query->whereHas('getUser', function ($q) use ($divisi, $entitas) {
+                    $q->whereIn('divisi', ['Helpdesk', 'Teknisi'])
+                        ->where('entitas', $entitas);
                 });
             } else {
                 $query->whereHas('getUser', function ($q) use ($divisi, $entitas) {

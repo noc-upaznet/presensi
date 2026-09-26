@@ -71,15 +71,17 @@ class ModalJadwalShift extends Component
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
 
-            $query = M_DataKaryawan::where('divisi', $divisi)
-                ->where('status_karyawan', '!=', 'NONAKTIF')
-                ->whereNotIn('id', $jadwalId);
-
-            if ($entitas === 'UNR') {
-                $query->whereIn('entitas', ['UNR', 'UHO']);
+            if ($user->hasRole('spv-helpdesk')) {
+                $query = M_DataKaryawan::whereIn('divisi', ['Helpdesk', 'Teknisi'])
+                    ->where('status_karyawan', '!=', 'NONAKTIF')
+                    ->whereNotIn('id', $jadwalId);
             } else {
-                $query->where('entitas', $entitas);
+                $query = M_DataKaryawan::where('divisi', $divisi)
+                    ->where('status_karyawan', '!=', 'NONAKTIF')
+                    ->whereNotIn('id', $jadwalId);
             }
+
+            $query->where('entitas', $entitas);
 
             $this->karyawans = $query
                 ->where('status_karyawan', '!=', 'NONAKTIF')
@@ -484,19 +486,27 @@ class ModalJadwalShift extends Component
         $jadwalId = M_Jadwal::where('bulan_tahun', $this->bulan_tahun)
             ->pluck('karyawan_id')
             ->toArray();
-        if ($user->hasAnyRole('spv-teknisi|spv-helpdesk')) {
+        if ($user->hasAnyRole('spv-teknisi')) {
             $divisi = $karyawan->divisi;
             $entitas = $karyawan->entitas;
 
             $query = M_DataKaryawan::where('divisi', $divisi)
                 ->where('status_karyawan', '!=', 'NONAKTIF')
-                ->whereNotIn('id', $jadwalId);
+                ->whereNotIn('id', $jadwalId)
+                ->where('entitas', $entitas);
 
-            if ($entitas === 'UNR') {
-                $query->whereIn('entitas', ['UNR', 'UHO']);
-            } else {
-                $query->where('entitas', $entitas);
-            }
+            $this->karyawans = $query
+                ->where('status_karyawan', '!=', 'NONAKTIF')
+                ->orderBy('nama_karyawan')
+                ->get();
+        } elseif ($user->hasRole('spv-helpdesk')) {
+            $divisi = $karyawan->divisi;
+            $entitas = $karyawan->entitas;
+
+            $query = M_DataKaryawan::whereIn('divisi', ['Helpdesk', 'Teknisi'])
+                ->where('status_karyawan', '!=', 'NONAKTIF')
+                ->whereNotIn('id', $jadwalId)
+                ->where('entitas', $entitas);
 
             $this->karyawans = $query
                 ->where('status_karyawan', '!=', 'NONAKTIF')

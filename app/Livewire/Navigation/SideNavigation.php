@@ -110,11 +110,7 @@ class SideNavigation extends Component
                     }
 
                     // Presensi Staff
-                    if ($divisi == 'NOC') {
-
-                        // NOC tidak menampilkan count
-                        $countPresensiStaff = 0;
-                    } else {
+                    if ($user->hasRole('spv-sales')) {
 
                         $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
                             ->where('approve', 0)
