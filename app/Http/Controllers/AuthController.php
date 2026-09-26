@@ -65,6 +65,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->away('http://127.0.0.1:8003');
+        return redirect('/login');
     }
 }
