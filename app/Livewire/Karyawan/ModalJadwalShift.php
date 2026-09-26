@@ -92,7 +92,7 @@ class ModalJadwalShift extends Component
             $entitas = $karyawan->entitas;
             $jabatan = $karyawan->jabatan;
 
-            $query = M_DataKaryawan::whereIn('divisi', [$divisi, 'Support'])
+            $query = M_DataKaryawan::whereIn('divisi', [$divisi, 'General Operation'])
                 ->whereIn('jabatan', [$jabatan, 'GO'])
                 ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->whereNotIn('id', $jadwalId);
@@ -509,7 +509,7 @@ class ModalJadwalShift extends Component
             $entitas = $karyawan->entitas;
             $jabatan = $karyawan->jabatan;
 
-            $query = M_DataKaryawan::whereIn('divisi', [$divisi, 'Support'])
+            $query = M_DataKaryawan::whereIn('divisi', [$divisi, 'General Operation'])
                 ->whereIn('jabatan', [$jabatan, 'GO'])
                 ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->whereNotIn('id', $jadwalId);
