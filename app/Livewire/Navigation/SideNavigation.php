@@ -111,15 +111,11 @@ class SideNavigation extends Component
 
                     // Presensi Staff
                     if ($divisi == 'NOC') {
-                        $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
-                            ->where('approve', 0)
-                            ->where('user_id', '!=', $dataKaryawan->id)
-                            ->where('deleted_at', null)
-                            ->whereHas('getKaryawan', function ($q) use ($divisi) {
-                                $q->where('divisi', $divisi);
-                            })
-                            ->count();
+
+                        // NOC tidak menampilkan count
+                        $countPresensiStaff = 0;
                     } else {
+
                         $countPresensiStaff = M_Presensi::where('lokasi_lock', 0)
                             ->where('approve', 0)
                             ->where('user_id', '!=', $dataKaryawan->id)
