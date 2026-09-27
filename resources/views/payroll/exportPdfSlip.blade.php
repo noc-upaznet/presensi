@@ -370,7 +370,7 @@
                         <td class="text-right">Rp. {{ number_format(intVal($data->tunjangan_kinerja)) }}</td>
                     </tr>
                 @endif
-                @if ($data->tunjangan_kinerja)
+                @if ($data->tunjangan_kinerja && $data->divisi != 'Teknisi')
                     <tr>
                         <td>Tunjangan Kinerja</td>
                         <td class="text-right">Rp. {{ number_format(intVal($data->tunjangan_kinerja)) }}</td>
