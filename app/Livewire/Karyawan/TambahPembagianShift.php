@@ -14,12 +14,12 @@ class TambahPembagianShift extends Component
     public $jadwals = [
         ['nama_shift' => '', 'jam_masuk' => '', 'jam_pulang' => ''],
     ];
-    
+
     public function tambahJadwal()
     {
         $this->jadwals[] = ['nama_shift' => '', 'jam_masuk' => '', 'jam_pulang' => ''];
     }
-    
+
     public function hapusJadwal($index)
     {
         unset($this->jadwals[$index]);
@@ -33,24 +33,47 @@ class TambahPembagianShift extends Component
             'jadwals.*.jam_masuk' => 'required',
             'jadwals.*.jam_pulang' => 'required',
         ]);
-        // dd($this->jadwals);
+
         foreach ($this->jadwals as $jadwal) {
+
+            // Normalisasi format jam
+            $jamMasuk = str_replace('.', ':', trim($jadwal['jam_masuk']));
+            $jamPulang = str_replace('.', ':', trim($jadwal['jam_pulang']));
+
+            // Pastikan format HH:MM
+            $jamMasuk = date('H:i', strtotime($jamMasuk));
+            $jamPulang = date('H:i', strtotime($jamPulang));
+
+            [$jamMasukHour, $jamMasukMinute] = explode(':', $jamMasuk);
+            [$jamPulangHour, $jamPulangMinute] = explode(':', $jamPulang);
+
+            if ($jamMasukMinute === '00' && $jamPulangMinute === '00') {
+
+                $kodeShift = $jamMasukHour . $jamPulangHour;
+            } else {
+
+                $kodeShift =
+                    $jamMasukHour .
+                    $jamMasukMinute .
+                    $jamPulangHour .
+                    $jamPulangMinute;
+            }
+
             M_JadwalShift::create([
                 'nama_shift' => $jadwal['nama_shift'],
-                'jam_masuk' => $jadwal['jam_masuk'],
-                'jam_pulang' => $jadwal['jam_pulang'],
+                'jam_masuk' => $jamMasuk,
+                'jam_pulang' => $jamPulang,
+                'kode_shift' => $kodeShift,
             ]);
         }
-    
-        // $this->form->reset();
+
         $this->reset('jadwals');
-    
+
         $this->dispatch('swal', params: [
             'title' => 'Data Saved',
             'icon' => 'success',
             'text' => 'Data has been saved successfully'
         ]);
-
     }
 
     public function render()
