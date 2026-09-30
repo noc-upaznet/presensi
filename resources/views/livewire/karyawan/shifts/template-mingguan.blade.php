@@ -49,25 +49,25 @@
                                     {{ $key->nama_template }}
                                 </td>
                                 <td style="color: var(--bs-body-color);">
-                                    {{ $key->getMinggu->nama_shift }}
+                                    {{ $key->getMinggu->nama_shift ?? '-' }}
                                 </td>
                                 <td style="color: var(--bs-body-color);">
-                                    {{ $key->getSenin->nama_shift }}
+                                    {{ $key->getSenin->nama_shift ?? '-' }}
                                 </td>
                                 <td style="color: var(--bs-body-color);">
-                                    {{ $key->getSelasa->nama_shift }}
+                                    {{ $key->getSelasa->nama_shift ?? '-' }}
                                 </td>
                                 <td style="color: var(--bs-body-color);">
-                                    {{ $key->getRabu->nama_shift }}
+                                    {{ $key->getRabu->nama_shift ?? '-' }}
                                 </td>
                                 <td style="color: var(--bs-body-color);">
-                                    {{ $key->getkamis->nama_shift }}
+                                    {{ $key->getkamis->nama_shift ?? '-' }}
                                 </td>
                                 <td style="color: var(--bs-body-color);">
-                                    {{ $key->getJumat->nama_shift }}
+                                    {{ $key->getJumat->nama_shift ?? '-' }}
                                 </td>
                                 <td style="color: var(--bs-body-color);">
-                                    {{ $key->getSabtu->nama_shift }}
+                                    {{ $key->getSabtu->nama_shift ?? '-' }}
                                 </td>
                                 <td>
                                     <button class="btn btn-warning btn-sm"
