@@ -341,7 +341,7 @@ class PengajuanLembur extends Component
                 } elseif ($divisi === 'teknisi' && $entitas === 'UNR') {
                     $karyawanIdList = M_DataKaryawan::where(function ($q) use ($dataKaryawan) {
                         // 1. Semua karyawan entitas MC
-                        $q->whereRaw('UPPER(entitas) = ?', ['UHO'])
+                        $q->whereRaw('UPPER(entitas) = ?', ['UNR'])
                             ->whereIn(DB::raw('UPPER(jabatan)'), ['TEKNISI'])
 
                             // 2. Divisi & entitas sendiri
@@ -367,6 +367,14 @@ class PengajuanLembur extends Component
                         [$entitas]
                     )
                         ->whereIn(DB::raw('UPPER(jabatan)'), ['SALES MARKETING', 'GO'])
+                        ->pluck('id');
+                } elseif ($divisi === 'Helpdesk') {
+
+                    $karyawanIdList = M_DataKaryawan::whereRaw(
+                        'UPPER(entitas) = ?',
+                        [$entitas]
+                    )
+                        ->whereIn(DB::raw('UPPER(jabatan)'), ['Helpdesk', 'Teknisi'])
                         ->pluck('id');
                 } else {
                     // Divisi lain → filter divisi + entitas (kondisi lama, tetap dipakai)
