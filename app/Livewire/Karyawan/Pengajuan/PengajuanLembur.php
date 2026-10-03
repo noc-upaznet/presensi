@@ -368,7 +368,7 @@ class PengajuanLembur extends Component
                     )
                         ->whereIn(DB::raw('UPPER(jabatan)'), ['SALES MARKETING', 'GO'])
                         ->pluck('id');
-                } elseif ($divisi === 'Helpdesk') {
+                } elseif ($divisi === 'helpdesk') {
 
                     $karyawanIdList = M_DataKaryawan::whereRaw(
                         'UPPER(entitas) = ?',
