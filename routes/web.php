@@ -92,7 +92,7 @@ Route::get('/sso/callback', function (Request $request) {
     }
 
     $response = Http::post(
-        'http://127.0.0.1:8009/api/sso/validate',
+        'https://app.upaz.net.id/api/sso/validate',
         [
             'token' => $token,
         ]
