@@ -83,48 +83,48 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/ganti-password', GantiPassword::class)->middleware('auth')->name('ganti-password');
 
-// Route::get('/sso/callback', function (Request $request) {
+Route::get('/sso/callback', function (Request $request) {
 
-//     $token = $request->query('token');
+    $token = $request->query('token');
 
-//     if (!$token) {
-//         abort(401, 'Token SSO tidak ditemukan.');
-//     }
+    if (!$token) {
+        abort(401, 'Token SSO tidak ditemukan.');
+    }
 
-//     $response = Http::post(
-//         'http://127.0.0.1:8003/api/sso/validate',
-//         [
-//             'token' => $token,
-//         ]
-//     );
+    $response = Http::post(
+        'http://127.0.0.1:8009/api/sso/validate',
+        [
+            'token' => $token,
+        ]
+    );
 
-//     if (!$response->successful()) {
-//         abort(401, 'Token SSO tidak valid atau sudah expired.');
-//     }
+    if (!$response->successful()) {
+        abort(401, 'Token SSO tidak valid atau sudah expired.');
+    }
 
-//     $data = $response->json();
+    $data = $response->json();
 
-//     if (!($data['valid'] ?? false)) {
-//         abort(401, 'Token SSO tidak valid.');
-//     }
+    if (!($data['valid'] ?? false)) {
+        abort(401, 'Token SSO tidak valid.');
+    }
 
-//     $userData = $data['user'];
+    $userData = $data['user'];
 
-//     $user = \App\Models\User::where(
-//         'email',
-//         $userData['email']
-//     )->first();
+    $user = \App\Models\User::where(
+        'email',
+        $userData['email']
+    )->first();
 
-//     if (!$user) {
-//         abort(401, 'User tidak ditemukan di aplikasi Presensi.');
-//     }
+    if (!$user) {
+        abort(401, 'User tidak ditemukan di aplikasi Presensi.');
+    }
 
-//     Auth::login($user);
+    Auth::login($user);
 
-//     $request->session()->regenerate();
+    $request->session()->regenerate();
 
-//     return redirect('/');
-// });
+    return redirect('/');
+});
 
 Route::get('/data-karyawan/{token}', FormDataKaryawan::class)
     ->middleware('auth')
