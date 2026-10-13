@@ -366,14 +366,24 @@ class ClockInSelfie extends Component
             return;
         }
 
+        $today = today();
+
         $presensi = M_Presensi::where('user_id', $karyawanId)
-            ->whereDate('tanggal', today())
+            ->whereDate('tanggal', '>=', $today->copy()->subDay())
+            ->whereDate('tanggal', '<=', $today)
             ->where('clock_in', '!=', '00:00:00')
-            ->where('clock_out', '00:00:00')
+            ->where(function ($query) {
+                $query->where('clock_out', '00:00:00')
+                    ->orWhereNull('clock_out');
+            })
+            ->orderByDesc('tanggal')
             ->first();
 
         if (!$presensi) {
-            session()->flash('error', 'Presensi yang dapat di-clock-out tidak ditemukan.');
+            session()->flash(
+                'error',
+                'Presensi yang dapat di-clock-out tidak ditemukan.'
+            );
             return;
         }
 

@@ -358,21 +358,30 @@ class JadwalShift extends Component
         } elseif ($user->hasRole('spv-sales')) {
             $karyawan = M_DataKaryawan::where('user_id', $user->id)->first();
 
-            $divisi  = $karyawan->divisi;
-            $entitas = $karyawan->entitas;
+            if ($karyawan) {
+                $divisi  = $karyawan->divisi;
+                $entitas = $karyawan->entitas;
 
-            $entitasFilter = [$entitas];
+                $entitasFilter = [$entitas];
 
-            if (in_array($entitas, ['UNB'])) {
-                $entitasFilter = [$entitas, 'UHO'];
+                if ($entitas === 'UNB') {
+                    $entitasFilter = [$entitas, 'UHO'];
+                }
+
+                $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitasFilter, $user) {
+                    $q->where(function ($sub) use ($divisi, $entitasFilter, $user) {
+                        $sub->where(function ($filter) use ($divisi, $entitasFilter) {
+                            $filter->whereIn('divisi', [$divisi, 'General Operation'])
+                                ->whereIn('jabatan', ['Sales Marketing', 'GO'])
+                                ->where('status_karyawan', '!=', 'NONAKTIF')
+                                ->whereIn('entitas', $entitasFilter);
+                        })
+                            ->orWhere('user_id', $user->id);
+                    });
+                });
+            } else {
+                $query->whereRaw('1 = 0');
             }
-
-            $query->whereHas('getKaryawan', function ($q) use ($divisi, $entitasFilter) {
-                $q->whereIn('divisi', [$divisi, 'General Operation'])
-                    ->whereIn('jabatan', ['Sales Marketing', 'GO'])
-                    ->where('status_karyawan', '!=', 'NONAKTIF')
-                    ->whereIn('entitas', $entitasFilter);
-            });
         } elseif ($user->hasRole('spv')) {
 
             $divisi  = $karyawan->divisi;
