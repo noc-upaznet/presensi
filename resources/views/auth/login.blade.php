@@ -94,6 +94,35 @@
                     <div class="social-auth-links text-center mb-3 d-grid gap-2">
                         <button type="submit" class="btn btn-primary" style="text-align: center">Login</button>
                     </div>
+                    <div class=" mb-3 d-grid gap-2">
+                        <div class="d-flex align-items-center my-2">
+                            <hr class="flex-grow-1">
+                            <span class="px-3 text-muted small">ATAU</span>
+                            <hr class="flex-grow-1">
+                        </div>
+                    </div>
+                    <div class="social-auth-links mb-3 d-grid gap-2">
+                        <div class="border rounded-3 p-3 bg-light">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3 text-success fs-3">
+                                    <i class="bi bi-shield-lock"></i>
+                                </div>
+
+                                <div>
+                                    <h6 class="fw-semibold mb-1">Login dengan SSO</h6>
+                                    <p class="text-muted small mb-0">
+                                        Gunakan akun Presensi Anda untuk masuk
+                                        dengan lebih mudah dan aman.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <a href="https://app.upaz.net.id/" class="btn btn-success w-100">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>
+                                Login dengan SSO
+                            </a>
+                        </div>
+                    </div>
                     {{-- <div class="d-flex justify-content-center mt-3">
                         <a href="{{ route('password.request') }}">Lupa Password?</a>
                     </div> --}}
