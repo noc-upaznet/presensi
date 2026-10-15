@@ -22,12 +22,18 @@ class ListLokasi extends Component
 
     public function simpanLokasi()
     {
+        $validate = $this->validate([
+            'nama_lokasi' => 'required|string',
+            'koordinat' => 'required|string',
+            'alamat' => 'required|string',
+            'status' => 'boolean',
+        ]);
         // Simpan data lokasi ke database
         Lokasi::create([
-            'nama_lokasi' => $this->nama_lokasi,
-            'koordinat' => $this->koordinat,
-            'alamat' => $this->alamat,
-            'status' => $this->status,
+            'nama_lokasi' => $validate['nama_lokasi'],
+            'koordinat' => $validate['koordinat'],
+            'alamat' => $validate['alamat'],
+            'status' => $validate['status'],
         ]);
 
         // Reset input
@@ -44,7 +50,7 @@ class ListLokasi extends Component
     {
         $lokasi = Lokasi::find($id);
         $this->lokasi_id = $lokasi->id;
-        $this->nama_lokasi = $lokasi->nama;
+        $this->nama_lokasi = $lokasi->nama_lokasi;
     }
 
     public function deleteLokasi()

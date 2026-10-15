@@ -23,6 +23,11 @@
                         <label for="nama-lokasi" class="form-label fw-bold">Nama Lokasi</label>
                         <input type="text" class="form-control" id="nama-lokasi" wire:model="nama_lokasi"
                             placeholder="Head Office (HO)">
+                        @error('nama_lokasi')
+                            <small class="text-danger">
+                                {{ $message }}
+                            </small>
+                        @enderror
                     </div>
                     <div class="col-md-6">
                         <label for="koordinat" class="form-label fw-bold">Koordinat</label>
@@ -33,11 +38,21 @@
                             <input type="text" class="form-control" id="koordinat" wire:model="koordinat"
                                 placeholder="-8.3489739">
                         </div>
+                        @error('koordinat')
+                            <small class="text-danger">
+                                {{ $message }}
+                            </small>
+                        @enderror
                     </div>
                     <div class="col-md-6">
                         <label for="alamat" class="form-label fw-bold">Alamat</label>
                         <textarea class="form-control" id="alamat" wire:model="alamat" rows="3"
                             placeholder="Jl. Ngantru - Srengat No.550, Dermosari, Pinggirsari, Kec. Ngantru, Kabupaten Tulungagung, Jawa Timur 66252"></textarea>
+                        @error('alamat')
+                            <small class="text-danger">
+                                {{ $message }}
+                            </small>
+                        @enderror
                     </div>
                     <div class="col-md-6 d-flex align-items-center">
                         <div>
@@ -135,6 +150,11 @@
                                     <input type="text" id="namaLokasi" wire:model="nama_lokasi"
                                         class="form-control" placeholder="Head Office (HO)"
                                         style="border-radius: 8px;">
+                                    @error('nama_lokasi')
+                                        <small class="text-danger">
+                                            {{ $message }}
+                                        </small>
+                                    @enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label for="koordinat" class="form-label fw-semibold">Koordinat</label>
@@ -146,6 +166,11 @@
                                             class="form-control" placeholder="-8.3489739"
                                             style="border-radius: 8px 0 0 8px;">
                                     </div>
+                                    @error('koordinat')
+                                        <small class="text-danger">
+                                            {{ $message }}
+                                        </small>
+                                    @enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">Status</label>
@@ -157,10 +182,15 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <label for="alamat" class="form-label fw-semibold">Lokasi Karyawan</label>
+                                    <label for="alamat" class="form-label fw-semibold">Alamat</label>
                                     <textarea id="alamat" wire:model="alamat" class="form-control" rows="3"
                                         placeholder="Jl. Ngantru - Srengat No.550, Dermosari, Pinggirsari, Kec. Ngantru, Kabupaten Tulungagung, Jawa Timur 66252"
                                         style="border-radius: 8px;"></textarea>
+                                    @error('alamat')
+                                        <small class="text-danger">
+                                            {{ $message }}
+                                        </small>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
