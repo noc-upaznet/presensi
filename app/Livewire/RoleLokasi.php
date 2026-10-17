@@ -152,6 +152,7 @@ class RoleLokasi extends Component
 
             $this->karyawans = M_DataKaryawan::where('entitas', $entitasNama)
                 ->where('divisi', 'SALES MARKETING')
+                ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->orderBy('nama_karyawan')
                 ->get();
         } else {
