@@ -173,6 +173,7 @@ class RoleLokasi extends Component
         $this->dispatch('refreshSelect2');
     }
 
+
     public function render()
     {
         $user = Auth::user();
@@ -183,9 +184,14 @@ class RoleLokasi extends Component
             $entitasId = $user->branch_id;
             $entitasNama = M_Entitas::where('id', $entitasId)->value('nama');
 
+            // Jika entitas UNB, tampilkan data UNB dan UHO
+            $entitasList = $entitasNama === 'UNB'
+                ? ['UNB', 'UHO']
+                : [$entitasNama];
+
             $lokasiList = RoleLokasiModel::with('getKaryawan')
-                ->whereHas('getKaryawan', function ($query) use ($entitasNama) {
-                    $query->where('entitas', $entitasNama)
+                ->whereHas('getKaryawan', function ($query) use ($entitasList) {
+                    $query->whereIn('entitas', $entitasList)
                         ->where('divisi', 'SALES MARKETING');
                 })
                 ->when($this->search, function ($query) {
@@ -197,7 +203,7 @@ class RoleLokasi extends Component
                 ->paginate(10);
         } else {
 
-            // Selain spv-sales tetap menggunakan entitas dari session
+            // Selain SPV-Sales tetap menggunakan entitas dari session
             $entitasNama = session('selected_entitas', 'UHO');
 
             $lokasiList = RoleLokasiModel::with('getKaryawan')
