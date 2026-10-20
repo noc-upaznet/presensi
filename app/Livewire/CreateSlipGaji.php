@@ -35,6 +35,7 @@ class CreateSlipGaji extends Component
     public $user_id;
     public $nip_karyawan;
     public $tunjangan_jabatan = 0;
+    public $achievement = 0;
 
     public $tunjangan = [
         ['nama' => '', 'nominal' => 0],
@@ -388,6 +389,7 @@ class CreateSlipGaji extends Component
             $this->tunjangan_coc = $dataKaryawan->tunjangan_coc ?? 0;
             $this->tunjangan_kinerja = $dataKaryawan->tunjangan_kinerja ?? 0;
             $this->insentif_tot = $dataKaryawan->insentif_tot ?? 0;
+            $this->achievement = $dataKaryawan->bonus ?? 0;
         }
 
         $this->hitungInovationReward();
@@ -1028,6 +1030,7 @@ class CreateSlipGaji extends Component
         $tunjanganCoc      = $this->numericValue($this->tunjangan_coc ?? 0);
         $tunjanganKinerja      = $this->numericValue($this->tunjangan_kinerja ?? 0);
         $insentifTot      = $this->numericValue($this->insentif_tot ?? 0);
+        $achievement      = $this->numericValue($this->achievement ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -1119,6 +1122,7 @@ class CreateSlipGaji extends Component
                 + $tunjanganCoc
                 + $tunjanganKinerja
                 + $insentifTot
+                + $achievement
         );
         // dd(strtoupper($this->entitas), strtolower($this->jabatan));
         // if (
@@ -1179,6 +1183,7 @@ class CreateSlipGaji extends Component
             'tunjangan_coc' => $this->numericValue($this->tunjangan_coc),
             'tunjangan_kinerja' => $this->numericValue($this->tunjangan_kinerja),
             'insentif_tot' => $this->numericValue($this->insentif_tot),
+            'achievement' => $this->numericValue($this->achievement),
         ];
         // dd($data);
         // dd($this->kasbonAktif);

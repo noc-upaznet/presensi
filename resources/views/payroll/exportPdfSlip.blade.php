@@ -303,6 +303,7 @@
                     intVal($data->tunjangan_coc) +
                     intVal($data->tunjangan_kinerja) +
                     intVal($data->insentit_tot) +
+                    intVal($data->achievment) +
                     $data->inov_reward;
             @endphp
 
@@ -319,6 +320,12 @@
                     <td>Tunjangan Kebudayaan</td>
                     <td class="text-right">Rp. {{ number_format($data->tunjangan_kebudayaan) }}</td>
                 </tr>
+                @if (!empty($data->achievement))
+                    <tr>
+                        <td>Achievement</td>
+                        <td class="text-right">Rp. {{ number_format($data->achievement) }}</td>
+                    </tr>
+                @endif
                 @foreach ($tunjangan as $item)
                     @if (!empty($item['nama']) && $item['nominal'] >= 0)
                         @php

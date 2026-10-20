@@ -124,6 +124,7 @@ class EditPayroll extends Component
     public $tunjangan_coc;
     public $tunjangan_kinerja;
     public $insentif_tot;
+    public $achievement;
 
     private function getEffectiveDay()
     {
@@ -328,6 +329,7 @@ class EditPayroll extends Component
         $this->tunjangan_coc = $this->karyawan->tunjangan_coc ?? 0;
         $this->tunjangan_kinerja = $this->karyawan->tunjangan_kinerja ?? 0;
         $this->insentif_tot = $this->karyawan->insentif_tot ?? 0;
+        $this->achievement = $this->karyawan->bonus ?? 0;
 
         // Komponen gaji
         $this->gaji_pokok = $payroll->gaji_pokok;
@@ -748,6 +750,7 @@ class EditPayroll extends Component
         $tunjanganCoc      = $this->numericValue($this->tunjangan_coc ?? 0);
         $tunjanganKinerja  = $this->numericValue($this->tunjangan_kinerja ?? 0);
         $insentifTot  = $this->numericValue($this->insentif_tot ?? 0);
+        $achievement  = $this->numericValue($this->achievement ?? 0);
 
         // === 2. Tunjangan kehadiran (0 jika ada keterlambatan) ===
         $tunjanganKehadiran = 0;
@@ -808,6 +811,7 @@ class EditPayroll extends Component
                 + $tunjanganCoc
                 + $tunjanganKinerja
                 + $insentifTot
+                + $achievement
                 - $totalPotonganManual
                 - $this->izin_nominal
                 - $this->terlambat_nominal
@@ -957,6 +961,7 @@ class EditPayroll extends Component
             'tunjangan_coc' => $this->tunjangan_coc,
             'tunjangan_kinerja' => $this->tunjangan_kinerja,
             'insentif_tot' => $this->insentif_tot,
+            'achievement' => $this->achievement,
         ];
         // dd($data);
         $payroll->update($data);
