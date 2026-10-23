@@ -84,9 +84,42 @@
                                     <th>Nama Karyawan</th>
                                     <th>Jenis Kelamin</th>
                                     <th>Branch</th>
-                                    <th>Level</th>
-                                    <th>Divisi</th>
-                                    <th>Tanggal Masuk</th>
+                                    <th wire:click="sortBy('level')" style="cursor:pointer; user-select:none;">
+                                        Level
+                                        @if ($sortField == 'level')
+                                            @if ($sortDirection == 'asc')
+                                                <i class="fas fa-sort-up"></i>
+                                            @else
+                                                <i class="fas fa-sort-down"></i>
+                                            @endif
+                                        @else
+                                            <i class="fas fa-sort text-muted"></i>
+                                        @endif
+                                    </th>
+                                    <th wire:click="sortBy('divisi')" style="cursor:pointer; user-select:none;">
+                                        Divisi
+                                        @if ($sortField == 'divisi')
+                                            @if ($sortDirection == 'asc')
+                                                <i class="fas fa-sort-up"></i>
+                                            @else
+                                                <i class="fas fa-sort-down"></i>
+                                            @endif
+                                        @else
+                                            <i class="fas fa-sort text-muted"></i>
+                                        @endif
+                                    </th>
+                                    <th wire:click="sortBy('tgl_masuk')" style="cursor:pointer; user-select:none;">
+                                        Tanggal Masuk
+                                        @if ($sortField == 'tgl_masuk')
+                                            @if ($sortDirection == 'asc')
+                                                <i class="fas fa-sort-up"></i>
+                                            @else
+                                                <i class="fas fa-sort-down"></i>
+                                            @endif
+                                        @else
+                                            <i class="fas fa-sort text-muted"></i>
+                                        @endif
+                                    </th>
                                     <th wire:click="sortBy('tgl_keluar')" style="cursor:pointer; user-select:none;">
                                         Tanggal Keluar (PKWT)
 
@@ -114,7 +147,18 @@
                                             <i class="fas fa-sort text-muted"></i>
                                         @endif
                                     </th>
-                                    <th>Email</th>
+                                    <th wire:click="sortBy('email')" style="cursor:pointer; user-select:none;">
+                                        Email
+                                        @if ($sortField == 'email')
+                                            @if ($sortDirection == 'asc')
+                                                <i class="fas fa-sort-up"></i>
+                                            @else
+                                                <i class="fas fa-sort-down"></i>
+                                            @endif
+                                        @else
+                                            <i class="fas fa-sort text-muted"></i>
+                                        @endif
+                                    </th>
                                     <th>Action</th>
                                     @hasrole('admin')
                                         <th>Action Admin</th>
