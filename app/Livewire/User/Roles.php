@@ -12,6 +12,7 @@ use Spatie\Permission\Models\Permission;
 class Roles extends Component
 {
     use WithPagination, WithoutUrlPagination;
+    protected $paginationTheme = 'bootstrap';
 
 
     public $permissions;
