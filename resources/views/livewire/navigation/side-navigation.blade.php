@@ -375,7 +375,7 @@
                         </ul>
                     </li>
                 @endcan
-                @hasanyrole('spv|hr')
+                {{-- @hasanyrole('spv|hr')
                     <li class="nav-item">
                         <a href="{{ route('slip-gaji') }}"
                             class="nav-link {{ request()->routeIs('slip-gaji') ? 'active' : '' }}">
@@ -383,7 +383,7 @@
                             <p>Slip Gaji</p>
                         </a>
                     </li>
-                @endhasanyrole
+                @endhasanyrole --}}
 
                 {{-- Approval untuk hr, spv, admin --}}
                 {{-- @hasanyrole('spv|admin|hr') --}}
@@ -447,7 +447,8 @@
                             </li>
                         </ul>
                     </li>
-
+                @endhasanyrole
+                @can('slip-gaji-view')
                     <li class="nav-item">
                         <a href="{{ route('slip-gaji') }}"
                             class="nav-link {{ request()->routeIs('slip-gaji') ? 'active' : '' }}">
@@ -455,7 +456,7 @@
                             <p>Slip Gaji</p>
                         </a>
                     </li>
-                @endhasanyrole
+                @endcan
                 @role('admin|hr')
                     @can('manage-user')
                         <li class="nav-item">
