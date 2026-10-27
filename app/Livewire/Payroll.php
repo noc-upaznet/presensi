@@ -184,7 +184,7 @@ class Payroll extends Component
                     + ($item->inov_reward ?? 0)
                     + ($item->insentif_tot ?? 0)
                     + ($item->tunjangan_coc ?? 0)
-                    + ($item->achievement ?? 0)
+                    + (float) ($item->achievement ?? 0)
                     + ($item->tunjangan_kinerja ?? 0);
 
                 // Tambahan tunjangan dari JSON
@@ -235,7 +235,7 @@ class Payroll extends Component
                     + ($item->inov_reward ?? 0)
                     + ($item->insentif_tot ?? 0)
                     + ($item->tunjangan_coc ?? 0)
-                    + ($item->achievement ?? 0)
+                    + (float) ($item->achievement ?? 0)
                     + ($item->tunjangan_kinerja ?? 0);
 
                 // Tambahan tunjangan dari JSON
