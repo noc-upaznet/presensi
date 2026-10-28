@@ -23,7 +23,7 @@
                         <tr>
                             <th>No</th>
                             <th>Nama Karyawan</th>
-                            <th>Rekap</th>
+                            {{-- <th>Rekap</th> --}}
                             <th>Poin Gamifikasi</th>
                             <th>Action</th>
                         </tr>
@@ -33,7 +33,7 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $key->nama_karyawan }}</td>
-                                <td>{{ $key->total_tepat_waktu }}</td>
+                                {{-- <td>{{ $key->total_tepat_waktu }}</td> --}}
                                 <td>{{ $key->poin }}</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm"

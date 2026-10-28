@@ -96,6 +96,8 @@ class Gamifikasi extends Component
             ->where('entitas', session('selected_entitas'))
             ->where('divisi', 'TEKNISI')
             ->where('level', 'STAFF')
+            ->where('deleted_at', null)
+            ->where('status_karyawan', '!=', 'NONAKTIF')
             ->get();
     }
 
