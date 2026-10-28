@@ -26,6 +26,8 @@ class Gamifikasi extends Component
     private function hitungTepatWaktu()
     {
         return DB::table('data_karyawan')
+            ->where('data_karyawan.deleted_at', null)
+            ->where('data_karyawan.status_karyawan', '!=', 'NONAKTIF')
             ->leftJoin('presensi', 'presensi.user_id', '=', 'data_karyawan.id')
             ->leftJoin('jadwal', function ($join) {
                 $join->on('jadwal.karyawan_id', '=', 'data_karyawan.id')
