@@ -71,6 +71,7 @@ class DashboardPayroll extends Component
                     + ($item->insentif_tot ?? 0)
                     + ($item->tunjangan_coc ?? 0)
                     + ($item->tunjangan_kinerja ?? 0)
+                    + (float) ($item->achievement ?? 0)
                     + ($item->inov_reward ?? 0);
 
                 foreach ($tunjanganArray as $t) {
