@@ -36,9 +36,10 @@
                                 <td>{{ $key->total_tepat_waktu }}</td>
                                 <td>{{ $key->poin }}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm"
+                                    <button class="btn btn-primary btn-sm"
                                         wire:click="showEditModal('{{ Crypt::encrypt($key->id) }}')">
                                         <i class="fas fa-edit"></i>
+                                        Kelola Poin
                                     </button>
                                 </td>
                             </tr>
@@ -52,29 +53,70 @@
             </div>
         </div>
     </div>
+
     <div wire:ignore.self class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel"
         aria-hidden="true">
+
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Form Tambah Poin</h5>
+                    <h5 class="modal-title" id="editModalLabel">
+                        Kelola Poin Gamifikasi
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
-                    <div class="mb-3 container">
-                        <label for="poin" class="form-label">Poin</label>
-                        <input type="text" class="form-control" id="poin" wire:model="poin">
+                    <div class="mb-3">
+                        <label class="form-label">Mode Poin</label>
+
+                        <select class="form-select" wire:model.lazy="modePoin">
+                            <option value="tambah">Tambah Poin</option>
+                            <option value="kurang">Kurangi Poin</option>
+                        </select>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="poin" class="form-label">
+                            Jumlah Poin
+                        </label>
+
+                        <input type="number" class="form-control" id="poin" wire:model="poin" min="1"
+                            step="1" placeholder="Masukkan jumlah poin">
+
+                        @error('poin')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    {{-- <div class="alert" class="{{ $modePoin === 'kurang' ? 'alert-warning' : 'alert-info' }}">
+                        @if ($modePoin === 'kurang')
+                            <i class="fas fa-minus-circle"></i>
+                            Poin karyawan akan dikurangi.
+                        @else
+                            <i class="fas fa-plus-circle"></i>
+                            Poin karyawan akan ditambahkan.
+                        @endif
+                    </div> --}}
                 </div>
 
                 <div class="modal-footer justify-content-center">
-                    <button type="button" wire:click="updatePoin" class="btn btn-primary">Simpan</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" wire:click="updatePoin"
+                        class="btn {{ $modePoin === 'kurang' ? 'btn-danger' : 'btn-primary' }}">
+                        <i class="fas {{ $modePoin === 'kurang' ? 'fa-minus' : 'fa-plus' }}"></i>
+                        {{ $modePoin === 'kurang' ? 'Kurangi Poin' : 'Tambah Poin' }}
+                    </button>
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Tutup
+                    </button>
                 </div>
+
             </div>
         </div>
     </div>
+
 </div>
 @push('scripts')
     <script>

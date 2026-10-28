@@ -9,8 +9,9 @@ use Livewire\Component;
 
 class Gamifikasi extends Component
 {
+    public $modePoin = 'tambah';
     public $editId;
-    public $poin;
+    public $poin = 0;
 
     private function countKaryawan()
     {
@@ -101,51 +102,89 @@ class Gamifikasi extends Component
     public function showEditModal($id)
     {
         $decryptedId = Crypt::decrypt($id);
+
         $this->editId = $decryptedId;
+        $this->poin;
+        $this->modePoin = 'tambah';
+
+        $this->resetValidation();
 
         $data = M_DataKaryawan::find($decryptedId);
-        // dd($data);
+
         if (!$data) {
-            session()->flash('error', 'Data tiket tidak ditemukan!');
+            $this->dispatch('swal', params: [
+                'title' => 'Gagal!',
+                'text' => 'Data karyawan tidak ditemukan.',
+                'icon' => 'error',
+            ]);
+
             return;
         }
 
-        // $this->poin = $data->poin;
         $this->dispatch('editModal', action: 'show');
     }
 
     public function updatePoin()
     {
         $this->validate([
-            'poin' => 'required|numeric|min:0',
+            'poin' => 'required|integer|min:1',
+            'modePoin' => 'required|in:tambah,kurang',
+        ], [
+            'poin.required' => 'Jumlah poin wajib diisi.',
+            'poin.integer' => 'Jumlah poin harus berupa bilangan bulat.',
+            'poin.min' => 'Jumlah poin minimal 1.',
         ]);
 
-        // Ambil data karyawan
-        $karyawan = $this->editId
-            ? M_DataKaryawan::find($this->editId)
-            : $this->karyawan;
+        $karyawan = M_DataKaryawan::find($this->editId);
 
         if (!$karyawan) {
-            session()->flash('error', 'Data karyawan tidak ditemukan!');
+            $this->dispatch('swal', params: [
+                'title' => 'Gagal!',
+                'text' => 'Data karyawan tidak ditemukan.',
+                'icon' => 'error',
+            ]);
+
             return;
         }
 
-        // Tambahkan poin ke poin lama
-        $poinLama = $karyawan->poin ?? 0;
-        $poinBaru = $poinLama + $this->poin;
+        $poinLama = (int) ($karyawan->poin ?? 0);
+        $jumlahPoin = (int) $this->poin;
+
+        // Validasi pengurangan poin
+        if ($this->modePoin === 'kurang' && $jumlahPoin > $poinLama) {
+            $this->addError(
+                'poin',
+                'Jumlah pengurangan tidak boleh melebihi poin saat ini (' . $poinLama . ').'
+            );
+
+            return;
+        }
+
+        // Hitung poin baru berdasarkan mode
+        if ($this->modePoin === 'tambah') {
+            $poinBaru = $poinLama + $jumlahPoin;
+            $judul = 'Poin Berhasil Ditambahkan';
+            $pesan = "Poin bertambah {$jumlahPoin}. Total sekarang: {$poinBaru}";
+        } else {
+            $poinBaru = $poinLama - $jumlahPoin;
+            $judul = 'Poin Berhasil Dikurangi';
+            $pesan = "Poin berkurang {$jumlahPoin}. Total sekarang: {$poinBaru}";
+        }
 
         $karyawan->update([
             'poin' => $poinBaru,
         ]);
 
         $this->reset('poin');
+        $this->modePoin = 'tambah';
+        $this->resetValidation();
 
         $this->dispatch('editModal', action: 'hide');
 
         $this->dispatch('swal', params: [
-            'title' => 'Poin Berhasil Ditambahkan',
+            'title' => $judul,
             'icon' => 'success',
-            'text' => "Poin bertambah, Total sekarang: $poinBaru"
+            'text' => $pesan,
         ]);
     }
 
