@@ -151,7 +151,7 @@ class RoleLokasi extends Component
             $entitasNama = M_Entitas::where('id', $entitasId)->value('nama');
 
             $this->karyawans = M_DataKaryawan::where('entitas', $entitasNama)
-                ->where('divisi', 'SALES MARKETING')
+                ->whereIn('divisi', ['SALES MARKETING', 'GENERAL OPERATION'])
                 ->where('status_karyawan', '!=', 'NONAKTIF')
                 ->orderBy('nama_karyawan')
                 ->get();
@@ -193,7 +193,7 @@ class RoleLokasi extends Component
             $lokasiList = RoleLokasiModel::with('getKaryawan')
                 ->whereHas('getKaryawan', function ($query) use ($entitasList) {
                     $query->whereIn('entitas', $entitasList)
-                        ->where('divisi', 'SALES MARKETING');
+                        ->whereIn('divisi', ['SALES MARKETING', 'GENERAL OPERATION']);
                 })
                 ->when($this->search, function ($query) {
                     $query->whereHas('getKaryawan', function ($q) {
