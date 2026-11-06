@@ -8,6 +8,12 @@ use Illuminate\Http\Request;
 
 class KaryawanController extends Controller
 {
+    public function index()
+    {
+        $employees = M_DataKaryawan::select('id', 'nama_karyawan', 'tempat_lahir', 'tanggal_lahir', 'divisi', 'level', 'entitas')->get();
+        return response()->json($employees);
+    }
+
     public function ulangTahun()
     {
         $karyawan = M_DataKaryawan::query()

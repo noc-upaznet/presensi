@@ -8,6 +8,8 @@ use App\Models\User;
 
 // Route::get('/karyawan/ulangtahun', [KaryawanController::class, 'ulangTahun']);
 
+Route::get('/karyawan', [KaryawanController::class, 'index']);
+
 Route::post('/login', function (Request $request) {
     $user = User::where('email', $request->email)->first();
     if (! $user || ! Hash::check($request->password, $user->password)) {
