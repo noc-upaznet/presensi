@@ -10,7 +10,10 @@ class KaryawanController extends Controller
 {
     public function index()
     {
-        $employees = M_DataKaryawan::select('id', 'nama_karyawan', 'tempat_lahir', 'tanggal_lahir', 'divisi', 'level', 'entitas')->get();
+        $employees = M_DataKaryawan::with('villageKtp.district.regency.province')
+            ->select('id', 'nama_karyawan', 'tempat_lahir', 'tanggal_lahir', 'divisi', 'level', 'entitas', 'alamat_ktp', 'village_id_ktp')
+            ->get();
+            
         return response()->json($employees);
     }
 

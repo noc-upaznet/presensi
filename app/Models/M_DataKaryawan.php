@@ -10,6 +10,8 @@ class M_DataKaryawan extends Model
 {
     use SoftDeletes;
     protected $table = 'data_karyawan';
+    protected $appends = ['full_address'];
+
     protected $fillable = [
         'user_id',
         'nama_karyawan',
@@ -124,4 +126,29 @@ class M_DataKaryawan extends Model
     {
         return $this->belongsTo(Village::class, 'village_id_domisili');
     }
+
+    public function getFullAddressAttribute()
+    {
+        $address = $this->alamat_ktp;
+
+        if ($this->relationLoaded('villageKtp') && $this->villageKtp) {
+            $village = $this->villageKtp->name;
+            $district = $this->villageKtp->district ? $this->villageKtp->district->name : '';
+            $regency = $this->villageKtp->district && $this->villageKtp->district->regency ? $this->villageKtp->district->regency->name : '';
+            $province = $this->villageKtp->district && $this->villageKtp->district->regency && $this->villageKtp->district->regency->province ? $this->villageKtp->district->regency->province->name : '';
+
+            $fullAddressParts = array_filter([
+                $address,
+                $village,
+                $district,
+                $regency,
+                $province,
+            ]);
+
+            return implode(', ', $fullAddressParts);
+        }
+
+        return $address;
+    }
+
 }
