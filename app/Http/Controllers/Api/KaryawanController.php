@@ -12,7 +12,7 @@ class KaryawanController extends Controller
     {
         $employees = M_DataKaryawan::with('villageKtp.district.regency.province')
             ->where('status_karyawan', '!=', 'NONAKTIF')
-            ->select('id', 'nama_karyawan', 'nik', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'divisi', 'level', 'entitas', 'alamat_ktp', 'village_id_ktp')
+            ->select('id', 'nama_karyawan', 'nik', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'divisi', 'level', 'entitas', 'alamat_domisili', 'village_id_domisili')
             ->get();
 
         return response()->json($employees);

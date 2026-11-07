@@ -129,13 +129,13 @@ class M_DataKaryawan extends Model
 
     public function getFullAddressAttribute()
     {
-        $address = $this->alamat_ktp;
+        $address = $this->alamat_domisili;
 
-        if ($this->relationLoaded('villageKtp') && $this->villageKtp) {
-            $village = $this->villageKtp->name;
-            $district = $this->villageKtp->district ? $this->villageKtp->district->name : '';
-            $regency = $this->villageKtp->district && $this->villageKtp->district->regency ? $this->villageKtp->district->regency->name : '';
-            $province = $this->villageKtp->district && $this->villageKtp->district->regency && $this->villageKtp->district->regency->province ? $this->villageKtp->district->regency->province->name : '';
+        if ($this->relationLoaded('villageDomisili') && $this->villageDomisili) {
+            $village = $this->villageDomisili->name;
+            $district = $this->villageDomisili->district?->name;
+            $regency = $this->villageDomisili->district?->regency?->name;
+            $province = $this->villageDomisili->district?->regency?->province?->name;
 
             $fullAddressParts = array_filter([
                 $address,
@@ -150,5 +150,4 @@ class M_DataKaryawan extends Model
 
         return $address;
     }
-
 }
