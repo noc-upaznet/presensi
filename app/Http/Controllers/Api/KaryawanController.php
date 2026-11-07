@@ -10,7 +10,7 @@ class KaryawanController extends Controller
 {
     public function index()
     {
-        $employees = M_DataKaryawan::with('villageKtp.district.regency.province')
+        $employees = M_DataKaryawan::with('villageDomisili.district.regency.province')
             ->where('status_karyawan', '!=', 'NONAKTIF')
             ->select('id', 'nama_karyawan', 'nik', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'divisi', 'level', 'entitas', 'alamat_domisili', 'village_id_domisili')
             ->get();
