@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.manage-user' => \App\Http\Middleware\PermissionPage::class,
             'check.dashboard-view' => \App\Http\Middleware\PermissionPage::class,
             'check.kasbon-view' => \App\Http\Middleware\PermissionPage::class,
+            'api.token' => \App\Http\Middleware\ApiTokenAuth::class,
         ]);
         $middleware->trustProxies(at: '*');
     })
