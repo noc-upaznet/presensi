@@ -48,7 +48,7 @@ class ApiTokenAuth
         }
 
         // Perpanjang masa berlaku setiap ada request valid
-        $expiresAt = now()->addMinutes(1);
+        $expiresAt = now()->addMinutes(120);
 
         $user->forceFill([
             'expires_at' => $expiresAt,

@@ -32,7 +32,7 @@ Route::post('/login', function (Request $request) {
     $token = bin2hex(random_bytes(32));
 
     // Masa berlaku token
-    $expiresAt = now()->addMinutes(1);
+    $expiresAt = now()->addMinutes(120);
 
     // Simpan hash token dan expired
     $user->forceFill([
