@@ -31,9 +31,13 @@ Route::post('/login', function (Request $request) {
     // Generate token acak
     $token = bin2hex(random_bytes(32));
 
-    // Simpan hash token ke database
+    // Masa berlaku token
+    $expiresAt = now()->addMinutes(1);
+
+    // Simpan hash token dan expired
     $user->forceFill([
         'api_token' => hash('sha256', $token),
+        'expires_at' => $expiresAt,
     ])->save();
 
     return response()->json([
@@ -41,6 +45,8 @@ Route::post('/login', function (Request $request) {
         'message' => 'Login berhasil.',
         'token_type' => 'Bearer',
         'token' => $token,
+        'expires_at' => $expiresAt->toISOString(),
+        'expires_in' => 86400,
         'user' => [
             'id' => $user->id,
             'name' => $user->name,

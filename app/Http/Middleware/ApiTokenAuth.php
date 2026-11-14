@@ -9,18 +9,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ApiTokenAuth
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $token = $request->bearerToken();
 
         if (!$token) {
             return response()->json([
-                'message' => 'Unauthorized'
+                'success' => false,
+                'message' => 'Token tidak ditemukan.',
             ], 401);
         }
 
@@ -30,11 +26,36 @@ class ApiTokenAuth
 
         if (!$user) {
             return response()->json([
-                'message' => 'Token tidak valid'
+                'success' => false,
+                'message' => 'Token tidak valid.',
             ], 401);
         }
 
-        auth()->setUser($user);
+        // Periksa masa berlaku token
+        if (
+            !$user->api_token_expires_at ||
+            now()->greaterThanOrEqualTo($user->api_token_expires_at)
+        ) {
+            $user->forceFill([
+                'api_token' => null,
+                'api_token_expires_at' => null,
+            ])->save();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Sesi berakhir. Silakan login kembali.',
+            ], 401);
+        }
+
+        // Perpanjang masa berlaku setiap ada request valid
+        $expiresAt = now()->addMinutes(1);
+
+        $user->forceFill([
+            'expires_at' => $expiresAt,
+        ])->save();
+
+        // Simpan user agar bisa digunakan controller
+        $request->setUserResolver(fn() => $user);
 
         return $next($request);
     }
