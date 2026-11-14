@@ -33,12 +33,12 @@ class ApiTokenAuth
 
         // Periksa masa berlaku token
         if (
-            !$user->api_token_expires_at ||
-            now()->greaterThanOrEqualTo($user->api_token_expires_at)
+            !$user->expires_at ||
+            now()->greaterThanOrEqualTo($user->expires_at)
         ) {
             $user->forceFill([
                 'api_token' => null,
-                'api_token_expires_at' => null,
+                'expires_at' => null,
             ])->save();
 
             return response()->json([
